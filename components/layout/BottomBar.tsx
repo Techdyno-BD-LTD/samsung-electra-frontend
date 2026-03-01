@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 export default function BottomBar() {
-  const [activeDropdown, setActiveDropdown] = useState(null);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
   const navLinks = [
     { name: "About Us", href: "/about", active: true },

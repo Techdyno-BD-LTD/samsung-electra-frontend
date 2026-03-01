@@ -18,23 +18,30 @@ export default function TopBar() {
 
           {/* Second Part: Discount Banner (Middle Section) */}
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 text-[#001f3f]">
-              <HiOutlineBell className="text-[16px]" />
-              <span className="font-normal">
-                You Will Get <span className="font-bold text-[14px]">50%</span> Discount
-              </span>
-            </div>
-            
-            <Link 
-              href="/offers" 
-              className="flex items-center gap-2 bg-black text-white px-3 py-0.5 rounded-full hover:bg-slate-800 transition-all text-[11px]"
-            >
-              <span>Shop now</span>
-              <div className="bg-[#1e90ff] rounded-full px-1 flex items-center justify-center">
-                <HiOutlineArrowLongRight className="text-white text-[10px]" />
-              </div>
-            </Link>
-          </div>
+  {/* THE VIEWPORT: This "clips" the text when it moves up/down */}
+  <div className="h-6 overflow-hidden"> 
+    
+    {/* THE CARRIER: This is what actually animates */}
+    <div className="flex items-center gap-1.5 text-[#001f3f] animate-roll-text">
+      <HiOutlineBell className="text-[16px] flex-shrink-0" />
+      <span className="whitespace-nowrap font-normal">
+        You Will Get <span className="font-bold text-[14px]">50%</span> Discount
+      </span>
+    </div>
+    
+  </div>
+  
+  {/* STATIC BUTTON: Stays in place regardless of the text animation */}
+  <Link 
+    href="/offers" 
+    className="flex items-center gap-2 bg-black text-white px-3 py-0.5 rounded-full hover:bg-slate-800 transition-all text-[11px]"
+  >
+    <span>Shop now</span>
+    <div className="bg-[#1e90ff] rounded-full px-1 flex items-center justify-center">
+      <HiOutlineArrowLongRight className="text-white text-[10px]" />
+    </div>
+  </Link>
+</div>
 
           {/* Third Part: Navigation Links */}
           <div className="flex items-center gap-6">
