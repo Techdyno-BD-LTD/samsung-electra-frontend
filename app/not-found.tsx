@@ -1,46 +1,34 @@
 "use client";
 
-import { useEffect } from "react";
-import { FaExclamationTriangle } from "react-icons/fa";
+import { FaSearch } from "react-icons/fa";
 
-export default function Error({
-  error,
-  reset,
-}: {
-  error: Error;
-  reset: () => void;
-}) {
-  useEffect(() => {
-    console.error(error);
-  }, [error]);
-
+export default function NotFound() {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-blue-50 via-blue-100 to-blue-200 p-6">
       <div className="w-full max-w-md rounded-2xl bg-white/70 backdrop-blur-md shadow-2xl border border-blue-200 p-8 text-center">
         
-        {/* Icon */}
+        {/* 404 Icon */}
         <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-blue-100">
-          <FaExclamationTriangle className="text-3xl text-blue-600" />
+          <FaSearch className="text-3xl text-blue-600" />
         </div>
 
         {/* Heading */}
         <h2 className="text-2xl font-semibold text-blue-900">
-          Something went wrong
+          Page Not Found
         </h2>
 
         {/* Description */}
         <p className="mt-3 text-sm text-blue-700/80">
-          This view failed to load properly. It might be a temporary issue.
-          Let&apos;s try again.
+          The page you&apos;re looking for doesn&apos;t exist or has been moved.
         </p>
 
         {/* Buttons */}
         <div className="mt-6 flex justify-center gap-3">
           <button 
-            onClick={() => reset()}
+            onClick={() => window.history.back()}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
           >
-            Retry
+            Go Back
           </button>
           <button 
             onClick={() => (window.location.href = "/")}

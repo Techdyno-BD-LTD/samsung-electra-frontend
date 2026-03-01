@@ -1,3 +1,7 @@
+# Samsung Electra Frontend
+
+A frontend application built with Next.js and Tailwind CSS, backed by a Laravel backend.
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
