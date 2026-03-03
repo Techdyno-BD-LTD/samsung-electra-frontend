@@ -4,6 +4,14 @@
 
 :root {
   color-scheme: light;
+  --sale-badge: 0 84% 55%;
+  --sale-badge-foreground: 0 0% 100%;
+  --emi-badge: 217 91% 50%;
+  --emi-badge-foreground: 0 0% 100%;
+  --price: 217 91% 50%;
+  --price-old: 220 10% 46%;
+  --discount: 0 84% 55%;
+  --save: 0 84% 55%;
 }
 
 body {
@@ -13,14 +21,12 @@ body {
 
 .mainwidth {
   width: 95%;
-  /* max-width: 1600px; optional but recommended */
   margin-left: auto;
   margin-right: auto;
 }
 
 .mainwidthmore {
   width: 90%;
-  /* max-width: 1600px; optional but recommended */
   margin-left: auto;
   margin-right: auto;
 }
