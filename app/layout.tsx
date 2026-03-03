@@ -3,6 +3,7 @@ import { Open_Sans } from "next/font/google";
 import "../styles/globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import { getRouteMetadata } from "@/lib/metadata";
 
 const openSans = Open_Sans({
@@ -28,6 +29,7 @@ export default function RootLayout({
           {children}
         </main>
         <Footer />
+        <MobileBottomNav />
       </body>
     </html>
   );

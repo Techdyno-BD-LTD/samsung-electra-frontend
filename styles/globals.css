@@ -18,6 +18,13 @@ body {
   margin-right: auto;
 }
 
+.mainwidthmore {
+  width: 90%;
+  /* max-width: 1600px; optional but recommended */
+  margin-left: auto;
+  margin-right: auto;
+}
+
 @keyframes roll-text {
   0% {
     transform: translateY(100%);
