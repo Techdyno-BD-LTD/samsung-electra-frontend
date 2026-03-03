@@ -113,7 +113,7 @@ export default function MobileNavbar() {
               <Image
                 src="/images/electralogo.webp"
                 alt="SAMSUNG electra"
-                width={200}
+                width={150}
                 height={50}
               />
             </Link>
@@ -127,13 +127,13 @@ export default function MobileNavbar() {
 
           {/* Contact Information */}
           <div className="p-2 text-center  border-slate-200">
-            <p className="text-sm text-gray-600">Need Online Help? Call Us <span className="font-bold text-[#0054A6]">01713353431</span></p>
+            <p className="text-[12px] text-gray-600">Need Online Help? Call Us <span className="font-bold text-[#0054A6]">01713353431</span></p>
             <p className="text-xs text-gray-500">Sat-Thu (09:00AM - 6:00 PM)</p>
           </div>
 
           {/* Login Section */}
-          <div className="p-2  flex items-center justify-center ">
-            <div className="bg-white shadow-md gap-2 px-2 py-2 flex items-center rounded-md">
+          <div className="px-2  flex items-center justify-center ">
+            <div className="bg-white shadow-md mb-1 gap-2 px-2 py-2 flex items-center rounded-md">
               <p className="text-[10px] text-gray-700">Log In To Unlock A Personalized Experience And Special Savings.</p>
               <button className="flex-shrink-0 bg-[#0081FF] text-white text-[13px] py-0.5 px-4 rounded-md hover:bg-blue-700 transition-colors">Login</button>
             </div>
@@ -141,7 +141,7 @@ export default function MobileNavbar() {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-around p-2 border-b border-slate-200">
+          <div className="flex justify-around p-2  border-slate-200">
             <button className="flex items-center gap-2 p-1 px-2  text-xs text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition">
               <Image src="/images/location.png" alt="Store Location" width={16} height={16} />
               <span>Store Location</span>
@@ -157,15 +157,15 @@ export default function MobileNavbar() {
           </div>
 
           {/* Navigation Menu */}
-          <div className="flex-1 overflow-y-auto">
-            <div className="bg-gray-50">
+          <div className="flex-1 px-3 mt-1   overflow-y-auto">
+            <div className="">
               {navItems.map((item) => (
-                <div key={item.title} className="border-b border-gray-200">
+                <div key={item.title} className="border-b bg-[#f4f4f4] mb-3  border-gray-200">
                   {item.hasDropdown ? (
                     <div>
                       <button
                         onClick={() => toggleSection(item.title)}
-                        className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-100 transition"
+                        className="w-full  flex items-center justify-between px-2 py-1 text-left hover:bg-gray-100 transition"
                       >
                         <span className="text-sm font-medium text-gray-700">{item.title}</span>
                         <span className="text-gray-400">
@@ -191,7 +191,7 @@ export default function MobileNavbar() {
                     <Link
                       href={item.href || '#'}
                       onClick={() => setIsOpen(false)}
-                      className="block p-4 text-sm font-medium text-gray-700 hover:bg-gray-100 transition"
+                      className="block px-2 py-1 text-sm font-medium text-gray-700 hover:bg-gray-100 transition"
                     >
                       {item.title}
                     </Link>
@@ -202,17 +202,17 @@ export default function MobileNavbar() {
           </div>
 
           {/* Account Section */}
-          <div className="border-t border-slate-200 p-4">
-            <div className="flex flex-col space-y-2">
-              <Link href="/my-account" onClick={() => setIsOpen(false)} className="flex items-center gap-3 p-3 text-sm text-gray-700 hover:bg-gray-50 rounded">
-                <Image src="/images/loginavatar.png" alt="My Account" width={16} height={16} />
+          <div className="border-t border-slate-200 p-1">
+            <div className="flex flex-col px-2 space-y-2">
+              <Link href="/my-account" onClick={() => setIsOpen(false)} className="flex bg-[#f4f4f4] px-1 items-center gap-3 p-1 text-sm text-gray-700 hover:bg-gray-50 rounded">
+                <Image src="/images/loginavatarblack.png" alt="My Account" width={16} height={16} />
                 <span>My Account</span>
               </Link>
-              <Link href="/wishlist" onClick={() => setIsOpen(false)} className="flex items-center gap-3 p-3 text-sm text-gray-700 hover:bg-gray-50 rounded">
+              <Link href="/wishlist" onClick={() => setIsOpen(false)} className="flex bg-[#f4f4f4] items-center px-1 gap-3 p-1 text-sm text-gray-700 hover:bg-gray-50 rounded">
                 <Image src="/images/heart.png" alt="Wishlist" width={16} height={16} />
                 <span>Wishlist</span>
               </Link>
-              <Link href="/compare" onClick={() => setIsOpen(false)} className="flex items-center gap-3 p-3 text-sm text-gray-700 hover:bg-gray-50 rounded">
+              <Link href="/compare" onClick={() => setIsOpen(false)} className="flex bg-[#f4f4f4] items-center px-1 gap-3 py-1 text-sm text-gray-700 hover:bg-gray-50 rounded">
                 <Image src="/images/compare.png" alt="Product Compare" width={16} height={16} />
                 <span>Product Compare</span>
               </Link>
@@ -221,19 +221,33 @@ export default function MobileNavbar() {
 
           {/* Social Media and Chat Section */}
           <div className="border-t border-slate-200 p-4">
-            <h3 className="text-sm font-semibold text-gray-800 mb-4">Connect With Us</h3>
+            
             <div className="flex items-center justify-between">
               {/* Social Media Icons - Left Side */}
-              <div className="flex space-x-4">
-                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:text-blue-900"><FaFacebook size={24} /></a>
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-pink-600 hover:text-pink-800"><FaInstagram size={24} /></a>
-                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="text-red-600 hover:text-red-800"><FaYoutube size={24} /></a>
-                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:text-blue-900"><FaLinkedin size={24} /></a>
-                <a href="https://whatsapp.com" target="_blank" rel="noopener noreferrer" className="text-green-500 hover:text-green-700"><FaWhatsapp size={24} /></a>
-              </div>
+              <div className="flex flex-col ">
+                <h3 className="text-sm font-semibold text-gray-800 mb-4">Connect With Us</h3>
+                <div className="flex space-x-4">
+ <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-[#0054A6] hover:opacity-80">
+    <FaFacebook size={24} />
+  </a>
+  <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-[#0054A6] hover:opacity-80">
+    <FaInstagram size={24} />
+  </a>
+  <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="text-[#0054A6] hover:opacity-80">
+    <FaYoutube size={24} />
+  </a>
+  <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-[#0054A6] hover:opacity-80">
+    <FaLinkedin size={24} />
+  </a>
+  <a href="https://whatsapp.com" target="_blank" rel="noopener noreferrer" className="text-[#0054A6] hover:opacity-80">
+    <FaWhatsapp size={24} />
+  </a>
+                </div>
+ 
+</div>
               
               {/* Chat Icons - Right Side */}
-              <div className="flex space-x-3">
+              <div className="flex flex-col items-center space-y-3">
                 <a href="https://whatsapp.com" target="_blank" rel="noopener noreferrer" className="text-green-500 hover:text-green-700"><FaWhatsapp size={32} /></a>
                 <a href="https://messenger.com" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700"><FaFacebookMessenger size={32} /></a>
               </div>
