@@ -99,7 +99,7 @@ const ProductCard = ({
       </p>
 
       {/* Type and Rating Section (Stars are now close to the type) */}
-      <div className="flex items-center justify-between px-4 pb-3">
+      <div className="flex items-center justify-between px-4 pb-2">
         <div className="flex items-center gap-2">
           <span className="text-xs text-gray-500 font-medium">{type}</span>
           <div className="flex items-center gap-1">
@@ -115,44 +115,61 @@ const ProductCard = ({
       </div>
 
       {/* Title */}
-      <h3 className="px-4 pb-3 text-sm font-medium leading-relaxed  line-clamp-2 min-h-[40px]">
+      <h3 className="px-4 pb-1 text-sm font-medium leading-relaxed  line-clamp-2 min-h-[40px]">
         {title}
       </h3>
 
       {/* EMI Info */}
-      <div className="flex items-center gap-1 px-4 pb-3">
-        <span className="text-xs text-muted-foreground">💳 {emiPrice} |</span>
-        <button className="text-xs font-semibold text-blue-600 hover:underline">
-          EMI Details
-        </button>
-      </div>
+     <div className="flex items-center gap-1 px-4 pb-1">
+  <span className="flex items-center gap-1 text-xs text-muted-foreground">
+    {/* Icon Image Tag */}
+    <Image 
+      src="/images/EMI.png" // Tomar icon er file path ekhane hobe
+      alt="EMI Icon"
+      width={14}  // Size tulo-namulok bhabe choto rakha hoyeche text er sathe milate
+      height={14}
+      className="object-contain"
+    />
+    {emiPrice} |
+  </span>
+  <button className="text-xs font-semibold text-blue-600 hover:underline">
+    EMI Details
+  </button>
+</div>
 
       {/* Pricing */}
       <div className="flex items-center gap-2 px-4 pb-2 flex-wrap">
-        <span className="text-2xl font-bold text-blue-600">{price}</span>
-        <span className="text-sm text-muted-foreground line-through">
+        <span className="text-[17px] font-bold text-[#0081FF]">{price}</span>
+        <span className="text-[13px] text-[#909090] line-through">
           {originalPrice}
         </span>
         <span className="text-xs font-semibold text-red-600">
           {discountPercent}
         </span>
-      </div>
-
-      {/* Savings Badge */}
-      {saveAmount && (
-        <div className="px-4 pb-3">
-          <span className="inline-block rounded-full bg-red-600 px-3 py-1 text-[10px] font-bold text-white uppercase">
-            Save {saveAmount}
+        {saveAmount && (
+        <div className="">
+          <span className="inline-block rounded-tl-2xl rounded-br-2xl bg-red-600 px-3 py-1 text-[10px] font-medium text-white uppercase">
+         {saveAmount}
           </span>
         </div>
       )}
+      </div>
+
+      {/* Savings Badge */}
+      {/* {saveAmount && (
+        <div className="px-4 pb-3">
+          <span className="inline-block rounded-full bg-red-600 px-3 py-1 text-[10px] font-bold text-white uppercase">
+         {saveAmount}
+          </span>
+        </div>
+      )} */}
 
       {/* Tags */}
       <div className="flex flex-wrap gap-2 px-4 pb-4">
         {tags.map((tag) => (
           <span
             key={tag}
-            className="rounded-full bg-blue-50 px-3 py-1 text-[10px] font-semibold text-blue-700"
+            className="rounded-full bg-[#E7EEF6] px-3 py-1 text-[10px] font-semibold text-[#0054A6]"
           >
             {tag}
           </span>
@@ -162,7 +179,7 @@ const ProductCard = ({
       {/* Add to Cart - Slide up effect */}
       <div className="overflow-hidden max-h-0 transition-all duration-300 ease-in-out group-hover:max-h-[60px]">
         <div className="px-4 pb-4">
-          <button className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700">
+          <button className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#E7EEF6] py-2.5 text-sm font-semibold text-blue-500 transition-colors hover:bg-blue-200">
             <FaShoppingCart className="h-4 w-4" />
             Add to cart
           </button>
