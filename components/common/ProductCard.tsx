@@ -1,4 +1,5 @@
-import { FaHeart, FaBalanceScale, FaShoppingCart, FaStar, FaShieldAlt } from "react-icons/fa";
+import { FaHeart, FaBalanceScale, FaShoppingCart, FaStar } from "react-icons/fa";
+import Image from "next/image";
 
 interface ProductCardProps {
   brand?: string;
@@ -21,141 +22,147 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({
-  brand = "Whirlpool",
-  title = "Haier Front Loading Washing Machine - HW90-BP14959S8 | 9KG",
-  image = "https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?w=300&h=250&fit=crop",
-  rating = 3.0,
-  ratingCount = "(3.0)",
-  type = "Front Loading",
-  weight = "85KG",
-  color = "White",
-  price = "৳ 1,50,000",
-  originalPrice = "৳ 1,80,000",
-  discountPercent = "-10% Off",
-  saveAmount = "Save : ৳30,00%",
-  emiPrice = "EMI From 14330 Tk/month",
-  emiMonths = 36,
-  isSale = true,
-  hasWarranty = true,
-  tags = ["Cash On Delivery", "0% EMI", "Free Delivery"],
+  brand = "",
+  title = "",
+  image = "",
+  rating = 0,
+  ratingCount = "",
+  type = "",
+  weight = "",
+  color = "",
+  price = "",
+  originalPrice = "",
+  discountPercent = "",
+  saveAmount = "",
+  emiPrice = "",
+  isSale = false,
+  tags = [],
 }: ProductCardProps) => {
+  
+  // Refined Star Renderer: Smaller (h-3) and Orange (orange-400)
   const renderStars = (count: number) => {
-    return Array.from({ length: 5 }, (_, i) => (
-        <FaStar
-          key={i}
-          className={`h-4 w-4 ${
-            i < Math.floor(count)
-              ? "fill-accent text-accent"
-              : "fill-muted text-muted"
-          }`}
-        />
-    ));
+    return (
+      <div className="flex items-center gap-0.5">
+        {Array.from({ length: 5 }, (_, i) => (
+          <FaStar
+            key={i}
+            className={`h-3 w-3 ${
+              i < Math.floor(count)
+                ? "fill-orange-400 text-orange-400"
+                : "fill-gray-200 text-gray-200"
+            }`}
+          />
+        ))}
+      </div>
+    );
   };
 
   return (
-    <div className="group relative w-full max-w-[340px] rounded-lg border border-border bg-card shadow-sm transition-shadow duration-300 hover:shadow-xl overflow-hidden">
+    <div className="group relative w-full max-w-[355px] sm:max-w-full rounded-t-2xl border border-border bg-card shadow-sm transition-shadow duration-300 hover:shadow-lg overflow-hidden">
+      {/* Sale Badge */}
       {isSale && (
-        <span className="absolute top-3 left-3 z-10 rounded-md bg-sale px-3 py-1 text-xs font-semibold text-sale-foreground">
+        <span className="absolute top-0 left-0 z-10 rounded-br-2xl bg-red-600 px-4 py-1.5 text-xs font-semibold text-white">
           Sale
         </span>
       )}
 
-      <div className="absolute top-3 right-3 z-10 flex flex-col gap-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-        <button className="flex h-9 w-9 items-center justify-center rounded-full bg-card shadow-md border border-border transition-colors hover:bg-secondary">
-          <FaHeart className="h-4 w-4 text-muted-foreground" />
+      {/* Hover Action Buttons */}
+      <div className="absolute top-3 right-3 z-10 flex flex-row gap-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+        <button className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md border border-border transition-colors hover:bg-gray-100">
+          <FaHeart className="h-4 w-4 text-gray-600" />
         </button>
-        <button className="flex h-9 w-9 items-center justify-center rounded-full bg-card shadow-md border border-border transition-colors hover:bg-secondary">
-          <FaBalanceScale className="h-4 w-4 text-muted-foreground" />
+        <button className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md border border-border transition-colors hover:bg-gray-100">
+          <FaBalanceScale className="h-4 w-4 text-gray-600" />
         </button>
       </div>
 
-      <div className="flex justify-center pt-4 pb-1">
-        <span className="text-sm font-bold tracking-wide text-primary">
+      {/* Brand Header */}
+      <div className="flex justify-center pt-6 pb-2">
+        <span className="text-lg font-bold tracking-wide text-foreground uppercase">
           {brand}
         </span>
       </div>
 
-      <div className="relative mx-auto flex items-center justify-center px-6 py-2">
-        {emiMonths && (
-          <div className="absolute top-0 right-6 z-10 flex h-10 w-10 flex-col items-center justify-center rounded-full bg-emi text-emi-foreground shadow-md">
-            <span className="text-xs font-bold leading-none">{emiMonths}</span>
-            <span className="text-[9px] leading-none">EMI</span>
-          </div>
-        )}
-        <img
+      {/* Product Image */}
+      <div className="relative mx-auto flex items-center justify-center px-6 py-4">
+        <Image
           src={image}
           alt={title}
-          className="h-[180px] w-auto object-contain"
+          width={300}
+          height={180}
+          className="h-[140px] w-auto object-contain"
         />
       </div>
 
-      {hasWarranty && (
-        <div className="flex items-center gap-1.5 px-4 pb-1">
-          <FaShieldAlt className="h-5 w-5 text-primary fill-primary/10" />
-          <span className="rounded bg-accent/20 px-1.5 py-0.5 text-[10px] font-bold uppercase text-accent">
-            Official
-          </span>
-        </div>
-      )}
-
-      <p className="text-center text-xs text-muted-foreground pb-1">
+      <p className="text-center text-[10px] uppercase tracking-wider text-muted-foreground pb-3">
         Quick Look
       </p>
 
-      <div className="flex items-center justify-between px-4 pb-2">
-        <span className="text-xs text-muted-foreground">{type}</span>
-        <div className="flex items-center gap-0.5">
-          {renderStars(rating)}
-          <span className="ml-1 text-xs text-accent">{ratingCount}</span>
+      {/* Type and Rating Section (Stars are now close to the type) */}
+      <div className="flex items-center justify-between px-4 pb-3">
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-gray-500 font-medium">{type}</span>
+          <div className="flex items-center gap-1">
+            {renderStars(rating)}
+            <span className="text-[10px] text-[#0054A6] font-medium">
+              {ratingCount}
+            </span>
+          </div>
         </div>
-        <span className="text-xs font-medium text-primary">
+        <span className="text-xs font-semibold text-blue-600">
           {weight} | {color}
         </span>
       </div>
 
-      <h3 className="px-4 pb-2 text-sm font-semibold leading-tight text-card-foreground line-clamp-2">
+      {/* Title */}
+      <h3 className="px-4 pb-3 text-sm font-medium leading-relaxed  line-clamp-2 min-h-[40px]">
         {title}
       </h3>
 
-      <div className="flex items-center gap-2 px-4 pb-2">
-        <span className="text-xs text-muted-foreground">💳 {emiPrice}|</span>
-        <button className="text-xs font-semibold text-primary hover:underline">
+      {/* EMI Info */}
+      <div className="flex items-center gap-1 px-4 pb-3">
+        <span className="text-xs text-muted-foreground">💳 {emiPrice} |</span>
+        <button className="text-xs font-semibold text-blue-600 hover:underline">
           EMI Details
         </button>
       </div>
 
-      <div className="flex items-center gap-2 px-4 pb-1 flex-wrap">
-        <span className="text-xl font-bold text-price">{price}</span>
-        <span className="text-sm text-price-old line-through">
+      {/* Pricing */}
+      <div className="flex items-center gap-2 px-4 pb-2 flex-wrap">
+        <span className="text-2xl font-bold text-blue-600">{price}</span>
+        <span className="text-sm text-muted-foreground line-through">
           {originalPrice}
         </span>
-        <span className="text-xs font-semibold text-discount">
+        <span className="text-xs font-semibold text-red-600">
           {discountPercent}
         </span>
       </div>
 
+      {/* Savings Badge */}
       {saveAmount && (
         <div className="px-4 pb-3">
-          <span className="inline-block rounded-full bg-save/10 px-3 py-0.5 text-xs font-semibold text-save">
-            {saveAmount}
+          <span className="inline-block rounded-full bg-red-600 px-3 py-1 text-[10px] font-bold text-white uppercase">
+            Save {saveAmount}
           </span>
         </div>
       )}
 
-      <div className="flex flex-wrap gap-2 px-4 pb-3">
+      {/* Tags */}
+      <div className="flex flex-wrap gap-2 px-4 pb-4">
         {tags.map((tag) => (
           <span
             key={tag}
-            className="rounded-full border border-border px-3 py-1 text-[11px] font-medium text-muted-foreground"
+            className="rounded-full bg-blue-50 px-3 py-1 text-[10px] font-semibold text-blue-700"
           >
             {tag}
           </span>
         ))}
       </div>
 
-      <div className="overflow-hidden max-h-0 transition-all duration-300 ease-in-out group-hover:max-h-20">
-        <div className="px-4 pb-4 animate-slide-up">
-          <button className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90">
+      {/* Add to Cart - Slide up effect */}
+      <div className="overflow-hidden max-h-0 transition-all duration-300 ease-in-out group-hover:max-h-[60px]">
+        <div className="px-4 pb-4">
+          <button className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700">
             <FaShoppingCart className="h-4 w-4" />
             Add to cart
           </button>

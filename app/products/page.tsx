@@ -1,34 +1,6 @@
 import ProductCard from "@/components/common/ProductCard";
 import { getRouteMetadata } from "@/lib/metadata";
-
-const catalog = [
-  {
-    id: 11,
-    name: "Volt Suitcase",
-    description: "Self-charging carry-on with modular battery bricks and proximity alerts.",
-    price: "$429",
-    badge: "Ships in 48h",
-  },
-  {
-    id: 12,
-    name: "Pulse Strap",
-    description: "Adaptive haptics for smart home gestures and notification triage.",
-    price: "$269",
-  },
-  {
-    id: 13,
-    name: "Lumen Desk",
-    description: "Height-adjustable desk with embedded MagSafe charging layer.",
-    price: "$1199",
-  },
-  {
-    id: 14,
-    name: "Flux Monitor",
-    description: "Ultra-thin QD-OLED with ambient bias lighting synced to on-screen color.",
-    price: "$1499",
-    badge: "Limited",
-  },
-];
+import products from "@/database/products.json";
 
 export const metadata = getRouteMetadata("products");
 
@@ -43,9 +15,28 @@ export default function ProductsPage() {
           frictionless returns, upgrades, and subscriptions.
         </p>
       </header>
-      <div className="grid gap-6 md:grid-cols-2">
-        {catalog.map((product) => (
-          <ProductCard key={product.id} product={product} />
+      <div className="grid gap-6 md:grid-cols-2 items-start">
+        {products.map((product) => (
+          <ProductCard
+            key={product.id}
+            brand={product.brand}
+            title={product.title}
+            image={product.image}
+            rating={product.rating}
+            ratingCount={product.ratingCount}
+            type={product.type}
+            weight={product.weight}
+            color={product.color}
+            price={product.price}
+            originalPrice={product.originalPrice}
+            discountPercent={product.discountPercent}
+            saveAmount={product.saveAmount}
+            emiPrice={product.emiPrice}
+            emiMonths={product.emiMonths}
+            isSale={product.isSale}
+            hasWarranty={product.hasWarranty}
+            tags={product.tags}
+          />
         ))}
       </div>
     </div>
