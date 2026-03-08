@@ -2,6 +2,7 @@
   {
     "id": 1,
     "brand": "Whirlpool",
+    "brandLogo": "/images/whirpool.png",
     "title": "Haier Front Loading Washing Machine - HW90-BP1495958 | 9KG",
     "image": "https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?w=300&h=250&fit=crop",
     "rating": 3.0,
@@ -14,14 +15,17 @@
     "discountPercent": "-10% Off",
     "saveAmount": "Save : ৳30,00",
     "emiPrice": "EMI From 14330 Tk/month",
+    "emiPercent": "32%",
     "emiMonths": 36,
     "isSale": true,
     "hasWarranty": true,
+    "warrantyBadgeImage": "/images/warrantybadge.png",
     "tags": ["Cash On Delivery", "0% EMI", "Free Delivery"]
   },
   {
     "id": 2,
     "brand": "Samsung",
+    "brandLogo": "/images/samsung.png",
     "title": "Samsung Galaxy Front Load Washing Machine - WW90M644OPX | 9KG",
     "image": "https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?w=300&h=250&fit=crop",
     "rating": 4.5,
@@ -34,14 +38,17 @@
     "discountPercent": "-12% Off",
     "saveAmount": "Save : ৳25,00",
     "emiPrice": "EMI From 15850 Tk/month",
+    "emiPercent": "28%",
     "emiMonths": 36,
     "isSale": true,
     "hasWarranty": true,
+    "warrantyBadgeImage": "/images/warrantybadge.png",
     "tags": ["Cash On Delivery", "0% EMI", "Free Delivery"]
   },
   {
     "id": 3,
     "brand": "LG",
+    "brandLogo": "/images/phillips.png",
     "title": "LG Front Load Washing Machine - FHM1065ZDL | 10KG",
     "image": "https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?w=300&h=250&fit=crop",
     "rating": 4.0,
@@ -54,14 +61,17 @@
     "discountPercent": "-13% Off",
     "saveAmount": "Save : ৳25,00",
     "emiPrice": "EMI From 14500 Tk/month",
+    "emiPercent": "25%",
     "emiMonths": 36,
     "isSale": true,
     "hasWarranty": true,
+    "warrantyBadgeImage": "/images/warrantybadge.png",
     "tags": ["Cash On Delivery", "0% EMI", "Free Delivery"]
   },
   {
     "id": 4,
     "brand": "Electrolux",
+    "brandLogo": "/images/electra.png",
     "title": "Electrolux Front Load Washing Machine - EWF9023ADWA | 9KG",
     "image": "https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?w=300&h=250&fit=crop",
     "rating": 3.5,
@@ -74,14 +84,17 @@
     "discountPercent": "-14% Off",
     "saveAmount": "Save : ৳27,00%",
     "emiPrice": "EMI From 14050 Tk/month",
+    "emiPercent": "",
     "emiMonths": 36,
     "isSale": false,
     "hasWarranty": true,
+    "warrantyBadgeImage": "/images/warrantybadge.png",
     "tags": ["Cash On Delivery", "0% EMI", "Free Delivery"]
   },
   {
     "id": 5,
     "brand": "IFB",
+    "brandLogo": "/images/whirpool.png",
     "title": "IFB Front Load Washing Machine - ELITE AQUA SXP | 8KG",
     "image": "https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?w=300&h=250&fit=crop",
     "rating": 4.2,
@@ -94,9 +107,11 @@
     "discountPercent": "-15% Off",
     "saveAmount": "Save : ৳25,00",
     "emiPrice": "EMI From 12650 Tk/month",
+    "emiPercent": "20%",
     "emiMonths": 36,
     "isSale": false,
     "hasWarranty": true,
+    "warrantyBadgeImage": "/images/warrantybadge.png",
     "tags": ["Cash On Delivery", "0% EMI", "Free Delivery"]
   }
 ]

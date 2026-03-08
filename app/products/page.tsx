@@ -17,26 +17,7 @@ export default function ProductsPage() {
       </header>
       <div className="grid gap-6 md:grid-cols-2 items-start">
         {products.map((product) => (
-          <ProductCard
-            key={product.id}
-            brand={product.brand}
-            title={product.title}
-            image={product.image}
-            rating={product.rating}
-            ratingCount={product.ratingCount}
-            type={product.type}
-            weight={product.weight}
-            color={product.color}
-            price={product.price}
-            originalPrice={product.originalPrice}
-            discountPercent={product.discountPercent}
-            saveAmount={product.saveAmount}
-            emiPrice={product.emiPrice}
-            emiMonths={product.emiMonths}
-            isSale={product.isSale}
-            hasWarranty={product.hasWarranty}
-            tags={product.tags}
-          />
+          <ProductCard key={product.id} {...product} />
         ))}
       </div>
     </div>

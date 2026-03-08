@@ -3,6 +3,7 @@ import Image from "next/image";
 
 interface ProductCardProps {
   brand?: string;
+  brandLogo?: string;
   title?: string;
   image?: string;
   rating?: number;
@@ -15,14 +16,17 @@ interface ProductCardProps {
   discountPercent?: string;
   saveAmount?: string;
   emiPrice?: string;
+  emiPercent?: string;
   emiMonths?: number;
   isSale?: boolean;
   hasWarranty?: boolean;
+  warrantyBadgeImage?: string;
   tags?: string[];
 }
 
 const ProductCard = ({
   brand = "",
+  brandLogo = "",
   title = "",
   image = "",
   rating = 0,
@@ -35,7 +39,10 @@ const ProductCard = ({
   discountPercent = "",
   saveAmount = "",
   emiPrice = "",
+  emiPercent = "",
   isSale = false,
+  hasWarranty = false,
+  warrantyBadgeImage = "",
   tags = [],
 }: ProductCardProps) => {
   
@@ -59,6 +66,16 @@ const ProductCard = ({
 
   return (
     <div className="group relative w-full max-w-[355px] sm:max-w-full rounded-t-2xl border border-border bg-card shadow-sm transition-shadow duration-300 hover:shadow-lg overflow-hidden">
+      {/* EMI Badge */}
+      {emiPercent && (
+        <div
+          className="absolute top-7 right-4 z-20 flex h-[64px] w-[64px] items-center justify-center bg-[#0081FF] p-2 text-center text-[14px] font-semibold leading-tight text-white"
+          style={{ clipPath: "polygon(50% 0%, 61% 18%, 80% 8%, 82% 28%, 100% 38%, 84% 50%, 100% 62%, 82% 72%, 80% 92%, 61% 82%, 50% 100%, 39% 82%, 20% 92%, 18% 72%, 0% 62%, 16% 50%, 0% 38%, 18% 28%, 20% 8%, 39% 18%)" }}
+        >
+          {emiPercent} EMI
+        </div>
+      )}
+
       {/* Sale Badge */}
       {isSale && (
         <span className="absolute top-0 left-0 z-10 rounded-br-2xl bg-red-600 px-4 py-1.5 text-xs font-semibold text-white">
@@ -67,7 +84,11 @@ const ProductCard = ({
       )}
 
       {/* Hover Action Buttons */}
-      <div className="absolute top-3 right-3 z-10 flex flex-row gap-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+      <div
+        className={`absolute right-3 z-10 flex flex-row gap-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100 ${
+          emiPercent ? "top-20" : "top-3"
+        }`}
+      >
         <button className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md border border-border transition-colors hover:bg-gray-100">
           <FaHeart className="h-4 w-4 text-gray-600" />
         </button>
@@ -78,13 +99,23 @@ const ProductCard = ({
 
       {/* Brand Header */}
       <div className="flex justify-center pt-6 pb-2">
-        <span className="text-lg font-bold tracking-wide text-foreground uppercase">
-          {brand}
-        </span>
+        {brandLogo ? (
+          <Image
+            src={brandLogo}
+            alt={brand || "Brand logo"}
+            width={140}
+            height={36}
+            className="h-9 w-auto object-contain"
+          />
+        ) : (
+          <span className="text-lg font-bold tracking-wide text-foreground uppercase">
+            {brand}
+          </span>
+        )}
       </div>
 
       {/* Product Image */}
-      <div className="relative mx-auto flex items-center justify-center px-6 py-4">
+      <div className="relative mx-auto flex items-center justify-center px-3 py-2">
         <Image
           src={image}
           alt={title}
@@ -92,6 +123,18 @@ const ProductCard = ({
           height={180}
           className="h-[140px] w-auto object-contain"
         />
+
+        {hasWarranty && (
+          <div className="absolute -bottom-6 left-5">
+            <Image
+              src={warrantyBadgeImage}
+              alt="Warranty badge"
+              width={64}
+              height={64}
+              className="h-20 w-20 object-contain"
+            />
+          </div>
+        )}
       </div>
 
       <p className="text-center text-[10px] uppercase tracking-wider text-muted-foreground pb-3">
