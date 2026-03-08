@@ -25,7 +25,7 @@ export default function RootLayout({
         className={`${openSans.variable} font-sans antialiased`}
       >
         <Navbar />
-        <main className="min-h-screen px-8 pb-16 pt-28 sm:px-12 lg:px-16">
+        <main className="min-h-screen px-2 pb-16 pt-28 sm:px-12 lg:px-16">
           {children}
         </main>
         <Footer />
