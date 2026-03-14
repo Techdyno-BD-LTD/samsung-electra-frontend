@@ -1,0 +1,71 @@
+{
+  "promoBarText": "Enjoy an instant 15% discount up to BDT 1,500 on all Visa, Mastercard, EBL DCL & UnionPay online payments",
+  "autoplayMs": 5000,
+  "categories": [
+    {
+      "id": 1,
+      "name": "Tv & Audio (Mc)",
+      "count": 12,
+      "icon": "tv"
+    },
+    {
+      "id": 2,
+      "name": "Refrigerator",
+      "count": 28,
+      "icon": "refrigerator"
+    },
+    {
+      "id": 3,
+      "name": "Freezer",
+      "count": 12,
+      "icon": "freezer"
+    },
+    {
+      "id": 4,
+      "name": "Air Conditional",
+      "count": 6,
+      "icon": "ac"
+    },
+    {
+      "id": 5,
+      "name": "Microwave",
+      "count": 24,
+      "icon": "microwave"
+    },
+    {
+      "id": 6,
+      "name": "Washing Machine",
+      "count": 8,
+      "icon": "washing"
+    },
+    {
+      "id": 7,
+      "name": "Home & Kitchen",
+      "count": 28,
+      "icon": "home"
+    }
+  ],
+  "slides": [
+    {
+      "id": 1,
+      "title": "Microwave Oven",
+      "subtitle": "Fast, Flavorful, Futuristic Cooking.",
+      "imageUrl": "/images/slider01.png",
+      "ctaLabel": "Explore Microwaves",
+      "ctaHref": "/products",
+      "countdownTarget": "2027-01-15T23:59:59Z",
+      "showTimer": true
+    },
+    {
+      "id": 2,
+      "title": "Smart Cooling Series",
+      "subtitle": "Freshness that adapts to your routine.",
+      "imageUrl": "/images/slider02.png",
+      "ctaLabel": "Shop Refrigerators",
+      "ctaHref": "/products",
+      "countdownTarget": "2027-02-01T23:59:59Z",
+      "showTimer": true
+    }
+    
+  ]
+}

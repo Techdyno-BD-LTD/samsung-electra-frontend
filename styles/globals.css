@@ -43,3 +43,30 @@ body {
 .animate-roll-text {
   animation: roll-text 2s linear infinite;
 }
+
+@keyframes hero-marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.hero-marquee-window {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.hero-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: hero-marquee 16s linear infinite;
+}
+
+.hero-marquee-item {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding-right: 3rem;
+}

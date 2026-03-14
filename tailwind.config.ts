@@ -35,15 +35,21 @@ const config: Config = {
           "87%": { transform: "translateY(-100%)", opacity: "0" },
           "100%": { transform: "translateY(-100%)", opacity: "0" },
         },
-        // Product card animation
         "slide-up": {
           from: { opacity: "0", transform: "translateY(10px)" },
           to: { opacity: "1", transform: "translateY(0)" },
+        },
+        // New Marquee Keyframes
+        marquee: {
+          "0%": { transform: "translateX(100%)" },
+          "100%": { transform: "translateX(-100%)" },
         },
       },
       animation: {
         "roll-text": "roll-text 7s cubic-bezier(0.4, 0, 0.2, 1) infinite",
         "slide-up": "slide-up 0.25s ease-out",
+        // New Marquee Animation (25s is a good readable speed)
+        marquee: "marquee 25s linear infinite",
       },
     },
   },
