@@ -2,7 +2,8 @@ import { getRouteMetadata } from "@/lib/metadata";
 
 import HeroSection from "@/components/home/HeroSection";
 import ServiceHighlights from "@/components/home/ServiceHighlights";
-
+import ShopByCategory from "@/components/home/ShopByCategory";
+import PopularProducts from "@/components/home/PopularProducts";
 export const metadata = getRouteMetadata("home");
 
 export default function Home() {
@@ -12,6 +13,12 @@ export default function Home() {
         <HeroSection/>
         <div className="mt-5">
           <ServiceHighlights />
+        </div>
+        <div className="mt-14">
+          <ShopByCategory />
+        </div>
+        <div className="mt-14">
+          <PopularProducts/>
         </div>
         
       </section>

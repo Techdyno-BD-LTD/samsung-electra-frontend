@@ -22,6 +22,7 @@ interface ProductCardProps {
   hasWarranty?: boolean;
   warrantyBadgeImage?: string;
   tags?: string[];
+  statusBadge?: string;
 }
 
 const ProductCard = ({
@@ -44,7 +45,22 @@ const ProductCard = ({
   hasWarranty = false,
   warrantyBadgeImage = "",
   tags = [],
+  statusBadge = "",
 }: ProductCardProps) => {
+  const badgeLabel = statusBadge.trim() || (isSale ? "Sale" : "");
+  const normalizedBadgeLabel = badgeLabel.toLowerCase();
+  const badgeClassName =
+    normalizedBadgeLabel === "sale"
+      ? "bg-red-600"
+      : normalizedBadgeLabel === "new"
+      ? "bg-emerald-600"
+      : normalizedBadgeLabel === "hot"
+      ? "bg-orange-500"
+      : normalizedBadgeLabel === "sold out"
+      ? "bg-slate-600"
+      : normalizedBadgeLabel === "special"
+      ? "bg-blue-600"
+      : "bg-red-600";
   
   // Refined Star Renderer: Smaller (h-3) and Orange (orange-400)
   const renderStars = (count: number) => {
@@ -76,10 +92,10 @@ const ProductCard = ({
         </div>
       )}
 
-      {/* Sale Badge */}
-      {isSale && (
-        <span className="absolute top-0 left-0 z-10 rounded-br-2xl bg-red-600 px-2 py-1 text-[10px] font-semibold text-white sm:px-4 sm:py-1.5 sm:text-xs">
-          Sale
+      {/* Primary Product Badge (Sale/New/Hot/Sold Out/Special) */}
+      {badgeLabel && (
+        <span className={`absolute top-0 left-0 z-10 rounded-br-2xl px-2 py-1 text-[10px] font-semibold text-white sm:px-4 sm:py-1.5 sm:text-xs ${badgeClassName}`}>
+          {badgeLabel}
         </span>
       )}
 
@@ -232,9 +248,9 @@ const ProductCard = ({
         </button>
       </div>
 
-      {/* Add to Cart - Slide up effect */}
-      <div className="hidden overflow-hidden max-h-0 transition-all duration-300 ease-in-out group-hover:max-h-[60px] sm:block">
-        <div className="px-4 pb-4">
+      {/* Add to Cart: fixed reserved height keeps carousel arrows from shifting */}
+      <div className="hidden h-[60px] sm:block">
+        <div className="px-4 pb-4 pt-1">
           <button className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#E7EEF6] py-2.5 text-sm font-semibold text-blue-500 transition-colors hover:bg-blue-200">
             <FaShoppingCart className="h-4 w-4" />
             Add to cart
