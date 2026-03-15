@@ -85,7 +85,7 @@ const ProductCard = ({
       {/* EMI Badge */}
       {emiPercent && (
         <div
-          className="absolute top-2 right-2 z-20 flex h-10 w-10 items-center justify-center bg-[#0081FF] p-1 text-center text-[9px] font-semibold leading-tight text-white sm:top-7 sm:right-4 sm:h-[64px] sm:w-[64px] sm:p-2 sm:text-[14px]"
+          className="absolute top-8 right-2 z-20 flex h-10 w-10 items-center justify-center bg-[#0081FF] p-1 text-center text-[9px] font-semibold leading-tight text-white sm:top-14 sm:right-4 sm:h-[64px] sm:w-[64px] sm:p-2 sm:text-[14px]"
           style={{ clipPath: "polygon(50% 0%, 61% 18%, 80% 8%, 82% 28%, 100% 38%, 84% 50%, 100% 62%, 82% 72%, 80% 92%, 61% 82%, 50% 100%, 39% 82%, 20% 92%, 18% 72%, 0% 62%, 16% 50%, 0% 38%, 18% 28%, 20% 8%, 39% 18%)" }}
         >
           {emiPercent} EMI
@@ -101,9 +101,7 @@ const ProductCard = ({
 
       {/* Hover Action Buttons */}
       <div
-        className={`absolute right-3 z-10 hidden flex-row gap-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100 sm:flex ${
-          emiPercent ? "top-16 sm:top-20" : "top-3"
-        }`}
+        className="absolute right-3 top-3 z-10 hidden flex-row gap-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100 sm:flex"
       >
         <button className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md border border-border transition-colors hover:bg-gray-100">
           <FaHeart className="h-4 w-4 text-gray-600" />
@@ -178,7 +176,7 @@ const ProductCard = ({
       </div>
 
       {/* Title */}
-      <h3 className="line-clamp-2 min-h-[36px] px-2 pb-1 text-[11px] font-semibold leading-4 sm:min-h-[40px] sm:px-4 sm:text-sm sm:font-medium sm:leading-relaxed">
+      <h3 className="line-clamp-2 min-h-[36px] px-2 pb-1 text-[12px] font-semibold leading-4 sm:min-h-[40px] sm:px-4 sm:text-[16px] sm:font-medium sm:leading-relaxed">
         {title}
       </h3>
 
@@ -243,13 +241,13 @@ const ProductCard = ({
 
       {/* Mobile CTA */}
       <div className="px-2 pb-3 sm:hidden">
-        <button className="flex w-full items-center justify-center rounded-full bg-[#0054A6] py-2 text-[11px] font-semibold text-white transition-colors hover:bg-[#004487]">
+        <button className="flex w-6/12 mx-auto items-center justify-center rounded-full bg-[#0054A6] py-1.5 text-[11px] font-semibold text-white transition-colors hover:bg-[#004487]">
           Buy Now
         </button>
       </div>
 
-      {/* Add to Cart: fixed reserved height keeps carousel arrows from shifting */}
-      <div className="hidden h-[60px] sm:block">
+      {/* Add to Cart - show only on hover */}
+      <div className="hidden overflow-hidden max-h-0 transition-all duration-300 ease-in-out group-hover:max-h-[60px] sm:block">
         <div className="px-4 pb-4 pt-1">
           <button className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#E7EEF6] py-2.5 text-sm font-semibold text-blue-500 transition-colors hover:bg-blue-200">
             <FaShoppingCart className="h-4 w-4" />

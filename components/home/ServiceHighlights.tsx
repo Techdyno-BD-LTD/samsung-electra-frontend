@@ -42,13 +42,13 @@ const serviceItems: ServiceItem[] = [
 export default function ServiceHighlights() {
   return (
     <section className="rounded-xl  ">
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-3 grid-cols-2 xl:grid-cols-4">
         {serviceItems.map((item) => (
           <article
             key={item.id}
-            className="flex items-center justify-center gap-4 rounded-lg bg-[#E7EEF6] px-5 py-4"
+            className="flex items-center justify-center gap-4 rounded-lg bg-[#E7EEF6] lg:px-5 lg:py-4 py-2 px-2"
           >
-            <div className="relative h-14 w-14 shrink-0">
+            <div className="relative w-6 h-6 lg:h-14 lg:w-14 shrink-0">
               <Image
                 src={item.iconSrc}
                 alt={item.iconAlt}
@@ -59,8 +59,8 @@ export default function ServiceHighlights() {
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold leading-tight text-[#0f58ad]">{item.title}</h3>
-              <p className="mt-1 text-sm font-base text-[#2f74bf]">{item.subtitle}</p>
+              <h3 className="lg:text-lg text-[12px] font-semibold leading-tight text-[#0f58ad]">{item.title}</h3>
+              <p className="mt-1 lg:text-sm text-[9px] font-base text-[#2f74bf]">{item.subtitle}</p>
             </div>
           </article>
         ))}

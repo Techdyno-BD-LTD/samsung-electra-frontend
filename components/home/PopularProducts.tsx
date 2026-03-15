@@ -81,9 +81,9 @@ export default function PopularProducts() {
           onClick={() => scrollByOneCard(-1)}
           disabled={!canScrollLeft}
           aria-label="Show previous product"
-          className="absolute left-0 top-1/2 z-10 inline-flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white text-[#1D3C61] shadow-md transition hover:border-[#2F73BD] hover:text-[#2F73BD] disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300"
+          className="absolute left-2 top-[220px] z-10 inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-[#1D3C61] shadow-md transition hover:border-[#2F73BD] hover:text-[#2F73BD] disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300 sm:left-0 sm:h-11 sm:w-11 sm:-translate-x-1/2 sm:top-[235px] lg:top-[250px]"
         >
-          <FaChevronLeft className="h-4 w-4" />
+          <FaChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
         </button>
 
         <button
@@ -91,9 +91,9 @@ export default function PopularProducts() {
           onClick={() => scrollByOneCard(1)}
           disabled={!canScrollRight}
           aria-label="Show next product"
-          className="absolute right-0 top-1/2 z-10 inline-flex h-11 w-11 translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white text-[#1D3C61] shadow-md transition hover:border-[#2F73BD] hover:text-[#2F73BD] disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300"
+          className="absolute right-2 top-[220px] z-10 inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-[#1D3C61] shadow-md transition hover:border-[#2F73BD] hover:text-[#2F73BD] disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300 sm:right-0 sm:h-11 sm:w-11 sm:translate-x-1/2 sm:top-[235px] lg:top-[250px]"
         >
-          <FaChevronRight className="h-4 w-4" />
+          <FaChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
         </button>
 
         <div
@@ -104,7 +104,7 @@ export default function PopularProducts() {
             <div
               key={product.id}
               data-popular-card
-              className="min-w-[84%] snap-start sm:min-w-[48%] lg:min-w-[31.5%] xl:min-w-[24%] 2xl:min-w-[19%]"
+              className="min-w-[48%] snap-start sm:min-w-[48%] lg:min-w-[31.5%] xl:min-w-[24%] 2xl:min-w-[19%]"
             >
               <ProductCard
                 {...product}

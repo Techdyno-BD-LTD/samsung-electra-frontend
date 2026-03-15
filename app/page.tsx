@@ -14,10 +14,10 @@ export default function Home() {
         <div className="mt-5">
           <ServiceHighlights />
         </div>
-        <div className="mt-14">
+        <div className="lg:mt-14 mt-5">
           <ShopByCategory />
         </div>
-        <div className="mt-14">
+        <div className="lg:mt-14 mt-5">
           <PopularProducts/>
         </div>
         
