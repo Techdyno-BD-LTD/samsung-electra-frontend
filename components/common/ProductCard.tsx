@@ -23,6 +23,7 @@ interface ProductCardProps {
   warrantyBadgeImage?: string;
   tags?: string[];
   statusBadge?: string;
+  isBestSeller?: boolean;
 }
 
 const ProductCard = ({
@@ -46,6 +47,7 @@ const ProductCard = ({
   warrantyBadgeImage = "",
   tags = [],
   statusBadge = "",
+  isBestSeller = false,
 }: ProductCardProps) => {
   const badgeLabel = statusBadge.trim() || (isSale ? "Sale" : "");
   const normalizedBadgeLabel = badgeLabel.toLowerCase();
@@ -79,6 +81,125 @@ const ProductCard = ({
       </div>
     );
   };
+
+  if (isBestSeller) {
+    return (
+      <article className="group relative w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md">
+        {isSale && (
+          <span className="absolute left-0 top-0 z-10 rounded-br-2xl bg-[#2B7FE8] px-4 py-1 text-xs font-medium text-white">
+            Sale
+          </span>
+        )}
+
+        <div className="absolute right-3 top-3 z-10 hidden items-center gap-2 group-hover:flex">
+          <button
+            type="button"
+            aria-label="Add to wishlist"
+            className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600"
+          >
+            <FaHeart className="h-3 w-3" />
+          </button>
+          <button
+            type="button"
+            aria-label="Compare product"
+            className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600"
+          >
+            <FaBalanceScale className="h-3 w-3" />
+          </button>
+        </div>
+
+        <div className="px-4 pb-3 pt-8">
+          <div className="mb-3 flex justify-center">
+            {brandLogo ? (
+              <Image
+                src={brandLogo}
+                alt={brand || "Brand logo"}
+                width={120}
+                height={28}
+                className="h-4 w-auto object-contain"
+              />
+            ) : (
+              <span className="text-xs font-bold uppercase tracking-wide text-slate-700">{brand}</span>
+            )}
+          </div>
+
+          <div className="relative mb-3 flex h-[125px] items-center justify-center">
+            <Image
+              src={image}
+              alt={title}
+              width={220}
+              height={150}
+              className="h-[100px] w-auto object-contain"
+            />
+          </div>
+
+          <p className="mb-2 text-center text-[10px] text-slate-400">Quick Look</p>
+
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 text-[11px] text-slate-500">
+              <span>{type}</span>
+              <div className="flex items-center gap-0.5">
+                {Array.from({ length: 5 }, (_, index) => (
+                  <FaStar
+                    key={index}
+                    className={
+                      index < Math.floor(rating)
+                        ? "h-3 w-3 fill-orange-400 text-orange-400"
+                        : "h-3 w-3 fill-slate-200 text-slate-200"
+                    }
+                  />
+                ))}
+                <span className="ml-1 text-[10px] font-medium text-[#0054A6]">{ratingCount}</span>
+              </div>
+            </div>
+            <span className="text-[11px] font-semibold text-[#0054A6]">
+              {weight} | {color}
+            </span>
+          </div>
+
+          <h3 className="mb-2 line-clamp-2 min-h-[44px] text-[15px] font-medium leading-5 text-slate-900">
+            {title}
+          </h3>
+
+          <div className="mb-3 flex items-end gap-2">
+            <span className="text-[17px] font-bold text-[#0AB15A]">{price}</span>
+            <span className="text-[12px] text-slate-400 line-through">{originalPrice}</span>
+          </div>
+
+          <div className="mb-1 h-1.5 w-full rounded-full bg-slate-200">
+            <div className="h-1.5 w-[25.6%] rounded-full bg-[#2B7FE8]" />
+          </div>
+
+          <div className="mb-2 flex items-center justify-between text-[11px]">
+            <span className="text-slate-500">Sold : 25 / 36</span>
+            <span className="font-semibold text-[#0AB15A]">25.60%</span>
+          </div>
+        </div>
+
+        <div className="px-3 pb-3 pt-1 sm:hidden">
+          <button
+            type="button"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-[#E7EEF6] py-2 text-sm font-semibold text-[#0B5DB7]"
+          >
+            <FaShoppingCart className="h-3 w-3" />
+            Buy Now
+          </button>
+        </div>
+
+        <div className="hidden max-h-0 overflow-hidden border-t border-slate-200 bg-slate-100 px-3 transition-all duration-300 group-hover:max-h-20 sm:block">
+          <div className="py-2">
+            <button
+              type="button"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-[#E7EEF6] py-2 text-sm font-semibold text-[#0B5DB7] transition hover:bg-[#d7e4f5]"
+            >
+              <FaShoppingCart className="h-3 w-3" />
+              Buy Now
+            </button>
+          </div>
+        </div>
+      </article>
+    );
+  }
 
   return (
     <div className="group relative w-full max-w-full overflow-hidden rounded-t-2xl border border-border bg-card shadow-sm transition-shadow duration-300 hover:shadow-lg">
