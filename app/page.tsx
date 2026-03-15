@@ -4,6 +4,7 @@ import HeroSection from "@/components/home/HeroSection";
 import ServiceHighlights from "@/components/home/ServiceHighlights";
 import ShopByCategory from "@/components/home/ShopByCategory";
 import PopularProducts from "@/components/home/PopularProducts";
+import StoreBanner from "@/components/home/StoreBanner";
 export const metadata = getRouteMetadata("home");
 
 export default function Home() {
@@ -20,7 +21,9 @@ export default function Home() {
         <div className="lg:mt-14 mt-5">
           <PopularProducts/>
         </div>
-        
+        <div className="lg:mt-14 mt-5">
+          <StoreBanner />
+        </div>
       </section>
     </div>
   );
