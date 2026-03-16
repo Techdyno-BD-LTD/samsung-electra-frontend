@@ -178,7 +178,7 @@ export default function BestSellingProducts() {
             <div
               key={product.id}
               data-bestseller-card
-              className="min-w-[88%] snap-start sm:min-w-[48%] lg:min-w-[31.5%] xl:min-w-[19.2%]"
+              className="min-w-[48%] snap-start sm:min-w-[48%] lg:min-w-[31.5%] xl:min-w-[24%] 2xl:min-w-[19%]"
             >
               <ProductCard {...product} isBestSeller={Boolean(product.isBestSeller)} />
             </div>

@@ -1,0 +1,354 @@
+{
+  "title": "Bids Of The Deals",
+  "contestLabel": "Win The contest",
+  "allDealsLabel": "All Deals",
+  "allDealsHref": "/products",
+  "deals": [
+    {
+      "id": "hurray-up",
+      "name": "Hurray Up",
+      "isActive": true,
+      "countdown": {
+        "days": "06",
+        "hours": "14",
+        "minutes": "28",
+        "seconds": "38"
+      },
+      "products": [
+        {
+          "id": 1,
+          "brand": "Whirlpool",
+          "brandLogo": "/images/whirpool.png",
+          "title": "Haier Front Loading Washing Machine - HW90-BP1495958 | 9KG",
+          "image": "/images/tv.png",
+          "dealLabel": "Hurray Up",
+          "stockLabel": "Limit stock",
+          "quickDetailsLabel": "Quick Details",
+          "countdown": {
+            "days": "01",
+            "hours": "14",
+            "minutes": "20",
+            "seconds": "04"
+          },
+          "bids": "08",
+          "views": "1,326",
+          "startingFrom": "৳ 56,500",
+          "bidButtonLabel": "Place Bid"
+        },
+        {
+          "id": 2,
+          "brand": "Philips",
+          "brandLogo": "/images/phillips.png",
+          "title": "Philips Smart Cooling AC Unit - 1.5 Ton | Inverter",
+          "image": "/images/acold.png",
+          "dealLabel": "Hurray Up",
+          "stockLabel": "Limit stock",
+          "quickDetailsLabel": "Quick Details",
+          "countdown": {
+            "days": "01",
+            "hours": "14",
+            "minutes": "20",
+            "seconds": "04"
+          },
+          "bids": "08",
+          "views": "1,326",
+          "startingFrom": "৳ 56,500",
+          "bidButtonLabel": "Place Bid"
+        },
+        {
+          "id": 3,
+          "brand": "Samsung",
+          "brandLogo": "/images/samsung.png",
+          "title": "Samsung Energy Saver Freezer - 260L | Digital Inverter",
+          "image": "/images/deepfridge.png",
+          "dealLabel": "Hurray Up",
+          "stockLabel": "Limit stock",
+          "quickDetailsLabel": "Quick Details",
+          "countdown": {
+            "days": "01",
+            "hours": "14",
+            "minutes": "20",
+            "seconds": "04"
+          },
+          "bids": "08",
+          "views": "1,326",
+          "startingFrom": "৳ 56,500",
+          "bidButtonLabel": "Place Bid"
+        },
+        {
+          "id": 4,
+          "brand": "Electra",
+          "brandLogo": "/images/electra.png",
+          "title": "Electra Ceiling Cassette AC - 2 Ton | Turbo Cooling",
+          "image": "/images/centralac.png",
+          "dealLabel": "Hurray Up",
+          "stockLabel": "Limit stock",
+          "quickDetailsLabel": "Quick Details",
+          "countdown": {
+            "days": "01",
+            "hours": "14",
+            "minutes": "20",
+            "seconds": "04"
+          },
+          "bids": "08",
+          "views": "1,326",
+          "startingFrom": "৳ 56,500",
+          "bidButtonLabel": "Place Bid"
+        },
+        {
+          "id": 5,
+          "brand": "Whirlpool",
+          "brandLogo": "/images/whirpool.png",
+          "title": "Whirlpool Kitchen Blender Set - 3 Jar | Heavy Duty",
+          "image": "/images/blender.png",
+          "dealLabel": "Hurray Up",
+          "stockLabel": "Limit stock",
+          "quickDetailsLabel": "Quick Details",
+          "countdown": {
+            "days": "01",
+            "hours": "14",
+            "minutes": "20",
+            "seconds": "04"
+          },
+          "bids": "08",
+          "views": "1,326",
+          "startingFrom": "৳ 56,500",
+          "bidButtonLabel": "Place Bid"
+        },
+        {
+          "id": 6,
+          "brand": "LG",
+          "brandLogo": "/images/phillips.png",
+          "title": "LG Dual Inverter Split AC - 1.5 Ton | Fast Cooling",
+          "image": "/images/ac-1.png",
+          "dealLabel": "Hurray Up",
+          "stockLabel": "Limit stock",
+          "quickDetailsLabel": "Quick Details",
+          "countdown": {
+            "days": "01",
+            "hours": "14",
+            "minutes": "20",
+            "seconds": "04"
+          },
+          "bids": "08",
+          "views": "1,326",
+          "startingFrom": "৳ 56,500",
+          "bidButtonLabel": "Place Bid"
+        },
+        {
+          "id": 7,
+          "brand": "Midea",
+          "brandLogo": "/images/electra.png",
+          "title": "Midea Smart Refrigerator - 375L | No Frost",
+          "image": "/images/ac-3.png",
+          "dealLabel": "Hurray Up",
+          "stockLabel": "Limit stock",
+          "quickDetailsLabel": "Quick Details",
+          "countdown": {
+            "days": "01",
+            "hours": "14",
+            "minutes": "20",
+            "seconds": "04"
+          },
+          "bids": "08",
+          "views": "1,326",
+          "startingFrom": "৳ 56,500",
+          "bidButtonLabel": "Place Bid"
+        },
+        {
+          "id": 8,
+          "brand": "Haier",
+          "brandLogo": "/images/whirpool.png",
+          "title": "Haier Front Loading Washing Machine - 9KG | Steam Wash",
+          "image": "/images/ac-2.png",
+          "dealLabel": "Hurray Up",
+          "stockLabel": "Limit stock",
+          "quickDetailsLabel": "Quick Details",
+          "countdown": {
+            "days": "01",
+            "hours": "14",
+            "minutes": "20",
+            "seconds": "04"
+          },
+          "bids": "08",
+          "views": "1,326",
+          "startingFrom": "৳ 56,500",
+          "bidButtonLabel": "Place Bid"
+        }
+      ]
+    },
+    {
+      "id": "mega-saver",
+      "name": "Mega Saver",
+      "isActive": false,
+      "countdown": {
+        "days": "04",
+        "hours": "08",
+        "minutes": "12",
+        "seconds": "26"
+      },
+      "products": [
+        {
+          "id": 1,
+          "brand": "Samsung",
+          "brandLogo": "/images/samsung.png",
+          "title": "Samsung Smart TV - 55 inch | Crystal UHD",
+          "image": "/images/ac-1.png",
+          "dealLabel": "Mega Saver",
+          "stockLabel": "Limit stock",
+          "quickDetailsLabel": "Quick Details",
+          "countdown": {
+            "days": "00",
+            "hours": "22",
+            "minutes": "10",
+            "seconds": "44"
+          },
+          "bids": "05",
+          "views": "980",
+          "startingFrom": "৳ 78,000",
+          "bidButtonLabel": "Place Bid"
+        },
+        {
+          "id": 2,
+          "brand": "Electra",
+          "brandLogo": "/images/electra.png",
+          "title": "Electra Inverter AC - 1 Ton | Eco Mode",
+          "image": "/images/ac-4.png",
+          "dealLabel": "Mega Saver",
+          "stockLabel": "Limit stock",
+          "quickDetailsLabel": "Quick Details",
+          "countdown": {
+            "days": "00",
+            "hours": "22",
+            "minutes": "10",
+            "seconds": "44"
+          },
+          "bids": "05",
+          "views": "980",
+          "startingFrom": "৳ 78,000",
+          "bidButtonLabel": "Place Bid"
+        },
+        {
+          "id": 3,
+          "brand": "Whirlpool",
+          "brandLogo": "/images/whirpool.png",
+          "title": "Whirlpool Microwave Oven - 30L | Grill",
+          "image": "/images/ac-5.png",
+          "dealLabel": "Mega Saver",
+          "stockLabel": "Limit stock",
+          "quickDetailsLabel": "Quick Details",
+          "countdown": {
+            "days": "00",
+            "hours": "22",
+            "minutes": "10",
+            "seconds": "44"
+          },
+          "bids": "05",
+          "views": "980",
+          "startingFrom": "৳ 78,000",
+          "bidButtonLabel": "Place Bid"
+        },
+        {
+          "id": 4,
+          "brand": "Philips",
+          "brandLogo": "/images/phillips.png",
+          "title": "Philips Home Audio Soundbar - 400W",
+          "image": "/images/ac-2.png",
+          "dealLabel": "Mega Saver",
+          "stockLabel": "Limit stock",
+          "quickDetailsLabel": "Quick Details",
+          "countdown": {
+            "days": "00",
+            "hours": "22",
+            "minutes": "10",
+            "seconds": "44"
+          },
+          "bids": "05",
+          "views": "980",
+          "startingFrom": "৳ 78,000",
+          "bidButtonLabel": "Place Bid"
+        },
+        {
+          "id": 5,
+          "brand": "LG",
+          "brandLogo": "/images/phillips.png",
+          "title": "LG Top Load Washing Machine - 8KG | Smart Motion",
+          "image": "/images/ac-1.png",
+          "dealLabel": "Mega Saver",
+          "stockLabel": "Limit stock",
+          "quickDetailsLabel": "Quick Details",
+          "countdown": {
+            "days": "00",
+            "hours": "22",
+            "minutes": "10",
+            "seconds": "44"
+          },
+          "bids": "05",
+          "views": "980",
+          "startingFrom": "৳ 78,000",
+          "bidButtonLabel": "Place Bid"
+        },
+        {
+          "id": 6,
+          "brand": "Haier",
+          "brandLogo": "/images/whirpool.png",
+          "title": "Haier Frost Free Refrigerator - 321L",
+          "image": "/images/ac-3.png",
+          "dealLabel": "Mega Saver",
+          "stockLabel": "Limit stock",
+          "quickDetailsLabel": "Quick Details",
+          "countdown": {
+            "days": "00",
+            "hours": "22",
+            "minutes": "10",
+            "seconds": "44"
+          },
+          "bids": "05",
+          "views": "980",
+          "startingFrom": "৳ 78,000",
+          "bidButtonLabel": "Place Bid"
+        },
+        {
+          "id": 7,
+          "brand": "Panasonic",
+          "brandLogo": "/images/electra.png",
+          "title": "Panasonic Convection Microwave - 25L",
+          "image": "/images/ac-4.png",
+          "dealLabel": "Mega Saver",
+          "stockLabel": "Limit stock",
+          "quickDetailsLabel": "Quick Details",
+          "countdown": {
+            "days": "00",
+            "hours": "22",
+            "minutes": "10",
+            "seconds": "44"
+          },
+          "bids": "05",
+          "views": "980",
+          "startingFrom": "৳ 78,000",
+          "bidButtonLabel": "Place Bid"
+        },
+        {
+          "id": 8,
+          "brand": "Midea",
+          "brandLogo": "/images/samsung.png",
+          "title": "Midea Air Cooler Pro - 1.5 Ton | Inverter",
+          "image": "/images/ac-5.png",
+          "dealLabel": "Mega Saver",
+          "stockLabel": "Limit stock",
+          "quickDetailsLabel": "Quick Details",
+          "countdown": {
+            "days": "00",
+            "hours": "22",
+            "minutes": "10",
+            "seconds": "44"
+          },
+          "bids": "05",
+          "views": "980",
+          "startingFrom": "৳ 78,000",
+          "bidButtonLabel": "Place Bid"
+        }
+      ]
+    }
+  ]
+}

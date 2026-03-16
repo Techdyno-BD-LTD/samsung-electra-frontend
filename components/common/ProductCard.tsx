@@ -1,7 +1,8 @@
-import { FaHeart, FaBalanceScale, FaShoppingCart, FaStar } from "react-icons/fa";
+import { FaHeart, FaBalanceScale, FaShoppingCart, FaStar, FaEye, FaGavel } from "react-icons/fa";
 import Image from "next/image";
 
 interface ProductCardProps {
+  cardVariant?: "default" | "flashDeal";
   brand?: string;
   brandLogo?: string;
   title?: string;
@@ -24,9 +25,21 @@ interface ProductCardProps {
   tags?: string[];
   statusBadge?: string;
   isBestSeller?: boolean;
+  dealLabel?: string;
+  stockLabel?: string;
+  quickDetailsLabel?: string;
+  dealDays?: string;
+  dealHours?: string;
+  dealMinutes?: string;
+  dealSeconds?: string;
+  bidsCount?: string;
+  viewsCount?: string;
+  startingFrom?: string;
+  bidButtonLabel?: string;
 }
 
 const ProductCard = ({
+  cardVariant = "default",
   brand = "",
   brandLogo = "",
   title = "",
@@ -48,6 +61,17 @@ const ProductCard = ({
   tags = [],
   statusBadge = "",
   isBestSeller = false,
+  dealLabel = "Hurray Up",
+  stockLabel = "Limit stock",
+  quickDetailsLabel = "Quick Details",
+  dealDays = "01",
+  dealHours = "14",
+  dealMinutes = "20",
+  dealSeconds = "04",
+  bidsCount = "08",
+  viewsCount = "1,326",
+  startingFrom = "৳ 56,500",
+  bidButtonLabel = "Place Bid",
 }: ProductCardProps) => {
   const badgeLabel = statusBadge.trim() || (isSale ? "Sale" : "");
   const normalizedBadgeLabel = badgeLabel.toLowerCase();
@@ -81,6 +105,97 @@ const ProductCard = ({
       </div>
     );
   };
+
+  if (cardVariant === "flashDeal") {
+    return (
+      <article className="relative w-full overflow-hidden rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+        <span className="absolute left-0 top-0 rounded-br-2xl rounded-tl-2xl bg-[#2B7FE8] px-4 py-1 text-sm font-medium text-white">
+          {dealLabel}
+        </span>
+
+        <span
+          className="absolute right-4 top-10 flex h-14 w-14 items-center justify-center bg-[#2B7FE8] px-1 text-center text-xs font-semibold leading-[1.05] text-white"
+          style={{ clipPath: "polygon(50% 0%, 61% 18%, 80% 8%, 82% 28%, 100% 38%, 84% 50%, 100% 62%, 82% 72%, 80% 92%, 61% 82%, 50% 100%, 39% 82%, 20% 92%, 18% 72%, 0% 62%, 16% 50%, 0% 38%, 18% 28%, 20% 8%, 39% 18%)" }}
+        >
+          {stockLabel}
+        </span>
+
+        <div className="pt-7">
+          <div className="mb-2 flex justify-center">
+            {brandLogo ? (
+              <Image
+                src={brandLogo}
+                alt={brand || "Brand logo"}
+                width={130}
+                height={34}
+                className="h-6 w-auto object-contain"
+              />
+            ) : (
+              <span className="text-sm font-bold uppercase tracking-wide text-slate-800">{brand}</span>
+            )}
+          </div>
+
+          <div className="mb-2 flex h-[180px] items-center justify-center rounded-md ">
+            <Image src={image} alt={title} width={230} height={150} className="h-[180px] w-auto object-contain" />
+          </div>
+
+          <button type="button" className="mx-auto mb-4 block text-xs text-slate-500 underline">
+            {quickDetailsLabel}
+          </button>
+
+          <h3 className="line-clamp-2 min-h-[56px] text-[18px] font-medium leading-7 text-slate-900">
+            {title}
+          </h3>
+
+          <div className=" grid grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] items-end gap-1 text-center text-[#1B57A6]">
+            <div>
+              <div className="rounded-b-xl border-b border-[#2B7FE8]  py-1 text-[25px] font-semibold leading-none">{dealDays}</div>
+              <p className="mt-1 text-xs text-slate-500">Days</p>
+            </div>
+            <span className="pb-5 text-[28px] text-slate-800">:</span>
+            <div>
+              <div className="rounded-b-xl border-b border-[#2B7FE8]  py-1 text-[25px] font-semibold leading-none">{dealHours}</div>
+              <p className="mt-1 text-xs text-slate-500">Hour</p>
+            </div>
+            <span className="pb-5 text-[28px] text-slate-800">:</span>
+            <div>
+              <div className="rounded-b-xl border-b border-[#2B7FE8]  py-1 text-[25px] font-semibold leading-none">{dealMinutes}</div>
+              <p className="mt-1 text-xs text-slate-500">Minute</p>
+            </div>
+            <span className="pb-5 text-[28px] text-slate-800">:</span>
+            <div>
+              <div className="rounded-b-xl border-b border-[#2B7FE8]  py-1 text-[25px] font-semibold leading-none">{dealSeconds}</div>
+              <p className="mt-1 text-xs text-slate-500">Second</p>
+            </div>
+          </div>
+
+          <div className="mt-3 flex items-center justify-between text-[15px]">
+            <p className="flex items-center gap-2 text-[#EF9B2E]">
+              <FaGavel className="h-4 w-4 text-slate-500" />
+              Bids : {bidsCount}
+            </p>
+            <span className="text-slate-300">|</span>
+            <p className="flex items-center gap-2 text-[#FF3D3D]">
+              <FaEye className="h-4 w-4 text-slate-500" />
+              Views : {viewsCount}
+            </p>
+          </div>
+
+          <div className="mt-3 rounded-md bg-[#efefef] px-3 py-2 text-[15px] font-semibold text-slate-900">
+            Starting From : {startingFrom}
+          </div>
+
+          <button
+            type="button"
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-md bg-[#1C5AA6] py-2 text-[18px] font-medium text-white"
+          >
+            <FaGavel className="h-4 w-4 text-[#ffd24d]" />
+            {bidButtonLabel}
+          </button>
+        </div>
+      </article>
+    );
+  }
 
   if (isBestSeller) {
     return (

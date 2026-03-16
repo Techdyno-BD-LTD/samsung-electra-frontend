@@ -6,8 +6,10 @@ import ShopByCategory from "@/components/home/ShopByCategory";
 import PopularProducts from "@/components/home/PopularProducts";
 import CategoryWiseProducts from "@/components/home/CategoryWiseProducts";
 import StoreBanner from "@/components/home/StoreBanner";
+import OurBrands from "@/components/home/OurBrands";
 import BestSellingProducts from "@/components/home/BestSellingProducts";
 import DualPromoBanners from "@/components/home/DualPromoBanners";
+import FlashDeals from "@/components/home/FlashDeals";
 import SingleWideBanner from "@/components/home/SingleWideBanner";
 import Newsletter from "@/components/home/Newsletter";
 import airConditionerProducts from "@/database/airconditionerproducts.json";
@@ -34,10 +36,16 @@ export default function Home() {
           <StoreBanner />
         </div>
         <div className="lg:mt-14 mt-5">
+          <OurBrands />
+        </div>
+        <div className="lg:mt-14 mt-5">
           <BestSellingProducts />
         </div>
         <div className="lg:mt-14 mt-5">
           <DualPromoBanners />
+        </div>
+        <div className="lg:mt-14 mt-5">
+          <FlashDeals />
         </div>
        
         

@@ -1,0 +1,126 @@
+[
+  {
+    "id": 1,
+    "name": "Electra",
+    "tabLogo": "/images/electra.png",
+    "categories": [
+      {
+        "id": 1,
+        "name": "Electra TV",
+        "categoryLogo": "/images/electra.png",
+        "image": "/images/electratv.png"
+      },
+      {
+        "id": 2,
+        "name": "Electra Washing Machine",
+        "categoryLogo": "/images/electra.png",
+        "image": "/images/electrawm.png"
+      },
+      {
+        "id": 3,
+        "name": "Electra Refrigerator",
+        "categoryLogo": "/images/electra.png",
+        "image": "/images/electrafridge.png"
+      },
+      {
+        "id": 4,
+        "name": "Electra Deep Freezer",
+        "categoryLogo": "/images/electra.png",
+        "image": "/images/electradeep.png"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Samsung",
+    "tabLogo": "/images/samsung.png",
+    "categories": [
+      {
+        "id": 1,
+        "name": "Samsung Smart TV",
+        "categoryLogo": "/images/samsung.png",
+        "image": "/images/tv.png"
+      },
+      {
+        "id": 2,
+        "name": "Samsung Washing Machine",
+        "categoryLogo": "/images/samsung.png",
+        "image": "/images/rectangle1.png"
+      },
+      {
+        "id": 3,
+        "name": "Samsung Refrigerator",
+        "categoryLogo": "/images/samsung.png",
+        "image": "/images/rectangle2.png"
+      },
+      {
+        "id": 4,
+        "name": "Samsung AC",
+        "categoryLogo": "/images/samsung.png",
+        "image": "/images/acimage.png"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Whirlpool",
+    "tabLogo": "/images/whirpool.png",
+    "categories": [
+      {
+        "id": 1,
+        "name": "Whirlpool TV",
+        "categoryLogo": "/images/whirpool.png",
+        "image": "/images/tv.png"
+      },
+      {
+        "id": 2,
+        "name": "Whirlpool Washing Machine",
+        "categoryLogo": "/images/whirpool.png",
+        "image": "/images/rectangle1.png"
+      },
+      {
+        "id": 3,
+        "name": "Whirlpool Refrigerator",
+        "categoryLogo": "/images/whirpool.png",
+        "image": "/images/rectangle2.png"
+      },
+      {
+        "id": 4,
+        "name": "Whirlpool Deep Freezer",
+        "categoryLogo": "/images/whirpool.png",
+        "image": "/images/deepfridge.png"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Philips",
+    "tabLogo": "/images/phillips.png",
+    "categories": [
+      {
+        "id": 1,
+        "name": "Philips TV",
+        "categoryLogo": "/images/phillips.png",
+        "image": "/images/tv.png"
+      },
+      {
+        "id": 2,
+        "name": "Philips Washing Machine",
+        "categoryLogo": "/images/phillips.png",
+        "image": "/images/rectangle1.png"
+      },
+      {
+        "id": 3,
+        "name": "Philips Refrigerator",
+        "categoryLogo": "/images/phillips.png",
+        "image": "/images/rectangle2.png"
+      },
+      {
+        "id": 4,
+        "name": "Philips Deep Freezer",
+        "categoryLogo": "/images/phillips.png",
+        "image": "/images/deepfridge.png"
+      }
+    ]
+  }
+]
