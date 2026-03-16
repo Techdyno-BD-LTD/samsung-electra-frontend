@@ -350,5 +350,109 @@
         }
       ]
     }
-  ]
+  ],
+  "specialDeals": {
+    "title": "December Offers",
+    "specialLabel": "★ Special discount",
+    "allDealsLabel": "All Deals",
+    "allDealsHref": "/products",
+    "countdown": {
+      "days": "06",
+      "hours": "14",
+      "minutes": "28",
+      "seconds": "38"
+    },
+    "products": [
+      {
+        "id": 1,
+        "brand": "Philips",
+        "brandLogo": "/images/phillips.png",
+        "title": "Philips Crystal UHD Smart TV - 55 inch | 4K Ultra HD",
+        "image": "/images/tv.png",
+        "dealLabel": "Cashback",
+        "quickDetailsLabel": "Quick Details",
+        "type": "Smart Tv",
+        "countdown": { "days": "01", "hours": "14", "minutes": "20", "seconds": "04" },
+        "price": "৳ 1,50,000",
+        "originalPrice": "৳ 1,80,000",
+        "saveAmount": "Save : ৳30,000",
+        "discountPercent": "-10% Off"
+      },
+      {
+        "id": 2,
+        "brand": "Whirlpool",
+        "brandLogo": "/images/whirpool.png",
+        "title": "Whirlpool Dishwasher - 14 Place Settings | 6 Programs",
+        "image": "/images/blender.png",
+        "dealLabel": "Cashback",
+        "quickDetailsLabel": "Quick Details",
+        "type": "Dishwasher",
+        "countdown": { "days": "01", "hours": "14", "minutes": "20", "seconds": "04" },
+        "price": "৳ 1,50,000",
+        "originalPrice": "৳ 1,80,000",
+        "saveAmount": "Save : ৳30,000",
+        "discountPercent": "-10% Off"
+      },
+      {
+        "id": 3,
+        "brand": "Samsung",
+        "brandLogo": "/images/samsung.png",
+        "title": "Samsung Crystal UHD Smart TV - 65 inch | 4K HDR",
+        "image": "/images/tv.png",
+        "dealLabel": "Cashback",
+        "quickDetailsLabel": "Quick Details",
+        "type": "Smart Tv",
+        "countdown": { "days": "01", "hours": "14", "minutes": "20", "seconds": "04" },
+        "price": "৳ 2,10,000",
+        "originalPrice": "৳ 2,45,000",
+        "saveAmount": "Save : ৳35,000",
+        "discountPercent": "-14% Off"
+      },
+      {
+        "id": 4,
+        "brand": "Electra",
+        "brandLogo": "/images/electra.png",
+        "title": "Electra No-Frost Double Door Refrigerator - 375L",
+        "image": "/images/rectangle2.png",
+        "dealLabel": "Cashback",
+        "quickDetailsLabel": "Quick Details",
+        "type": "Refrigerator",
+        "countdown": { "days": "02", "hours": "08", "minutes": "15", "seconds": "30" },
+        "price": "৳ 85,000",
+        "originalPrice": "৳ 98,000",
+        "saveAmount": "Save : ৳13,000",
+        "discountPercent": "-13% Off"
+      },
+      {
+        "id": 5,
+        "brand": "Philips",
+        "brandLogo": "/images/phillips.png",
+        "title": "Philips Front Load Washing Machine - 9KG | SteamCare",
+        "image": "/images/rectangle1.png",
+        "dealLabel": "Cashback",
+        "quickDetailsLabel": "Quick Details",
+        "type": "Washing Machine",
+        "countdown": { "days": "02", "hours": "08", "minutes": "15", "seconds": "30" },
+        "price": "৳ 95,000",
+        "originalPrice": "৳ 1,10,000",
+        "saveAmount": "Save : ৳15,000",
+        "discountPercent": "-14% Off"
+      },
+      {
+        "id": 6,
+        "brand": "Samsung",
+        "brandLogo": "/images/samsung.png",
+        "title": "Samsung Inverter Split AC - 1.5 Ton | Wind-Free Cooling",
+        "image": "/images/acimage.png",
+        "dealLabel": "Cashback",
+        "quickDetailsLabel": "Quick Details",
+        "type": "Air Conditioner",
+        "countdown": { "days": "03", "hours": "12", "minutes": "45", "seconds": "15" },
+        "price": "৳ 1,20,000",
+        "originalPrice": "৳ 1,40,000",
+        "saveAmount": "Save : ৳20,000",
+        "discountPercent": "-14% Off"
+      }
+    ]
+  }
 }

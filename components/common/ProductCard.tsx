@@ -2,7 +2,7 @@ import { FaHeart, FaBalanceScale, FaShoppingCart, FaStar, FaEye, FaGavel } from 
 import Image from "next/image";
 
 interface ProductCardProps {
-  cardVariant?: "default" | "flashDeal";
+  cardVariant?: "default" | "flashDeal" | "specialDeal";
   brand?: string;
   brandLogo?: string;
   title?: string;
@@ -36,6 +36,7 @@ interface ProductCardProps {
   viewsCount?: string;
   startingFrom?: string;
   bidButtonLabel?: string;
+  dealImageHeight?: string;
 }
 
 const ProductCard = ({
@@ -72,6 +73,7 @@ const ProductCard = ({
   viewsCount = "1,326",
   startingFrom = "৳ 56,500",
   bidButtonLabel = "Place Bid",
+  dealImageHeight = "180px",
 }: ProductCardProps) => {
   const badgeLabel = statusBadge.trim() || (isSale ? "Sale" : "");
   const normalizedBadgeLabel = badgeLabel.toLowerCase();
@@ -107,9 +109,10 @@ const ProductCard = ({
   };
 
   if (cardVariant === "flashDeal") {
+    const dealBadgeBg = dealLabel.toLowerCase() === "cashback" ? "bg-red-600" : "bg-[#2B7FE8]";
     return (
       <article className="relative w-full overflow-hidden rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
-        <span className="absolute left-0 top-0 rounded-br-2xl rounded-tl-2xl bg-[#2B7FE8] px-4 py-1 text-sm font-medium text-white">
+        <span className={`absolute left-0 top-0 rounded-br-2xl rounded-tl-2xl px-4 py-1 text-sm font-medium text-white ${dealBadgeBg}`}>
           {dealLabel}
         </span>
 
@@ -135,8 +138,8 @@ const ProductCard = ({
             )}
           </div>
 
-          <div className="mb-2 flex h-[180px] items-center justify-center rounded-md ">
-            <Image src={image} alt={title} width={230} height={150} className="h-[180px] w-auto object-contain" />
+          <div className="mb-2 flex items-center justify-center rounded-md" style={{ height: dealImageHeight }}>
+            <Image src={image} alt={title} width={230} height={150} style={{ height: dealImageHeight }} className="w-auto object-contain" />
           </div>
 
           <button type="button" className="mx-auto mb-4 block text-xs text-slate-500 underline">
@@ -192,6 +195,85 @@ const ProductCard = ({
             <FaGavel className="h-4 w-4 text-[#ffd24d]" />
             {bidButtonLabel}
           </button>
+        </div>
+      </article>
+    );
+  }
+
+  if (cardVariant === "specialDeal") {
+    const specialBadgeBg = dealLabel.toLowerCase() === "cashback" ? "bg-red-600" : "bg-[#2B7FE8]";
+    return (
+      <article className="group relative w-full overflow-hidden rounded-2xl border border-slate-200 bg-white p-3 shadow-sm transition-shadow duration-300 hover:shadow-lg">
+        <span className={`absolute left-0 top-0 rounded-br-2xl rounded-tl-2xl px-4 py-1 text-sm font-medium text-white ${specialBadgeBg}`}>
+          {dealLabel}
+        </span>
+
+        <div className="absolute right-3 top-3 z-10 flex flex-col gap-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+          <button type="button" className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white shadow-md transition-colors hover:bg-gray-100">
+            <FaHeart className="h-4 w-4 text-gray-600" />
+          </button>
+          <button type="button" className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white shadow-md transition-colors hover:bg-gray-100">
+            <FaBalanceScale className="h-4 w-4 text-gray-600" />
+          </button>
+        </div>
+
+        <div className="pt-7">
+          <div className="mb-3 flex justify-center">
+            {brandLogo ? (
+              <Image src={brandLogo} alt={brand || "Brand logo"} width={130} height={34} className="h-6 w-auto object-contain" />
+            ) : (
+              <span className="text-sm font-bold uppercase tracking-wide text-slate-800">{brand}</span>
+            )}
+          </div>
+
+          <div className="mb-2 flex items-center justify-center rounded-md" style={{ height: dealImageHeight }}>
+            <Image src={image} alt={title} width={380} height={260} style={{ height: dealImageHeight }} className="w-auto object-contain" />
+          </div>
+
+          <button type="button" className="mx-auto mb-3 block text-xs text-slate-500 underline opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+            {quickDetailsLabel}
+          </button>
+
+          {type && <p className="mb-2 text-sm text-slate-500">{type}</p>}
+
+          <div className="grid grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] items-end gap-1 text-center text-[#1B57A6]">
+            <div>
+              <div className="rounded-b-xl border-b border-[#2B7FE8] py-1 text-[25px] font-semibold leading-none">{dealDays}</div>
+              <p className="mt-1 text-xs text-slate-500">Days</p>
+            </div>
+            <span className="pb-5 text-[28px] text-slate-800">:</span>
+            <div>
+              <div className="rounded-b-xl border-b border-[#2B7FE8] py-1 text-[25px] font-semibold leading-none">{dealHours}</div>
+              <p className="mt-1 text-xs text-slate-500">Hour</p>
+            </div>
+            <span className="pb-5 text-[28px] text-slate-800">:</span>
+            <div>
+              <div className="rounded-b-xl border-b border-[#2B7FE8] py-1 text-[25px] font-semibold leading-none">{dealMinutes}</div>
+              <p className="mt-1 text-xs text-slate-500">Minute</p>
+            </div>
+            <span className="pb-5 text-[28px] text-slate-800">:</span>
+            <div>
+              <div className="rounded-b-xl border-b border-[#2B7FE8] py-1 text-[25px] font-semibold leading-none">{dealSeconds}</div>
+              <p className="mt-1 text-xs text-slate-500">Second</p>
+            </div>
+          </div>
+
+          <h3 className="mt-3 line-clamp-2 min-h-[56px] text-[18px] font-medium leading-7 text-slate-900">
+            {title}
+          </h3>
+
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
+            <span className="text-lg font-bold text-slate-900">{price}</span>
+            {originalPrice && <span className="text-slate-400 line-through text-xs">{originalPrice}</span>}
+            {saveAmount && <span className="rounded bg-[#1B57A6] px-2 py-0.5 text-xs text-white">{saveAmount}</span>}
+            {discountPercent && <span className="text-xs text-red-500 font-medium">{discountPercent}</span>}
+          </div>
+
+          <div className="max-h-0 overflow-hidden transition-all duration-300 ease-in-out group-hover:max-h-[60px]">
+            <button type="button" className="mt-3 flex w-full items-center justify-center gap-2 rounded-md bg-[#1C5AA6] py-2.5 text-[18px] font-medium text-white transition-colors hover:bg-[#15458a]">
+              Buy Now
+            </button>
+          </div>
         </div>
       </article>
     );
