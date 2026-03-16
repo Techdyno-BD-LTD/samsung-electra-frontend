@@ -5,7 +5,7 @@
     "brandLogo": "/images/whirpool.png",
     "title": "Haier Front Loading Washing Machine - HW90-BP1495958 | 9KG",
     "image": "https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?w=300&h=250&fit=crop",
-    "rating": 3.0,
+    "rating": 3,
     "ratingCount": "(3.0)",
     "type": "Front Loading",
     "weight": "85KG",
@@ -20,7 +20,13 @@
     "isSale": true,
     "hasWarranty": true,
     "warrantyBadgeImage": "/images/warrantybadge.png",
-    "tags": ["Cash On Delivery", "0% EMI", "Free Delivery"]
+    "tags": [
+      "Cash On Delivery",
+      "0% EMI",
+      "Free Delivery"
+    ],
+    "category": "Washing Machine",
+    "subcategory": "Front Loading"
   },
   {
     "id": 2,
@@ -43,7 +49,13 @@
     "isSale": true,
     "hasWarranty": true,
     "warrantyBadgeImage": "/images/warrantybadge.png",
-    "tags": ["Cash On Delivery", "0% EMI", "Free Delivery"]
+    "tags": [
+      "Cash On Delivery",
+      "0% EMI",
+      "Free Delivery"
+    ],
+    "category": "Washing Machine",
+    "subcategory": "Front Loading"
   },
   {
     "id": 3,
@@ -51,7 +63,7 @@
     "brandLogo": "/images/phillips.png",
     "title": "LG Front Load Washing Machine - FHM1065ZDL | 10KG",
     "image": "https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?w=300&h=250&fit=crop",
-    "rating": 4.0,
+    "rating": 4,
     "ratingCount": "(4.0)",
     "type": "Front Loading",
     "weight": "90KG",
@@ -66,7 +78,13 @@
     "isSale": true,
     "hasWarranty": true,
     "warrantyBadgeImage": "/images/warrantybadge.png",
-    "tags": ["Cash On Delivery", "0% EMI", "Free Delivery"]
+    "tags": [
+      "Cash On Delivery",
+      "0% EMI",
+      "Free Delivery"
+    ],
+    "category": "Washing Machine",
+    "subcategory": "Front Loading"
   },
   {
     "id": 4,
@@ -89,7 +107,13 @@
     "isSale": false,
     "hasWarranty": true,
     "warrantyBadgeImage": "/images/warrantybadge.png",
-    "tags": ["Cash On Delivery", "0% EMI", "Free Delivery"]
+    "tags": [
+      "Cash On Delivery",
+      "0% EMI",
+      "Free Delivery"
+    ],
+    "category": "Washing Machine",
+    "subcategory": "Front Loading"
   },
   {
     "id": 5,
@@ -112,6 +136,12 @@
     "isSale": false,
     "hasWarranty": true,
     "warrantyBadgeImage": "/images/warrantybadge.png",
-    "tags": ["Cash On Delivery", "0% EMI", "Free Delivery"]
+    "tags": [
+      "Cash On Delivery",
+      "0% EMI",
+      "Free Delivery"
+    ],
+    "category": "Washing Machine",
+    "subcategory": "Front Loading"
   }
 ]

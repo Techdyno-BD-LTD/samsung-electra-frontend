@@ -4,8 +4,16 @@ import HeroSection from "@/components/home/HeroSection";
 import ServiceHighlights from "@/components/home/ServiceHighlights";
 import ShopByCategory from "@/components/home/ShopByCategory";
 import PopularProducts from "@/components/home/PopularProducts";
+import CategoryWiseProducts from "@/components/home/CategoryWiseProducts";
 import StoreBanner from "@/components/home/StoreBanner";
 import BestSellingProducts from "@/components/home/BestSellingProducts";
+import DualPromoBanners from "@/components/home/DualPromoBanners";
+import SingleWideBanner from "@/components/home/SingleWideBanner";
+import Newsletter from "@/components/home/Newsletter";
+import airConditionerProducts from "@/database/airconditionerproducts.json";
+import refrigeratorProducts from "@/database/refrigeratorproducts.json";
+import washingMachineProducts from "@/database/washingmachineproducts.json";
+import microwaveProducts from "@/database/microwaveproducts.json";
 export const metadata = getRouteMetadata("home");
 
 export default function Home() {
@@ -22,12 +30,55 @@ export default function Home() {
         <div className="lg:mt-14 mt-5">
           <PopularProducts/>
         </div>
-        <div className="lg:mt-14 mt-5">
+         <div className="lg:mt-14 mt-5">
           <StoreBanner />
         </div>
         <div className="lg:mt-14 mt-5">
           <BestSellingProducts />
         </div>
+        <div className="lg:mt-14 mt-5">
+          <DualPromoBanners />
+        </div>
+       
+        
+        
+        <div className="lg:mt-14 mt-5">
+          <CategoryWiseProducts
+            title="Air Conditioner"
+            products={airConditionerProducts}
+            seeMoreHref="/products"
+          />
+        </div>
+        <div className="lg:mt-14 mt-5">
+          <CategoryWiseProducts
+            title="Refrigerator"
+            products={refrigeratorProducts}
+            seeMoreHref="/products"
+          />
+        </div>
+        <div className="lg:mt-14 mt-5">
+          <CategoryWiseProducts
+            title="Washing Machine"
+            products={washingMachineProducts}
+            seeMoreHref="/products"
+          />
+        </div>
+         <div className="lg:mt-14 mt-5">
+          <SingleWideBanner />
+        </div>
+      
+        <div className="lg:mt-14 mt-5">
+          <CategoryWiseProducts
+            title="Microwave"
+            products={microwaveProducts}
+            seeMoreHref="/products"
+          />
+        </div>
+          <div className="lg:mt-14 mt-5">
+          <Newsletter />
+        </div>
+       
+        
       </section>
     </div>
   );

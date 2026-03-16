@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "name": "Air Conditioner",
+    "slug": "air-conditioner",
+    "subcategories": ["Split AC", "Window AC", "Inverter AC", "Portable AC"]
+  },
+  {
+    "id": 2,
+    "name": "TV and Audio",
+    "slug": "tv-and-audio",
+    "subcategories": ["Smart TV", "LED TV", "Soundbar", "Home Theater", "Bluetooth Speaker"]
+  },
+  {
+    "id": 3,
+    "name": "Refrigerator",
+    "slug": "refrigerator",
+    "subcategories": ["Single Door", "Double Door", "Side by Side", "French Door"]
+  },
+  {
+    "id": 4,
+    "name": "Microwave",
+    "slug": "microwave",
+    "subcategories": ["Solo Microwave", "Grill Microwave", "Convection Microwave"]
+  },
+  {
+    "id": 5,
+    "name": "Washing Machine",
+    "slug": "washing-machine",
+    "subcategories": ["Front Loading", "Top Loading", "Washer Dryer Combo", "Semi Automatic"]
+  },
+  {
+    "id": 6,
+    "name": "Kitchen Appliance",
+    "slug": "kitchen-appliance",
+    "subcategories": ["Induction Cooker", "Rice Cooker", "Blender", "Electric Kettle", "Dishwasher"]
+  }
+]
