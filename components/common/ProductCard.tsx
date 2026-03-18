@@ -152,27 +152,27 @@ const ProductCard = ({
 
           <div className=" grid grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] items-end gap-1 text-center text-[#1B57A6]">
             <div>
-              <div className="rounded-b-xl border-b border-[#2B7FE8]  py-1 text-[25px] font-semibold leading-none">{dealDays}</div>
+              <div className="rounded-b-xl border-b border-[#2B7FE8]  py-1 text-[18px] lg:text-[25px] font-semibold leading-none">{dealDays}</div>
               <p className="mt-1 text-xs text-slate-500">Days</p>
             </div>
-            <span className="pb-5 text-[28px] text-slate-800">:</span>
+            <span className="pb-4 text-[28px] text-slate-800">:</span>
             <div>
-              <div className="rounded-b-xl border-b border-[#2B7FE8]  py-1 text-[25px] font-semibold leading-none">{dealHours}</div>
+              <div className="rounded-b-xl border-b border-[#2B7FE8]  py-1 text-[18px] lg:text-[25px] font-semibold leading-none">{dealHours}</div>
               <p className="mt-1 text-xs text-slate-500">Hour</p>
             </div>
-            <span className="pb-5 text-[28px] text-slate-800">:</span>
+            <span className="pb-4 text-[28px] text-slate-800">:</span>
             <div>
-              <div className="rounded-b-xl border-b border-[#2B7FE8]  py-1 text-[25px] font-semibold leading-none">{dealMinutes}</div>
+              <div className="rounded-b-xl border-b border-[#2B7FE8]  py-1 text-[18px] lg:text-[25px] font-semibold leading-none">{dealMinutes}</div>
               <p className="mt-1 text-xs text-slate-500">Minute</p>
             </div>
-            <span className="pb-5 text-[28px] text-slate-800">:</span>
+            <span className="pb-4 text-[28px] text-slate-800">:</span>
             <div>
-              <div className="rounded-b-xl border-b border-[#2B7FE8]  py-1 text-[25px] font-semibold leading-none">{dealSeconds}</div>
+              <div className="rounded-b-xl border-b border-[#2B7FE8]  py-1 text-[18px] lg:text-[25px] font-semibold leading-none">{dealSeconds}</div>
               <p className="mt-1 text-xs text-slate-500">Second</p>
             </div>
           </div>
 
-          <div className="mt-3 flex items-center justify-between text-[15px]">
+          <div className="mt-3 flex items-center justify-between text-[12px] lg:text-[15px]">
             <p className="flex items-center gap-2 text-[#EF9B2E]">
               <FaGavel className="h-4 w-4 text-slate-500" />
               Bids : {bidsCount}
@@ -184,7 +184,7 @@ const ProductCard = ({
             </p>
           </div>
 
-          <div className="mt-3 rounded-md bg-[#efefef] px-3 py-2 text-[15px] font-semibold text-slate-900">
+          <div className="mt-3 rounded-md bg-[#efefef] px-3 py-2  text-[12px] lg:text-[15px] font-semibold text-slate-900">
             Starting From : {startingFrom}
           </div>
 
