@@ -13,6 +13,7 @@ import FlashDeals from "@/components/home/FlashDeals";
 import SingleWideBanner from "@/components/home/SingleWideBanner";
 import Newsletter from "@/components/home/Newsletter";
 import SpecialDeals from "@/components/home/SpecialDeals";
+import AboutElectraHtmlSection from "@/components/home/AboutElectraHtmlSection";
 import airConditionerProducts from "@/database/airconditionerproducts.json";
 import refrigeratorProducts from "@/database/refrigeratorproducts.json";
 import washingMachineProducts from "@/database/washingmachineproducts.json";
@@ -88,6 +89,9 @@ export default function Home() {
         </div>
         <div className="lg:mt-14 mt-5">
           <SpecialDeals />
+        </div>
+        <div className="lg:mt-14 mt-5">
+          <AboutElectraHtmlSection />
         </div>
        
         
