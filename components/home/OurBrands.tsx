@@ -34,11 +34,11 @@ export default function OurBrands() {
   return (
     <section className="mx-auto">
       <div className="text-center">
-        <h2 className="text-2xl font-semibold text-slate-900 sm:text-[2.1rem]">Our Brands</h2>
+        <h2 className="text-[18px] font-semibold text-slate-900 sm:text-[2.1rem]">Our Brands</h2>
         <div className="mt-3 h-[1px] w-full bg-gradient-to-r from-transparent via-[#2F73BD]/70 to-transparent" />
       </div>
 
-      <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
+      <div className="mt-4 grid grid-cols-4 gap-2 sm:grid-cols-4 sm:gap-3">
         {brandTabs.map((brand) => {
           const isActive = brand.id === activeBrandId;
           return (
@@ -46,7 +46,7 @@ export default function OurBrands() {
               key={brand.id}
               type="button"
               onClick={() => setActiveBrandId(brand.id)}
-              className={`group border border-slate-200 px-2 py-4 text-center transition-all duration-200 ${
+              className={`group border border-slate-200 px-2 py-1 text-center transition-all duration-200 ${
                 isActive ? "bg-[#f3f3f3]" : "bg-white"
               }`}
               aria-label={`Show ${brand.name} categories`}
@@ -64,7 +64,7 @@ export default function OurBrands() {
                 />
               </div>
               <div
-                className={`mt-3 h-[3px] w-full transition-colors duration-200 ${
+                className={`mt-1 h-[3px] w-full transition-colors duration-200 ${
                   isActive ? "bg-[#2F73BD]" : "bg-[#2F73BD]/45 group-hover:bg-[#2F73BD]/70"
                 }`}
               />
@@ -73,7 +73,7 @@ export default function OurBrands() {
         })}
       </div>
 
-      <div className="mt-0 grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3 xl:grid-cols-4">
+      <div className="mt-0 grid grid-cols-2 gap-2 sm:grid-cols-2 sm:gap-3 xl:grid-cols-4">
         {activeBrand.categories.slice(0, 4).map((category) => (
           <article
             key={`${activeBrand.id}-${category.id}`}
@@ -99,7 +99,7 @@ export default function OurBrands() {
               />
             </div>
 
-            <h3 className="mt-5 text-center text-base font-medium text-slate-900">
+            <h3 className="mt-5 text-center text-[12px] xl:text-base font-medium text-slate-900">
               {category.name}
             </h3>
           </article>

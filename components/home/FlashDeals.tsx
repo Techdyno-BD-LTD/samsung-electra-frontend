@@ -111,7 +111,7 @@ export default function FlashDeals() {
     <section className="mx-auto space-y-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-wrap items-center gap-3 sm:gap-4">
-          <h2 className="text-2xl font-semibold text-slate-900 sm:text-[2.1rem]">{flashDealsData.title}</h2>
+          <h2 className="text-[18px] font-semibold text-slate-900 sm:text-[2.1rem]">{flashDealsData.title}</h2>
           
           <span className="text-slate-300">|</span>
           <p className="flex items-center gap-2 text-xl font-base text-[#1B57A6] sm:text-[2rem]">

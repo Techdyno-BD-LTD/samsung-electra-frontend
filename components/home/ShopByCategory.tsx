@@ -59,7 +59,7 @@ export default function ShopByCategory() {
     <section className="rounded-xl  ">
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h2 className="text-xl font-semibold text-slate-900 sm:text-[2.1rem]">Shop by category</h2>
+          <h2 className="text-[18px] font-semibold text-slate-900 sm:text-[2.1rem]">Shop by category</h2>
           <div className="mt-5 h-[2px] w-[260px] bg-gradient-to-r from-[#2F73BD] via-[#2F73BD]/50 to-transparent sm:w-[380px]" />
         </div>
         <Link

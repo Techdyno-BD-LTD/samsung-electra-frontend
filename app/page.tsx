@@ -37,7 +37,7 @@ export default function Home() {
          <div className="lg:mt-14 mt-5">
           <StoreBanner />
         </div>
-        <div className="lg:mt-14 mt-5">
+        <div className="lg:mt-14 mt-5 ">
           <OurBrands />
         </div>
         <div className="lg:mt-14 mt-5">

@@ -122,7 +122,7 @@ export default function BestSellingProducts() {
     <section className="mx-auto space-y-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h2 className="text-2xl font-semibold text-slate-900 sm:text-[2.1rem]">Best Selling / Top Selling</h2>
+          <h2 className="text-[18px] font-semibold text-slate-900 sm:text-[2.1rem]">Best Selling / Top Selling</h2>
           <div className="mt-3 h-[2px] w-[260px] bg-gradient-to-r from-[#2F73BD] via-[#2F73BD]/50 to-transparent sm:w-[380px]" />
         </div>
 

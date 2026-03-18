@@ -34,11 +34,11 @@ export default function StoreBanner() {
       </div>
 
       {/* ── MOBILE ── */}
-      <div className="flex sm:hidden items-center justify-center gap-5 px-5 py-4">
+      <div className=" flex items-center justify-center gap-5 rounded-lg bg-gradient-to-r from-[#0081FF] to-[#0054A6] px-5 py-1 sm:hidden">
         <span className="text-white font-semibold text-base tracking-wide">Our Store</span>
 
         {/* Dashed circle */}
-        <div className="flex items-center justify-center w-14 h-14 rounded-full border-2 border-dashed border-white/60 text-white font-bold text-lg shrink-0">
+        <div className="flex items-center justify-center w-11 h-11 rounded-full border-2 border-dashed border-white/60 text-white font-bold text-lg shrink-0">
           42+
         </div>
 
