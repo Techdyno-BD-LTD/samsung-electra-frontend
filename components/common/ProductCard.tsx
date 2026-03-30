@@ -1,11 +1,14 @@
 import { FaHeart, FaBalanceScale, FaShoppingCart, FaStar, FaEye, FaGavel } from "react-icons/fa";
 import Image from "next/image";
+import Link from "next/link";
+import { toProductSlug } from "@/lib/productSlug";
 
 interface ProductCardProps {
   cardVariant?: "default" | "flashDeal" | "specialDeal";
   brand?: string;
   brandLogo?: string;
   title?: string;
+  slug?: string;
   image?: string;
   rating?: number;
   ratingCount?: string;
@@ -44,6 +47,7 @@ const ProductCard = ({
   brand = "",
   brandLogo = "",
   title = "",
+  slug = "",
   image = "",
   rating = 0,
   ratingCount = "",
@@ -75,6 +79,8 @@ const ProductCard = ({
   bidButtonLabel = "Place Bid",
   dealImageHeight = "180px",
 }: ProductCardProps) => {
+  const productSlug = slug || toProductSlug(title);
+  const productHref = `/products/${productSlug}`;
   const badgeLabel = statusBadge.trim() || (isSale ? "Sale" : "");
   const normalizedBadgeLabel = badgeLabel.toLowerCase();
   const badgeClassName =
@@ -138,16 +144,16 @@ const ProductCard = ({
             )}
           </div>
 
-          <div className="mb-2 flex items-center justify-center rounded-md" style={{ height: dealImageHeight }}>
+          <Link href={productHref} className="mb-2 flex items-center justify-center rounded-md" style={{ height: dealImageHeight }}>
             <Image src={image} alt={title} width={230} height={150} style={{ height: dealImageHeight }} className="w-auto object-contain" />
-          </div>
+          </Link>
 
-          <button type="button" className="mx-auto mb-4 block text-xs text-slate-500 underline">
+          <Link href={productHref} className="mx-auto mb-4 block text-xs text-slate-500 underline">
             {quickDetailsLabel}
-          </button>
+          </Link>
 
           <h3 className="line-clamp-2 min-h-[56px] text-[18px] font-medium leading-7 text-slate-900">
-            {title}
+            <Link href={productHref}>{title}</Link>
           </h3>
 
           <div className=" grid grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] items-end gap-1 text-center text-[#1B57A6]">
@@ -226,13 +232,13 @@ const ProductCard = ({
             )}
           </div>
 
-          <div className="mb-2 flex items-center justify-center rounded-md" style={{ height: dealImageHeight }}>
+          <Link href={productHref} className="mb-2 flex items-center justify-center rounded-md" style={{ height: dealImageHeight }}>
             <Image src={image} alt={title} width={380} height={260} style={{ height: dealImageHeight }} className="w-auto object-contain" />
-          </div>
+          </Link>
 
-          <button type="button" className="mx-auto mb-3 block text-xs text-slate-500 underline opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+          <Link href={productHref} className="mx-auto mb-3 block text-xs text-slate-500 underline opacity-0 transition-opacity duration-200 group-hover:opacity-100">
             {quickDetailsLabel}
-          </button>
+          </Link>
 
           {type && <p className="mb-2 text-sm text-slate-500">{type}</p>}
 
@@ -259,7 +265,7 @@ const ProductCard = ({
           </div>
 
           <h3 className="mt-3 line-clamp-2 min-h-[56px] text-[18px] font-medium leading-7 text-slate-900">
-            {title}
+            <Link href={productHref}>{title}</Link>
           </h3>
 
           <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
@@ -323,13 +329,15 @@ const ProductCard = ({
         </div>
 
         <div className="relative mx-auto flex items-center justify-center px-2 py-1.5 sm:px-3 sm:py-2">
-          <Image
-            src={image}
-            alt={title}
-            width={300}
-            height={180}
-            className="h-[96px] w-auto object-contain sm:h-[200px]"
-          />
+          <Link href={productHref}>
+            <Image
+              src={image}
+              alt={title}
+              width={300}
+              height={180}
+              className="h-[96px] w-auto object-contain sm:h-[200px]"
+            />
+          </Link>
 
           {hasWarranty && (
             <div className="absolute -bottom-2 left-2 sm:-bottom-6 sm:left-5">
@@ -345,7 +353,7 @@ const ProductCard = ({
         </div>
 
         <p className="pb-2 text-center text-[9px] uppercase tracking-wide text-muted-foreground sm:pb-3 sm:text-[10px] sm:tracking-wider">
-          Quick Look
+          <Link href={productHref}>Quick Look</Link>
         </p>
 
         <div className="flex items-start justify-between px-2 pb-1.5 sm:items-center sm:px-4 sm:pb-2">
@@ -368,7 +376,7 @@ const ProductCard = ({
         </div>
 
         <h3 className="line-clamp-2 min-h-[36px] px-2 pb-1 text-[12px] font-semibold leading-4 sm:min-h-[40px] sm:px-4 sm:text-[16px] sm:font-medium sm:leading-relaxed">
-          {title}
+          <Link href={productHref}>{title}</Link>
         </h3>
 
         <div className="flex items-end gap-2 px-2 pb-2 sm:px-4">
@@ -455,13 +463,15 @@ const ProductCard = ({
 
       {/* Product Image */}
       <div className="relative mx-auto flex items-center justify-center px-2 py-1.5 sm:px-3 sm:py-2">
-        <Image
-          src={image}
-          alt={title}
-          width={300}
-          height={180}
-          className="h-[96px] w-auto object-contain sm:h-[200px]"
-        />
+        <Link href={productHref}>
+          <Image
+            src={image}
+            alt={title}
+            width={300}
+            height={180}
+            className="h-[96px] w-auto object-contain sm:h-[200px]"
+          />
+        </Link>
 
         {hasWarranty && (
           <div className="absolute -bottom-2 left-2 sm:-bottom-6 sm:left-5">
@@ -477,7 +487,7 @@ const ProductCard = ({
       </div>
 
       <p className="pb-2 text-center text-[9px] uppercase tracking-wide text-muted-foreground sm:pb-3 sm:text-[10px] sm:tracking-wider">
-        Quick Look
+        <Link href={productHref}>Quick Look</Link>
       </p>
 
       {/* Type and Rating Section (Stars are now close to the type) */}
@@ -502,7 +512,7 @@ const ProductCard = ({
 
       {/* Title */}
       <h3 className="line-clamp-2 min-h-[36px] px-2 pb-1 text-[12px] font-semibold leading-4 sm:min-h-[40px] sm:px-4 sm:text-[16px] sm:font-medium sm:leading-relaxed">
-        {title}
+        <Link href={productHref}>{title}</Link>
       </h3>
 
       {/* EMI Info */}

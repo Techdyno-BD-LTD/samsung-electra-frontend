@@ -1,0 +1,276 @@
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+import popularProducts from '@/database/popularproducts.json';
+import RecentViewedProductCard from '@/components/productdetails/RecentViewedProductCard';
+
+type ProductDetailsTabsProps = {
+  title?: string;
+  descriptionHtml?: string;
+  specificationsHtml?: string;
+  featureHtml?: string;
+  policyHtml?: string;
+};
+
+export default function ProductDetailsTabs({
+  title,
+  descriptionHtml,
+  specificationsHtml,
+  featureHtml,
+  policyHtml,
+}: ProductDetailsTabsProps) {
+  const [activeTab, setActiveTab] = useState('description');
+  const descriptionRef = useRef<HTMLDivElement>(null);
+  const specificationsRef = useRef<HTMLDivElement>(null);
+  const featuresRef = useRef<HTMLDivElement>(null);
+  const reviewsRef = useRef<HTMLDivElement>(null);
+  const policyRef = useRef<HTMLDivElement>(null);
+
+  const tabs = [
+    { id: 'description', label: 'Description', ref: descriptionRef },
+    { id: 'specifications', label: 'Specifications', ref: specificationsRef },
+    { id: 'features', label: 'Features', ref: featuresRef },
+    { id: 'reviews', label: 'Review (5)', ref: reviewsRef },
+    { id: 'policy', label: 'Product Policy', ref: policyRef },
+  ];
+
+  const recentViewedItems = (popularProducts as Array<{
+    title?: string;
+    image?: string;
+    brandLogo?: string;
+    type?: string;
+    rating?: number;
+    ratingCount?: string;
+    weight?: string;
+    color?: string;
+    emiPrice?: string;
+    price?: string;
+    originalPrice?: string;
+    discountPercent?: string;
+    saveAmount?: string;
+    tags?: string[];
+  }>).slice(0, 3);
+
+  const headingTitle = title ?? 'Samsung Front Loading Washing Machine- 8KG | WW80AGAS21AXLP';
+  const reviewItems = [
+    {
+      name: 'Khondokar Salah-Uddin',
+      title: 'Good product',
+      body: 'Working Smoothly As Expected. However On The Right Side Of The Machine It Seems Like Its Edge Shrinks A Bit.',
+      score: '(5.0)',
+    },
+    {
+      name: 'Khondokar Salah-Uddin',
+      title: 'Good product',
+      body: 'Working Smoothly As Expected. However On The Right Side Of The Machine It Seems Like Its Edge Shrinks A Bit.',
+      score: '(5.0)',
+    },
+    {
+      name: 'Khondokar Salah-Uddin',
+      title: 'Good product',
+      body: 'Working Smoothly As Expected. However On The Right Side Of The Machine It Seems Like Its Edge Shrinks A Bit.',
+      score: '(5.0)',
+    },
+    {
+      name: 'Khondokar Salah-Uddin',
+      title: 'Good product',
+      body: 'Working Smoothly As Expected. However On The Right Side Of The Machine It Seems Like Its Edge Shrinks A Bit.',
+      score: '(5.0)',
+    },
+  ];
+
+  const scrollToSection = (ref: React.RefObject<HTMLDivElement>) => {
+    const id = tabs.find((tab) => tab.ref === ref)?.id ?? 'description';
+    setActiveTab(id);
+    ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  useEffect(() => {
+    const sectionRefs = [descriptionRef, specificationsRef, featuresRef, reviewsRef, policyRef];
+    const sectionIds = ['description', 'specifications', 'features', 'reviews', 'policy'];
+
+    const onScroll = () => {
+      for (let i = 0; i < sectionRefs.length; i += 1) {
+        const node = sectionRefs[i].current;
+        if (!node) {
+          continue;
+        }
+
+        const rect = node.getBoundingClientRect();
+        if (rect.top <= 110 && rect.bottom > 110) {
+          setActiveTab(sectionIds[i]);
+          break;
+        }
+      }
+    };
+
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  return (
+    <section className="mx-auto mt-10">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[2fr_1fr]">
+        <div className="border border-slate-300 bg-white">
+          <div className="border-b border-slate-300 px-4 py-3 text-center">
+            <h2 className="text-[14px] font-semibold leading-tight text-slate-900 md:text-[20px]">
+              {headingTitle}
+            </h2>
+          </div>
+
+          <div className="px-2 pb-3 pt-3 sm:px-3 sm:pb-4 sm:pt-4">
+            <div className="mb-5 grid grid-cols-5 gap-1.5 sm:mb-6 sm:gap-2.5 lg:mb-8 lg:gap-3">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => scrollToSection(tab.ref)}
+                className={`w-full min-w-0 truncate whitespace-nowrap rounded-md px-0.5 py-1.5 text-center text-[10px] font-semibold leading-tight transition sm:px-1 sm:text-[11px] lg:rounded-lg lg:px-0 lg:py-3 lg:text-sm ${
+                  activeTab === tab.id
+                    ? 'bg-black text-white'
+                    : 'bg-slate-100 text-slate-800 hover:bg-slate-200'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+            </div>
+
+            <div className="space-y-10">
+              <div ref={descriptionRef} className="scroll-mt-32">
+                <div
+                  className="text-gray-900 [&_p]:mb-4 [&_p]:text-[13px] [&_p]:leading-relaxed sm:[&_p]:mb-5 sm:[&_p]:text-[14px] lg:[&_p]:text-[16px]"
+                  dangerouslySetInnerHTML={{
+                    __html:
+                      descriptionHtml ??
+                      '<p>Product description is not available right now.</p>',
+                  }}
+                />
+              </div>
+
+              <div ref={specificationsRef} className="scroll-mt-32 -mt-1">
+                <div
+                  className="overflow-x-auto [&_table]:w-full [&_table]:border-collapse [&_table]:text-left [&_tr]:border [&_tr]:border-slate-300 [&_td]:px-2 [&_td]:py-1.5 [&_td]:text-[12px] [&_td]:text-slate-800 sm:[&_td]:px-2.5 sm:[&_td]:py-2 sm:[&_td]:text-[13px] lg:[&_td]:px-3 lg:[&_td]:py-2 lg:[&_td]:text-[14px] [&_td:first-child]:w-1/4 [&_td:first-child]:bg-slate-50 [&_td:first-child]:font-semibold"
+                  dangerouslySetInnerHTML={{
+                    __html:
+                      specificationsHtml ??
+                      '<table><tbody><tr><td>Specifications</td><td>Not available</td></tr></tbody></table>',
+                  }}
+                />
+              </div>
+
+              <div ref={featuresRef} className="scroll-mt-32">
+                <h2 className="mb-3 bg-slate-100 py-1.5 text-center text-[16px] font-semibold text-slate-900 sm:mb-4 sm:py-2 sm:text-[18px] lg:text-xl">
+                  Features
+                </h2>
+                <div
+                  className="space-y-4 text-slate-700 [&_h2]:hidden [&_h3]:mb-1.5 [&_h3]:text-[16px] [&_h3]:font-semibold sm:[&_h3]:text-[20px] lg:[&_h3]:text-[24px] [&_h4]:mb-1 [&_h4]:text-[13px] [&_h4]:font-medium sm:[&_h4]:text-[15px] lg:[&_h4]:text-[18px] [&_p]:mb-2 [&_p]:text-[12px] [&_p]:leading-relaxed sm:[&_p]:text-[14px] lg:[&_p]:text-[16px] [&_img]:mt-2 [&_img]:w-full [&_img]:rounded-sm [&_img]:object-cover sm:[&_img]:mt-3"
+                  dangerouslySetInnerHTML={{
+                    __html:
+                      featureHtml ??
+                      '<p class="text-slate-500">Features section placeholder.</p>',
+                  }}
+                />
+              </div>
+
+              <div ref={reviewsRef} className="scroll-mt-32">
+                <h2 className="mb-4 bg-slate-100 py-1.5 text-center text-[15px] font-semibold text-slate-900">
+                  Reviews
+                </h2>
+
+                <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_1.6fr]">
+                  <div className="rounded border border-slate-300 bg-white p-3">
+                    <div className="grid grid-cols-[72px_1px_1fr] items-center gap-3 border-b border-slate-200 pb-3">
+                      <div className="text-center">
+                        <p className="text-[26px] font-semibold text-slate-900">5/5</p>
+                        <p className="text-[13px] text-orange-500">★★★★★</p>
+                        <p className="text-[13px] text-slate-700">99% Rating</p>
+                      </div>
+
+                      <div className="h-full bg-slate-300" />
+
+                      <div>
+                        {[
+                          { label: '★★★★★', width: '38%', count: '(18)' },
+                          { label: '★★★★☆', width: '2%', count: '(0)' },
+                          { label: '★★★☆☆', width: '2%', count: '(0)' },
+                          { label: '★★☆☆☆', width: '2%', count: '(0)' },
+                          { label: '★☆☆☆☆', width: '2%', count: '(0)' },
+                        ].map((row) => (
+                          <div key={row.label} className="mb-1.5 flex items-center gap-2">
+                            <span className="w-14 text-xs text-orange-500">{row.label}</span>
+                            <span className="h-1.5 flex-1 rounded bg-slate-200">
+                              <span className="block h-1.5 rounded bg-orange-500" style={{ width: row.width }} />
+                            </span>
+                            <span className="w-8 text-right text-xs text-slate-600">{row.count}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <h3 className="mb-1.5 mt-4 text-[15px] font-semibold text-slate-900">Add Reviews</h3>
+                    <p className="mb-2 text-xs text-slate-500">★★★★★ ( add rating )</p>
+                    <input className="mb-2 w-full rounded border border-slate-300 px-2.5 py-1.5 text-xs" placeholder="Please Enter Your Name" />
+                    <input className="mb-2 w-full rounded border border-slate-300 px-2.5 py-1.5 text-xs" placeholder="Please Enter Your Review Title" />
+                    <textarea className="mb-2.5 w-full rounded border border-slate-300 px-2.5 py-1.5 text-xs" rows={3} placeholder="Please Share Your Feedback About The Product." />
+                    <div className="flex justify-end">
+                      <button type="button" className="rounded bg-[#2F7FE8] px-4 py-1.5 text-xs font-semibold text-white">Submit Review</button>
+                    </div>
+                  </div>
+
+                  <div className="rounded border border-slate-300 bg-white p-3">
+                    <div className="mb-2 flex items-center justify-between gap-2">
+                      <h3 className="text-lg font-semibold text-slate-900">Reviews from real people</h3>
+                      <select className="rounded border border-slate-300 px-2.5 py-1.5 text-xs text-slate-700">
+                        <option>Default</option>
+                      </select>
+                    </div>
+                    <p className="mb-2.5 text-xs text-slate-500">10 Reviews</p>
+
+                    {reviewItems.map((item, index) => (
+                      <article key={`${item.name}-${index}`} className="border-t border-slate-200 py-3 first:border-t-0 first:pt-0">
+                        <p className="text-[13px] font-medium text-slate-900">{item.name}</p>
+                        <p className="text-orange-500">★★★★★ <span className="text-[11px] text-slate-500">{item.score}</span></p>
+                        <p className="text-[13px] font-semibold text-slate-900">{item.title}</p>
+                        <p className="text-[12px] text-slate-700">{item.body}</p>
+                      </article>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div ref={policyRef} className="scroll-mt-32">
+                <h2 className="mb-3 bg-slate-100 py-1.5 text-center text-[14px] font-semibold text-slate-900 sm:mb-4 sm:text-[15px] lg:text-base">
+                  Product Policy
+                </h2>
+
+                <div
+                  className="text-slate-800 [&_h3]:mb-1 [&_h3]:mt-2 [&_h3]:text-[18px] [&_h3]:font-semibold sm:[&_h3]:mt-3 sm:[&_h3]:text-[24px] lg:[&_h3]:text-[30px] [&_h4]:mb-1 [&_h4]:mt-2 [&_h4]:text-[14px] [&_h4]:font-semibold sm:[&_h4]:mt-3 sm:[&_h4]:text-[17px] lg:[&_h4]:text-[20px] [&_p]:mb-1 [&_p]:text-[12px] [&_p]:leading-relaxed sm:[&_p]:text-[14px] lg:[&_p]:text-[16px] [&_ul]:mb-2 [&_ul]:list-disc [&_ul]:pl-4 sm:[&_ul]:mb-3 sm:[&_ul]:pl-5 [&_li]:mb-0.5 [&_li]:text-[12px] [&_li]:leading-relaxed sm:[&_li]:text-[14px] lg:[&_li]:text-[16px]"
+                  dangerouslySetInnerHTML={{
+                    __html:
+                      policyHtml ??
+                      '<p>Product policy is not available right now.</p>',
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <aside className="hidden lg:block">
+          <div className=" ">
+            <h3 className="mb-3 border border-slate-300 py-2 text-center text-[18px] font-semibold text-slate-900">
+              Recent View Products
+            </h3>
+
+            <div className="space-y-4">
+              {recentViewedItems.map((item, index) => (
+                <RecentViewedProductCard key={`${item.title ?? 'recent'}-${index}`} product={item} />
+              ))}
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+  );
+}

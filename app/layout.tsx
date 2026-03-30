@@ -22,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="light" suppressHydrationWarning>
       <body
-        className={`${openSans.variable} font-sans antialiased`}
+        className={`${openSans.variable} antialiased`}
       >
         <Navbar />
         <main className="min-h-screen mainwidth pb-16 pt-8 lg:pt-28  ">
