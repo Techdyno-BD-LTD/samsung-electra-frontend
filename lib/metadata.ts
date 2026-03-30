@@ -50,7 +50,10 @@ export function getRouteMetadata(key: RouteMetadataKey, overrides?: Partial<Rout
   const title = overrides?.title ?? base.title;
   const description = overrides?.description ?? base.description;
   const image = overrides?.image ?? base.image ?? metadataRegistry.root.image ?? "/og/default.png";
+  const metadataBase = new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000");
+
   return {
+    metadataBase,
     title,
     description,
     openGraph: {

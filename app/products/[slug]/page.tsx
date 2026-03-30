@@ -354,9 +354,9 @@ export async function generateStaticParams() {
     staticSlugs.add(item.slug);
   }
 
-  for (const slug of fallbackProductsBySlug.keys()) {
+  fallbackProductsBySlug.forEach((_value, slug) => {
     staticSlugs.add(slug);
-  }
+  });
 
   return Array.from(staticSlugs).map((slug) => ({ slug }));
 }
