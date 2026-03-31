@@ -1,10 +1,20 @@
 "use client";
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { FaTimes, FaBars, FaFacebook, FaInstagram, FaYoutube, FaLinkedin, FaWhatsapp, FaFacebookMessenger } from "react-icons/fa";
+import { useAppSelector } from "@/store/hooks";
 
 export default function MobileNavbar() {
+  const [mounted, setMounted] = useState(false);
+  const cartTotalCount = useAppSelector((state) => 
+    state.cart.items.reduce((total, item) => total + item.quantity, 0)
+  );
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [isOpen, setIsOpen] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
@@ -78,7 +88,7 @@ export default function MobileNavbar() {
             </button>
 
             {/* Cart with Badge */}
-            <button className="relative">
+            <Link href="/cart" className="relative">
               <Image
                 src="/images/shopping-cart.png"
                 alt="Cart"
@@ -86,10 +96,12 @@ export default function MobileNavbar() {
                 height={20}
                 className="w-5 h-5"
               />
-              <span className="absolute -top-2 -right-2 flex h-[14px] w-[14px] items-center justify-center rounded-full bg-[#ef4444] text-[8px] font-bold text-white border border-white">
-                01
-              </span>
-            </button>
+              {mounted && cartTotalCount > 0 && (
+                <span className="absolute -top-2 -right-2 flex h-[14px] w-[14px] items-center justify-center rounded-full bg-[#ef4444] text-[8px] font-bold text-white border border-white">
+                  {cartTotalCount < 10 ? `0${cartTotalCount}` : cartTotalCount}
+                </span>
+              )}
+            </Link>
 
             {/* Hamburger Menu */}
             <button

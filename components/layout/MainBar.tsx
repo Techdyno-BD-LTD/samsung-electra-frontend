@@ -1,8 +1,20 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { FaSearch } from "react-icons/fa";
+import { useAppSelector } from "@/store/hooks";
 
 export default function MainBar() {
+  const [mounted, setMounted] = useState(false);
+  const cartTotalCount = useAppSelector((state) => 
+    state.cart.items.reduce((total, item) => total + item.quantity, 0)
+  );
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   return (
     <div className="bg-white border-b h-[4.75rem]  flex items-center border-slate-200">
       <div className="mainwidth">
@@ -80,7 +92,7 @@ export default function MainBar() {
   </button>
 
   {/* Cart with Badge */}
-  <button className="relative flex items-center gap-3 tracking-tight font-medium text-[#001e3c] hover:opacity-80 transition">
+  <Link href="/cart" className="relative flex items-center gap-3 tracking-tight font-medium text-[#001e3c] hover:opacity-80 transition">
     <div className="relative flex items-center justify-center">
       <Image
         src="/images/shopping-cart.png"
@@ -90,12 +102,14 @@ export default function MainBar() {
         quality={100}
         priority
       />
-      <span className="absolute -top-1.5 -right-2 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-[#ef4444] text-[9px] font-bold text-white border-2 border-white leading-none">
-        01
-      </span>
+      {mounted && cartTotalCount > 0 && (
+        <span className="absolute -top-1.5 -right-2 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-[#ef4444] text-[9px] font-bold text-white border-2 border-white leading-none">
+          {cartTotalCount < 10 ? `0${cartTotalCount}` : cartTotalCount}
+        </span>
+      )}
     </div>
     <span className="text-base">Cart</span>
-  </button>
+  </Link>
 
   {/* Login Button */}
   <button className="flex items-center gap-2 rounded-[5px] bg-[#2b85ff] px-5 py-2.5 text-white shadow-sm hover:bg-blue-600 transition">

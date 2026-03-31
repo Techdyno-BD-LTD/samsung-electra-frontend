@@ -1,5 +1,6 @@
-"use client"
-import { useState } from "react";
+"use client";
+
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -14,7 +15,13 @@ import {
 } from "react-icons/fa";
 
 export default function Footer() {
+  const [mounted, setMounted] = useState(false);
   const currentYear = new Date().getFullYear();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const [openSections, setOpenSections] = useState({
     company: false,
     myAccount: false,
@@ -475,7 +482,7 @@ export default function Footer() {
       {/* Footer Bottom */}
       <div className="container mx-auto px-4 lg:px-12 mt-12 pt-6 border-t border-blue-200">
         <p className="text-center text-blue-600 text-[15px] font-medium">
-          &copy; {currentYear} samsung electra.all rights reserved
+          &copy; {mounted ? currentYear : 2026} samsung electra.all rights reserved
         </p>
       </div>
     </footer>

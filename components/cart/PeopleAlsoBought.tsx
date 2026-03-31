@@ -9,7 +9,7 @@ type ProductBadge = "New" | "Hot" | "Sold Out" | "Special" | "";
 
 const fallbackStatusBadges: ProductBadge[] = ["New", "Hot", "Sold Out", "Special", ""];
 
-export default function PopularProducts() {
+export default function PeopleAlsoBought() {
   const featuredProducts = products.slice(0, 8);
   const sliderRef = useRef<HTMLDivElement | null>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -67,10 +67,10 @@ export default function PopularProducts() {
   }, []);
 
   return (
-    <section className="mx-auto space-y-6">
+    <section className="mx-auto space-y-6 mt-12 lg:mt-16 2xl:mt-24">
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h2 className="text-[18px] font-semibold text-slate-900 sm:text-[2.1rem]">Popular Products</h2>
+          <h2 className="text-[18px] font-semibold text-slate-900 sm:text-[2.1rem]">People also bought</h2>
           <div className="mt-5 h-[2px] w-[260px] bg-gradient-to-r from-[#2F73BD] via-[#2F73BD]/50 to-transparent sm:w-[380px]" />
         </div>
       </div>
@@ -117,4 +117,3 @@ export default function PopularProducts() {
     </section>
   );
 }
-

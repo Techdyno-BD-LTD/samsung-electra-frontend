@@ -1,4 +1,8 @@
+"use client";
+
 import { FaHeart, FaBalanceScale, FaShoppingCart, FaStar, FaEye, FaGavel } from "react-icons/fa";
+import { useAppDispatch } from "@/store/hooks";
+import { addToCart } from "@/store/features/cart/cartSlice";
 import Image from "next/image";
 import Link from "next/link";
 import { toProductSlug } from "@/lib/productSlug";
@@ -79,7 +83,29 @@ const ProductCard = ({
   bidButtonLabel = "Place Bid",
   dealImageHeight = "180px",
 }: ProductCardProps) => {
+  const dispatch = useAppDispatch();
+  
   const productSlug = slug || toProductSlug(title);
+  
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dispatch(addToCart({
+      id: productSlug || title,
+      title,
+      brand,
+      image,
+      price,
+      originalPrice,
+      discountPercent,
+      saveAmount,
+      color,
+      type,
+      weight,
+    }));
+    alert("Added to cart!"); // Minimal feedback
+  };
+
   const productHref = `/products/${productSlug}`;
   const badgeLabel = statusBadge.trim() || (isSale ? "Sale" : "");
   const normalizedBadgeLabel = badgeLabel.toLowerCase();
@@ -196,6 +222,7 @@ const ProductCard = ({
 
           <button
             type="button"
+            onClick={handleAddToCart}
             className="mt-3 flex w-full items-center justify-center gap-2 rounded-md bg-[#1C5AA6] py-2 text-[18px] font-medium text-white"
           >
             <FaGavel className="h-4 w-4 text-[#ffd24d]" />
@@ -276,7 +303,7 @@ const ProductCard = ({
           </div>
 
           <div className="max-h-0 overflow-hidden transition-all duration-300 ease-in-out group-hover:max-h-[60px]">
-            <button type="button" className="mt-3 flex w-full items-center justify-center gap-2 rounded-md bg-[#1C5AA6] py-2.5 text-[18px] font-medium text-white transition-colors hover:bg-[#15458a]">
+            <button type="button" onClick={handleAddToCart} className="mt-3 flex w-full items-center justify-center gap-2 rounded-md bg-[#1C5AA6] py-2.5 text-[18px] font-medium text-white transition-colors hover:bg-[#15458a]">
               Buy Now
             </button>
           </div>
@@ -396,14 +423,14 @@ const ProductCard = ({
         </div>
 
         <div className="px-2 pb-3 sm:hidden">
-          <button className="flex mx-auto w-6/12 items-center justify-center rounded-full bg-[#0054A6] py-1.5 text-[11px] font-semibold text-white transition-colors hover:bg-[#004487]">
+          <button onClick={handleAddToCart} className="flex mx-auto w-6/12 items-center justify-center rounded-full bg-[#0054A6] py-1.5 text-[11px] font-semibold text-white transition-colors hover:bg-[#004487]">
             Buy Now
           </button>
         </div>
 
         <div className="hidden max-h-0 overflow-hidden transition-all duration-300 ease-in-out group-hover:max-h-[60px] sm:block">
           <div className="px-4 pb-4 pt-1">
-            <button className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#E7EEF6] py-2.5 text-sm font-semibold text-blue-500 transition-colors hover:bg-blue-200">
+            <button onClick={handleAddToCart} className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#E7EEF6] py-2.5 text-sm font-semibold text-blue-500 transition-colors hover:bg-blue-200">
               <FaShoppingCart className="h-4 w-4" />
               Add to cart
             </button>
@@ -576,7 +603,7 @@ const ProductCard = ({
 
       {/* Mobile CTA */}
       <div className="px-2 pb-3 sm:hidden">
-        <button className="flex w-6/12 mx-auto items-center justify-center rounded-full bg-[#0054A6] py-1.5 text-[11px] font-semibold text-white transition-colors hover:bg-[#004487]">
+        <button onClick={handleAddToCart} className="flex w-6/12 mx-auto items-center justify-center rounded-full bg-[#0054A6] py-1.5 text-[11px] font-semibold text-white transition-colors hover:bg-[#004487]">
           Buy Now
         </button>
       </div>
@@ -584,7 +611,7 @@ const ProductCard = ({
       {/* Add to Cart - show only on hover */}
       <div className="hidden overflow-hidden max-h-0 transition-all duration-300 ease-in-out group-hover:max-h-[60px] sm:block">
         <div className="px-4 pb-4 pt-1">
-          <button className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#E7EEF6] py-2.5 text-sm font-semibold text-blue-500 transition-colors hover:bg-blue-200">
+          <button onClick={handleAddToCart} className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#E7EEF6] py-2.5 text-sm font-semibold text-blue-500 transition-colors hover:bg-blue-200">
             <FaShoppingCart className="h-4 w-4" />
             Add to cart
           </button>
