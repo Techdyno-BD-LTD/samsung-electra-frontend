@@ -151,7 +151,7 @@ export default function CartPage() {
                         </div>
                       )}
                       {item.saveAmount && (
-                        <div className="bg-[#f04848] text-white text-[9px] lg:text-[10px] 2xl:text-[12px] px-2 2xl:px-2.5 py-[2px] 2xl:py-[3px] rounded-full font-medium mt-[2px] leading-tight shadow-sm tracking-wide">
+                        <div className="bg-[#f04848] text-white text-[9px] lg:text-[10px] 2xl:text-[12px] px-2 2xl:px-2.5 py-[2px] 2xl:py-[3px] rounded-tl-2xl rounded-br-2xl font-medium mt-[2px] leading-tight shadow-sm tracking-wide">
                           {item.saveAmount}
                         </div>
                       )}
@@ -239,8 +239,8 @@ export default function CartPage() {
           <button
             disabled={!mounted || cartItems.length === 0}
             className={`w-full font-semibold py-3 2xl:py-3.5 rounded-md transition-colors text-[15px] lg:text-[16px] 2xl:text-[18px] shadow-sm tracking-wide ${mounted && cartItems.length > 0
-                ? "bg-[#247dfa] hover:bg-blue-600 text-white"
-                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              ? "bg-[#247dfa] hover:bg-blue-600 text-white"
+              : "bg-gray-300 text-gray-500 cursor-not-allowed"
               }`}
           >
             Process to Checkout
@@ -261,12 +261,12 @@ export default function CartPage() {
             15% discount on pay with visa Master card
           </span>
         </div>
-        
+
         <div className="w-full max-w-5xl mx-auto px-4 flex justify-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img 
-            src="/images/paymethods.png" 
-            alt="Acceptable Payment Methods" 
+          <img
+            src="/images/paymethods.png"
+            alt="Acceptable Payment Methods"
             className="w-full h-auto max-w-[900px] object-contain opacity-90 transition-opacity hover:opacity-100"
           />
         </div>
