@@ -67,7 +67,7 @@ export default function PeopleAlsoBought() {
   }, []);
 
   return (
-    <section className="mx-auto space-y-6 mt-12 lg:mt-16 2xl:mt-24">
+    <section className="w-full max-w-full overflow-hidden mx-auto space-y-6 mt-12 lg:mt-16 2xl:mt-24">
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h2 className="text-[18px] font-semibold text-slate-900 sm:text-[2.1rem]">People also bought</h2>
@@ -75,13 +75,13 @@ export default function PeopleAlsoBought() {
         </div>
       </div>
 
-      <div className="relative">
+      <div className="relative w-full max-w-full">
         <button
           type="button"
           onClick={() => scrollByOneCard(-1)}
           disabled={!canScrollLeft}
           aria-label="Show previous product"
-          className="absolute left-2 top-[220px] z-10 inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-[#1D3C61] shadow-md transition hover:border-[#2F73BD] hover:text-[#2F73BD] disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300 sm:left-0 sm:h-11 sm:w-11 sm:-translate-x-1/2 sm:top-[235px] lg:top-[250px]"
+          className="absolute left-1 top-1/3 -translate-y-1/2 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-[#1D3C61] shadow-md transition hover:border-[#2F73BD] hover:text-[#2F73BD] disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300 sm:left-0 sm:h-11 sm:w-11 sm:-translate-x-1/2"
         >
           <FaChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
         </button>
@@ -91,20 +91,20 @@ export default function PeopleAlsoBought() {
           onClick={() => scrollByOneCard(1)}
           disabled={!canScrollRight}
           aria-label="Show next product"
-          className="absolute right-2 top-[220px] z-10 inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-[#1D3C61] shadow-md transition hover:border-[#2F73BD] hover:text-[#2F73BD] disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300 sm:right-0 sm:h-11 sm:w-11 sm:translate-x-1/2 sm:top-[235px] lg:top-[250px]"
+          className="absolute right-1 top-1/3 -translate-y-1/2 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-[#1D3C61] shadow-md transition hover:border-[#2F73BD] hover:text-[#2F73BD] disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300 sm:right-0 sm:h-11 sm:w-11 sm:translate-x-1/2"
         >
           <FaChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
         </button>
 
         <div
           ref={sliderRef}
-          className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          className="flex snap-x snap-mandatory gap-3 sm:gap-4 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         >
           {featuredProducts.map((product, index) => (
             <div
               key={product.id}
               data-popular-card
-              className="min-w-[48%] snap-start sm:min-w-[48%] lg:min-w-[31.5%] xl:min-w-[24%] 2xl:min-w-[19%]"
+              className="w-[calc(50%-6px)] flex-shrink-0 overflow-hidden snap-start sm:w-[calc(50%-8px)] lg:w-[calc(33.333%-11px)] xl:w-[calc(25%-12px)] 2xl:w-[calc(20%-13px)]"
             >
               <ProductCard
                 {...product}

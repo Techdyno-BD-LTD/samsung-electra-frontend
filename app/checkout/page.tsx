@@ -1,16 +1,94 @@
-import React from 'react';
+"use client"
+import React, { useMemo, useState } from 'react';
 import { FiChevronRight, FiEdit, FiArrowRight, FiChevronDown } from 'react-icons/fi';
 import { HiOutlineTicket } from "react-icons/hi2";
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
+import { clearCart } from '@/store/features/cart/cartSlice';
+import { setLastOrder } from '@/store/features/order/orderSlice';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+
 const Checkout = () => {
+    const dispatch = useAppDispatch();
+    const router = useRouter();
+    const cartItems = useAppSelector((state) => state.cart.items);
+    const [paymentMethod, setPaymentMethod] = useState('Online Payment Gateway');
+    const [deliveryNote, setDeliveryNote] = useState('');
+
+    const parsePrice = (priceStr: string) => {
+        return parseFloat(priceStr.replace(/[^0-9.]/g, '')) || 0;
+    };
+
+    const totals = useMemo(() => {
+        const subtotal = cartItems.reduce((acc, item) => acc + (parsePrice(item.price) * item.quantity), 0);
+        const originalSubtotal = cartItems.reduce((acc, item) => acc + (parsePrice(item.originalPrice) * item.quantity), 0);
+        const savings = originalSubtotal - subtotal;
+        const tax = 0; // Assuming tax is free/0 as per UI
+        const delivery = 0; // Assuming delivery is free as per UI
+        const total = subtotal + tax + delivery;
+
+        return {
+            subtotal,
+            originalSubtotal,
+            savings,
+            tax,
+            delivery,
+            total,
+            savePercent: originalSubtotal > 0 ? Math.round((savings / originalSubtotal) * 100) : 0
+        };
+    }, [cartItems]);
+
+    const handlePlaceOrder = () => {
+        if (cartItems.length === 0) {
+            alert("Your cart is empty!");
+            return;
+        }
+
+        const orderId = `#${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+        const today = new Date();
+        const deliveryDate = new Date(today);
+        deliveryDate.setDate(today.getDate() + 5);
+
+        const formatDate = (date: Date) => {
+            return date.toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            });
+        };
+
+        dispatch(setLastOrder({
+            orderId,
+            paymentMethod: paymentMethod,
+            deliveryDate: formatDate(deliveryDate),
+            items: cartItems.map(item => ({
+                id: item.id,
+                title: item.title,
+                brand: item.brand,
+                image: item.image,
+                price: item.price,
+                originalPrice: item.originalPrice,
+                quantity: item.quantity,
+                color: item.color
+            })),
+            subtotal: totals.subtotal,
+            savings: totals.savings,
+            tax: totals.tax,
+            delivery: totals.delivery,
+            total: totals.total
+        }));
+
+        dispatch(clearCart());
+        router.push('/checkout/success');
+    };
+
     return (
         <div className="px-4 py-8 mt-10 ">
             {/* Breadcrumb */}
             <nav className="text-sm text-gray-400 mb-8 flex items-center space-x-2">
-                <span className="cursor-pointer hover:text-gray-900">Home</span>
+                <span className="cursor-pointer hover:text-gray-900" onClick={() => router.push('/')}>Home</span>
                 <FiChevronRight className="w-4 h-4" />
-                <span className="cursor-pointer hover:text-gray-900">Washing Machine</span>
-                <FiChevronRight className="w-4 h-4" />
-                <span className="cursor-pointer hover:text-gray-900">Washing Machine details</span>
+                <span className="cursor-pointer hover:text-gray-900">Checkout</span>
                 <FiChevronRight className="w-4 h-4" />
                 <span className="text-gray-800 font-medium">Secure Checkout Process</span>
             </nav>
@@ -72,7 +150,7 @@ const Checkout = () => {
                                 </div>
                                 <div className="ml-[34px] text-[15px]">
                                     <p className="text-gray-500">Estimated Shipping Time</p>
-                                    <p className="text-gray-800 font-medium mt-1">14 December 2025 - 17 December 2025</p>
+                                    <p className="text-gray-800 font-medium mt-1">14 April 2026 - 17 April 2026</p>
                                 </div>
                             </div>
 
@@ -149,12 +227,17 @@ const Checkout = () => {
                             {/* Online Payment Gateway */}
                             <div className="p-6 pb-5">
                                 <label className="flex items-center space-x-3 cursor-pointer group mb-5">
-                                    <input type="radio" name="payment" className="w-[22px] h-[22px] text-[#1877f2] border-[2px] border-[#1877f2] focus:ring-[#1877f2] cursor-pointer" defaultChecked />
+                                    <input
+                                        type="radio"
+                                        name="payment"
+                                        checked={paymentMethod === 'Online Payment Gateway'}
+                                        onChange={() => setPaymentMethod('Online Payment Gateway')}
+                                        className="w-[22px] h-[22px] text-[#1877f2] border-[2px] border-[#1877f2] focus:ring-[#1877f2] cursor-pointer"
+                                    />
                                     <span className="font-medium text-[20px] text-gray-800 group-hover:text-[#1877f2] transition-colors">Online Payment Gateway</span>
                                 </label>
                                 <div className="ml-[34px]">
                                     <div className="flex items-center gap-4">
-                                        {/* Mocking the cards based on image: Mastercard, Visa, Amex, DBBL */}
                                         <div className="w-[72px] h-[45px] border border-gray-100 rounded bg-[#f8f9fa] flex flex-col justify-center items-center shadow-sm">
                                             <div className="flex -space-x-1.5"><div className="w-5 h-5 bg-red-500 rounded-full opacity-90"></div><div className="w-5 h-5 bg-yellow-500 rounded-full opacity-90"></div></div>
                                         </div>
@@ -175,7 +258,13 @@ const Checkout = () => {
                             {/* EMI Payment */}
                             <div className="p-6 py-5">
                                 <label className="flex items-center space-x-3 cursor-pointer group mb-3">
-                                    <input type="radio" name="payment" className="w-[22px] h-[22px] text-[#1877f2] border-[2px] border-[#1877f2] focus:ring-[#1877f2] cursor-pointer" />
+                                    <input
+                                        type="radio"
+                                        name="payment"
+                                        checked={paymentMethod === 'EMI Payment'}
+                                        onChange={() => setPaymentMethod('EMI Payment')}
+                                        className="w-[22px] h-[22px] text-[#1877f2] border-[2px] border-[#1877f2] focus:ring-[#1877f2] cursor-pointer"
+                                    />
                                     <span className="font-medium text-[20px] text-gray-800 group-hover:text-[#1877f2] transition-colors">EMI Payment (Credit Card only)</span>
                                 </label>
                                 <div className="ml-[34px] text-[15px] space-y-1.5">
@@ -187,12 +276,17 @@ const Checkout = () => {
                             {/* Mobile Bank Payment */}
                             <div className="p-6 py-5">
                                 <label className="flex items-center space-x-3 cursor-pointer group mb-5">
-                                    <input type="radio" name="payment" className="w-[22px] h-[22px] text-[#1877f2] border-[2px] border-[#1877f2] focus:ring-[#1877f2] cursor-pointer" />
+                                    <input
+                                        type="radio"
+                                        name="payment"
+                                        checked={paymentMethod === 'Mobile Bank Payment'}
+                                        onChange={() => setPaymentMethod('Mobile Bank Payment')}
+                                        className="w-[22px] h-[22px] text-[#1877f2] border-[2px] border-[#1877f2] focus:ring-[#1877f2] cursor-pointer"
+                                    />
                                     <span className="font-medium text-[20px] text-gray-800 group-hover:text-[#1877f2] transition-colors">Mobile Bank Payment</span>
                                 </label>
                                 <div className="ml-[34px]">
                                     <div className="flex items-center gap-4">
-                                        {/* Mocking mobile payment logos */}
                                         <div className="w-[72px] h-[45px] border border-gray-100 rounded bg-[#f8f9fa] flex items-center justify-center shadow-sm">
                                             <span className="text-pink-600 font-bold text-[18px]">bKash</span>
                                         </div>
@@ -210,7 +304,13 @@ const Checkout = () => {
                             {/* COD */}
                             <div className="p-6 py-5">
                                 <label className="flex items-center space-x-3 cursor-pointer group flex-wrap gap-y-2">
-                                    <input type="radio" name="payment" className="w-[22px] h-[22px] text-[#1877f2] border-[2px] border-[#1877f2] focus:ring-[#1877f2] cursor-pointer flex-shrink-0" />
+                                    <input
+                                        type="radio"
+                                        name="payment"
+                                        checked={paymentMethod === 'Cash On Delivery'}
+                                        onChange={() => setPaymentMethod('Cash On Delivery')}
+                                        className="w-[22px] h-[22px] text-[#1877f2] border-[2px] border-[#1877f2] focus:ring-[#1877f2] cursor-pointer flex-shrink-0"
+                                    />
                                     <span className="font-medium text-[20px] text-gray-800 group-hover:text-[#1877f2] transition-colors">Cash On Delivery</span>
                                     <span className="text-[#1877f2] text-[15px] xl:ml-2 font-medium hover:underline cursor-pointer">(Advanced pay 10% For Order confirmation)</span>
                                     <span className="text-gray-900 text-[16px] font-bold xl:ml-2">Free Delivery</span>
@@ -220,7 +320,13 @@ const Checkout = () => {
                             {/* Store Pickup */}
                             <div className="p-6 pt-5 pb-8">
                                 <label className="flex items-center space-x-3 cursor-pointer group flex-wrap gap-y-2">
-                                    <input type="radio" name="payment" className="w-[22px] h-[22px] text-[#1877f2] border-[2px] border-[#1877f2] focus:ring-[#1877f2] cursor-pointer flex-shrink-0" />
+                                    <input
+                                        type="radio"
+                                        name="payment"
+                                        checked={paymentMethod === 'Store Pickup / Showroom Booking'}
+                                        onChange={() => setPaymentMethod('Store Pickup / Showroom Booking')}
+                                        className="w-[22px] h-[22px] text-[#1877f2] border-[2px] border-[#1877f2] focus:ring-[#1877f2] cursor-pointer flex-shrink-0"
+                                    />
                                     <span className="font-medium text-[20px] text-gray-800 group-hover:text-[#1877f2] transition-colors">Store Pickup / Showroom Booking</span>
                                     <span className="text-[#1877f2] text-[15px] xl:ml-2 font-medium hover:underline cursor-pointer">(Advanced pay 10% For Order confirmation)</span>
                                     <span className="text-gray-900 text-[16px] font-bold xl:ml-2">Get 5% OFF</span>
@@ -233,6 +339,8 @@ const Checkout = () => {
                     <section>
                         <h2 className="text-[24px] font-semibold mb-6 text-gray-900 tracking-wide">Delivery Note</h2>
                         <textarea
+                            value={deliveryNote}
+                            onChange={(e) => setDeliveryNote(e.target.value)}
                             className="w-full border border-gray-200 rounded-xl p-5 text-[15px] text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#1877f2] focus:border-[#1877f2] min-h-[160px] resize-y bg-white"
                             placeholder="Enter your instruction message"
                         ></textarea>
@@ -247,49 +355,76 @@ const Checkout = () => {
                                 Order Total <FiChevronDown className="ml-2 w-6 h-6 text-gray-500" />
                             </h2>
                             <div className="flex flex-col items-end">
-                                <span className="text-[26px] font-bold text-[#1877f2] tracking-tight">8,113,900</span>
-                                <span className="bg-[#ff3b30] text-white text-[12px] px-2.5 py-1 rounded mt-1 font-medium">Saving : 20%</span>
+                                <span className="text-[26px] font-bold text-[#1877f2] tracking-tight">৳{totals.total.toLocaleString()}</span>
+                                {totals.savePercent > 0 && (
+                                    <span className="bg-[#ff3b30] text-white text-[12px] px-2.5 py-1 rounded mt-1 font-medium">Saving : {totals.savePercent}%</span>
+                                )}
                             </div>
                         </div>
 
                         {/* Order Items */}
                         <div className="space-y-4 mb-8">
-                            {[1, 2].map((i) => (
-                                <div key={i} className="flex gap-4 p-4 bg-white border border-gray-200 rounded-xl items-start shadow-sm">
+                            {cartItems.map((item) => (
+                                <div key={item.id} className="flex gap-4 p-4 bg-white border border-gray-200 rounded-xl items-start shadow-sm">
                                     <div className="w-[72px] h-[72px] bg-gray-100 rounded-lg flex-shrink-0 relative overflow-hidden flex items-center justify-center border border-gray-100">
-                                        <div className="w-10 h-10 rounded-md border-[3px] border-gray-700 bg-gray-800 opacity-80 relative flex items-center justify-center">
-                                            <div className="w-5 h-5 rounded-full border border-gray-500 bg-black"></div>
-                                        </div>
+                                        <Image
+                                            src={item.image}
+                                            alt={item.title}
+                                            fill
+                                            className="object-contain p-1"
+                                        />
                                     </div>
                                     <div className="flex-1 flex justify-between">
                                         <div className="pr-3">
                                             <p className="text-[14px] text-gray-800 font-medium leading-[1.3]">
-                                                Washing Machine - 8KG |<br />SKU -5487 | Black
+                                                {item.title} | {item.color}
                                             </p>
-                                            <p className="text-[14px] text-gray-500 mt-2">QTY : 1</p>
+                                            <p className="text-[14px] text-gray-500 mt-2">QTY : {item.quantity}</p>
                                         </div>
                                         <div className="text-right flex flex-col items-end whitespace-nowrap">
-                                            <span className="text-[13px] text-[#a1a1aa] line-through font-medium">৳4,70,900</span>
-                                            <span className="font-bold text-[18px] mt-0.5 text-black">৳4,56,900</span>
+                                            <span className="text-[13px] text-[#a1a1aa] line-through font-medium">{item.originalPrice}</span>
+                                            <span className="font-bold text-[18px] mt-0.5 text-black">{item.price}</span>
                                         </div>
                                     </div>
                                 </div>
                             ))}
+                            {cartItems.length === 0 && (
+                                <p className="text-center text-gray-500 py-4 italic">Your cart is empty</p>
+                            )}
                         </div>
 
                         {/* Sub-Total */}
                         <div className="pt-2">
                             <h3 className="text-[20px] font-bold mb-5 text-gray-900">Sub -Total</h3>
                             <div className="space-y-3.5 text-[16px]">
-                                <div className="flex justify-between"><span className="text-gray-600">Save</span><span className="font-bold text-gray-900">৳13,500</span></div>
-                                <div className="flex justify-between"><span className="text-gray-600">Store Pickup</span><span className="font-bold text-gray-900">Free</span></div>
-                                <div className="flex justify-between"><span className="text-gray-600">TAX</span><span className="font-bold text-gray-900">Free</span></div>
-                                <div className="flex justify-between"><span className="text-gray-600">Delivery</span><span className="font-bold text-gray-900">Free/ Charge</span></div>
-                                <div className="flex justify-between"><span className="text-gray-600">Coupon Code</span><span className="font-bold text-gray-900">0</span></div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Save</span>
+                                    <span className="font-bold text-gray-900">৳{totals.savings.toLocaleString()}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Store Pickup</span>
+                                    <span className="font-bold text-gray-900">Free</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">TAX</span>
+                                    <span className="font-bold text-gray-900">Free</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Delivery</span>
+                                    <span className="font-bold text-gray-900">Free/ Charge</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Coupon Code</span>
+                                    <span className="font-bold text-gray-900">0</span>
+                                </div>
                             </div>
                         </div>
 
-                        <button className="w-full bg-[#1877f2] hover:bg-blue-600 text-white font-semibold py-4 rounded-xl mt-8 shadow-sm transition-colors text-[17px]">
+                        <button
+                            onClick={handlePlaceOrder}
+                            disabled={cartItems.length === 0}
+                            className={`w-full bg-[#1877f2] hover:bg-blue-600 text-white font-semibold py-4 rounded-xl mt-8 shadow-sm transition-colors text-[17px] ${cartItems.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
                             Place Order
                         </button>
                     </div>
