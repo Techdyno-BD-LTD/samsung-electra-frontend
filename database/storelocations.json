@@ -1,0 +1,89 @@
+{
+  "banner": {
+    "label": "image"
+  },
+  "searchPlaceholder": "Enter - district- thana etc....",
+  "filters": {
+    "serviceTypes": ["Service Center", "Brand Shop"],
+    "divisions": ["Division", "Dhaka", "Chattogram", "Khulna", "Rajshahi"],
+    "districts": ["District", "Dhaka", "Gazipur", "Narayanganj", "Cumilla"]
+  },
+  "map": {
+    "embedUrl": "https://maps.google.com/maps?q=Abdullapur%20Dhaka&t=&z=12&ie=UTF8&iwloc=&output=embed",
+    "title": "Store location map"
+  },
+  "stores": [
+    {
+      "id": 1,
+      "title": "Electra International Abdullapur, Dhaka",
+      "address": "Mojidullah Matbor Market, Abdullapur Bazar, Abdullapur, Keranigonj, Dhaka",
+      "phone": "+8801713092219",
+      "callHref": "tel:+8801713092219",
+      "messageHref": "https://wa.me/8801713092219",
+      "mapHref": "https://maps.google.com/?q=Abdullapur+Dhaka",
+      "hours": [
+        { "day": "Saturday", "time": "9:00 am - 9:00 pm" },
+        { "day": "Sunday", "time": "9:00 am - 9:00 pm" },
+        { "day": "Monday", "time": "9:00 am - 9:00 pm" },
+        { "day": "Tuesday", "time": "9:00 am - 9:00 pm" },
+        { "day": "Wednesday", "time": "9:00 am - 9:00 pm" },
+        { "day": "Thursday", "time": "9:00 am - 9:00 pm" },
+        { "day": "Friday", "time": "9:00 am - 9:00 pm" }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Electra International Abdullapur, Dhaka",
+      "address": "Mojidullah Matbor Market, Abdullapur Bazar, Abdullapur, Keranigonj, Dhaka",
+      "phone": "+8801713092219",
+      "callHref": "tel:+8801713092219",
+      "messageHref": "https://wa.me/8801713092219",
+      "mapHref": "https://maps.google.com/?q=Abdullapur+Dhaka",
+      "hours": [
+        { "day": "Saturday", "time": "9:00 am - 9:00 pm" },
+        { "day": "Sunday", "time": "9:00 am - 9:00 pm" },
+        { "day": "Monday", "time": "9:00 am - 9:00 pm" },
+        { "day": "Tuesday", "time": "9:00 am - 9:00 pm" },
+        { "day": "Wednesday", "time": "9:00 am - 9:00 pm" },
+        { "day": "Thursday", "time": "9:00 am - 9:00 pm" },
+        { "day": "Friday", "time": "9:00 am - 9:00 pm" }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Electra International Abdullapur, Dhaka",
+      "address": "Mojidullah Matbor Market, Abdullapur Bazar, Abdullapur, Keranigonj, Dhaka",
+      "phone": "+8801713092219",
+      "callHref": "tel:+8801713092219",
+      "messageHref": "https://wa.me/8801713092219",
+      "mapHref": "https://maps.google.com/?q=Abdullapur+Dhaka",
+      "hours": [
+        { "day": "Saturday", "time": "9:00 am - 9:00 pm" },
+        { "day": "Sunday", "time": "9:00 am - 9:00 pm" },
+        { "day": "Monday", "time": "9:00 am - 9:00 pm" },
+        { "day": "Tuesday", "time": "9:00 am - 9:00 pm" },
+        { "day": "Wednesday", "time": "9:00 am - 9:00 pm" },
+        { "day": "Thursday", "time": "9:00 am - 9:00 pm" },
+        { "day": "Friday", "time": "9:00 am - 9:00 pm" }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Electra International Abdullapur, Dhaka",
+      "address": "Mojidullah Matbor Market, Abdullapur Bazar, Abdullapur, Keranigonj, Dhaka",
+      "phone": "+8801713092219",
+      "callHref": "tel:+8801713092219",
+      "messageHref": "https://wa.me/8801713092219",
+      "mapHref": "https://maps.google.com/?q=Abdullapur+Dhaka",
+      "hours": [
+        { "day": "Saturday", "time": "9:00 am - 9:00 pm" },
+        { "day": "Sunday", "time": "9:00 am - 9:00 pm" },
+        { "day": "Monday", "time": "9:00 am - 9:00 pm" },
+        { "day": "Tuesday", "time": "9:00 am - 9:00 pm" },
+        { "day": "Wednesday", "time": "9:00 am - 9:00 pm" },
+        { "day": "Thursday", "time": "9:00 am - 9:00 pm" },
+        { "day": "Friday", "time": "9:00 am - 9:00 pm" }
+      ]
+    }
+  ]
+}
