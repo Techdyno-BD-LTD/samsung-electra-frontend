@@ -1,0 +1,140 @@
+{
+  "title": "A diverse and professionally managed business conglomerate.",
+  "founder": {
+    "sectionTitle": "The Founder",
+    "name": "Mr. Al Haj Md. Shahidullah",
+    "year": "Year Of Establishment 1976",
+    "description": "He Was Respectul Person and He was the founder chairman of Electra International which today is one of Bangldesh’s largest and most diversified business conglomerates",
+    "image": "/images/founder-placeholder.png"
+  },
+  "history": {
+    "sectionTitle": "Company History",
+    "content": "<p class='mb-4 text-[16px] !text-justify lg:text-[20px]'>Electra International Limited, a privately owned company, stands as one of the oldest and largest electronics traders, distributors, and sellers in Bangladesh. Founded by Al Haj Md. Shahidullah, the company was later led by his sons, including Md. Sanaullah Shahid as Chairman, Md. Zakiullah Shahid as Managing Director, Mohammad Zafarullah Shahid, and Md. Wahiullah Shahid as Directors.</p><p class=' text-[16px] !text-justify lg:text-[20px]'>Beginning with a single showroom, Electra International ventured into the consumer electronics (CE) business, offering a wide array of products such as ACs, LED TVs, refrigerators, microwaves, washing machines, and more. Over the years, the company has expanded its reach with 48 outlets and over 100 dealer shops, establishing itself as a prominent distributor of Samsung CE products in Bangladesh.</p>"
+  },
+  "directors": {
+    "sectionTitle": "Meet Our Directors",
+    "list": [
+      {
+        "name": "Md. Sanaullah Shahid",
+        "role": "Chairman",
+        "image": "/images/sanaullah.png"
+      },
+      {
+        "name": "Md. Zakiullah Shahid",
+        "role": "Managing Director",
+        "image": "/images/zakiullah.png"
+      },
+      {
+        "name": "Md. Zafarullah Shahid",
+        "role": "Director",
+        "image": "/images/zafarullah.png"
+      },
+      {
+        "name": "Md. Wahiullah Shahid",
+        "role": "Director",
+        "image": "/images/wahiullah.png"
+      }
+    ]
+  },
+  "missionVision": {
+    "items": [
+      {
+        "title": "Who We Are",
+        "description": "Electra International is a trusted name in consumer electronics dedicated to bringing premium-quality home and lifestyle appliances to customers across Bangladesh. With a strong focus on authenticity, innovation, and customer satisfaction.",
+        "icon": "Groups"
+      },
+      {
+        "title": "Our Vision",
+        "description": "Electra International is a trusted name in consumer electronics dedicated to bringing premium-quality home and lifestyle appliances to customers across Bangladesh. With a strong focus on authenticity, innovation, and customer satisfaction.",
+        "icon": "Target",
+        "isHighlighted": true
+      },
+      {
+        "title": "Our Mission",
+        "description": "Electra International is a trusted name in consumer electronics dedicated to bringing premium-quality home and lifestyle appliances to customers across Bangladesh. With a strong focus on authenticity, innovation, and customer satisfaction.",
+        "icon": "Rocket"
+      }
+    ]
+  },
+  "retails": {
+    "title": "Retails",
+    "paragraphs": [
+      "Electra International have 42+ Showroom all over in bangladesh. Electra International multi-brand portfolio includes globally renowned brands like Samsung, Electra,Whirlpool,Philips etc Eelctra to cater to all segments of customers and offer the best buying experience for customers in electronics, home appliances, air-conditioning, small appliances",
+      "The company has its own online platform electrabd.com.com as moves towards evolving into an omnichannel retail platform.Electra International have 42+ Showroom all over in bangladesh. Electra International multi-brand portfolio includes globally renowned brands like Samsung, Electra,Whirlpool,Philips etc Eelctra to cater to all segments of customers and offer the best buying experience for customers in electronics, home appliances, air-conditioning, small appliances"
+    ],
+    "image": "/images/retail.png"
+  },
+  "distribution": {
+    "title": "Distribution",
+    "paragraphs": [
+      "Electra International have 42+ Showroom all over in bangladesh. Electra International multi-brand portfolio includes globally renowned brands like Samsung, Electra,Whirlpool,Philips etc Eelctra to cater to all segments of customers and offer the best buying experience for customers in electronics, home appliances, air-conditioning, small appliances",
+      "The company has its own online platform electrabd.com.com as moves towards evolving into an omnichannel retail platform.Electra International have 42+ Showroom all over in bangladesh. Electra International multi-brand portfolio includes globally renowned brands like Samsung, Electra,Whirlpool,Philips etc Eelctra to cater to all segments of customers and offer the best buying experience for customers in electronics, home appliances, air-conditioning, small appliances"
+    ],
+    "image": "/images/retail.png"
+  },
+  "brands": {
+    "title": "Our Brands",
+    "subtitle": "Supplying world-class consumer electronics backed by reliability, service, and innovation.",
+    "list": [
+      { "name": "SAMSUNG", "logo": "/images/samsung1.png" },
+      { "name": "Whirlpool", "logo": "/images/whirpool1.png" },
+      { "name": "electra", "logo": "/images/electra1.png" },
+      { "name": "PHILIPS", "logo": "/images/phillips1.png" }
+    ]
+  },
+  "services": {
+    "title": "Our Services",
+    "subtitle": "Supplying world-class consumer electronics backed by reliability, service, and innovation.",
+    "description": "To provide superior customer service, Electra has built a nationwide service network with integrated call center operations. Electra is also the official service partner for Samsung, Whirlpool, electra , philips  and other brands in Bangladesh.",
+    "images": [
+      "/images/service1.png",
+      "/images/service2.png"
+    ]
+  },
+  "sisterConcerns": {
+    "title": "Electra Sister Concerns",
+    "subtitle": "Supplying world-class consumer electronics backed by reliability, service, and innovation.",
+    "list": [
+      { "id": 1, "image": "/images/service2.png", "btnText": "Read more" },
+      { "id": 2, "image": "/images/service2.png", "btnText": "Read more" },
+      { "id": 3, "image": "/images/service2.png", "btnText": "Read more" },
+      { "id": 4, "image": "/images/service2.png", "btnText": "Read more" }
+    ]
+  },
+  "inquiry": {
+    "title": "Submit An Inquiry",
+    "subtitle": "Technical complaints, adverse events & suggestions can be sent via this form.",
+    "btnText": "Inquiry From"
+  },
+  "network": {
+    "title": "Electra CE Network",
+    "stats": [
+      {
+        "value": "26",
+        "label": "Districts"
+      },
+      {
+        "value": "508",
+        "label": "Employees"
+      },
+      {
+        "value": "42",
+        "label": "Own Retail"
+      },
+      {
+        "value": "100+",
+        "label": "Dealers"
+      }
+    ],
+    "image": "/images/map2.png"
+  },
+  "contactBanner": {
+    "title": "Need To Know More About us",
+    "description": "At Electra International, we go beyond selling electronics—we build lasting relationships through trust, quality, and service excellence.",
+    "btnText": "Contact Us"
+  }
+}
+
+
+
+

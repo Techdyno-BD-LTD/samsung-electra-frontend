@@ -3,36 +3,68 @@
     "id": 1,
     "name": "Air Conditioner",
     "slug": "air-conditioner",
-    "subcategories": ["Split AC", "Window AC", "Inverter AC", "Portable AC"]
+    "subcategories": [
+      { "name": "Split AC", "count": 42 },
+      { "name": "Window AC", "count": 18 },
+      { "name": "Inverter AC", "count": 56 },
+      { "name": "Portable AC", "count": 12 }
+    ]
   },
   {
     "id": 2,
     "name": "TV and Audio",
     "slug": "tv-and-audio",
-    "subcategories": ["Smart TV", "LED TV", "Soundbar", "Home Theater", "Bluetooth Speaker"]
+    "subcategories": [
+      { "name": "Flat", "count": 58 },
+      { "name": "Uhd Tv", "count": 84 },
+      { "name": "Qled", "count": 58 },
+      { "name": "Smart Tv", "count": 106 },
+      { "name": "Hd Tv", "count": 64 },
+      { "name": "Sound Bar", "count": 58 }
+    ]
   },
   {
     "id": 3,
     "name": "Refrigerator",
     "slug": "refrigerator",
-    "subcategories": ["Single Door", "Double Door", "Side by Side", "French Door"]
+    "subcategories": [
+      { "name": "Single Door", "count": 34 },
+      { "name": "Double Door", "count": 48 },
+      { "name": "Side by Side", "count": 22 },
+      { "name": "French Door", "count": 16 }
+    ]
   },
   {
     "id": 4,
     "name": "Microwave",
     "slug": "microwave",
-    "subcategories": ["Solo Microwave", "Grill Microwave", "Convection Microwave"]
+    "subcategories": [
+      { "name": "Solo Microwave", "count": 28 },
+      { "name": "Grill Microwave", "count": 36 },
+      { "name": "Convection Microwave", "count": 42 }
+    ]
   },
   {
     "id": 5,
     "name": "Washing Machine",
     "slug": "washing-machine",
-    "subcategories": ["Front Loading", "Top Loading", "Washer Dryer Combo", "Semi Automatic"]
+    "subcategories": [
+      { "name": "Front Loading", "count": 38 },
+      { "name": "Top Loading", "count": 52 },
+      { "name": "Washer Dryer Combo", "count": 18 },
+      { "name": "Semi Automatic", "count": 24 }
+    ]
   },
   {
     "id": 6,
     "name": "Kitchen Appliance",
     "slug": "kitchen-appliance",
-    "subcategories": ["Induction Cooker", "Rice Cooker", "Blender", "Electric Kettle", "Dishwasher"]
+    "subcategories": [
+      { "name": "Induction Cooker", "count": 22 },
+      { "name": "Rice Cooker", "count": 34 },
+      { "name": "Blender", "count": 28 },
+      { "name": "Electric Kettle", "count": 18 },
+      { "name": "Dishwasher", "count": 14 }
+    ]
   }
 ]

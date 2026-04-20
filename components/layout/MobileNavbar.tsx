@@ -5,9 +5,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { FaTimes, FaBars, FaFacebook, FaInstagram, FaYoutube, FaLinkedin, FaWhatsapp, FaFacebookMessenger } from "react-icons/fa";
 import { useAppSelector } from "@/store/hooks";
+import { usePathname } from "next/navigation";
 
 export default function MobileNavbar() {
   const [mounted, setMounted] = useState(false);
+  const pathname = usePathname();
   const cartTotalCount = useAppSelector((state) => 
     state.cart.items.reduce((total, item) => total + item.quantity, 0)
   );
@@ -88,20 +90,22 @@ export default function MobileNavbar() {
             </button>
 
             {/* Cart with Badge */}
-            <Link href="/cart" className="relative">
-              <Image
-                src="/images/shopping-cart.png"
-                alt="Cart"
-                width={20}
-                height={20}
-                className="w-5 h-5"
-              />
-              {mounted && cartTotalCount > 0 && (
-                <span className="absolute -top-2 -right-2 flex h-[14px] w-[14px] items-center justify-center rounded-full bg-[#ef4444] text-[8px] font-bold text-white border border-white">
-                  {cartTotalCount < 10 ? `0${cartTotalCount}` : cartTotalCount}
-                </span>
-              )}
-            </Link>
+            {pathname?.includes('/products/') && (
+              <Link href="/cart" className="relative">
+                <Image
+                  src="/images/shopping-cart.png"
+                  alt="Cart"
+                  width={20}
+                  height={20}
+                  className="w-5 h-5"
+                />
+                {mounted && cartTotalCount > 0 && (
+                  <span className="absolute -top-2 -right-2 flex h-[14px] w-[14px] items-center justify-center rounded-full bg-[#ef4444] text-[8px] font-bold text-white border border-white">
+                    {cartTotalCount < 10 ? `0${cartTotalCount}` : cartTotalCount}
+                  </span>
+                )}
+              </Link>
+            )}
 
             {/* Hamburger Menu */}
             <button

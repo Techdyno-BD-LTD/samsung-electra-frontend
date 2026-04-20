@@ -1,9 +1,13 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function MobileBottomBar() {
+  const pathname = usePathname();
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+
+  if (pathname !== "/") return null;
 
   const navLinks = [
     { name: "About Us", href: "/about", active: true },

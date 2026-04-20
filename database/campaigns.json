@@ -1,0 +1,23 @@
+{
+  "pageTitle": "Find your campaign offer & Buy your favorite products",
+  "campaigns": [
+    {
+      "id": "campaign-1",
+      "title": "Electronics Mega Weekend",
+      "image": "/images/camping1.png",
+      "alt": "Electronics campaign banner",
+      "endAt": "2026-05-01T23:59:59+06:00",
+      "ctaText": "Shop now",
+      "ctaHref": "/shop"
+    },
+    {
+      "id": "campaign-2",
+      "title": "Home Appliance Special Offer",
+      "image": "/images/camping2.png",
+      "alt": "Home appliance campaign banner",
+      "endAt": "2026-05-12T23:59:59+06:00",
+      "ctaText": "See deals",
+      "ctaHref": "/shop"
+    }
+  ]
+}

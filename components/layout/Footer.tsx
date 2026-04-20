@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
- 
+
   FaFacebookF,
   FaInstagram,
   FaYoutube,
@@ -176,7 +176,7 @@ export default function Footer() {
               <ul className="space-y-2.5 text-[15px]">
                 <li><Link href="/about-us" className="hover:text-blue-600 transition-colors">About Us</Link></li>
                 <li><Link href="/brands" className="hover:text-blue-600 transition-colors">Brands</Link></li>
-                <li><Link href="/contact-us" className="hover:text-blue-600 transition-colors">Contact Us</Link></li>
+                <li><Link href="/contact" className="hover:text-blue-600 transition-colors">Contact Us</Link></li>
                 <li><Link href="/emi-bank-list" className="hover:text-blue-600 transition-colors">EMI Bank List</Link></li>
                 <li>
                   <Link href="/career" className="flex items-center gap-2 hover:text-blue-600 transition-colors">
@@ -243,46 +243,46 @@ export default function Footer() {
               </ul>
 
               <div className="w-full mt-8 hidden lg:block">
-        <h3 className="text-xl font-semibold text-gray-800 mb-4">Secured Payment Method</h3>
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">Secured Payment Method</h3>
 
-        <div className="flex gap-4 items-center mb-6">
-          {/* Cash on Delivery Image Container */}
-          <div className="rounded p-2 flex items-center justify-center bg-white shadow-sm">
-            <Image
-              src="/images/easycod.png"
-              alt="Cash on Delivery"
-              width={120}
-              height={40}
-              className="object-contain"
-            />
-          </div>
+                <div className="flex gap-4 items-center mb-6">
+                  {/* Cash on Delivery Image Container */}
+                  <div className="rounded p-2 flex items-center justify-center bg-white shadow-sm">
+                    <Image
+                      src="/images/easycod.png"
+                      alt="Cash on Delivery"
+                      width={120}
+                      height={40}
+                      className="object-contain"
+                    />
+                  </div>
 
-          {/* Easy EMI Payment Image Container */}
-          <div className="rounded p-2 flex items-center justify-center bg-white shadow-sm">
-            <Image
-              src="/images/easyemi.png"
-              alt="Easy EMI Payment"
-              width={120}
-              height={40}
-              className="object-contain"
-            />
-          </div>
-        </div>
+                  {/* Easy EMI Payment Image Container */}
+                  <div className="rounded p-2 flex items-center justify-center bg-white shadow-sm">
+                    <Image
+                      src="/images/easyemi.png"
+                      alt="Easy EMI Payment"
+                      width={120}
+                      height={40}
+                      className="object-contain"
+                    />
+                  </div>
+                </div>
 
-        <div className="text-center">
-          <Image
-            src="/images/pmethod.png"
-            alt="Payment Methods"
-            width={300}
-            height={80}
-            className="w-full h-auto transition-all duration-300"
-          />
-        </div>
+                <div className="text-center">
+                  <Image
+                    src="/images/pmethod.png"
+                    alt="Payment Methods"
+                    width={300}
+                    height={80}
+                    className="w-full h-auto transition-all duration-300"
+                  />
+                </div>
 
-        <p className="text-[#0054A6] text-[15px] font-semibold text-center mt-4">
-          15% discount on pay with visa Master card
-        </p>
-      </div>
+                <p className="text-[#0054A6] text-[15px] font-semibold text-center mt-4">
+                  15% discount on pay with visa Master card
+                </p>
+              </div>
 
             </div>
 
@@ -304,7 +304,7 @@ export default function Footer() {
         <div className="lg:hidden w-full">
           {/* Company Accordion */}
           <div className="mb-4 border border-gray-300 rounded-lg overflow-hidden">
-            <button 
+            <button
               onClick={() => toggleSection('company')}
               className="w-full flex justify-between items-center py-1 px-4 text-left bg-[#B4CBE3] hover:bg-[#A8B8D0] transition-colors"
             >
@@ -332,7 +332,7 @@ export default function Footer() {
 
           {/* My Account Accordion */}
           <div className="mb-4 border border-gray-300 rounded-lg overflow-hidden">
-            <button 
+            <button
               onClick={() => toggleSection('myAccount')}
               className="w-full flex justify-between items-center py-1 px-4 text-left bg-[#B4CBE3] hover:bg-[#A8B8D0] transition-colors"
             >
@@ -355,7 +355,7 @@ export default function Footer() {
 
           {/* After Sales Support Accordion */}
           <div className="mb-4 border border-gray-300 rounded-lg overflow-hidden">
-            <button 
+            <button
               onClick={() => toggleSection('afterSales')}
               className="w-full flex justify-between items-center py-1 px-4 text-left bg-[#B4CBE3] hover:bg-[#A8B8D0] transition-colors"
             >
@@ -389,7 +389,7 @@ export default function Footer() {
 
           {/* Popular Accordion */}
           <div className="mb-4 border border-gray-300 rounded-lg overflow-hidden">
-            <button 
+            <button
               onClick={() => toggleSection('popular')}
               className="w-full flex justify-between items-center py-1 px-4 text-left bg-[#B4CBE3] hover:bg-[#A8B8D0] transition-colors"
             >
@@ -409,7 +409,7 @@ export default function Footer() {
 
           {/* Customer Service Accordion */}
           <div className="border border-gray-300 rounded-lg overflow-hidden">
-            <button 
+            <button
               onClick={() => toggleSection('customerService')}
               className="w-full flex justify-between items-center py-1 px-4 text-left bg-[#B4CBE3] hover:bg-[#A8B8D0] transition-colors"
             >
@@ -432,52 +432,52 @@ export default function Footer() {
 
       {/* Secured Payment Method - Full Width Section */}
       <div className="w-full mt-8 flex flex-col lg:hidden items-center md:items-start">
-  {/* Title: Centered on mobile, left-aligned on desktop */}
-  <h3 className="text-xl font-semibold text-gray-800 mb-4 text-center md:text-left w-full">
-    Secured Payment Method
-  </h3>
+        {/* Title: Centered on mobile, left-aligned on desktop */}
+        <h3 className="text-xl font-semibold text-gray-800 mb-4 text-center md:text-left w-full">
+          Secured Payment Method
+        </h3>
 
-  {/* Image row: Centered on mobile, gap-4 on desktop */}
-  <div className="flex gap-4 items-center justify-center md:justify-start mb-6 w-full">
-    {/* Cash on Delivery */}
-    <div className="rounded p-2 flex items-center justify-center bg-white shadow-sm">
-      <Image
-        src="/images/easycod.png"
-        alt="Cash on Delivery"
-        width={120}
-        height={40}
-        className="object-contain"
-      />
-    </div>
+        {/* Image row: Centered on mobile, gap-4 on desktop */}
+        <div className="flex gap-4 items-center justify-center md:justify-start mb-6 w-full">
+          {/* Cash on Delivery */}
+          <div className="rounded p-2 flex items-center justify-center bg-white shadow-sm">
+            <Image
+              src="/images/easycod.png"
+              alt="Cash on Delivery"
+              width={120}
+              height={40}
+              className="object-contain"
+            />
+          </div>
 
-    {/* Easy EMI */}
-    <div className="rounded p-2 flex items-center justify-center bg-white shadow-sm">
-      <Image
-        src="/images/easyemi.png"
-        alt="Easy EMI Payment"
-        width={120}
-        height={40}
-        className="object-contain"
-      />
-    </div>
-  </div>
+          {/* Easy EMI */}
+          <div className="rounded p-2 flex items-center justify-center bg-white shadow-sm">
+            <Image
+              src="/images/easyemi.png"
+              alt="Easy EMI Payment"
+              width={120}
+              height={40}
+              className="object-contain"
+            />
+          </div>
+        </div>
 
-  {/* Full Payment Methods Image */}
-  <div className="text-center w-11/12 mx-auto">
-    <Image
-      src="/images/pmethod.png"
-      alt="Payment Methods"
-      width={300}
-      height={80}
-      className="w-full h-auto transition-all duration-300 mx-auto md:mx-0"
-    />
-  </div>
+        {/* Full Payment Methods Image */}
+        <div className="text-center w-11/12 mx-auto">
+          <Image
+            src="/images/pmethod.png"
+            alt="Payment Methods"
+            width={300}
+            height={80}
+            className="w-full h-auto transition-all duration-300 mx-auto md:mx-0"
+          />
+        </div>
 
-  {/* Promo Text: Always centered based on your original code, but kept text-center */}
-  <p className="text-[#0054A6] text-[15px] font-semibold text-center mt-4 w-full">
-    15% discount on pay with visa Master card
-  </p>
-</div>
+        {/* Promo Text: Always centered based on your original code, but kept text-center */}
+        <p className="text-[#0054A6] text-[15px] font-semibold text-center mt-4 w-full">
+          15% discount on pay with visa Master card
+        </p>
+      </div>
 
       {/* Footer Bottom */}
       <div className="container mx-auto px-4 lg:px-12 mt-12 pt-6 border-t border-blue-200">

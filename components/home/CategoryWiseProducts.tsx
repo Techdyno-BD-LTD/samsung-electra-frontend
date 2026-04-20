@@ -85,15 +85,15 @@ export default function CategoryWiseProducts({
 
 	return (
 		<section className="mx-auto space-y-6">
-			<div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-				<div>
+			<div className="flex flex-row items-center justify-between gap-4">
+				<div className="flex-1">
 					<h2 className="text-[18px] font-semibold text-slate-900 sm:text-[2.1rem]">{title}</h2>
-					<div className="mt-5 h-[2px] w-[260px] bg-gradient-to-r from-[#2F73BD] via-[#2F73BD]/50 to-transparent sm:w-[380px]" />
+					<div className="mt-2 sm:mt-5 h-[2px] w-full max-w-[260px] bg-gradient-to-r from-[#2F73BD] via-[#2F73BD]/50 to-transparent sm:max-w-[380px]" />
 				</div>
 
 				<Link
 					href={seeMoreHref}
-					className="inline-flex items-center rounded-full border border-[#2F73BD] px-5 py-2 text-sm font-medium text-[#2F73BD] transition hover:bg-[#2F73BD] hover:text-white"
+					className="inline-flex flex-shrink-0 items-center rounded-full border border-[#2F73BD] px-4 py-1.5 text-xs font-medium text-[#2F73BD] transition hover:bg-[#2F73BD] hover:text-white sm:px-5 sm:py-2 sm:text-sm"
 				>
 					See More
 				</Link>

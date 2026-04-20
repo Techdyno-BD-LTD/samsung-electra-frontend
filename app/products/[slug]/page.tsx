@@ -18,6 +18,8 @@ import MobileProductGallery from "@/components/productdetails/MobileProductGalle
 import MobileStickyPurchaseBar from "@/components/productdetails/MobileStickyPurchaseBar";
 import MobileOfferDetails from "@/components/productdetails/MobileOfferDetails";
 import MobileMadeInFeatures from "@/components/productdetails/MobileMadeInFeatures";
+import MobileBackButton from "@/components/productdetails/MobileBackButton";
+import FooterBreadcrumbPortal from "@/components/productdetails/FooterBreadcrumbPortal";
 
 type PageProps = {
   params: { slug: string };
@@ -362,7 +364,7 @@ export async function generateStaticParams() {
 }
 
 export default function ProductDetailPage({ params }: PageProps) {
-  
+
 
   const product = getProductBySlug(params.slug);
 
@@ -379,10 +381,13 @@ export default function ProductDetailPage({ params }: PageProps) {
   return (
     <div className="pb-[118px] md:pb-0">
       {/* Product Image and Buy now Section */}
-      <section className="  mt-16  ">
+      <section className="  mt-10  ">
+        <div className="mb-3 px-4 lg:hidden">
+          <MobileBackButton />
+        </div>
         <nav
           aria-label="Breadcrumb"
-          className="mb-3 flex items-center gap-2 lg:text-sm text-[12px] leading-none text-slate-500"
+          className="mb-3 hidden lg:flex items-center gap-2 lg:text-sm text-[12px] leading-none text-slate-500 px-4 md:px-0"
         >
           <span>Home</span>
           <span className="text-slate-400">›</span>
@@ -633,7 +638,7 @@ export default function ProductDetailPage({ params }: PageProps) {
                     </button>
                   </div>
 
-                  
+
                 </div>
               </div>
 
@@ -779,7 +784,7 @@ export default function ProductDetailPage({ params }: PageProps) {
       </section>
 
       {/* Detailed Product Details */}
-      
+
       <ProductDetailsTabs
         title={`${product.title} | ${product.model}`}
         descriptionHtml={product.descriptionHtml ?? buildDescriptionHtml(product)}
@@ -798,8 +803,20 @@ export default function ProductDetailPage({ params }: PageProps) {
         emiDetailsLabel={product.emiDetailsLabel}
       />
 
-
-
+      <FooterBreadcrumbPortal>
+        <div className="">
+          <nav
+            aria-label="Breadcrumb"
+            className="flex flex-wrap items-center gap-2 text-[12px] leading-none text-slate-500"
+          >
+            <span>Home</span>
+            <span className="text-slate-400">›</span>
+            <span>{breadcrumbCategory}</span>
+            <span className="text-slate-400">›</span>
+            <span className="text-slate-700">Washing Machine details</span>
+          </nav>
+        </div>
+      </FooterBreadcrumbPortal>
 
     </div>
   );

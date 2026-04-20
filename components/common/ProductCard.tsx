@@ -84,9 +84,9 @@ const ProductCard = ({
   dealImageHeight = "180px",
 }: ProductCardProps) => {
   const dispatch = useAppDispatch();
-  
+
   const productSlug = slug || toProductSlug(title);
-  
+
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -113,15 +113,15 @@ const ProductCard = ({
     normalizedBadgeLabel === "sale"
       ? "bg-red-600"
       : normalizedBadgeLabel === "new"
-      ? "bg-emerald-600"
-      : normalizedBadgeLabel === "hot"
-      ? "bg-orange-500"
-      : normalizedBadgeLabel === "sold out"
-      ? "bg-slate-600"
-      : normalizedBadgeLabel === "special"
-      ? "bg-blue-600"
-      : "bg-red-600";
-  
+        ? "bg-emerald-600"
+        : normalizedBadgeLabel === "hot"
+          ? "bg-orange-500"
+          : normalizedBadgeLabel === "sold out"
+            ? "bg-slate-600"
+            : normalizedBadgeLabel === "special"
+              ? "bg-blue-600"
+              : "bg-red-600";
+
   // Refined Star Renderer: Smaller (h-3) and Orange (orange-400)
   const renderStars = (count: number) => {
     return (
@@ -129,11 +129,10 @@ const ProductCard = ({
         {Array.from({ length: 5 }, (_, i) => (
           <FaStar
             key={i}
-            className={`h-3 w-3 ${
-              i < Math.floor(count)
+            className={`h-3 w-3 ${i < Math.floor(count)
                 ? "fill-orange-400 text-orange-400"
                 : "fill-gray-200 text-gray-200"
-            }`}
+              }`}
           />
         ))}
       </div>
@@ -379,7 +378,7 @@ const ProductCard = ({
           )}
         </div>
 
-        <p className="pb-2 text-center text-[9px] uppercase tracking-wide text-muted-foreground sm:pb-3 sm:text-[10px] sm:tracking-wider">
+        <p className="hidden sm:block pb-2 text-center text-[9px] uppercase tracking-wide text-muted-foreground sm:pb-3 sm:text-[10px] sm:tracking-wider">
           <Link href={productHref}>Quick Look</Link>
         </p>
 
@@ -513,7 +512,7 @@ const ProductCard = ({
         )}
       </div>
 
-      <p className="pb-2 text-center text-[9px] uppercase tracking-wide text-muted-foreground sm:pb-3 sm:text-[10px] sm:tracking-wider">
+      <p className="hidden sm:block pb-2 text-center text-[9px] uppercase tracking-wide text-muted-foreground sm:pb-3 sm:text-[10px] sm:tracking-wider">
         <Link href={productHref}>Quick Look</Link>
       </p>
 
@@ -543,24 +542,24 @@ const ProductCard = ({
       </h3>
 
       {/* EMI Info */}
-     <div className="flex items-start justify-between gap-1 px-2 pb-1 sm:items-center sm:px-4">
-  <span className="flex min-w-0 items-center gap-1 text-[10px] text-muted-foreground sm:text-xs">
-    {/* Icon Image Tag */}
-    <Image 
-      src="/images/EMI.png" // Tomar icon er file path ekhane hobe
-      alt="EMI Icon"
-      width={12}  // Size tulo-namulok bhabe choto rakha hoyeche text er sathe milate
-      height={12}
-      className="object-contain"
-    />
-    <span className="line-clamp-2 leading-4 sm:line-clamp-1">
-      {emiPrice} |
-    </span>
-  </span>
-  <button className="shrink-0 text-[10px] font-semibold text-blue-600 hover:underline sm:text-xs">
-    EMI Details
-  </button>
-</div>
+      <div className="flex items-start justify-between gap-1 px-2 pb-1 sm:items-center sm:px-4">
+        <span className="flex min-w-0 items-center gap-1 text-[10px] text-muted-foreground sm:text-xs">
+          {/* Icon Image Tag */}
+          <Image
+            src="/images/EMI.png" // Tomar icon er file path ekhane hobe
+            alt="EMI Icon"
+            width={12}  // Size tulo-namulok bhabe choto rakha hoyeche text er sathe milate
+            height={12}
+            className="object-contain"
+          />
+          <span className="line-clamp-2 leading-4 sm:line-clamp-1">
+            {emiPrice} |
+          </span>
+        </span>
+        <button className="shrink-0 text-[10px] font-semibold text-blue-600 hover:underline sm:text-xs">
+          EMI Details
+        </button>
+      </div>
 
       {/* Pricing */}
       <div className="flex flex-wrap items-center gap-1.5 px-2 pb-2 sm:gap-2 sm:px-4">
@@ -572,12 +571,12 @@ const ProductCard = ({
           {discountPercent}
         </span>
         {saveAmount && (
-        <div className="">
-          <span className="inline-block rounded-tl-2xl rounded-br-2xl bg-red-600 px-2 py-0.5 text-[9px] font-medium text-white uppercase sm:px-3 sm:py-1 sm:text-[10px]">
-         {saveAmount}
-          </span>
-        </div>
-      )}
+          <div className="">
+            <span className="inline-block rounded-tl-2xl rounded-br-2xl bg-red-600 px-2 py-0.5 text-[9px] font-medium text-white uppercase sm:px-3 sm:py-1 sm:text-[10px]">
+              {saveAmount}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Savings Badge */}
@@ -590,16 +589,25 @@ const ProductCard = ({
       )} */}
 
       {/* Tags */}
-      <div className="flex flex-wrap gap-1.5 px-2 pb-3 sm:gap-2 sm:px-4 sm:pb-4">
-        {tags.map((tag) => (
-          <span
-            key={tag}
-            className="rounded-full bg-[#E7EEF6] px-2 py-1 text-[9px] font-semibold text-[#0054A6] sm:px-3 sm:text-[10px]"
-          >
-            {tag}
-          </span>
-        ))}
-      </div>
+      {tags.length > 0 && (
+        <div
+          className="px-2 pb-3 sm:px-4 sm:pb-4"
+          style={{
+            display: "grid",
+            gridTemplateColumns: `repeat(${tags.length}, 1fr)`,
+            gap: "6px",
+          }}
+        >
+          {tags.map((tag) => (
+            <span
+              key={tag}
+              className="rounded-full bg-[#E7EEF6] py-1 text-center text-[9px] font-semibold text-[#0054A6] sm:text-[10px]"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      )}
 
       {/* Mobile CTA */}
       <div className="px-2 pb-3 sm:hidden">

@@ -27,9 +27,10 @@ export default function RootLayout({
       >
         <StoreProvider>
           <Navbar />
-          <main className="min-h-screen mainwidth pb-16 pt-8 lg:pt-28  ">
+          <main className="mainwidth pb-16 pt-8 lg:pt-28  ">
             {children}
           </main>
+          <div id="footer-breadcrumb-target" className="lg:hidden mx-auto mainwidthmore mb-4 px-4"></div>
           <Footer />
           <MobileBottomNav />
         </StoreProvider>

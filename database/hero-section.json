@@ -6,43 +6,50 @@
       "id": 1,
       "name": "Tv & Audio (Mc)",
       "count": 12,
-      "icon": "tv"
+      "icon": "tv",
+      "slug": "tv-and-audio"
     },
     {
       "id": 2,
       "name": "Refrigerator",
       "count": 28,
-      "icon": "refrigerator"
+      "icon": "refrigerator",
+      "slug": "refrigerator"
     },
     {
       "id": 3,
       "name": "Freezer",
       "count": 12,
-      "icon": "freezer"
+      "icon": "freezer",
+      "slug": "refrigerator"
     },
     {
       "id": 4,
       "name": "Air Conditional",
       "count": 6,
-      "icon": "ac"
+      "icon": "ac",
+      "slug": "air-conditioner"
     },
     {
       "id": 5,
       "name": "Microwave",
       "count": 24,
-      "icon": "microwave"
+      "icon": "microwave",
+      "slug": "microwave"
     },
     {
       "id": 6,
       "name": "Washing Machine",
       "count": 8,
-      "icon": "washing"
+      "icon": "washing",
+      "slug": "washing-machine"
     },
     {
       "id": 7,
       "name": "Home & Kitchen",
       "count": 28,
-      "icon": "home"
+      "icon": "home",
+      "slug": "kitchen-appliance"
     }
   ],
   "slides": [

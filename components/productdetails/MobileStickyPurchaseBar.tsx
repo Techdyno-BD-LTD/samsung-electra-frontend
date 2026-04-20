@@ -29,12 +29,12 @@ export default function MobileStickyPurchaseBar({
           <span className="text-[13px] font-medium text-[#00619E]">{availability}</span>
           <span className="text-[13px] text-gray-500">Free Delivery</span>
         </div>
-
+<div className="flex justify-between ">
         {/* SECTION 2: Pricing & Buttons Row */}
-        <div className="flex items-center justify-between gap-1">
+        <div className="flex flex-col items-start justify-around ">
           {/* Price & Badge Group */}
           <div className="flex items-center gap-2 min-w-0">
-            <span className="text-[18px] font-semibold tracking-tight text-[#0081FF] whitespace-nowrap">
+            <span className="text-[22px] font-semibold tracking-tight text-[#0081FF] whitespace-nowrap">
               {price}
             </span>
             
@@ -54,14 +54,14 @@ export default function MobileStickyPurchaseBar({
           <div className="flex items-center gap-1.5 shrink-0">
             <button
               type="button"
-              className="flex h-[24px] items-center justify-center gap-1.5 rounded-full bg-[#F3F4F6] px-3 text-[10px] font-medium text-gray-800"
+              className="flex h-[34px] items-center justify-center gap-1.5 rounded-full bg-[#F3F4F6] px-4 text-[12px] font-medium text-gray-800"
             >
               <FaShoppingCart className="text-[14px] text-gray-600" />
               <span className="whitespace-nowrap">Add to Cart</span>
             </button>
             <button
               type="button"
-              className="h-[24px] rounded-full bg-[#0081FF] px-3 text-[10px] font-medium text-white whitespace-nowrap active:bg-[#006ED9]"
+              className="h-[34px] rounded-full bg-[#0081FF] px-4 text-[12px] font-medium text-white whitespace-nowrap active:bg-[#006ED9]"
             >
               Buy Now
             </button>
@@ -69,7 +69,7 @@ export default function MobileStickyPurchaseBar({
         </div>
 
         {/* SECTION 3: EMI Row */}
-        <div className="mt-2.5 flex items-center gap-1.5 px-1 text-[11px] text-gray-600">
+        <div className="mt-2.5 flex flex-col items-end gap-1.5 px-1 text-[11px] text-gray-600">
           <div className="relative h-3.5 w-4">
              <Image 
                 src="/images/EMI.png" 
@@ -79,11 +79,14 @@ export default function MobileStickyPurchaseBar({
               />
           </div>
           <span className="whitespace-nowrap">{emiText}</span>
-          <span className="text-gray-300">|</span>
+  
           <button type="button" className="font-medium text-[#00619E]">
             {emiDetailsLabel}
           </button>
         </div>
+  
+</div>
+
 
       </div>
     </div>

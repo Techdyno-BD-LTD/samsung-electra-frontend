@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-// import Link from "next/link";
+import Link from "next/link";
 import { type ComponentType, useEffect, useMemo, useState } from "react";
 import {
   HiOutlineArchiveBox,
@@ -21,6 +21,7 @@ type HeroCategory = {
   name: string;
   count: number;
   icon: string;
+  slug?: string;
 };
 
 type HeroSlide = {
@@ -186,9 +187,9 @@ export default function HeroSection() {
             const CategoryIcon = iconMap[category.icon] || HiOutlineArchiveBox;
 
             return (
-              <button
+              <Link
                 key={category.id}
-                type="button"
+                href={`/category/${category.slug || category.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`}
                 className="flex w-full items-center justify-between rounded-md border border-slate-100 px-2 py-3 text-left shadow-md transition hover:border-blue-300 hover:bg-white lg:px-2 lg:py-2 xl:px-2 xl:py-2 2xl:px-3 2xl:py-4"
               >
                 <div className="flex items-center gap-2 lg:gap-1.5 xl:gap-1.5 2xl:gap-2">
@@ -198,7 +199,7 @@ export default function HeroSection() {
                 <span className="inline-flex h-7 min-w-7 items-center justify-center rounded-full bg-blue-500 px-2 text-xs font-semibold text-white">
                   {twoDigit(category.count)}
                 </span>
-              </button>
+              </Link>
             );
           })}
         </div>
