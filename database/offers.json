@@ -1,0 +1,29 @@
+{
+  "pageTitle": "Find your campaign offer & Buy your favorite products",
+  "offers": [
+    {
+      "id": "offer-1",
+      "title": "Big Seasonal Offer",
+      "image": "/images/offer1.png",
+      "alt": "Big seasonal electronics discount offer"
+    },
+    {
+      "id": "offer-2",
+      "title": "Stay Home Offer",
+      "image": "/images/offer2.png",
+      "alt": "Stay home promotional offer banner"
+    },
+    {
+      "id": "offer-3",
+      "title": "Samsung Festival Offer",
+      "image": "/images/offer3.png",
+      "alt": "Samsung festival offer banner"
+    },
+    {
+      "id": "offer-4",
+      "title": "Special Cashback Offer",
+      "image": "/images/offer4.png",
+      "alt": "Special cashback and exchange benefits offer"
+    }
+  ]
+}
