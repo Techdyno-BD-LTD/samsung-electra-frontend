@@ -87,7 +87,7 @@ export default function VerifyOTP({ phoneNumber, onBack, onVerify }: VerifyOTPPr
         <p className="text-[10px] leading-relaxed text-gray-500 px-4">
           By Tapping Send OTP, You Agree To{" "}
           <Link href="/terms" className="hover:underline">Terms And Conditions</Link>{" "}
-          And <Link href="/privacy" className="hover:underline">Privacy Policy</Link> Of Electra International
+          And <Link href="/policy/privacy" className="hover:underline">Privacy Policy</Link> Of Electra International
         </p>
       </div>
     </div>

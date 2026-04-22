@@ -4,6 +4,8 @@ import { useRef, useEffect } from "react";
 import { Provider } from "react-redux";
 import { store } from "./store";
 import { setCartItems } from "./features/cart/cartSlice";
+import { setWishlistItems } from "./features/wishlist/wishlistSlice";
+import { setCompareSlots } from "./features/compare/compareSlice";
 
 export default function StoreProvider({ children }: { children: React.ReactNode }) {
   // Use a ref to ensure we only dispatch initial load once
@@ -18,6 +20,22 @@ export default function StoreProvider({ children }: { children: React.ReactNode 
             const parsedItems = JSON.parse(storedCart);
             if (Array.isArray(parsedItems)) {
               store.dispatch(setCartItems(parsedItems));
+            }
+          }
+
+          const storedWishlist = localStorage.getItem("samsung-electra-wishlist");
+          if (storedWishlist) {
+            const parsedWishlistItems = JSON.parse(storedWishlist);
+            if (Array.isArray(parsedWishlistItems)) {
+              store.dispatch(setWishlistItems(parsedWishlistItems));
+            }
+          }
+
+          const storedCompare = localStorage.getItem("samsung-electra-compare");
+          if (storedCompare) {
+            const parsedCompareSlots = JSON.parse(storedCompare);
+            if (Array.isArray(parsedCompareSlots)) {
+              store.dispatch(setCompareSlots(parsedCompareSlots));
             }
           }
         } catch (error) {

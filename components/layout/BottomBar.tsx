@@ -27,7 +27,7 @@ export default function BottomBar() {
         { name: "Upcoming", href: "/bidding/upcoming" },
       ]
     },
-    { name: "Higher Sale / Kisti", href: "/kisti" },
+    { name: "Higher Sale / Kisti", href: "/higher-sale" },
     { name: "Exchange Product", href: "/exchange" },
     { name: "Offers", href: "/offers" },
   ];

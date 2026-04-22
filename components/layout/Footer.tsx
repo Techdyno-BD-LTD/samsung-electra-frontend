@@ -183,10 +183,10 @@ export default function Footer() {
                     Career <span className="inline-block bg-[#006ce4] text-white text-[9px] px-1.5 py-0.5 rounded animate-pulse">We Are Hiring</span>
                   </Link>
                 </li>
-                <li><Link href="/privacy" className="hover:text-blue-600 transition-colors">Privacy Policy</Link></li>
-                <li><Link href="/terms" className="hover:text-blue-600 transition-colors">Terms & Conditions</Link></li>
-                <li><Link href="/warranty-policy" className="hover:text-blue-600 transition-colors">Warranty Policy</Link></li>
-                <li><Link href="/cancellation-refund" className="hover:text-blue-600 transition-colors">Cancellation & Refund</Link></li>
+                <li><Link href="/policy/privacy" className="hover:text-blue-600 transition-colors">Privacy Policy</Link></li>
+                <li><Link href="/policy/terms" className="hover:text-blue-600 transition-colors">Terms & Conditions</Link></li>
+                <li><Link href="/policy/warranty-policy" className="hover:text-blue-600 transition-colors">Warranty Policy</Link></li>
+                <li><Link href="/policy/cancellation-refund" className="hover:text-blue-600 transition-colors">Cancellation & Refund</Link></li>
               </ul>
             </div>
 
@@ -322,10 +322,10 @@ export default function Footer() {
                     Career <span className="inline-block bg-[#006ce4] text-white text-[9px] px-1.5 py-0.5 rounded animate-pulse">We Are Hiring</span>
                   </Link>
                 </li>
-                <li><Link href="/privacy" className="hover:text-blue-600 transition-colors">Privacy Policy</Link></li>
-                <li><Link href="/terms" className="hover:text-blue-600 transition-colors">Terms & Conditions</Link></li>
-                <li><Link href="/warranty-policy" className="hover:text-blue-600 transition-colors">Warranty Policy</Link></li>
-                <li><Link href="/cancellation-refund" className="hover:text-blue-600 transition-colors">Cancellation & Refund</Link></li>
+                <li><Link href="/policy/privacy" className="hover:text-blue-600 transition-colors">Privacy Policy</Link></li>
+                <li><Link href="/policy/terms" className="hover:text-blue-600 transition-colors">Terms & Conditions</Link></li>
+                <li><Link href="/policy/warranty-policy" className="hover:text-blue-600 transition-colors">Warranty Policy</Link></li>
+                <li><Link href="/policy/cancellation-refund" className="hover:text-blue-600 transition-colors">Cancellation & Refund</Link></li>
               </ul>
             )}
           </div>

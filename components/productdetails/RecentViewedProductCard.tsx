@@ -1,8 +1,14 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { FaRegHeart, FaShoppingCart, FaStar } from "react-icons/fa";
+import { FaHeart, FaShoppingCart, FaStar } from "react-icons/fa";
 import { HiOutlineArrowsRightLeft } from "react-icons/hi2";
 import { toProductSlug } from "@/lib/productSlug";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { addToCart } from "@/store/features/cart/cartSlice";
+import { toggleWishlist } from "@/store/features/wishlist/wishlistSlice";
+import { toggleCompare } from "@/store/features/compare/compareSlice";
 
 type RecentViewedProduct = {
   title?: string;
@@ -26,8 +32,74 @@ type RecentViewedProductCardProps = {
 };
 
 export default function RecentViewedProductCard({ product }: RecentViewedProductCardProps) {
+  const dispatch = useAppDispatch();
   const productSlug = toProductSlug(product.title ?? "product");
   const productHref = `/products/${productSlug}`;
+  const isWishlisted = useAppSelector((state) => state.wishlist.items.some((item) => item.id === productSlug));
+  const isCompared = useAppSelector((state) => state.compare.slots.some((slot) => slot?.id === productSlug));
+
+  const handleAddToCart = () => {
+    dispatch(
+      addToCart({
+        id: productSlug,
+        title: product.title ?? "Product",
+        brand: product.brandLogo ? "Brand" : "",
+        image: product.image ?? "/images/wm2.png",
+        price: product.price ?? "৳ 1,50,000",
+        originalPrice: product.originalPrice ?? "৳ 1,80,000",
+        discountPercent: product.discountPercent ?? "-10% Off",
+        saveAmount: product.saveAmount ?? "Save : ৳30,00",
+        color: product.color,
+        type: product.type,
+        weight: product.weight,
+      })
+    );
+  };
+
+  const handleToggleWishlist = () => {
+    dispatch(
+      toggleWishlist({
+        id: productSlug,
+        title: product.title ?? "Product",
+        brand: product.brandLogo ? "Brand" : "",
+        image: product.image ?? "/images/wm2.png",
+        price: product.price ?? "৳ 1,50,000",
+        originalPrice: product.originalPrice ?? "৳ 1,80,000",
+        discountPercent: product.discountPercent ?? "-10% Off",
+        saveAmount: product.saveAmount ?? "Save : ৳30,00",
+        color: product.color,
+        type: product.type,
+        weight: product.weight,
+        rating: product.rating,
+        ratingCount: product.ratingCount,
+        brandLogo: product.brandLogo,
+        emiPrice: product.emiPrice,
+        tags: product.tags,
+      })
+    );
+  };
+
+  const handleToggleCompare = () => {
+    dispatch(
+      toggleCompare({
+        id: productSlug,
+        title: product.title ?? "Product",
+        brand: product.brandLogo ? "Brand" : "",
+        brandLogo: product.brandLogo,
+        image: product.image ?? "/images/wm2.png",
+        price: product.price ?? "৳ 1,50,000",
+        originalPrice: product.originalPrice ?? "৳ 1,80,000",
+        discountPercent: product.discountPercent ?? "-10% Off",
+        saveAmount: product.saveAmount ?? "Save : ৳30,00",
+        category: "",
+        type: product.type,
+        weight: product.weight,
+        color: product.color,
+        rating: product.rating,
+        ratingCount: product.ratingCount,
+      })
+    );
+  };
 
   return (
     <article className="grid grid-cols-[minmax(150px,38%)_minmax(0,1fr)] gap-2 rounded-[10px] xl:grid-cols-[minmax(170px,40%)_minmax(0,1fr)] 2xl:grid-cols-[200px_1fr]">
@@ -100,15 +172,15 @@ export default function RecentViewedProductCard({ product }: RecentViewedProduct
         </div>
 
         <div className="mt-3 flex items-center gap-1.5 xl:gap-2">
-          <button type="button" className="flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-[8px] bg-[#0054A6] px-2.5 py-2 text-[13px] font-semibold leading-none text-white xl:gap-2 xl:px-4 xl:text-[14px]">
+          <button type="button" onClick={handleAddToCart} className="flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-[8px] bg-[#0054A6] px-2.5 py-2 text-[13px] font-semibold leading-none text-white xl:gap-2 xl:px-4 xl:text-[14px]">
             <FaShoppingCart className="h-4 w-4" />
             <span className="truncate">Add to cart</span>
           </button>
-          <button type="button" className="rounded-[8px] bg-slate-100 p-2 text-slate-700 xl:p-2.5" aria-label="Add to wishlist">
-            <FaRegHeart className="h-4 w-4 xl:h-5 xl:w-5" />
+          <button type="button" onClick={handleToggleWishlist} className="rounded-[8px] bg-slate-100 p-2 xl:p-2.5" aria-label="Toggle wishlist">
+            <FaHeart className={`h-4 w-4 xl:h-5 xl:w-5 ${isWishlisted ? "text-red-500" : "text-slate-700"}`} />
           </button>
-          <button type="button" className="rounded-[8px] bg-slate-100 p-2 text-slate-700 xl:p-2.5" aria-label="Compare product">
-            <HiOutlineArrowsRightLeft className="h-4 w-4 xl:h-5 xl:w-5" />
+          <button type="button" onClick={handleToggleCompare} className="rounded-[8px] bg-slate-100 p-2 xl:p-2.5" aria-label="Toggle compare">
+            <HiOutlineArrowsRightLeft className={`h-4 w-4 xl:h-5 xl:w-5 ${isCompared ? "text-[#2b7fe8]" : "text-slate-700"}`} />
           </button>
         </div>
       </div>

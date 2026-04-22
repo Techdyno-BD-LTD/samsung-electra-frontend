@@ -1,14 +1,17 @@
 "use client";
 
 import { FaHeart, FaBalanceScale, FaShoppingCart, FaStar, FaEye, FaGavel } from "react-icons/fa";
-import { useAppDispatch } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { addToCart } from "@/store/features/cart/cartSlice";
+import { toggleWishlist } from "@/store/features/wishlist/wishlistSlice";
+import { toggleCompare } from "@/store/features/compare/compareSlice";
 import Image from "next/image";
 import Link from "next/link";
 import { toProductSlug } from "@/lib/productSlug";
 
 interface ProductCardProps {
   cardVariant?: "default" | "flashDeal" | "specialDeal";
+  category?: string;
   brand?: string;
   brandLogo?: string;
   title?: string;
@@ -48,6 +51,7 @@ interface ProductCardProps {
 
 const ProductCard = ({
   cardVariant = "default",
+  category = "",
   brand = "",
   brandLogo = "",
   title = "",
@@ -86,6 +90,9 @@ const ProductCard = ({
   const dispatch = useAppDispatch();
 
   const productSlug = slug || toProductSlug(title);
+  const wishlistItemId = productSlug || title;
+  const isWishlisted = useAppSelector((state) => state.wishlist.items.some((item) => item.id === wishlistItemId));
+  const isCompared = useAppSelector((state) => state.compare.slots.some((slot) => slot?.id === wishlistItemId));
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -104,6 +111,56 @@ const ProductCard = ({
       weight,
     }));
     alert("Added to cart!"); // Minimal feedback
+  };
+
+  const handleToggleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dispatch(
+      toggleWishlist({
+        id: wishlistItemId,
+        title,
+        brand,
+        image,
+        price,
+        originalPrice,
+        discountPercent,
+        saveAmount,
+        color,
+        type,
+        weight,
+        rating,
+        ratingCount,
+        brandLogo,
+        emiPrice,
+        emiPercent,
+        tags,
+      })
+    );
+  };
+
+  const handleToggleCompare = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dispatch(
+      toggleCompare({
+        id: wishlistItemId,
+        title,
+        brand,
+        brandLogo,
+        image,
+        price,
+        originalPrice,
+        discountPercent,
+        saveAmount,
+        category,
+        type,
+        weight,
+        color,
+        rating,
+        ratingCount,
+      })
+    );
   };
 
   const productHref = `/products/${productSlug}`;
@@ -241,11 +298,11 @@ const ProductCard = ({
         </span>
 
         <div className="absolute right-3 top-3 z-10 flex flex-col gap-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-          <button type="button" className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white shadow-md transition-colors hover:bg-gray-100">
-            <FaHeart className="h-4 w-4 text-gray-600" />
+          <button type="button" onClick={handleToggleWishlist} aria-label="Toggle wishlist" className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white shadow-md transition-colors hover:bg-gray-100">
+            <FaHeart className={`h-4 w-4 ${isWishlisted ? "text-red-500" : "text-gray-600"}`} />
           </button>
-          <button type="button" className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white shadow-md transition-colors hover:bg-gray-100">
-            <FaBalanceScale className="h-4 w-4 text-gray-600" />
+          <button type="button" onClick={handleToggleCompare} aria-label="Toggle compare" className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white shadow-md transition-colors hover:bg-gray-100">
+            <FaBalanceScale className={`h-4 w-4 ${isCompared ? "text-[#2b7fe8]" : "text-gray-600"}`} />
           </button>
         </div>
 
@@ -330,11 +387,11 @@ const ProductCard = ({
         )}
 
         <div className="absolute right-3 top-3 z-10 hidden flex-row gap-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100 sm:flex">
-          <button className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-white shadow-md transition-colors hover:bg-gray-100">
-            <FaHeart className="h-4 w-4 text-gray-600" />
+          <button onClick={handleToggleWishlist} aria-label="Toggle wishlist" className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-white shadow-md transition-colors hover:bg-gray-100">
+            <FaHeart className={`h-4 w-4 ${isWishlisted ? "text-red-500" : "text-gray-600"}`} />
           </button>
-          <button className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-white shadow-md transition-colors hover:bg-gray-100">
-            <FaBalanceScale className="h-4 w-4 text-gray-600" />
+          <button onClick={handleToggleCompare} aria-label="Toggle compare" className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-white shadow-md transition-colors hover:bg-gray-100">
+            <FaBalanceScale className={`h-4 w-4 ${isCompared ? "text-[#2b7fe8]" : "text-gray-600"}`} />
           </button>
         </div>
 
@@ -462,11 +519,11 @@ const ProductCard = ({
       <div
         className="absolute right-3 top-3 z-10 hidden flex-row gap-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100 sm:flex"
       >
-        <button className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md border border-border transition-colors hover:bg-gray-100">
-          <FaHeart className="h-4 w-4 text-gray-600" />
+        <button onClick={handleToggleWishlist} aria-label="Toggle wishlist" className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md border border-border transition-colors hover:bg-gray-100">
+          <FaHeart className={`h-4 w-4 ${isWishlisted ? "text-red-500" : "text-gray-600"}`} />
         </button>
-        <button className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md border border-border transition-colors hover:bg-gray-100">
-          <FaBalanceScale className="h-4 w-4 text-gray-600" />
+        <button onClick={handleToggleCompare} aria-label="Toggle compare" className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md border border-border transition-colors hover:bg-gray-100">
+          <FaBalanceScale className={`h-4 w-4 ${isCompared ? "text-[#2b7fe8]" : "text-gray-600"}`} />
         </button>
       </div>
 
