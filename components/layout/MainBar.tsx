@@ -13,6 +13,7 @@ export default function MainBar() {
   const [mounted, setMounted] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const cartTotalCount = useAppSelector((state) => 
     state.cart.items.reduce((total, item) => total + item.quantity, 0)
   );
@@ -22,6 +23,28 @@ export default function MainBar() {
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    let mountedFlag = true;
+
+    async function loadHeader() {
+      try {
+        const response = await fetch("/api/header", { cache: "no-store" });
+        if (!response.ok) return;
+        const payload = await response.json();
+        if (mountedFlag) {
+          setLogoUrl(payload?.data?.logo?.url?.trim() || null);
+        }
+      } catch {
+        if (mountedFlag) setLogoUrl(null);
+      }
+    }
+
+    loadHeader();
+    return () => {
+      mountedFlag = false;
+    };
   }, []);
 
   const handleSearch = () => {
@@ -39,16 +62,17 @@ export default function MainBar() {
       <div className="mainwidth">
         <div className="flex items-center justify-between py-4">
           {/* Logo */}
-          <Link href="/" className="flex items-center">
-            <Image
-              src="/images/electralogo.webp"
-              alt="SAMSUNG electra"
-              width={283}
-              height={48}
-              className="h-8 md:h-10 lg:h-12 w-auto"
-            />
-
-          </Link>
+          {logoUrl ? (
+            <Link href="/" className="flex items-center">
+              <Image
+                src={logoUrl}
+                alt="SAMSUNG electra"
+                width={283}
+                height={48}
+                className="h-8 md:h-10 lg:h-12 w-auto"
+              />
+            </Link>
+          ) : null}
 
           {/* Search Bar */}
           <div className="flex-1 max-w-3xl mx-8">

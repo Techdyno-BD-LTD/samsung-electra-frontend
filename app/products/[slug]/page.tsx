@@ -1,17 +1,9 @@
+'use client';
+
 import Image from "next/image";
-import { notFound } from "next/navigation";
 import { FaHeart, FaMinus, FaPlus, FaRegShareSquare, FaStar } from "react-icons/fa";
-// FaBolt
-import { withDynamicMetadata } from "@/lib/metadata";
-import { toProductSlug } from "@/lib/productSlug";
-import productDetails from "@/database/productdetails.json";
-import popularProducts from "@/database/popularproducts.json";
-import products from "@/database/products.json";
-import bestsellingProducts from "@/database/bestselling.json";
-import washingMachineProducts from "@/database/washingmachineproducts.json";
-import airconditionerProducts from "@/database/airconditionerproducts.json";
-import refrigeratorProducts from "@/database/refrigeratorproducts.json";
-import microwaveProducts from "@/database/microwaveproducts.json";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 
 import ProductDetailsTabs from "@/components/productdetails/ProductDetailsTabs";
 import MobileProductGallery from "@/components/productdetails/MobileProductGallery";
@@ -21,367 +13,348 @@ import MobileMadeInFeatures from "@/components/productdetails/MobileMadeInFeatur
 import MobileBackButton from "@/components/productdetails/MobileBackButton";
 import FooterBreadcrumbPortal from "@/components/productdetails/FooterBreadcrumbPortal";
 
-type PageProps = {
-  params: { slug: string };
-};
-
-type CatalogProduct = {
-  title?: string;
-  brand?: string;
-  image?: string;
+interface ProductData {
+  id?: number;
+  slug?: string;
+  name?: string;
+  description?: string;
+  category?: {
+    name?: string;
+    slug?: string;
+  };
+  brand?: {
+    name?: string;
+    slug?: string;
+    logo?: string;
+  };
+  thumbnail_image?: string;
+  photos?: Array<{ photo?: string; path?: string; variant?: string }>;
+  main_price?: string;
+  stroked_price?: string;
+  discount?: string;
+  has_discount?: boolean;
+  current_stock?: number;
+  unit?: string;
   rating?: number;
-  ratingCount?: string;
-  price?: string | number;
-  originalPrice?: string;
-  discountPercent?: string;
-  saveAmount?: string;
-  emiPrice?: string;
-  category?: string;
-  color?: string;
-  weight?: string;
-};
-
-type ProductDetailsEntry = {
-  slug: string;
-  category: string;
-  title: string;
-  brand: string;
-  brandLogo: string;
-  rating: number;
-  ratingCount: string;
-  model: string;
-  sku: string;
-  availability: string;
-  price: string;
-  originalPrice: string;
-  discountLabel: string;
-  saveLabel: string;
-  offersLabel: string;
-  emiText: string;
-  emiDetailsLabel: string;
-  capacities: string[];
-  colorLabel: string;
-  colorSwatches: string[];
-  features: string[];
-  descriptionHtml?: string;
-  specificationsHtml?: string;
-  featuresHtml?: string;
-  policyHtml?: string;
-  flashTitle: string;
-  flashTime: string;
-  flashTimeLabels: string;
-  coupon: string;
-  gallery: string[];
-  mainImage: string;
-  warrantyBadgeImage: string;
-  specialOfferLeft: string;
-  specialOfferOne: string;
-  specialOfferTwo: string;
-  shippingInfo: string;
-  warrantyInfo: string;
-  emiFacilityInfo: string;
-  exchangeInfo: string;
-  madeInText: string;
-};
-
-const typedProductDetails = productDetails as ProductDetailsEntry[];
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/\"/g, "&quot;")
-    .replace(/'/g, "&#39;");
+  rating_count?: number;
+  model_number?: string;
+  variants?: Array<{
+    variant?: string;
+    price?: number;
+    sku?: string;
+    qty?: number;
+    image?: string;
+  }>;
+  emi_start?: string;
+  book_in_showroom_title?: string;
+  made_in_text?: string;
+  other_features?: string;
+  tags?: string[];
+  special_offer_title?: string;
+  special_offers?: Array<{
+    text?: string;
+    image?: string | null;
+  }>;
+  featured_specs?: Array<{
+    title?: string;
+    description?: string;
+    image?: string | null;
+    text?: string | null;
+    icon?: string | null;
+  }>;
+  emi_facility?: {
+    text?: string;
+    link?: string | null;
+    link_label?: string | null;
+    plans?: Array<{
+      month?: number;
+      amount?: number;
+    }>;
+  };
+  reviews?: {
+    total?: number;
+    average?: number;
+    breakdown?: Array<{ star: number; count: number }>;
+    items?: Array<{ name: string; title: string; body: string; score: number }>;
+  };
+  exchange?: {
+    text?: string;
+    link?: string | null;
+    link_label?: string | null;
+  };
+  product_policy?: {
+    title?: string;
+    content?: string;
+  };
+  specifications?: Array<{ label?: string; value?: string }>;
+  choice_options?: Array<{
+    name?: number | string;
+    title?: string;
+    options?: string[];
+  }>;
+  attributes?: Array<{
+    attribute_id?: number | string;
+    name?: string;
+    values?: string[];
+  }>;
+  color_details?: Array<{
+    id?: number | null;
+    name?: string;
+    code?: string | null;
+  }>;
+  warranty?: {
+    warranty_type?: string;
+    text?: string;
+    link?: string | null;
+    link_label?: string | null;
+  };
+  colors?: string[];
+  estimated_shipping_text?: string;
+  [key: string]: unknown;
 }
 
-function buildFeatureHtml(product: ProductDetailsEntry): string {
-  const sections = [
-    {
-      title: product.features[2] ?? "Powerful bubbles",
-      subtitle: product.features[0] ?? "Eco Bubble",
-      description:
-        "Enjoy efficient cleaning, even at low temperatures with advanced wash technology. Detergent is turned into bubbles quickly to penetrate fabric and remove dirt while saving energy.",
-      image: product.gallery[1] ?? product.mainImage,
-    },
-    {
-      title: "Wash in 49 minutes",
-      subtitle: product.features[1] ?? "Drum Clean",
-      description:
-        "Cut your laundry time and get clothes thoroughly clean by selecting a faster wash mode. The rinsing cycle is shortened by combining a speed spray with efficient spin performance.",
-      image: product.gallery[2] ?? product.mainImage,
-    },
-  ];
-
-  const sectionHtml = sections
-    .map(
-      (section) => `
-        <article>
-          <h3>${escapeHtml(section.title)}</h3>
-          <h4>${escapeHtml(section.subtitle)}</h4>
-          <p>${escapeHtml(section.description)}</p>
-          <img src="${escapeHtml(section.image)}" alt="${escapeHtml(section.title)}" />
-        </article>
-      `
-    )
-    .join("");
-
-  return `
-    <div>
-      <h2>Features</h2>
-      ${sectionHtml}
-    </div>
-  `;
+interface ApiResponse {
+  data?: ProductData[];
+  success?: boolean;
+  status?: number;
+  message?: string;
 }
 
-function buildDescriptionHtml(product: ProductDetailsEntry): string {
-  return `
-    <p>
-      Experience powerful, hygienic, and energy-efficient washing with ${escapeHtml(product.title)}. Designed for modern households, this washer combines smart technology with superior fabric care to deliver spotless results while saving water and electricity.
-    </p>
-    <p>
-      The ${escapeHtml(product.model)} is built for convenience, hygiene, and efficiency. Whether you are washing everyday wear or delicate fabrics, its advanced technology ensures excellent cleaning results while caring for your clothes and the environment.
-    </p>
-  `;
-}
+export default function ProductDetailsPage() {
+  const params = useParams();
+  const slug = params.slug as string;
 
-function buildSpecificationsHtml(product: ProductDetailsEntry): string {
-  const specRows = [
-    ["Loading", "Front Loading"],
-    ["Energy Efficiency Class", "A+++"],
-    ["Child Lock", "Yes"],
-    ["Auto Resume", "Yes"],
-    ["Time Delay Function", "Yes"],
-    ["Water Overflow Lock", "Yes"],
-    ["Number Of Washing Programs", "23"],
-    ["Preset Wash Programs", "18"],
-    ["Height", "840 MM"],
-    ["Width", "600 MM"],
-    ["Depth", "550 MM"],
-    ["Capacity", escapeHtml(product.capacities[0] ?? "8 KG")],
-    ["RPM", "1200"],
-    ["Motor Type", "BLDC Inverter Motor"],
-  ];
+  const [productData, setProductData] = useState<ProductData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
+  const [selectedColorName, setSelectedColorName] = useState("");
 
-  const rowsHtml = specRows
-    .map(([key, value]) => `<tr><td>${escapeHtml(key)}</td><td>${escapeHtml(value)}</td></tr>`)
-    .join("");
-
-  return `<table><tbody>${rowsHtml}</tbody></table>`;
-}
-
-function buildPolicyHtml(product: ProductDetailsEntry): string {
-  return `
-    <h3>Product Policy</h3>
-    <p>${escapeHtml(product.title)}</p>
-    <p>Model: ${escapeHtml(product.model)}</p>
-
-    <h4>Warranty Policy</h4>
-    <ul>
-      <li>Motor Warranty: Up to 10 Years (Digital Inverter Motor)</li>
-      <li>Parts Warranty: 1 Year (as per Samsung official policy)</li>
-      <li>Service Warranty: 1 Year free service from the date of purchase</li>
-      <li>Warranty is valid only with an official warranty card and purchase invoice</li>
-    </ul>
-
-    <h4>Delivery Policy</h4>
-    <ul>
-      <li>Inside City: Home delivery available within 2-5 working days</li>
-      <li>Outside City: Delivery time may vary depending on location</li>
-      <li>Product will be delivered in factory-sealed packaging</li>
-    </ul>
-
-    <h4>Installation Policy</h4>
-    <ul>
-      <li>Free installation provided by authorized Samsung service engineers</li>
-      <li>Installation request must be placed after product delivery</li>
-      <li>Customer must ensure proper electricity, water inlet, and drainage setup</li>
-    </ul>
-
-    <h4>Replacement Policy</h4>
-    <ul>
-      <li>Replacement applicable within 7 days of delivery</li>
-      <li>Product must be unused, uninstalled, and in original packaging</li>
-      <li>Replacement allowed only for manufacturing defects</li>
-      <li>Physical damage or damage caused by improper handling is not eligible</li>
-    </ul>
-
-    <h4>Non-Warranty Coverage</h4>
-    <ul>
-      <li>Physical or electrical damage</li>
-      <li>Use of improper voltage or unauthorized accessories</li>
-      <li>Unauthorized repair or modification</li>
-      <li>Damage caused by water leakage, fire, or natural disasters</li>
-    </ul>
-
-    <h4>Return Policy</h4>
-    <ul>
-      <li>Returns are accepted only if approved after technical inspection</li>
-      <li>Refunds are not applicable once the product is installed or used</li>
-    </ul>
-
-    <h4>Required Documents</h4>
-    <ul>
-      <li>Original invoice</li>
-      <li>Warranty card</li>
-      <li>Product serial number must match company records</li>
-    </ul>
-  `;
-}
-
-
-const catalogProducts = [
-  ...(popularProducts as CatalogProduct[]),
-  ...(products as CatalogProduct[]),
-  ...(bestsellingProducts as CatalogProduct[]),
-  ...(washingMachineProducts as CatalogProduct[]),
-  ...(airconditionerProducts as CatalogProduct[]),
-  ...(refrigeratorProducts as CatalogProduct[]),
-  ...(microwaveProducts as CatalogProduct[]),
-];
-
-const fallbackProductsBySlug = new Map<string, CatalogProduct>();
-for (const item of catalogProducts) {
-  if (!item.title) {
-    continue;
-  }
-
-  const key = toProductSlug(item.title);
-  if (!fallbackProductsBySlug.has(key)) {
-    fallbackProductsBySlug.set(key, item);
-  }
-}
-
-function createFallbackProduct(slug: string, catalogItem: CatalogProduct): ProductDetailsEntry {
-  const basePrice = typeof catalogItem.price === "string" ? catalogItem.price : `৳${catalogItem.price ?? 0}`;
-  const baseOriginalPrice = catalogItem.originalPrice ?? basePrice;
-  const brandName = (catalogItem.brand ?? "SAMSUNG").toUpperCase();
-  const brandLogoMap: Record<string, string> = {
-    SAMSUNG: "/images/samsung.png",
-    HAIER: "/images/whirpool.png",
-    WHIRPOOL: "/images/whirpool.png",
-    PHILLIPS: "/images/phillips.png",
+  const toComparable = (value?: string) => value?.trim().toLowerCase() ?? "";
+  const isHexColor = (value?: string | null) => /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(value ?? "");
+  
+  const parseHtmlFeatures = (htmlContent?: string): string[] => {
+    if (!htmlContent) return [];
+    const parser = new DOMParser();
+    try {
+      const doc = parser.parseFromString(htmlContent, 'text/html');
+      const paragraphs = Array.from(doc.querySelectorAll('p'));
+      return paragraphs
+        .map(p => p.textContent?.trim() || '')
+        .map(text => text.replace(/^[•\s]+/, '').trim())
+        .filter(Boolean);
+    } catch {
+      return [];
+    }
   };
 
-  return {
-    slug,
-    category: (catalogItem.category ?? "Washing machine").toLowerCase(),
-    title: catalogItem.title ?? "Electra Product",
-    brand: brandName,
-    brandLogo: brandLogoMap[brandName] ?? "/images/electra.png",
-    rating: catalogItem.rating ?? 4,
-    ratingCount: catalogItem.ratingCount ?? "(4.0)",
-    model: "N/A",
-    sku: "N/A",
-    availability: "In-stock",
-    price: String(basePrice),
-    originalPrice: String(baseOriginalPrice),
-    discountLabel: (catalogItem.discountPercent ?? "10% Off").replace("-", ""),
-    saveLabel: catalogItem.saveAmount ?? "Save : ৳5,000",
-    offersLabel: "View available Offer's",
-    emiText: catalogItem.emiPrice ?? "EMI Available",
-    emiDetailsLabel: "See EMI Details",
-    capacities: [catalogItem.weight ?? "8-KG", "10-KG", "12-KG"],
+  useEffect(() => {
+    if (!slug) return;
+
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const response = await fetch(`/api/products/${slug}`);
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch product');
+        }
+
+        const data: ApiResponse = await response.json();
+        
+        if (data.success && data.data && data.data.length > 0) {
+          setProductData(data.data[0]);
+        } else {
+          throw new Error('Product not found');
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+        setProductData(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [slug]);
+
+  useEffect(() => {
+    if (!productData) return;
+
+    const nextSelectedAttributes: Record<string, string> = {};
+    (productData.attributes ?? []).forEach((attribute) => {
+      const attributeKey = String(attribute.attribute_id ?? attribute.name ?? "");
+      const firstValue = attribute.values?.[0];
+      if (attributeKey && firstValue) {
+        nextSelectedAttributes[attributeKey] = firstValue;
+      }
+    });
+
+    setSelectedAttributes(nextSelectedAttributes);
+    setSelectedColorName(productData.color_details?.[0]?.name ?? "");
+  }, [productData]);
+
+  // Provide defaults for all props to ensure page doesn't crash
+  const {
+    category = productData?.category?.name || "Product Category",
+    title = productData?.name || "Product Title",
+    brand = productData?.brand?.name || "Brand",
+    brandLogo = productData?.brand?.logo || "/images/samsung.png",
+    ratingCount = productData?.rating_count?.toString() || "0",
+    model = productData?.model_number || "Model",
+    sku = productData?.variants?.[0]?.sku || "SKU",
+    price = productData?.main_price || "Price",
+    originalPrice = productData?.stroked_price || "Price",
+    discountLabel = productData?.discount || "0% Off",
+    saveLabel = productData?.discount || "Save Amount",
+    offersLabel = "View offers",
+    emiText = productData?.emi_start || "EMI Available",
+    emiDetailsLabel = productData?.emi_facility?.link_label ? productData.emi_facility.link_label : "See details",
+    colorLabel = "Color",
+    features = productData?.tags || [],
+    descriptionHtml = productData?.description || "",
+    featuresList = parseHtmlFeatures(productData?.other_features) || productData?.tags || [],
+    gallery = productData?.photos?.map((p: { photo?: string; path?: string }) => p.path || p.photo || "") || [productData?.thumbnail_image || "/images/wm2.png"],
+    mainImage = productData?.thumbnail_image || "/images/wm2.png",
+    warrantyBadgeImage = "/images/warrantybadge.png",
+    specialOfferLeft = "Special Offer",
+    specialOfferOne = "Offer 1",
+    specialOfferTwo = "Offer 2",
+    showroomTitle = productData?.book_in_showroom_title ? productData.book_in_showroom_title : "Book in showroom Get 5% Off",
+    shippingInfo = productData?.estimated_shipping_text ? productData.estimated_shipping_text : "Shipping information",
+    warrantyInfo = productData?.warranty?.text ? productData.warranty.text : productData?.warranty?.warranty_type ? `Warranty: ${productData.warranty.warranty_type}` : "Warranty information",
+    warrantyLinkLabel = productData?.warranty?.link_label ? productData.warranty.link_label : "View policy",
+    emiFacilityInfo = productData?.emi_facility?.text ? productData.emi_facility.text : "EMI information",
+    emiLinkLabel = productData?.emi_facility?.link_label ? productData.emi_facility.link_label : "See EMI Details",
+    exchangeInfo = productData?.exchange?.text ? productData.exchange.text : "Exchange information",
+    exchangeLinkLabel = productData?.exchange?.link_label ? productData.exchange.link_label : "Available Showrooms",
+    madeInText = productData?.made_in_text ? productData.made_in_text : "Product information",
+  } = {
+    category: productData?.category?.name || "Product Category",
+    title: productData?.name || "Product Title",
+    brand: productData?.brand?.name || "Brand",
+    brandLogo: productData?.brand?.logo || "/images/samsung.png",
+    ratingCount: productData?.rating_count?.toString() || "0",
+    model: productData?.model_number || "Model",
+    sku: productData?.variants?.[0]?.sku || "SKU",
+    price: productData?.main_price || "Price",
+    originalPrice: productData?.stroked_price || "Price",
+    discountLabel: productData?.discount || "0% Off",
+    saveLabel: productData?.discount || "Save Amount",
+    offersLabel: "View offers",
+    emiText: productData?.emi_start || "EMI Available",
+    emiDetailsLabel: productData?.emi_facility?.link_label ? productData.emi_facility.link_label : "See details",
     colorLabel: "Color",
-    colorSwatches: [catalogItem.image ?? "/images/wm2.png", "/images/bl2.png", "/images/electrawm.png"],
-    features: [
-      "Digital Inverter Technology",
-      "Drum Clean",
-      "Eco Bubble",
-      "Hygiene Steam",
-      "Bubble Soak",
-    ],
-    flashTitle: "Flash Sales Ends in",
-    flashTime: "01 : 04 : 32 : 56",
-    flashTimeLabels: "d : h : m : s",
-    coupon: "EL05",
-    gallery: [
-      catalogItem.image ?? "/images/wm2.png",
-      "/images/electrawm.png",
-      "/images/bl2.png",
-      "/images/fr2.png",
-      catalogItem.image ?? "/images/wm2.png",
-    ],
-    mainImage: catalogItem.image ?? "/images/wm2.png",
+    features: productData?.tags || [],
+    descriptionHtml: productData?.description || "",
+    gallery: productData?.photos?.map((p: { photo?: string; path?: string }) => p.path || p.photo || "") || [productData?.thumbnail_image || "/images/wm2.png"],
+    mainImage: productData?.thumbnail_image || "/images/wm2.png",
     warrantyBadgeImage: "/images/warrantybadge.png",
     specialOfferLeft: "Special Offer",
-    specialOfferOne: "EBL Cashback 10%",
-    specialOfferTwo: "Nagad Cashback 10%",
-    shippingInfo: "Estimated Shipping Time : ( Sat, Dec 13 - Wed 17 Dec ) -Ship From Dhaka",
-    warrantyInfo: "Warranty : DIT Motor-20 years, spare parts & after sales service - 1 year",
-    emiFacilityInfo: "EMI Facility : 0% EMI Facility For 6 Months & Available EMI 36 Month For this Item",
-    exchangeInfo: "Exchange : Yes / No | Not Available for this item / Get Exchange Up to 4000 Tk Available From Available Showrooms",
-    madeInText: "-Made In Vietnam Assamble By Thailand",
+    specialOfferOne: "Offer 1",
+    specialOfferTwo: "Offer 2",
+    showroomTitle: productData?.book_in_showroom_title ? productData.book_in_showroom_title : "Book in showroom Get 5% Off",
+    shippingInfo: productData?.estimated_shipping_text ? productData.estimated_shipping_text : "Shipping information",
+    warrantyInfo: productData?.warranty?.text ? productData.warranty.text : productData?.warranty?.warranty_type ? `Warranty: ${productData.warranty.warranty_type}` : "Warranty information",
+    warrantyLinkLabel: productData?.warranty?.link_label ? productData.warranty.link_label : "View policy",
+    emiFacilityInfo: productData?.emi_facility?.text ? productData.emi_facility.text : "EMI information",
+    emiLinkLabel: productData?.emi_facility?.link_label ? productData.emi_facility.link_label : "See EMI Details",
+    exchangeInfo: productData?.exchange?.text ? productData.exchange.text : "Exchange information",
+    exchangeLinkLabel: productData?.exchange?.link_label ? productData.exchange.link_label : "Available Showrooms",
+    madeInText: productData?.made_in_text ? productData.made_in_text : "Product information",
   };
-}
 
-function getProductBySlug(slug: string): ProductDetailsEntry | null {
-  const fromDedicatedData = typedProductDetails.find((item) => item.slug === slug);
-  if (fromDedicatedData) {
-    return fromDedicatedData;
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+          <p className="mt-4 text-gray-600">Loading product details...</p>
+        </div>
+      </div>
+    );
   }
 
-  const fallbackItem = fallbackProductsBySlug.get(slug);
-  if (!fallbackItem) {
-    return null;
+  // Show error state
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <p className="text-red-600 text-lg">Error: {error}</p>
+          <p className="text-gray-600 mt-2">The product could not be found.</p>
+        </div>
+      </div>
+    );
   }
 
-  return createFallbackProduct(slug, fallbackItem);
-}
-
-export const generateMetadata = withDynamicMetadata<{ params: { slug: string } }>(
-  "product-detail",
-  ({ params }) => {
-    const product = getProductBySlug(params.slug);
-
-    if (!product) {
-      return {
-        title: "Product not found | Electra",
-        description: "We can't locate the requested product right now.",
-      };
-    }
-
-    return {
-      title: `${product.title} | Electra`,
-      description: `${product.title} at ${product.price}. ${product.features.join(", ")}.`,
-      image: product.mainImage,
-    };
-  }
-);
-
-export async function generateStaticParams() {
-  const staticSlugs = new Set<string>();
-
-  for (const item of typedProductDetails) {
-    staticSlugs.add(item.slug);
-  }
-
-  fallbackProductsBySlug.forEach((_value, slug) => {
-    staticSlugs.add(slug);
-  });
-
-  return Array.from(staticSlugs).map((slug) => ({ slug }));
-}
-
-export default function ProductDetailPage({ params }: PageProps) {
-
-
-  const product = getProductBySlug(params.slug);
-
-  if (!product) {
-    notFound();
-  }
-
-  const breadcrumbCategory = product.category
+  const breadcrumbCategory = category
     .split(" ")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
-  const flatOfferPercent = product.discountLabel.match(/\d+%/)?.[0] ?? "10%";
+  const flatOfferPercent = discountLabel.match(/\d+%/)?.[0] ?? "0%";
+
+  const attributesForUi = (productData?.attributes ?? []).filter((attribute) => {
+    return (attribute.values?.length ?? 0) > 0;
+  });
+
+  const variants = productData?.variants ?? [];
+  const fallbackColorDetails = (productData?.colors ?? []).map((color) => ({
+    name: color,
+    code: isHexColor(color) ? color : null,
+  }));
+  const colorsForUi = (productData?.color_details?.length ?? 0) > 0
+    ? (productData?.color_details ?? [])
+    : fallbackColorDetails;
+
+  const colorOptions = colorsForUi.map((color, index) => {
+    const colorName = color.name ?? color.code ?? `Color ${index + 1}`;
+    const colorNameComparable = toComparable(color.name);
+    const matchedVariant = variants.find((variant) => {
+      const variantName = toComparable(variant.variant);
+      if (!variantName || !colorNameComparable) return false;
+      return variantName === colorNameComparable || variantName.startsWith(`${colorNameComparable}-`);
+    });
+
+    return {
+      key: `${colorName}-${index}`,
+      name: colorName,
+      code: color.code,
+      image: matchedVariant?.image ?? productData?.thumbnail_image ?? "/images/wm2.png",
+    };
+  });
+
+  const activeColorName = selectedColorName || colorOptions[0]?.name || "";
+  const selectedVariant = variants.find((variant) => {
+    const variantName = toComparable(variant.variant);
+    if (!variantName) return false;
+
+    const comparableColor = toComparable(activeColorName);
+    if (comparableColor && !(variantName === comparableColor || variantName.startsWith(`${comparableColor}-`))) {
+      return false;
+    }
+
+    return attributesForUi.every((attribute) => {
+      const attributeKey = String(attribute.attribute_id ?? attribute.name ?? "");
+      const selectedValue = selectedAttributes[attributeKey];
+      if (!selectedValue) return true;
+      return variantName.includes(toComparable(selectedValue));
+    });
+  });
+
+  const selectedSku = selectedVariant?.sku || sku;
+  const selectedAvailability = (selectedVariant?.qty ?? productData?.current_stock ?? 0) > 0 ? "In Stock" : "Out of Stock";
+  const selectedMainImage = selectedVariant?.image || colorOptions.find((color) => toComparable(color.name) === toComparable(activeColorName))?.image || mainImage;
+  const selectedGallery = selectedMainImage
+    ? [selectedMainImage, ...gallery.filter((image) => image !== selectedMainImage)]
+    : gallery;
 
   return (
-    <div className="pb-[118px] md:pb-0">
+    <div className="pb-[118px] md:pb-0 ">
       {/* Product Image and Buy now Section */}
-      <section className="  mt-10  ">
+      <section className="  mt-16  ">
         <div className="mb-3 px-4 lg:hidden">
           <MobileBackButton />
         </div>
@@ -393,7 +366,7 @@ export default function ProductDetailPage({ params }: PageProps) {
           <span className="text-slate-400">›</span>
           <span>{breadcrumbCategory}</span>
           <span className="text-slate-400">›</span>
-          <span className="text-slate-700">Washing Machine details</span>
+          <span className="text-slate-700">Product details</span>
         </nav>
 
         <div className="mx-auto mt-2 w-11/12">
@@ -409,15 +382,15 @@ export default function ProductDetailPage({ params }: PageProps) {
 
                 <div className="relative mx-auto min-h-[250px] max-w-[520px] sm:min-h-[320px] md:min-h-[700px]">
                   <MobileProductGallery
-                    images={product.gallery}
-                    title={product.title}
-                    warrantyBadgeImage={product.warrantyBadgeImage}
+                    images={selectedGallery}
+                    title={title}
+                    warrantyBadgeImage={warrantyBadgeImage}
                   />
 
                   <div className="hidden items-center justify-center md:flex md:min-h-[700px]">
                     <Image
-                      src={product.mainImage}
-                      alt={product.title}
+                      src={selectedMainImage}
+                      alt={title}
                       width={520}
                       height={520}
                       className="h-auto w-full object-contain"
@@ -426,7 +399,7 @@ export default function ProductDetailPage({ params }: PageProps) {
                   </div>
 
                   <Image
-                    src={product.warrantyBadgeImage}
+                    src={warrantyBadgeImage}
                     alt="Official warranty"
                     width={120}
                     height={120}
@@ -436,7 +409,7 @@ export default function ProductDetailPage({ params }: PageProps) {
               </div>
 
               <div className="hidden grid-cols-5 gap-2 md:grid">
-                {product.gallery.map((item, index) => (
+                {selectedGallery.map((item, index) => (
                   <button
                     key={`${item}-${index}`}
                     type="button"
@@ -444,7 +417,7 @@ export default function ProductDetailPage({ params }: PageProps) {
                   >
                     <Image
                       src={item}
-                      alt={`${product.title} preview ${index + 1}`}
+                      alt={`${title} preview ${index + 1}`}
                       width={92}
                       height={92}
                       className="mx-auto h-20 w-20 object-contain md:h-28 md:w-28"
@@ -455,138 +428,164 @@ export default function ProductDetailPage({ params }: PageProps) {
             </div>
 
             <div className="w-full lg:space-y-3 space-y-2  lg:w-[47%]">
-              <p className="text-[12px] lg:text-[18px]  text-slate-600">{product.category}</p>
-              <h1 className="text-[16px] lg:text-3xl font-semibold leading-tight text-slate-900">{product.title}</h1>
+              <p className="text-[12px] lg:text-[18px]  text-slate-600">{category}</p>
+              <h1 className="text-[16px] lg:text-3xl font-semibold leading-tight text-slate-900">{title}</h1>
 
               <div className="space-y-1 text-[12px] text-slate-500 lg:hidden">
                 <div className="flex items-center gap-2 whitespace-nowrap">
-                  <Image src={product.brandLogo} alt={product.brand} width={60} height={24} className="h-4 w-auto object-contain" />
+                  <Image src={brandLogo} alt={brand} width={60} height={24} className="h-4 w-auto object-contain" />
                   <div className="flex items-center gap-0.5 text-[#F59E0B]">
                     <FaStar className="h-2.5 w-2.5" />
                     <FaStar className="h-2.5 w-2.5" />
                     <FaStar className="h-2.5 w-2.5" />
                     <FaStar className="h-2.5 w-2.5" />
                     <FaStar className="h-2.5 w-2.5 text-slate-300" />
-                    <span className="ml-0.5 text-slate-500">{product.ratingCount}</span>
+                    <span className="ml-0.5 text-slate-500">{ratingCount}</span>
                   </div>
                   <span>|</span>
-                  <span>Model : {product.model}</span>
+                  <span>Model : {model}</span>
                 </div>
 
                 <div className="flex items-center gap-2 whitespace-nowrap">
-                  <span>SKU : {product.sku}</span>
+                  <span>SKU : {selectedSku}</span>
                   <span>|</span>
-                  <span className="text-[#0A67C8]">{product.availability}</span>
+                  <span className="text-[#0A67C8]">{selectedAvailability}</span>
                 </div>
               </div>
 
               <div className="hidden flex-wrap items-center gap-3 text-sm text-slate-500 lg:flex">
-                <Image src={product.brandLogo} alt={product.brand} width={60} height={24} className="h-6 w-auto object-contain" />
+                <Image src={brandLogo} alt={brand} width={60} height={24} className="h-6 w-auto object-contain" />
                 <div className="flex items-center gap-1 text-[#F59E0B]">
                   <FaStar className="h-3 w-3" />
                   <FaStar className="h-3 w-3" />
                   <FaStar className="h-3 w-3" />
                   <FaStar className="h-3 w-3" />
                   <FaStar className="h-3 w-3 text-slate-300" />
-                  <span className="ml-1 text-slate-500">{product.ratingCount}</span>
+                  <span className="ml-1 text-slate-500">{ratingCount}</span>
                 </div>
                 <span>|</span>
-                <span>Model : {product.model}</span>
+                <span>Model : {model}</span>
                 <span>|</span>
-                <span>SKU : {product.sku}</span>
+                <span>SKU : {selectedSku}</span>
                 <span>|</span>
-                <span className="text-[#0A67C8]">{product.availability}</span>
+                <span className="text-[#0A67C8]">{selectedAvailability}</span>
               </div>
 
               <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:hidden">
-                <p className="text-[22px] font-medium leading-none text-[#0C73DA]">{product.price}</p>
+                <p className="text-[22px] font-medium leading-none text-[#0C73DA]">{price}</p>
                 <div className="flex flex-col items-center leading-none">
-                  <p className="text-[8px] font-semibold text-[#15A85B]">{product.discountLabel}</p>
-                  <p className="text-[10px] text-slate-400 line-through">{product.originalPrice}</p>
+                  <p className="text-[8px] font-semibold text-[#15A85B]">{discountLabel}</p>
+                  <p className="text-[10px] text-slate-400 line-through">{originalPrice}</p>
                 </div>
-                <span className="rounded-tl-3xl rounded-br-3xl bg-[#F13D36] px-3 py-1 text-[8px] font-semibold leading-none text-white">{product.saveLabel}</span>
+                <span className="rounded-tl-3xl rounded-br-3xl bg-[#F13D36] px-3 py-1 text-[8px] font-semibold leading-none text-white">{saveLabel}</span>
                 <button type="button" className="text-[8px] font-semibold leading-none text-[#0C73DA]">
-                  {product.offersLabel}
+                  {offersLabel}
                 </button>
               </div>
 
               <div className="hidden flex-wrap items-center gap-8 lg:flex">
-                <p className="text-4xl font-medium text-[#0C73DA]">{product.price}</p>
-                <div className="flex flex-col items-center" >
-                  <p className="text-base font-semibold text-[#15A85B]">{product.discountLabel}</p>
-                  <p className="text-md text-slate-400 line-through">{product.originalPrice}</p>
-                </div>
-                <span className="rounded-tl-3xl rounded-br-3xl bg-[#F13D36]  px-6 py-1 text-sm font-semibold text-white">{product.saveLabel}</span>
-                <button type="button" className="text-sm font-semibold text-[#0C73DA]">
-                  {product.offersLabel}
-                </button>
-              </div>
+  <p className="text-4xl font-medium text-[#0C73DA]">{price}</p>
+  
+  <div className="flex flex-col items-center">
+    <p className="text-base font-semibold text-[#15A85B]">{discountLabel}</p>
+    <p className="text-md text-slate-400 line-through">{originalPrice}</p>
+  </div>
+
+  {/* Updated Section Below */}
+  <span className="rounded-tl-3xl rounded-br-3xl bg-[#F13D36] px-6 py-1 text-sm font-semibold text-white">
+  SAVE : { (Number(originalPrice.replace(/[^0-9.-]+/g, "")) - Number(price.replace(/[^0-9.-]+/g, ""))).toFixed(2) }
+</span>
+
+  <button type="button" className="text-sm font-semibold text-[#0C73DA]">
+    {offersLabel}
+  </button>
+</div>
 
               <div className="flex items-center  gap-2 border-b border-slate-200 pb-3 text-[12px] lg:text-[16px] text-slate-700">
                 <Image src="/images/EMI.png" alt="EMI" width={20} height={20} className="lg:h-5 h-4 w-4 lg:w-5 object-contain" />
-                <span >{product.emiText}</span>
+                 EMI Starts From <span >{emiText}</span>
                 <button type="button" className="font-semibold text-[#0C73DA]">
-                  | {product.emiDetailsLabel}
+                  | {emiDetailsLabel}
                 </button>
               </div>
 
               <div className="space-y-2">
-                <div className="flex items-center gap-3 text-[12px] lg:text-sm">
-                  <span className="text-slate-700">Capacity :</span>
-                  {product.capacities.map((capacity, index) => (
-                    <button
-                      key={capacity}
-                      type="button"
-                      className={`min-w-16 rounded border lg:px-4 lg:py-1.5 lg:text-xs px-2 py-0.5 text-[10px] ${index === 0 ? "border-slate-500 bg-slate-100 text-slate-900" : "border-slate-200 text-slate-600"}`}
-                    >
-                      {capacity}
-                    </button>
-                  ))}
-                </div>
+                {attributesForUi.length > 0 ? (
+                  attributesForUi.map((attribute) => {
+                    const attributeKey = String(attribute.attribute_id ?? attribute.name ?? "");
+                    const selectedValue = selectedAttributes[attributeKey];
+                    return (
+                      <div key={attributeKey} className="flex items-center gap-3 text-[12px] lg:text-sm">
+                        <span className="text-slate-700">{attribute.name || "Attribute"} :</span>
+                        {(attribute.values ?? []).map((value) => {
+                          const isSelected = selectedValue === value;
+                          return (
+                            <button
+                              key={`${attributeKey}-${value}`}
+                              type="button"
+                              onClick={() => {
+                                setSelectedAttributes((prev) => ({ ...prev, [attributeKey]: value }));
+                              }}
+                              className={`min-w-16 rounded border lg:px-4 lg:py-1.5 lg:text-xs px-2 py-0.5 text-[10px] ${isSelected ? "border-slate-500 bg-slate-100 text-slate-900" : "border-slate-200 text-slate-600"}`}
+                            >
+                              {value}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="flex items-center gap-3 text-[12px] lg:text-sm">
+                    <span className="text-slate-700">Capacity :</span>
+                    <span className="text-slate-400">Not specified</span>
+                  </div>
+                )}
 
                 <div className="flex items-center gap-3 text-[12px] lg:text-sm">
-                  <span className="text-slate-700">{product.colorLabel} :</span>
-                  {product.colorSwatches.map((colorImage, index) => (
-                    <button
-                      key={`${colorImage}-${index}`}
-                      type="button"
-                      className={`rounded border p-1 ${index === 0 ? "border-slate-600" : "border-slate-200"}`}
-                    >
-                      <Image src={colorImage} alt="Color option" width={36} height={36} className="lg:h-9 lg:w-9 w-6 h-6 object-contain" />
-                    </button>
-                  ))}
+                  <span className="text-slate-700">{colorLabel} :</span>
+                  {colorOptions.length > 0 ? (
+                    colorOptions.map((color) => {
+                      const isSelected = toComparable(color.name) === toComparable(activeColorName);
+                      return (
+                      <button
+                        key={color.key}
+                        type="button"
+                        onClick={() => setSelectedColorName(color.name)}
+                        className={`rounded border p-1 ${isSelected ? "border-slate-600" : "border-slate-200"}`}
+                        title={color.name}
+                      >
+                        <span className="flex items-center gap-1.5">
+                          <Image src={color.image} alt={color.name} width={36} height={36} className="lg:h-9 lg:w-9 w-6 h-6 object-contain" />
+                          <span className="text-[10px] text-slate-700 lg:text-xs">{color.name}</span>
+                        </span>
+                      </button>
+                      );
+                    })
+                  ) : (
+                    <span className="text-slate-400">Not specified</span>
+                  )}
                 </div>
               </div>
 
-              <div className="text-[14px] text-slate-700 hidden lg:block">
-                {product.features.map((feature, index) => (
-                  <p key={feature}>
-                    • {feature}
-                    {index === product.features.length - 1 && (
-                      <button type="button" className="ml-3 text-[12px] font-semibold text-[#0C73DA]">
-                        See More
+              <div className="text-[14px] text-slate-700 hidden lg:block space-y-1">
+                {featuresList && featuresList.length > 0 ? (
+                  <>
+                    {featuresList.map((feature, index) => (
+                      <p key={`${feature}-${index}`}>
+                        • {feature}
+                      </p>
+                    ))}
+                    {featuresList.length > 0 && (
+                      <button type="button" className="ml-3 text-[12px] font-semibold text-[#0C73DA] hover:underline">
+                        See More Features
                       </button>
                     )}
-                  </p>
-                ))}
+                  </>
+                ) : (
+                  <p className="text-slate-400">No features available</p>
+                )}
               </div>
-
-              {/* <div className="flex items-center justify-between border-y border-slate-200 py-3">
-              <div>
-                <p className="flex items-center gap-1 text-[18px] font-semibold text-slate-800">
-                  <FaBolt className="text-orange-500" />
-                  {product.flashTitle}
-                </p>
-                <p className="ml-5 text-[22px] font-bold text-[#0C73DA]">{product.flashTime}</p>
-                <p className="ml-5 text-xs text-slate-500">{product.flashTimeLabels}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-xs text-slate-500">Use Coupon :</p>
-                <button type="button" className="mt-1 rounded border border-slate-300 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-700">
-                  {product.coupon}
-                </button>
-              </div>
-            </div> */}
 
               {/* Mobile-only offer/actions layout */}
               <div className="flex items-start gap-2 lg:hidden">
@@ -614,7 +613,7 @@ export default function ProductDetailPage({ params }: PageProps) {
                 <div className="min-w-0 flex-1 space-y-1.5">
                   <button type="button" className="inline-flex items-center gap-1.5 whitespace-nowrap text-[11px] font-medium tracking-wide text-[#0C73DA] leading-none">
                     <Image src="/images/shop.png" alt="Showroom" width={12} height={12} className="h-3 w-3 object-contain" />
-                    Book in showroom Get 5% Off
+                    {showroomTitle}
                   </button>
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-3 rounded-md border border-slate-300 px-7 py-1">
@@ -687,7 +686,7 @@ export default function ProductDetailPage({ params }: PageProps) {
                       Share
                     </button>
                     <button type="button" className="whitespace-nowrap text-[16px] font-semibold text-[#0C73DA] leading-none">
-                      Book in showroom Get 5% Off
+                      {showroomTitle}
                     </button>
                   </div>
 
@@ -704,16 +703,16 @@ export default function ProductDetailPage({ params }: PageProps) {
               </div>
 
               <MobileOfferDetails
-                specialOfferLeft={product.specialOfferLeft}
-                specialOfferOne={product.specialOfferOne}
-                specialOfferTwo={product.specialOfferTwo}
-                shippingInfo={product.shippingInfo}
-                warrantyInfo={product.warrantyInfo}
-                emiFacilityInfo={product.emiFacilityInfo}
-                exchangeInfo={product.exchangeInfo}
+                specialOfferLeft={specialOfferLeft}
+                specialOfferOne={specialOfferOne}
+                specialOfferTwo={specialOfferTwo}
+                shippingInfo={shippingInfo}
+                warrantyInfo={warrantyInfo}
+                emiFacilityInfo={emiFacilityInfo}
+                exchangeInfo={exchangeInfo}
               />
 
-              <MobileMadeInFeatures madeInText={product.madeInText} features={product.features} />
+              <MobileMadeInFeatures madeInText={madeInText} features={features} />
 
               <div className="hidden lg:flex lg:flex-wrap lg:items-center lg:gap-x-3 lg:gap-y-2 lg:py-1 lg:text-md lg:text-slate-600">
                 <p className="mr-0 flex shrink-0 items-center gap-1.5 border-r border-slate-300 pr-3 last:border-r-0 last:pr-0 lg:mr-4 lg:gap-2 lg:border-r-2 lg:pr-4">
@@ -734,49 +733,69 @@ export default function ProductDetailPage({ params }: PageProps) {
                 </p>
               </div>
 
-              <div className="hidden lg:inline-flex lg:w-fit lg:max-w-full lg:flex-wrap lg:items-center lg:gap-2 lg:rounded-lg lg:border lg:border-[#2F7FE8] lg:px-3 lg:py-2 lg:text-sm lg:text-slate-900">
-                <span className="whitespace-nowrap text-[15px] font-semibold text-[#0C73DA] md:text-sm">*{product.specialOfferLeft} =</span>
+              {(productData?.special_offers?.length ?? 0) > 0 ? (
+                <div className="hidden lg:inline-flex lg:w-fit lg:max-w-full lg:flex-wrap lg:items-center lg:gap-2 lg:rounded-lg lg:border lg:border-[#2F7FE8] lg:px-3 lg:py-2 lg:text-sm lg:text-slate-900">
+                  <span className="whitespace-nowrap text-[15px] font-semibold text-[#0C73DA] md:text-sm">*{productData?.special_offer_title || specialOfferLeft} =</span>
 
-                <span className="h-6 w-px bg-slate-500/60" aria-hidden="true" />
+                  {productData?.special_offers?.map((offer, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      {index > 0 && <span className="h-6 w-px bg-slate-500/60" aria-hidden="true" />}
+                      <span className="flex items-center gap-2 whitespace-nowrap text-[15px] md:text-sm">
+                        {offer.image ? (
+                          <Image src={offer.image} alt={offer.text || `Offer ${index + 1}`} width={40} height={24} className="h-6 w-auto object-contain" />
+                        ) : null}
+                        {offer.text}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="hidden lg:inline-flex lg:w-fit lg:max-w-full lg:flex-wrap lg:items-center lg:gap-2 lg:rounded-lg lg:border lg:border-[#2F7FE8] lg:px-3 lg:py-2 lg:text-sm lg:text-slate-900">
+                  <span className="whitespace-nowrap text-[15px] font-semibold text-[#0C73DA] md:text-sm">*{specialOfferLeft} =</span>
 
-                <span className="flex items-center gap-2 whitespace-nowrap text-[15px] md:text-sm">
-                  <Image src="/images/ebl.png" alt="EBL" width={40} height={24} className="h-6 w-auto object-contain" />
-                  {product.specialOfferOne}
-                </span>
+                  <span className="h-6 w-px bg-slate-500/60" aria-hidden="true" />
 
-                <span className="h-6 w-px bg-slate-500/60" aria-hidden="true" />
+                  <span className="flex items-center gap-2 whitespace-nowrap text-[15px] md:text-sm">
+                    <Image src="/images/ebl.png" alt="EBL" width={40} height={24} className="h-6 w-auto object-contain" />
+                    {specialOfferOne}
+                  </span>
 
-                <span className="flex items-center gap-2 whitespace-nowrap text-[15px] md:text-sm">
-                  <Image src="/images/nogod.png" alt="Nagad" width={40} height={24} className="h-6 w-auto object-contain" />
-                  {product.specialOfferTwo}
-                </span>
-              </div>
+                  <span className="h-6 w-px bg-slate-500/60" aria-hidden="true" />
+
+                  <span className="flex items-center gap-2 whitespace-nowrap text-[15px] md:text-sm">
+                    <Image src="/images/nogod.png" alt="Nagad" width={40} height={24} className="h-6 w-auto object-contain" />
+                    {specialOfferTwo}
+                  </span>
+                </div>
+              )}
 
               <div className="hidden lg:block lg:space-y-2 lg:border-b lg:border-slate-200 lg:pb-3 lg:text-xs lg:text-slate-600 lg:md:text-sm">
                 <p className="flex items-center gap-5">
+                 
                   <Image src="/images/shippingtime.png" alt="Shipping time" width={24} height={24} unoptimized className="h-7 w-7 object-contain" />
-                  {product.shippingInfo}
+                  <span>Shipping Timeline:</span>{shippingInfo}
                 </p>
                 <p className="flex flex-wrap items-center gap-2">
                   <span className="flex items-center gap-5">
                     <Image src="/images/warranty.png" alt="Warranty" width={24} height={24} unoptimized className="h-7 w-7 object-contain" />
-                    {product.warrantyInfo}
+                    {warrantyInfo}
                   </span>
-                  <button type="button" className="whitespace-nowrap text-[#0C73DA] text-xs md:text-sm font-medium hover:underline">View policy</button>
+                  <button type="button" className="whitespace-nowrap text-[#0C73DA] text-xs md:text-sm font-medium hover:underline">{warrantyLinkLabel}</button>
                 </p>
                 <p className="flex items-center gap-5">
                   <Image src="/images/Vector.png" alt="EMI facility" width={24} height={24} unoptimized className="h-7 w-7 object-contain" />
-                  {product.emiFacilityInfo}
+                  {emiFacilityInfo}
+                  <button type="button" className="whitespace-nowrap text-[#0C73DA] text-xs md:text-sm font-medium hover:underline">{emiLinkLabel}</button>
                 </p>
                 <p className="flex flex-wrap items-start gap-2">
                   <Image src="/images/exchange.png" alt="Exchange" width={24} height={24} unoptimized className="h-7 w-7 object-contain flex-shrink-0" />
-                  <span className="flex-1 pt-0.5">{product.exchangeInfo}</span>
-                  <button type="button" className="whitespace-nowrap text-[#0C73DA] text-xs md:text-sm font-medium hover:underline flex-shrink-0">Available Showrooms</button>
+                  <span className="flex-1 pt-0.5">{exchangeInfo}</span>
+                  <button type="button" className="whitespace-nowrap text-[#0C73DA] text-xs md:text-sm font-medium hover:underline flex-shrink-0">{exchangeLinkLabel}</button>
                 </p>
               </div>
 
               <p className="hidden rounded bg-slate-100 py-1 text-center text-lg font-medium text-[#0C73DA] lg:block">
-                {product.madeInText}
+                {madeInText}
               </p>
             </div>
           </div>
@@ -786,21 +805,23 @@ export default function ProductDetailPage({ params }: PageProps) {
       {/* Detailed Product Details */}
 
       <ProductDetailsTabs
-        title={`${product.title} | ${product.model}`}
-        descriptionHtml={product.descriptionHtml ?? buildDescriptionHtml(product)}
-        specificationsHtml={product.specificationsHtml ?? buildSpecificationsHtml(product)}
-        featureHtml={product.featuresHtml ?? buildFeatureHtml(product)}
-        policyHtml={product.policyHtml ?? buildPolicyHtml(product)}
+        title={`${title} | ${model}`}
+        descriptionHtml={descriptionHtml}
+        specifications={productData?.specifications ?? []}
+        featureSections={productData?.featured_specs ?? []}
+        policyTitle={productData?.product_policy?.title ?? 'Product Policy'}
+        policyContent={productData?.product_policy?.content ?? ''}
+        reviews={productData?.reviews}
       />
 
       <MobileStickyPurchaseBar
-        availability={product.availability}
-        price={product.price}
-        discountLabel={product.discountLabel}
-        originalPrice={product.originalPrice}
-        saveLabel={product.saveLabel}
-        emiText={product.emiText}
-        emiDetailsLabel={product.emiDetailsLabel}
+        availability={selectedAvailability}
+        price={price}
+        discountLabel={discountLabel}
+        originalPrice={originalPrice}
+        saveLabel={saveLabel}
+        emiText={emiText}
+        emiDetailsLabel={emiDetailsLabel}
       />
 
       <FooterBreadcrumbPortal>
@@ -813,7 +834,7 @@ export default function ProductDetailPage({ params }: PageProps) {
             <span className="text-slate-400">›</span>
             <span>{breadcrumbCategory}</span>
             <span className="text-slate-400">›</span>
-            <span className="text-slate-700">Washing Machine details</span>
+            <span className="text-slate-700">Product details</span>
           </nav>
         </div>
       </FooterBreadcrumbPortal>

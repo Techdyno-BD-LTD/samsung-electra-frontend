@@ -4,17 +4,28 @@ import { useMemo, useState } from 'react';
 import Image from 'next/image';
 
 type MobileProductGalleryProps = {
-  images: string[];
-  title: string;
-  warrantyBadgeImage: string;
+  productData?: {
+    name?: string;
+    thumbnail_image?: string;
+    photos?: Array<{ photo?: string; path?: string }>;
+  };
+  images?: string[];
+  title?: string;
+  warrantyBadgeImage?: string;
 };
 
 export default function MobileProductGallery({
-  images,
-  title,
-  warrantyBadgeImage,
+  productData,
+  images = [],
+  title = "Product",
+  warrantyBadgeImage = "/images/warrantybadge.png",
 }: MobileProductGalleryProps) {
-  const galleryImages = useMemo(() => (images.length > 0 ? images : ['/images/wm2.png']), [images]);
+  const productImages = productData?.photos?.map((photo) => photo.path || photo.photo || "").filter(Boolean) || [];
+  const galleryImages = useMemo(
+    () => (productImages.length > 0 ? productImages : images.length > 0 ? images : [productData?.thumbnail_image || '/images/wm2.png']),
+    [images, productData?.photos, productData?.thumbnail_image]
+  );
+  const productTitle = productData?.name || title;
   const [activeIndex, setActiveIndex] = useState(0);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
@@ -62,7 +73,7 @@ export default function MobileProductGallery({
     >
       <Image
         src={galleryImages[activeIndex]}
-        alt={`${title} image ${activeIndex + 1}`}
+        alt={`${productTitle} image ${activeIndex + 1}`}
         width={520}
         height={520}
         className="mx-auto h-[220px] w-full object-contain"

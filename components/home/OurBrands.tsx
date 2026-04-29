@@ -1,61 +1,100 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import brands from "@/database/brands.json";
 
-type BrandCategory = {
+type Category = {
   id: number;
   name: string;
-  categoryLogo: string;
-  image: string;
+  slug: string;
+  banner: string;
+  icon: string;
+  cover_image: string;
+  parent_id: number;
 };
 
-type BrandTab = {
+type Brand = {
   id: number;
   name: string;
-  tabLogo: string;
-  categories: BrandCategory[];
+  slug: string;
+  logo: string;
+};
+
+type BrandSection = {
+  row_index: number;
+  brand: Brand;
+  selected_categories: Category[];
 };
 
 export default function OurBrands() {
-  const brandTabs = brands as BrandTab[];
-  const [activeBrandId, setActiveBrandId] = useState<number>(brandTabs[0]?.id ?? 1);
+  const [brandSections, setBrandSections] = useState<BrandSection[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [title, setTitle] = useState("Our Brands");
+  const [activeRowIndex, setActiveRowIndex] = useState<number>(0);
 
-  const activeBrand = useMemo(
-    () => brandTabs.find((brand) => brand.id === activeBrandId) ?? brandTabs[0],
-    [activeBrandId, brandTabs]
+  useEffect(() => {
+    async function fetchBrandSections() {
+      try {
+        const res = await fetch("/api/brands/section");
+        const data = await res.json();
+        if (data?.success && Array.isArray(data?.data)) {
+          setBrandSections(data.data);
+          setTitle(data.title || "Our Brands");
+          if (data.data.length > 0) {
+            setActiveRowIndex(data.data[0].row_index);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching brand sections:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchBrandSections();
+  }, []);
+
+  const activeSection = useMemo(
+    () => brandSections.find((section) => section.row_index === activeRowIndex) || brandSections[0],
+    [activeRowIndex, brandSections]
   );
 
-  if (!activeBrand) {
+  if (loading) {
+    return (
+      <div className="flex w-full items-center justify-center py-20">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#0054A6] border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (!activeSection) {
     return null;
   }
 
   return (
     <section className="mx-auto">
       <div className="text-center">
-        <h2 className="text-[18px] font-semibold text-slate-900 sm:text-[2.1rem]">Our Brands</h2>
+        <h2 className="text-[18px] font-semibold text-slate-900 sm:text-[2.1rem]">{title}</h2>
         <div className="mt-3 h-[1px] w-full bg-gradient-to-r from-transparent via-[#2F73BD]/70 to-transparent" />
       </div>
 
       <div className="mt-4 grid grid-cols-4 gap-2 sm:grid-cols-4 sm:gap-3">
-        {brandTabs.map((brand) => {
-          const isActive = brand.id === activeBrandId;
+        {brandSections.map((section) => {
+          const isActive = section.row_index === activeRowIndex;
           return (
             <button
-              key={brand.id}
+              key={section.row_index}
               type="button"
-              onClick={() => setActiveBrandId(brand.id)}
+              onClick={() => setActiveRowIndex(section.row_index)}
               className={`group border border-slate-200 px-2 py-1 text-center transition-all duration-200 ${
                 isActive ? "bg-[#f3f3f3]" : "bg-white"
               }`}
-              aria-label={`Show ${brand.name} categories`}
+              aria-label={`Show ${section.brand.name} categories`}
               aria-pressed={isActive}
             >
               <div className="relative mx-auto h-10 w-full max-w-[180px] sm:h-12">
                 <Image
-                  src={brand.tabLogo}
-                  alt={`${brand.name} logo`}
+                  src={section.brand.logo}
+                  alt={`${section.brand.name} logo`}
                   fill
                   sizes="(max-width: 640px) 120px, 170px"
                   className={`object-contain transition-all duration-200 ${
@@ -74,15 +113,15 @@ export default function OurBrands() {
       </div>
 
       <div className="mt-0 grid grid-cols-2 gap-2 sm:grid-cols-2 sm:gap-3 xl:grid-cols-4">
-        {activeBrand.categories.slice(0, 4).map((category) => (
+        {activeSection.selected_categories.slice(0, 4).map((category) => (
           <article
-            key={`${activeBrand.id}-${category.id}`}
+            key={`${activeSection.row_index}-${category.id}`}
             className="border border-slate-200  px-4 pb-3 pt-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[#2F73BD]/30 hover:shadow-md"
           >
             <div className="relative mx-auto h-7 w-full max-w-[130px]">
               <Image
-                src={category.categoryLogo}
-                alt={`${activeBrand.name} category logo`}
+                src={activeSection.brand.logo}
+                alt={`${activeSection.brand.name} category logo`}
                 fill
                 sizes="130px"
                 className="object-contain"
@@ -91,7 +130,7 @@ export default function OurBrands() {
 
             <div className="relative mx-auto mt-5 h-[200px] w-full max-w-[320px] sm:h-[260px]">
               <Image
-                src={category.image}
+                src={category.cover_image || "/assets/img/placeholder.jpg"}
                 alt={category.name}
                 fill
                 sizes="210px"

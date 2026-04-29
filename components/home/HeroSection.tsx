@@ -2,26 +2,15 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { type ComponentType, useEffect, useMemo, useState } from "react";
-import {
-  HiOutlineArchiveBox,
-
-  // HiOutlineChevronLeft,
-  // HiOutlineChevronRight,
-  HiOutlineCog6Tooth,
-  HiOutlineCpuChip,
-  HiOutlineHome,
-  HiOutlineSparkles,
-  HiOutlineSun,
-  HiOutlineTv,
-} from "react-icons/hi2";
+import { useEffect, useMemo, useState } from "react";
 
 type HeroCategory = {
   id: number;
   name: string;
   count: number;
-  icon: string;
+  icon: string | null;
   slug?: string;
+  parent_id?: number;
 };
 
 type HeroSlide = {
@@ -42,14 +31,34 @@ type HeroPayload = {
   slides: HeroSlide[];
 };
 
-const iconMap: Record<string, ComponentType<{ className?: string }>> = {
-  tv: HiOutlineTv,
-  refrigerator: HiOutlineArchiveBox,
-  freezer: HiOutlineSparkles,
-  ac: HiOutlineSun,
-  microwave: HiOutlineCpuChip,
-  washing: HiOutlineCog6Tooth,
-  home: HiOutlineHome,
+type SliderItem = {
+  id: number;
+  image: string;
+  file_name: string;
+  external_link: string | null;
+};
+
+type SliderApiResponse = {
+  data: {
+    text: string;
+    sliders: SliderItem[];
+  };
+  success: boolean;
+  status: number;
+};
+
+type CategoryApiItem = {
+  id: number;
+  name: string;
+  slug: string;
+  icon: string | null;
+  parent_id?: number;
+};
+
+type CategoriesApiResponse = {
+  data: CategoryApiItem[];
+  success: boolean;
+  status: number;
 };
 
 const HERO_SLIDE_ASPECT_RATIO = "1530 / 528";
@@ -86,14 +95,48 @@ export default function HeroSection() {
 
     async function loadHeroData() {
       try {
-        const response = await fetch("/api/hero", { cache: "no-store" });
-        if (!response.ok) {
+        const [sliderResponse, categoriesResponse] = await Promise.all([
+          fetch("/api/homepage/sliders", { cache: "no-store" }),
+          fetch("/api/categories", { cache: "no-store" }),
+        ]);
+
+        if (!sliderResponse.ok) {
           throw new Error("Failed to fetch hero section data");
         }
 
-        const payload: HeroPayload = await response.json();
+        const sliderPayload: SliderApiResponse = await sliderResponse.json();
+        const categoryPayload = categoriesResponse.ok ? (await categoriesResponse.json()) as CategoriesApiResponse : { data: [] as CategoryApiItem[] };
+
+        const slides: HeroSlide[] = (sliderPayload.data?.sliders || []).map((item, index) => ({
+          id: item.id,
+          title: `Slide ${index + 1}`,
+          subtitle: "",
+          imageUrl: item.image,
+          ctaLabel: "",
+          ctaHref: item.external_link || "#",
+          countdownTarget: new Date().toISOString(),
+          showTimer: false,
+        }));
+
+        const categories: HeroCategory[] = (categoryPayload.data || [])
+          .filter((item) => item.parent_id === 0)
+          .slice(0, 7)
+          .map((item) => ({
+            id: item.id,
+            name: item.name,
+            count: 0,
+            icon: item.icon,
+            slug: item.slug,
+            parent_id: item.parent_id,
+          }));
+
         if (isMounted) {
-          setHeroData(payload);
+          setHeroData({
+            promoBarText: sliderPayload.data?.text || "Discover Samsung Electra seasonal offers.",
+            autoplayMs: 5000,
+            categories,
+            slides,
+          });
         }
       } catch {
         if (isMounted) {
@@ -183,9 +226,7 @@ export default function HeroSection() {
         </div>
 
         <div className="space-y-2.5 lg:space-y-1.5 xl:space-y-1.5 2xl:space-y-3">
-          {heroData.categories.map((category) => {
-            const CategoryIcon = iconMap[category.icon] || HiOutlineArchiveBox;
-
+          {heroData.categories.slice(0, 7).map((category) => {
             return (
               <Link
                 key={category.id}
@@ -193,7 +234,15 @@ export default function HeroSection() {
                 className="flex w-full items-center justify-between rounded-md border border-slate-100 px-2 py-3 text-left shadow-md transition hover:border-blue-300 hover:bg-white lg:px-2 lg:py-2 xl:px-2 xl:py-2 2xl:px-3 2xl:py-4"
               >
                 <div className="flex items-center gap-2 lg:gap-1.5 xl:gap-1.5 2xl:gap-2">
-                  <CategoryIcon className="text-xl text-slate-600 2xl:text-2xl" />
+                  {category.icon ? (
+                    <Image
+                      src={category.icon}
+                      alt={category.name}
+                      width={500}
+                      height={500}
+                      className="h-6 w-6 object-contain"
+                    />
+                  ) : null}
                   <span className="text-[13px] text-slate-700 lg:text-[12px] xl:text-[12px] 2xl:text-[13px]">{category.name}</span>
                 </div>
                 <span className="inline-flex h-7 min-w-7 items-center justify-center rounded-full bg-blue-500 px-2 text-xs font-semibold text-white">

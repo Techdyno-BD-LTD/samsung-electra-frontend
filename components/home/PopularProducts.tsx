@@ -3,17 +3,36 @@
 import { useEffect, useRef, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import ProductCard from "@/components/common/ProductCard";
-import products from "@/database/popularproducts.json";
+import { Product } from "@/types/product";
+// import products from "@/database/popularproducts.json";
 
 type ProductBadge = "New" | "Hot" | "Sold Out" | "Special" | "";
 
 const fallbackStatusBadges: ProductBadge[] = ["New", "Hot", "Sold Out", "Special", ""];
 
 export default function PopularProducts() {
-  const featuredProducts = products.slice(0, 8);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const sliderRef = useRef<HTMLDivElement | null>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch("/api/products/popular");
+        const json = await response.json();
+        if (json.success) {
+          setFeaturedProducts(json.data.slice(0, 10));
+        }
+      } catch (error) {
+        console.error("Failed to fetch popular products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   const updateScrollState = () => {
     const slider = sliderRef.current;
@@ -64,7 +83,15 @@ export default function PopularProducts() {
       slider.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
     };
-  }, []);
+  }, [featuredProducts]);
+
+  if (loading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#2F73BD] border-t-transparent"></div>
+      </div>
+    );
+  }
 
   return (
     <section className="mx-auto space-y-6">
@@ -107,8 +134,8 @@ export default function PopularProducts() {
               className="min-w-[48%] snap-start sm:min-w-[48%] lg:min-w-[31.5%] xl:min-w-[24%] 2xl:min-w-[19%]"
             >
               <ProductCard
-                {...product}
-                statusBadge={product.statusBadge || fallbackStatusBadges[index] || ""}
+                productData={product}
+                statusBadge={fallbackStatusBadges[index] || ""}
               />
             </div>
           ))}

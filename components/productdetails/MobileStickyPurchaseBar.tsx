@@ -2,23 +2,35 @@ import { FaShoppingCart } from "react-icons/fa";
 import Image from "next/image";
 
 type MobileStickyPurchaseBarProps = {
-  availability: string;
-  price: string;
-  discountLabel: string;
-  originalPrice: string;
-  saveLabel: string;
-  emiText: string;
-  emiDetailsLabel: string;
+  productData?: {
+    current_stock?: number;
+    main_price?: string;
+    stroked_price?: string;
+    discount?: string;
+    emi_start?: string;
+    emi_facility?: {
+      text?: string;
+      link_label?: string | null;
+    };
+  };
+  availability?: string;
+  price?: string;
+  discountLabel?: string;
+  originalPrice?: string;
+  saveLabel?: string;
+  emiText?: string;
+  emiDetailsLabel?: string;
 };
 
 export default function MobileStickyPurchaseBar({
-  availability,
-  price,
-  discountLabel,
-  originalPrice,
-  saveLabel,
-  emiText,
-  emiDetailsLabel,
+  productData,
+  availability = (productData?.current_stock ?? 0) > 0 ? "In Stock" : "Out of Stock",
+  price = productData?.main_price || "Price",
+  discountLabel = productData?.discount || "0% Off",
+  originalPrice = productData?.stroked_price || "Price",
+  saveLabel = productData?.discount ? `Save ${productData.discount}` : "Save Amount",
+  emiText = productData?.emi_start || "EMI Available",
+  emiDetailsLabel = productData?.emi_facility?.text || "See details",
 }: MobileStickyPurchaseBarProps) {
   return (
     <div className="fixed inset-x-0 bottom-0 z-[60] border-t border-slate-100 bg-white px-3 pt-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(0,0,0,0.08)] md:hidden">

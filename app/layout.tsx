@@ -4,7 +4,7 @@ import "../styles/globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
-import { getRouteMetadata } from "@/lib/metadata";
+// import { getRouteMetadata } from "@/lib/metadata";
 import StoreProvider from "@/store/StoreProvider";
 
 const openSans = Open_Sans({
@@ -13,7 +13,48 @@ const openSans = Open_Sans({
   weight: ["300", "400", "500", "600", "700", "800"],
 });
 
-export const metadata: Metadata = getRouteMetadata("root");
+export async function generateMetadata(): Promise<Metadata> {
+  const baseUrl = process.env.API_BASE_URL;
+  const systemKey = process.env.API_SYSTEM_KEY;
+
+  let settings: any[] = [];
+  try {
+    const res = await fetch(`${baseUrl}/api/v2/business-settings`, {
+      headers: { "x-system-key": systemKey || "" },
+      next: { revalidate: 3600 },
+    });
+    const json = await res.json();
+    settings = json.data || [];
+  } catch (e) {
+    console.error("Failed to fetch business settings for metadata", e);
+  }
+
+  const findSetting = (type: string) => settings.find((s: any) => s.type === type)?.value;
+
+  const siteTitle = findSetting("meta_title") || "Samsung Electra";
+  const siteDescription = findSetting("meta_description") || "Next-gen connected retail operating system for Samsung Bangladesh.";
+  const siteImage = findSetting("meta_image") || "/og/default.png";
+  const siteIcon = findSetting("site_icon") || "/favicon.ico";
+
+  return {
+    title: siteTitle,
+    description: siteDescription,
+    icons: {
+      icon: siteIcon,
+    },
+    openGraph: {
+      title: siteTitle,
+      description: siteDescription,
+      images: [siteImage],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: siteTitle,
+      description: siteDescription,
+      images: [siteImage],
+    },
+  };
+}
 
 export default function RootLayout({
   children,

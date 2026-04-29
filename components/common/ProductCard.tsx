@@ -47,6 +47,54 @@ interface ProductCardProps {
   startingFrom?: string;
   bidButtonLabel?: string;
   dealImageHeight?: string;
+  productData?: {
+    id: number;
+    slug: string;
+    name: string;
+    category_id: number;
+    category: {
+      name: string;
+      slug: string;
+    };
+    weight: number;
+    model_number: string;
+    connection_type: string;
+    thumbnail_image: string;
+    price_high_low: string;
+    has_discount: boolean;
+    discount: string;
+    stroked_price: string;
+    main_price: string;
+    calculable_price: number;
+    rating: number;
+    rating_count: number;
+    sales: number;
+    current_stock: number;
+    unit: string;
+    emi_start: string;
+    links: {
+      details: string;
+    };
+    brand?: {
+      id: number;
+      slug: string;
+      name: string;
+      logo: string;
+    };
+    variants: Array<{
+      variant: string;
+      price: number;
+      sku: string;
+      qty: number;
+      image: string | null;
+    }>;
+    other_features: string;
+    tags: string[];
+    badge_tag?: string;
+    badge_value?: string;
+    product_sold?: number;
+    [key: string]: unknown;
+  };
 }
 
 const ProductCard = ({
@@ -86,10 +134,11 @@ const ProductCard = ({
   startingFrom = "৳ 56,500",
   bidButtonLabel = "Place Bid",
   dealImageHeight = "180px",
+  productData,
 }: ProductCardProps) => {
   const dispatch = useAppDispatch();
 
-  const productSlug = slug || toProductSlug(title);
+  const productSlug = productData?.slug || slug || toProductSlug(title);
   const wishlistItemId = productSlug || title;
   const isWishlisted = useAppSelector((state) => state.wishlist.items.some((item) => item.id === wishlistItemId));
   const isCompared = useAppSelector((state) => state.compare.slots.some((slot) => slot?.id === wishlistItemId));
@@ -164,20 +213,26 @@ const ProductCard = ({
   };
 
   const productHref = `/products/${productSlug}`;
-  const badgeLabel = statusBadge.trim() || (isSale ? "Sale" : "");
-  const normalizedBadgeLabel = badgeLabel.toLowerCase();
+  const displayBadgeLabel = productData?.badge_value || statusBadge.trim() || (isSale ? "Sale" : "");
+  const badgeStyleTag = productData?.badge_tag || statusBadge.trim() || (isSale ? "Sale" : "");
+  const normalizedBadgeTag = badgeStyleTag.toLowerCase();
+
   const badgeClassName =
-    normalizedBadgeLabel === "sale"
+    normalizedBadgeTag === "sale"
       ? "bg-red-600"
-      : normalizedBadgeLabel === "new"
+      : normalizedBadgeTag === "new"
         ? "bg-emerald-600"
-        : normalizedBadgeLabel === "hot"
+        : normalizedBadgeTag === "hot"
           ? "bg-orange-500"
-          : normalizedBadgeLabel === "sold out"
+          : normalizedBadgeTag === "sold out"
             ? "bg-slate-600"
-            : normalizedBadgeLabel === "special"
+            : normalizedBadgeTag === "special"
               ? "bg-blue-600"
-              : "bg-red-600";
+              : normalizedBadgeTag === "hurry up"
+                ? "bg-red-500"
+                : normalizedBadgeTag === "popular"
+                  ? "bg-indigo-600"
+                  : "bg-red-600";
 
   // Refined Star Renderer: Smaller (h-3) and Orange (orange-400)
   const renderStars = (count: number) => {
@@ -187,8 +242,8 @@ const ProductCard = ({
           <FaStar
             key={i}
             className={`h-3 w-3 ${i < Math.floor(count)
-                ? "fill-orange-400 text-orange-400"
-                : "fill-gray-200 text-gray-200"
+              ? "fill-orange-400 text-orange-400"
+              : "fill-gray-200 text-gray-200"
               }`}
           />
         ))}
@@ -260,30 +315,39 @@ const ProductCard = ({
             </div>
           </div>
 
-          <div className="mt-3 flex items-center justify-between text-[12px] lg:text-[15px]">
-            <p className="flex items-center gap-2 text-[#EF9B2E]">
-              <FaGavel className="h-4 w-4 text-slate-500" />
-              Bids : {bidsCount}
-            </p>
-            <span className="text-slate-300">|</span>
-            <p className="flex items-center gap-2 text-[#FF3D3D]">
-              <FaEye className="h-4 w-4 text-slate-500" />
-              Views : {viewsCount}
-            </p>
-          </div>
+          {/* Stats or Add to Cart on Hover */}
+          <div className="relative min-h-[90px] overflow-hidden mt-3">
+            {/* Stats - fades out on hover */}
+            <div className="w-full transition-all duration-300 ease-in-out group-hover:pointer-events-none group-hover:-translate-y-4 group-hover:opacity-0">
+              <div className="flex items-center justify-between text-[12px] lg:text-[15px]">
+                <p className="flex items-center gap-2 text-[#EF9B2E]">
+                  <FaGavel className="h-4 w-4 text-slate-500" />
+                  Bids : {bidsCount}
+                </p>
+                <span className="text-slate-300">|</span>
+                <p className="flex items-center gap-2 text-[#FF3D3D]">
+                  <FaEye className="h-4 w-4 text-slate-500" />
+                  Views : {viewsCount}
+                </p>
+              </div>
 
-          <div className="mt-3 rounded-md bg-[#efefef] px-3 py-2  text-[12px] lg:text-[15px] font-semibold text-slate-900">
-            Starting From : {startingFrom}
-          </div>
+              <div className="mt-3 rounded-md bg-[#efefef] px-3 py-2 text-[12px] lg:text-[15px] font-semibold text-slate-900">
+                Starting From : {startingFrom}
+              </div>
+            </div>
 
-          <button
-            type="button"
-            onClick={handleAddToCart}
-            className="mt-3 flex w-full items-center justify-center gap-2 rounded-md bg-[#1C5AA6] py-2 text-[18px] font-medium text-white"
-          >
-            <FaGavel className="h-4 w-4 text-[#ffd24d]" />
-            {bidButtonLabel}
-          </button>
+            {/* Add to cart - slides up and fades in on hover */}
+            <div className="absolute inset-0 flex items-center opacity-0 translate-y-10 transition-all duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100">
+              <button
+                type="button"
+                onClick={handleAddToCart}
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#1C5AA6] py-2.5 text-[18px] font-medium text-white transition-all hover:bg-[#15458a]"
+              >
+                <FaShoppingCart className="h-5 w-5" />
+                Add to cart
+              </button>
+            </div>
+          </div>
         </div>
       </article>
     );
@@ -351,17 +415,26 @@ const ProductCard = ({
             <Link href={productHref}>{title}</Link>
           </h3>
 
-          <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
-            <span className="text-lg font-bold text-slate-900">{price}</span>
-            {originalPrice && <span className="text-slate-400 line-through text-xs">{originalPrice}</span>}
-            {saveAmount && <span className="rounded bg-[#1B57A6] px-2 py-0.5 text-xs text-white">{saveAmount}</span>}
-            {discountPercent && <span className="text-xs text-red-500 font-medium">{discountPercent}</span>}
-          </div>
+          {/* Prices or Buy Now on Hover */}
+          <div className="relative min-h-[44px] overflow-hidden mt-2">
+            {/* Prices - fades out and slides up on hover */}
+            <div className="flex flex-wrap items-center gap-2 text-sm transition-all duration-300 ease-in-out group-hover:pointer-events-none group-hover:-translate-y-4 group-hover:opacity-0">
+              <span className="text-lg font-bold text-slate-900">{price}</span>
+              {originalPrice && <span className="text-slate-400 line-through text-xs">{originalPrice}</span>}
+              {saveAmount && <span className="rounded bg-[#1B57A6] px-2 py-0.5 text-xs text-white">{saveAmount}</span>}
+              {discountPercent && <span className="text-xs text-red-500 font-medium">{discountPercent}</span>}
+            </div>
 
-          <div className="max-h-0 overflow-hidden transition-all duration-300 ease-in-out group-hover:max-h-[60px]">
-            <button type="button" onClick={handleAddToCart} className="mt-3 flex w-full items-center justify-center gap-2 rounded-md bg-[#1C5AA6] py-2.5 text-[18px] font-medium text-white transition-colors hover:bg-[#15458a]">
-              Buy Now
-            </button>
+            {/* Buy Now - slides up and fades in on hover */}
+            <div className="absolute inset-0 flex items-center opacity-0 translate-y-10 transition-all duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100">
+              <button
+                type="button"
+                onClick={handleAddToCart}
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#1C5AA6] py-2 text-[16px] font-medium text-white transition-all hover:bg-[#15458a]"
+              >
+                Buy Now
+              </button>
+            </div>
           </div>
         </div>
       </article>
@@ -369,22 +442,35 @@ const ProductCard = ({
   }
 
   if (isBestSeller) {
+    const title = productData?.name || "";
+    const image = productData?.thumbnail_image || "";
+    const brandName = productData?.brand?.name || brand;
+    const brandLogoUrl = productData?.brand?.logo || brandLogo;
+    const currentPrice = productData?.main_price || price;
+    const oldPrice = productData?.stroked_price || originalPrice;
+    const ratingValue = productData?.rating ?? rating;
+    const ratingCountValue = productData?.rating_count ?? ratingCount;
+    const categoryName = productData?.category?.name || type;
+    const weightValue = productData?.weight ? `${productData.weight}kg` : weight;
+    const variantLabel = productData?.variants?.[0]?.variant || "No Variant";
+
     return (
       <article className="group relative w-full max-w-full overflow-hidden rounded-t-2xl border border-border bg-card shadow-sm transition-shadow duration-300 hover:shadow-lg">
-        {emiPercent && (
-          <div
-            className="absolute right-2 top-8 z-20 flex h-10 w-10 items-center justify-center bg-[#0081FF] p-1 text-center text-[9px] font-semibold leading-tight text-white sm:right-4 sm:top-14 sm:h-[64px] sm:w-[64px] sm:p-2 sm:text-[14px]"
-            style={{ clipPath: "polygon(50% 0%, 61% 18%, 80% 8%, 82% 28%, 100% 38%, 84% 50%, 100% 62%, 82% 72%, 80% 92%, 61% 82%, 50% 100%, 39% 82%, 20% 92%, 18% 72%, 0% 62%, 16% 50%, 0% 38%, 18% 28%, 20% 8%, 39% 18%)" }}
-          >
-            {emiPercent} EMI
-          </div>
-        )}
+         {displayBadgeLabel && (
+        <div
+          className="absolute top-8 right-2 z-20 flex h-12 w-12 items-center justify-center bg-[#0081FF] p-1 text-center text-[9px] font-semibold leading-tight text-white sm:top-14 sm:right-6 sm:h-[70px] sm:w-[70px] sm:p-2 sm:text-[12px]"
+          style={{ clipPath: "polygon(50% 0%, 61% 18%, 80% 8%, 82% 28%, 100% 38%, 84% 50%, 100% 62%, 82% 72%, 80% 92%, 61% 82%, 50% 100%, 39% 82%, 20% 92%, 18% 72%, 0% 62%, 16% 50%, 0% 38%, 18% 28%, 20% 8%, 39% 18%)" }}
+        >
+          {displayBadgeLabel}
+        </div>
+      )}
 
-        {badgeLabel && (
-          <span className={`absolute left-0 top-0 z-10 rounded-br-2xl px-2 py-1 text-[10px] font-semibold text-white sm:px-4 sm:py-1.5 sm:text-xs ${badgeClassName}`}>
-            {badgeLabel}
-          </span>
-        )}
+      {/* Primary Product Badge (Sale/New/Hot/Sold Out/Special) */}
+      {badgeStyleTag && (
+        <span className={`absolute top-0 left-0 z-10 rounded-br-2xl px-2 py-1 text-[10px] font-semibold text-white sm:px-4 sm:py-1.5 sm:text-xs ${badgeClassName}`}>
+          {badgeStyleTag}
+        </span>
+      )}
 
         <div className="absolute right-3 top-3 z-10 hidden flex-row gap-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100 sm:flex">
           <button onClick={handleToggleWishlist} aria-label="Toggle wishlist" className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-white shadow-md transition-colors hover:bg-gray-100">
@@ -396,22 +482,22 @@ const ProductCard = ({
         </div>
 
         <div className="flex justify-center pb-1 pt-4 sm:pb-2 sm:pt-6">
-          {brandLogo ? (
+          {brandLogoUrl ? (
             <Image
-              src={brandLogo}
-              alt={brand || "Brand logo"}
+              src={brandLogoUrl}
+              alt={brandName || "Brand logo"}
               width={140}
               height={36}
               className="h-5 w-auto object-contain sm:h-9"
             />
           ) : (
             <span className="text-sm font-bold uppercase tracking-wide text-foreground sm:text-lg">
-              {brand}
+              {brandName}
             </span>
           )}
         </div>
 
-        <div className="relative mx-auto flex items-center justify-center px-2 py-1.5 sm:px-3 sm:py-2">
+        <div className="relative mx-auto flex items-center justify-center overflow-hidden px-2 py-1.5 sm:px-3 sm:py-2">
           <Link href={productHref}>
             <Image
               src={image}
@@ -421,6 +507,8 @@ const ProductCard = ({
               className="h-[96px] w-auto object-contain sm:h-[200px]"
             />
           </Link>
+
+          {/* Add to cart removed from here as per user request */}
 
           {hasWarranty && (
             <div className="absolute -bottom-2 left-2 sm:-bottom-6 sm:left-5">
@@ -441,20 +529,20 @@ const ProductCard = ({
 
         <div className="flex items-start justify-between px-2 pb-1.5 sm:items-center sm:px-4 sm:pb-2">
           <div className="min-w-0 flex items-center gap-1 sm:gap-2">
-            <span className="text-[10px] font-medium text-gray-500 sm:text-xs">{type}</span>
+            <span className="text-[10px] font-medium text-gray-500 sm:text-xs">{categoryName}</span>
             <div className="flex items-center gap-0.5 sm:gap-1">
               <div className="flex items-center gap-0.5 sm:hidden">
                 <FaStar className="h-3 w-3 fill-orange-400 text-orange-400" />
-                <span className="text-[9px] font-medium text-[#0054A6]">{rating.toFixed(1)}</span>
+                <span className="text-[9px] font-medium text-[#0054A6]">{Number(ratingValue).toFixed(1)}</span>
               </div>
               <div className="hidden items-center gap-0.5 sm:flex">
-                {renderStars(rating)}
-                <span className="text-[10px] font-medium text-[#0054A6]">{ratingCount}</span>
+                {renderStars(Number(ratingValue))}
+                <span className="text-[10px] font-medium text-[#0054A6]">{ratingCountValue}</span>
               </div>
             </div>
           </div>
           <span className="text-[10px] font-semibold text-blue-600 sm:text-xs">
-            {weight} | {color}
+            {weightValue} | {variantLabel}
           </span>
         </div>
 
@@ -463,19 +551,38 @@ const ProductCard = ({
         </h3>
 
         <div className="flex items-end gap-2 px-2 pb-2 sm:px-4">
-          <span className="text-[17px] font-bold text-[#0AB15A]">{price}</span>
-          <span className="text-[12px] text-slate-400 line-through">{originalPrice}</span>
+          <span className="text-[17px] font-bold text-[#0AB15A]">{currentPrice}</span>
+          <span className="text-[12px] text-slate-400 line-through">{oldPrice}</span>
         </div>
 
         <div className="px-2 pb-1 sm:px-4">
           <div className="h-1.5 w-full rounded-full bg-slate-200">
-            <div className="h-1.5 w-[25.6%] rounded-full bg-[#2B7FE8]" />
+            <div 
+              className="h-1.5 rounded-full bg-[#2B7FE8]" 
+              style={{ width: `${Math.min(100, Math.max(0, ((productData?.product_sold || 0) / (productData?.current_stock || 1)) * 100))}%` }}
+            />
           </div>
         </div>
+        {/* Sold Info or Add to Cart on Hover */}
+        <div className="relative min-h-[50px] overflow-hidden">
+          {/* Sold Info - visible by default, hidden on hover */}
+          <div className="flex items-center justify-between px-2 pb-3 text-[11px] sm:px-4 transition-all duration-300 ease-in-out group-hover:pointer-events-none group-hover:-translate-y-4 group-hover:opacity-0">
+            <span className="text-slate-500">Sold : {productData?.product_sold || 0} / {productData?.current_stock || 0}</span>
+            <span className="font-semibold text-[#0AB15A]">
+              {((productData?.product_sold || 0) / (productData?.current_stock || 1) * 100).toFixed(2)}%
+            </span>
+          </div>
 
-        <div className="flex items-center justify-between px-2 pb-3 text-[11px] sm:px-4">
-          <span className="text-slate-500">Sold : 25 / 36</span>
-          <span className="font-semibold text-[#0AB15A]">25.60%</span>
+          {/* Add to cart - slides up and fades in on hover */}
+          <div className="absolute inset-x-2 bottom-3 flex opacity-0 translate-y-10 transition-all duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100 sm:inset-x-4 sm:bottom-3">
+            <button
+              onClick={handleAddToCart}
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-[#0054A6] py-1.5 text-[12px] font-semibold text-white transition-all hover:bg-[#004487]"
+            >
+              <FaShoppingCart className="h-3.5 w-3.5" />
+              Add to cart
+            </button>
+          </div>
         </div>
 
         <div className="px-2 pb-3 sm:hidden">
@@ -484,14 +591,6 @@ const ProductCard = ({
           </button>
         </div>
 
-        <div className="hidden max-h-0 overflow-hidden transition-all duration-300 ease-in-out group-hover:max-h-[60px] sm:block">
-          <div className="px-4 pb-4 pt-1">
-            <button onClick={handleAddToCart} className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#E7EEF6] py-2.5 text-sm font-semibold text-blue-500 transition-colors hover:bg-blue-200">
-              <FaShoppingCart className="h-4 w-4" />
-              Add to cart
-            </button>
-          </div>
-        </div>
       </article>
     );
   }
@@ -499,19 +598,19 @@ const ProductCard = ({
   return (
     <div className="group relative w-full max-w-full overflow-hidden rounded-t-2xl border border-border bg-card shadow-sm transition-shadow duration-300 hover:shadow-lg">
       {/* EMI Badge */}
-      {emiPercent && (
+      {displayBadgeLabel && (
         <div
-          className="absolute top-8 right-2 z-20 flex h-10 w-10 items-center justify-center bg-[#0081FF] p-1 text-center text-[9px] font-semibold leading-tight text-white sm:top-14 sm:right-4 sm:h-[64px] sm:w-[64px] sm:p-2 sm:text-[14px]"
+          className="absolute top-8 right-2 z-20 flex h-12 w-12 items-center justify-center bg-[#0081FF] p-1 text-center text-[9px] font-semibold leading-tight text-white sm:top-14 sm:right-6 sm:h-[70px] sm:w-[70px] sm:p-2 sm:text-[12px]"
           style={{ clipPath: "polygon(50% 0%, 61% 18%, 80% 8%, 82% 28%, 100% 38%, 84% 50%, 100% 62%, 82% 72%, 80% 92%, 61% 82%, 50% 100%, 39% 82%, 20% 92%, 18% 72%, 0% 62%, 16% 50%, 0% 38%, 18% 28%, 20% 8%, 39% 18%)" }}
         >
-          {emiPercent} EMI
+          {displayBadgeLabel}
         </div>
       )}
 
       {/* Primary Product Badge (Sale/New/Hot/Sold Out/Special) */}
-      {badgeLabel && (
+      {badgeStyleTag && (
         <span className={`absolute top-0 left-0 z-10 rounded-br-2xl px-2 py-1 text-[10px] font-semibold text-white sm:px-4 sm:py-1.5 sm:text-xs ${badgeClassName}`}>
-          {badgeLabel}
+          {badgeStyleTag}
         </span>
       )}
 
@@ -529,32 +628,34 @@ const ProductCard = ({
 
       {/* Brand Header */}
       <div className="flex justify-center pt-4 pb-1 sm:pt-6 sm:pb-2">
-        {brandLogo ? (
+        {(productData?.brand?.logo || brandLogo) ? (
           <Image
-            src={brandLogo}
-            alt={brand || "Brand logo"}
+            src={productData?.brand?.logo || brandLogo || ""}
+            alt={productData?.brand?.name || brand || "Brand logo"}
             width={140}
             height={36}
             className="h-5 w-auto object-contain sm:h-9"
           />
         ) : (
           <span className="text-sm font-bold tracking-wide text-foreground uppercase sm:text-lg">
-            {brand}
+            {productData?.brand?.name || brand}
           </span>
         )}
       </div>
 
       {/* Product Image */}
-      <div className="relative mx-auto flex items-center justify-center px-2 py-1.5 sm:px-3 sm:py-2">
+      <div className="relative mx-auto flex items-center justify-center overflow-hidden px-2 py-1.5 sm:px-3 sm:py-2">
         <Link href={productHref}>
           <Image
-            src={image}
+            src={productData?.thumbnail_image || image || ""}
             alt={title}
             width={300}
             height={180}
             className="h-[96px] w-auto object-contain sm:h-[200px]"
           />
         </Link>
+
+        {/* Add to cart removed from here as per user request */}
 
         {hasWarranty && (
           <div className="absolute -bottom-2 left-2 sm:-bottom-6 sm:left-5">
@@ -576,26 +677,26 @@ const ProductCard = ({
       {/* Type and Rating Section (Stars are now close to the type) */}
       <div className="flex items-start justify-between px-2 pb-1.5 sm:items-center sm:px-4 sm:pb-2">
         <div className="min-w-0 flex items-center gap-1 sm:gap-2">
-          <span className="text-[10px] font-medium text-gray-500 sm:text-xs">{type}</span>
+          <span className="text-[10px] font-medium text-gray-500 sm:text-xs">{productData?.category?.name || type}</span>
           <div className="flex items-center gap-0.5 sm:gap-1">
             <div className="flex items-center gap-0.5 sm:hidden">
               <FaStar className="h-3 w-3 fill-orange-400 text-orange-400" />
-              <span className="text-[9px] font-medium text-[#0054A6]">{rating.toFixed(1)}</span>
+              <span className="text-[9px] font-medium text-[#0054A6]">{Number(productData?.rating ?? rating).toFixed(1)}</span>
             </div>
             <div className="hidden items-center gap-0.5 sm:flex">
-              {renderStars(rating)}
-              <span className="text-[10px] font-medium text-[#0054A6]">{ratingCount}</span>
+              {renderStars(Number(productData?.rating ?? rating))}
+              <span className="text-[10px] font-medium text-[#0054A6]">{productData?.rating_count ?? ratingCount}</span>
             </div>
           </div>
         </div>
         <span className="text-[10px] font-semibold text-blue-600 sm:text-xs">
-          {weight} | {color}
+          {productData?.variants?.[0]?.variant || "No Variant"}
         </span>
       </div>
 
       {/* Title */}
       <h3 className="line-clamp-2 min-h-[36px] px-2 pb-1 text-[12px] font-semibold leading-4 sm:min-h-[40px] sm:px-4 sm:text-[16px] sm:font-medium sm:leading-relaxed">
-        <Link href={productHref}>{title}</Link>
+        <Link href={productHref}>{productData?.name}</Link>
       </h3>
 
       {/* EMI Info */}
@@ -610,7 +711,7 @@ const ProductCard = ({
             className="object-contain"
           />
           <span className="line-clamp-2 leading-4 sm:line-clamp-1">
-            {emiPrice} |
+            EMI From {productData?.emi_start} Tk/Month
           </span>
         </span>
         <button className="shrink-0 text-[10px] font-semibold text-blue-600 hover:underline sm:text-xs">
@@ -620,20 +721,37 @@ const ProductCard = ({
 
       {/* Pricing */}
       <div className="flex flex-wrap items-center gap-1.5 px-2 pb-2 sm:gap-2 sm:px-4">
-        <span className="text-[20px] font-bold text-[#0081FF] sm:text-[17px]">{price}</span>
+        <span className="text-[20px] font-bold text-[#0081FF] sm:text-[17px]">{productData?.main_price}</span>
         <span className="text-[11px] text-[#909090] line-through sm:text-[13px]">
-          {originalPrice}
+          {productData?.stroked_price}
         </span>
         <span className="text-[10px] font-semibold text-red-600 sm:text-xs">
-          {discountPercent}
+          {productData?.discount}
         </span>
-        {saveAmount && (
-          <div className="">
-            <span className="inline-block rounded-tl-2xl rounded-br-2xl bg-red-600 px-2 py-0.5 text-[9px] font-medium text-white uppercase sm:px-3 sm:py-1 sm:text-[10px]">
-              {saveAmount}
-            </span>
-          </div>
-        )}
+        <div className="">
+          <span className="inline-block rounded-tl-2xl rounded-br-2xl bg-red-600 px-2 py-0.5 text-[9px] font-medium text-white uppercase sm:px-3 sm:py-1 sm:text-[10px]"> Save:
+            {(() => {
+              const cleanNumber = (str?: string) => {
+                if (!str) return 0;
+                // Remove everything except digits, dots and commas
+                const s = str.replace(/[^\d.,]/g, '');
+                // Identify decimal separator: if last comma is after last dot, it's decimal
+                if (s.lastIndexOf(',') > s.lastIndexOf('.')) {
+                  return parseFloat(s.replace(/\./g, '').replace(',', '.')) || 0;
+                }
+                // Otherwise dot is decimal (or no decimal), just remove commas
+                return parseFloat(s.replace(/,/g, '')) || 0;
+              };
+
+              const original = cleanNumber(productData?.stroked_price);
+              const current = cleanNumber(productData?.main_price);
+              const savings = original - current;
+
+              return savings.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+            })()}
+          </span>
+        </div>
+
       </div>
 
       {/* Savings Badge */}
@@ -645,26 +763,57 @@ const ProductCard = ({
         </div>
       )} */}
 
-      {/* Tags */}
-      {tags.length > 0 && (
-        <div
-          className="px-2 pb-3 sm:px-4 sm:pb-4"
-          style={{
-            display: "grid",
-            gridTemplateColumns: `repeat(${tags.length}, 1fr)`,
-            gap: "6px",
-          }}
-        >
-          {tags.map((tag) => (
-            <span
-              key={tag}
-              className="rounded-full bg-[#E7EEF6] py-1 text-center text-[9px] font-semibold text-[#0054A6] sm:text-[10px]"
-            >
-              {tag}
-            </span>
-          ))}
+      {/* Tags or Add to Cart on Hover */}
+      <div className="relative min-h-[52px] overflow-hidden px-2 pb-3 sm:px-4 sm:pb-4">
+        {/* Tags - fades out and slides up on hover */}
+        <div className="w-full transition-all duration-300 ease-in-out group-hover:pointer-events-none group-hover:-translate-y-4 group-hover:opacity-0">
+          {(() => {
+            const displayTags = productData?.tags || tags || [];
+            if (displayTags.length === 0) return null;
+
+            return (
+              <div
+                className="grid gap-1.5"
+                style={{
+                  gridTemplateColumns: `repeat(${displayTags.length}, 1fr)`,
+                }}
+              >
+                {displayTags.map((tag, index) => {
+                  try {
+                    const cleanedTag = tag.replace(/^\[|\]$/g, "");
+                    const tagObj = JSON.parse(cleanedTag);
+                    return (
+                      <span
+                        key={index}
+                        className="rounded-full bg-[#E7EEF6] py-1 text-center text-[9px] font-semibold text-[#0054A6] sm:text-[10px]"
+                      >
+                        {tagObj.value}
+                      </span>
+                    );
+                  } catch {
+                    return (
+                      <span key={index} className="rounded-full bg-[#E7EEF6] py-1 text-center text-[9px] font-semibold text-[#0054A6] sm:text-[10px]">
+                        {tag}
+                      </span>
+                    );
+                  }
+                })}
+              </div>
+            );
+          })()}
         </div>
-      )}
+
+        {/* Add to cart - slides up and fades in on hover */}
+        <div className="absolute inset-x-2 bottom-3 flex opacity-0 translate-y-10 transition-all duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100 sm:inset-x-4 sm:bottom-4">
+          <button
+            onClick={handleAddToCart}
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-[#0054A6] py-2 text-sm font-semibold text-white transition-all hover:bg-[#004487]"
+          >
+            <FaShoppingCart className="h-4 w-4" />
+            Add to cart
+          </button>
+        </div>
+      </div>
 
       {/* Mobile CTA */}
       <div className="px-2 pb-3 sm:hidden">
@@ -674,14 +823,6 @@ const ProductCard = ({
       </div>
 
       {/* Add to Cart - show only on hover */}
-      <div className="hidden overflow-hidden max-h-0 transition-all duration-300 ease-in-out group-hover:max-h-[60px] sm:block">
-        <div className="px-4 pb-4 pt-1">
-          <button onClick={handleAddToCart} className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#E7EEF6] py-2.5 text-sm font-semibold text-blue-500 transition-colors hover:bg-blue-200">
-            <FaShoppingCart className="h-4 w-4" />
-            Add to cart
-          </button>
-        </div>
-      </div>
     </div>
   );
 };

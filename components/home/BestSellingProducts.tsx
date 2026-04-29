@@ -1,70 +1,36 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import ProductCard from "@/components/common/ProductCard";
-import products from "@/database/bestselling.json";
-
-type BestSellingProduct = (typeof products)[number];
-
-type Category = {
-  key: string;
-  label: string;
-  matcher: (product: BestSellingProduct) => boolean;
-};
-
-const categories: Category[] = [
-  {
-    key: "all",
-    label: "All",
-    matcher: () => true,
-  },
-  {
-    key: "tv-audio",
-    label: "Tv & Audio",
-    matcher: (product) => /tv|audio/i.test(product.title),
-  },
-  {
-    key: "refrigerator",
-    label: "Refrigerator",
-    matcher: (product) => /refrigerator|fridge/i.test(product.title),
-  },
-  {
-    key: "washing-machine",
-    label: "Washing Machine",
-    matcher: (product) => /washing/i.test(product.title),
-  },
-  {
-    key: "microwave",
-    label: "Microwave",
-    matcher: (product) => /microwave|oven/i.test(product.title),
-  },
-  {
-    key: "kitchen-appliance",
-    label: "Kitchen Appliance",
-    matcher: (product) => /kitchen|appliance/i.test(product.title),
-  },
-  {
-    key: "personal-care",
-    label: "Personal Care",
-    matcher: (product) => /personal|care|dryer|trimmer/i.test(product.title),
-  },
-];
+import { Product } from "@/types/product";
 
 export default function BestSellingProducts() {
-  const [activeCategory, setActiveCategory] = useState("all");
+  const [dynamicProducts, setDynamicProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const sliderRef = useRef<HTMLDivElement | null>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
-  const filteredProducts = useMemo(() => {
-    const selected = categories.find((item) => item.key === activeCategory);
-    if (!selected) {
-      return products;
+  useEffect(() => {
+    async function fetchProducts() {
+      try {
+        const res = await fetch("/api/products/best-seller");
+        const data = await res.json();
+        if (data?.success && Array.isArray(data?.data)) {
+          setDynamicProducts(data.data);
+        } else {
+          setDynamicProducts([]);
+        }
+      } catch (error) {
+        console.error("Error fetching best selling products:", error);
+        setDynamicProducts([]);
+      } finally {
+        setLoading(false);
+      }
     }
-    const matched = products.filter(selected.matcher);
-    return matched.length > 0 ? matched : products;
-  }, [activeCategory]);
+    fetchProducts();
+  }, []);
 
   const updateScrollState = () => {
     const slider = sliderRef.current;
@@ -116,37 +82,13 @@ export default function BestSellingProducts() {
       slider.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
     };
-  }, [filteredProducts]);
+  }, [dynamicProducts]);
 
   return (
     <section className="mx-auto space-y-6">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <h2 className="text-[18px] font-semibold text-slate-900 sm:text-[2.1rem]">Best Selling / Top Selling</h2>
-          <div className="mt-3 h-[2px] w-[260px] bg-gradient-to-r from-[#2F73BD] via-[#2F73BD]/50 to-transparent sm:w-[380px]" />
-        </div>
-
-        <div className="overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-          <div className="flex min-w-max items-center gap-2 pb-1">
-            {categories.map((category) => {
-              const isActive = activeCategory === category.key;
-              return (
-                <button
-                  key={category.key}
-                  type="button"
-                  onClick={() => setActiveCategory(category.key)}
-                  className={`whitespace-nowrap rounded-full px-4 py-1.5 text-sm transition ${
-                    isActive
-                      ? "bg-black font-medium text-white"
-                      : "bg-slate-200 font-normal text-slate-800 hover:bg-slate-300"
-                  }`}
-                >
-                  {category.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
+      <div>
+        <h2 className="text-[18px] font-semibold text-slate-900 sm:text-[2.1rem]">Best Selling / Top Selling</h2>
+        <div className="mt-3 h-[2px] w-[260px] bg-gradient-to-r from-[#2F73BD] via-[#2F73BD]/50 to-transparent sm:w-[380px]" />
       </div>
 
       <div className="relative">
@@ -174,15 +116,25 @@ export default function BestSellingProducts() {
           ref={sliderRef}
           className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         >
-          {filteredProducts.map((product) => (
-            <div
-              key={product.id}
-              data-bestseller-card
-              className="min-w-[48%] snap-start sm:min-w-[48%] lg:min-w-[31.5%] xl:min-w-[24%] 2xl:min-w-[19%]"
-            >
-              <ProductCard {...product} isBestSeller={Boolean(product.isBestSeller)} />
+          {loading ? (
+            <div className="flex w-full items-center justify-center py-20">
+              <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#0054A6] border-t-transparent" />
             </div>
-          ))}
+          ) : dynamicProducts.length === 0 ? (
+            <div className="flex w-full items-center justify-center py-20 text-slate-500">
+              No products found.
+            </div>
+          ) : (
+            dynamicProducts.map((product) => (
+              <div
+                key={product.id}
+                data-bestseller-card
+                className="min-w-[48%] snap-start sm:min-w-[48%] lg:min-w-[31.5%] xl:min-w-[24%] 2xl:min-w-[19%]"
+              >
+                <ProductCard productData={product} isBestSeller={true} />
+              </div>
+            ))
+          )}
         </div>
       </div>
     </section>

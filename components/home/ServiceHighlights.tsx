@@ -1,59 +1,46 @@
 import Image from "next/image";
 
-type ServiceItem = {
-  id: number;
+type TrustSignal = {
+  image: string;
   title: string;
   subtitle: string;
-  iconSrc: string;
-  iconAlt: string;
 };
 
-const serviceItems: ServiceItem[] = [
-  {
-    id: 1,
-    title: "Free Delivery",
-    subtitle: "Nation Wide",
-    iconSrc: "/images/freedelivery.png",
-    iconAlt: "Delivery service icon",
-  },
-  {
-    id: 2,
-    title: "Free Installation",
-    subtitle: "24/7 Amazing Services",
-    iconSrc: "/images/freeinstalation.png",
-    iconAlt: "Installation service icon",
-  },
-  {
-    id: 3,
-    title: "0% EMI Facility",
-    subtitle: "Save Your Money",
-    iconSrc: "/images/emifacility.png",
-    iconAlt: "EMI service icon",
-  },
-  {
-    id: 4,
-    title: "Officially Product",
-    subtitle: "Mega Discounts",
-    iconSrc: "/images/officiallyproduct.png",
-    iconAlt: "Official product icon",
-  },
-];
+async function getTrustSignals(): Promise<TrustSignal[]> {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  
+  try {
+    const res = await fetch(`${siteUrl}/api/homepage/trust-signals`, {
+      cache: 'no-store'
+    });
+    if (!res.ok) return [];
+    const json = await res.json();
+    return json.data || [];
+  } catch (error) {
+    console.error("Error loading trust signals from proxy:", error);
+    return [];
+  }
+}
 
-export default function ServiceHighlights() {
+export default async function ServiceHighlights() {
+  const trustSignals = await getTrustSignals();
+
+  if (trustSignals.length === 0) return null;
+
   return (
-    <section className="rounded-xl  ">
+    <section className="rounded-xl">
       <div className="grid gap-3 grid-cols-2 xl:grid-cols-4">
-        {serviceItems.map((item) => (
+        {trustSignals.map((item, index) => (
           <article
-            key={item.id}
+            key={index}
             className="flex items-center justify-center gap-4 rounded-lg bg-[#E7EEF6] lg:px-5 lg:py-4 py-2 px-2"
           >
             <div className="relative w-6 h-6 lg:h-14 lg:w-14 shrink-0">
               <Image
-                src={item.iconSrc}
-                alt={item.iconAlt}
+                src={item.image}
+                alt={item.title}
                 fill
-                sizes="44px"
+                sizes="56px"
                 className="object-contain"
               />
             </div>

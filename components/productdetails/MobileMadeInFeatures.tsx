@@ -1,9 +1,19 @@
 type MobileMadeInFeaturesProps = {
-  madeInText: string;
-  features: string[];
+  productData?: {
+    brand?: {
+      name?: string;
+    };
+    tags?: string[];
+  };
+  madeInText?: string;
+  features?: string[];
 };
 
-export default function MobileMadeInFeatures({ madeInText, features }: MobileMadeInFeaturesProps) {
+export default function MobileMadeInFeatures({ 
+  productData,
+  madeInText = productData?.brand?.name ? `Brand: ${productData.brand.name}` : "Product information", 
+  features = productData?.tags || [] 
+}: MobileMadeInFeaturesProps) {
   const mobileFeatures = features.slice(0, 4);
 
   return (
@@ -13,18 +23,24 @@ export default function MobileMadeInFeatures({ madeInText, features }: MobileMad
       </p>
 
       <div className="px-2 text-slate-500">
-        {mobileFeatures.map((feature) => (
-          <p key={feature} className="text-[10px] leading-3">
-            • {feature}
-          </p>
-        ))}
+        {mobileFeatures.length > 0 ? (
+          mobileFeatures.map((feature) => (
+            <p key={feature} className="text-[10px] leading-3">
+              • {feature}
+            </p>
+          ))
+        ) : (
+          <p className="text-[10px] leading-3 text-slate-400">No features available</p>
+        )}
       </div>
 
-      <div className="text-center">
-        <button type="button" className="text-[10px] font-semibold text-[#0C73DA]">
-          See More
-        </button>
-      </div>
+      {mobileFeatures.length > 0 && (
+        <div className="text-center">
+          <button type="button" className="text-[10px] font-semibold text-[#0C73DA]">
+            See More
+          </button>
+        </div>
+      )}
     </div>
   );
 }

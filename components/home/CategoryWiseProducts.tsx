@@ -4,32 +4,53 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import ProductCard from "@/components/common/ProductCard";
+import { Product } from "@/types/product";
 
 type ProductBadge = "New" | "Hot" | "Sold Out" | "Special" | "";
 
-type CategoryProduct = {
-	id: number;
-	statusBadge?: ProductBadge | string;
-	[key: string]: unknown;
-};
-
 type CategoryWiseProductsProps = {
-	title: string;
-	products: CategoryProduct[];
-	seeMoreHref?: string;
+  title: string;
+	subtitle?: string;
+  products?: Product[];
+  categorySlug?: string;
+  seeMoreHref?: string;
 };
 
 const fallbackStatusBadges: ProductBadge[] = ["New", "Hot", "Sold Out", "Special", ""];
 
 export default function CategoryWiseProducts({
-	title,
-	products,
-	seeMoreHref = "/products",
+  title,
+	subtitle,
+  products = [],
+  categorySlug,
+  seeMoreHref = "/products",
 }: CategoryWiseProductsProps) {
-	const featuredProducts = products.slice(0, 8);
-	const sliderRef = useRef<HTMLDivElement | null>(null);
-	const [canScrollLeft, setCanScrollLeft] = useState(false);
-	const [canScrollRight, setCanScrollRight] = useState(true);
+  const [dynamicProducts, setDynamicProducts] = useState<Product[]>(products);
+  const [loading, setLoading] = useState(!!categorySlug);
+  const sliderRef = useRef<HTMLDivElement | null>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  useEffect(() => {
+    if (!categorySlug) return;
+
+    async function fetchProducts() {
+      try {
+        const res = await fetch(`/api/products/category/${categorySlug}`);
+        const data = await res.json();
+        if (data.success) {
+          setDynamicProducts(data.data);
+        }
+      } catch (error) {
+        console.error(`Error fetching products for category ${categorySlug}:`, error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchProducts();
+  }, [categorySlug]);
+
+  const featuredProducts = dynamicProducts.slice(0, 8);
 
 	const updateScrollState = () => {
 		const slider = sliderRef.current;
@@ -88,6 +109,7 @@ export default function CategoryWiseProducts({
 			<div className="flex flex-row items-center justify-between gap-4">
 				<div className="flex-1">
 					<h2 className="text-[18px] font-semibold text-slate-900 sm:text-[2.1rem]">{title}</h2>
+					{subtitle ? <p className="mt-1 text-sm text-slate-500 sm:mt-2 sm:text-base">{subtitle}</p> : null}
 					<div className="mt-2 sm:mt-5 h-[2px] w-full max-w-[260px] bg-gradient-to-r from-[#2F73BD] via-[#2F73BD]/50 to-transparent sm:max-w-[380px]" />
 				</div>
 
@@ -120,23 +142,33 @@ export default function CategoryWiseProducts({
 					<FaChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
 				</button>
 
-				<div
-					ref={sliderRef}
-					className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-				>
-					{featuredProducts.map((product, index) => (
-						<div
-							key={product.id}
-							data-category-card
-							className="min-w-[48%] snap-start sm:min-w-[48%] lg:min-w-[31.5%] xl:min-w-[24%] 2xl:min-w-[19%]"
-						>
-							<ProductCard
-								{...product}
-								statusBadge={String(product.statusBadge || fallbackStatusBadges[index] || "")}
-							/>
-						</div>
-					))}
-				</div>
+        <div
+          ref={sliderRef}
+          className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {loading ? (
+            <div className="flex w-full items-center justify-center py-20">
+              <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#0054A6] border-t-transparent" />
+            </div>
+          ) : featuredProducts.length === 0 ? (
+            <div className="flex w-full items-center justify-center py-20 text-slate-500">
+              No products found in this category.
+            </div>
+          ) : (
+            featuredProducts.map((product, index) => (
+              <div
+                key={product.id}
+                data-category-card
+                className="min-w-[48%] snap-start sm:min-w-[48%] lg:min-w-[31.5%] xl:min-w-[24%] 2xl:min-w-[19%]"
+              >
+                <ProductCard
+                  productData={product}
+                  statusBadge={String(product.statusBadge || fallbackStatusBadges[index] || "")}
+                />
+              </div>
+            ))
+          )}
+        </div>
 			</div>
 		</section>
 	);

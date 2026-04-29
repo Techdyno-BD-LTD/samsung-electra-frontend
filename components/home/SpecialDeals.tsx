@@ -4,49 +4,58 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import ProductCard from "@/components/common/ProductCard";
-import flashDealsData from "@/database/flashdeals.json";
+import { formatCurrency } from "@/lib/currencyUtils";
 
-type SpecialDealProduct = {
+type FlashDealListItem = {
   id: number;
-  brand?: string;
-  brandLogo?: string;
-  title?: string;
-  image?: string;
-  dealLabel?: string;
-  quickDetailsLabel?: string;
-  type?: string;
-  countdown: {
-    days: string;
-    hours: string;
-    minutes: string;
-    seconds: string;
-  };
-  price?: string;
-  originalPrice?: string;
-  saveAmount?: string;
-  discountPercent?: string;
+  slug: string;
+  homepage: number;
 };
 
-type SpecialDeals = {
+type FlashDealProductDetails = {
+  id: number;
+  name: string;
+  slug: string;
+  thumbnail_image: string;
+  unit_price: number;
+  brand?: {
+    id: number;
+    name: string;
+    logo: string;
+  };
+  category?: {
+    id: number;
+    name: string;
+  };
+};
+
+type FlashDealProduct = {
+  product_id: number;
+  discount: number;
+  discount_type: string;
+  product: FlashDealProductDetails;
+};
+
+type FlashDeal = {
+  id: number;
   title: string;
-  specialLabel: string;
-  allDealsLabel: string;
-  allDealsHref: string;
-  countdown: {
-    days: string;
-    hours: string;
-    minutes: string;
-    seconds: string;
-  };
-  products: SpecialDealProduct[];
+  subtitle: string | null;
+  slug: string;
+  banner: string;
+  start_date: number;
+  end_date: number;
+  banner_subtitle_top?: string;
+  products?: FlashDealProduct[];
 };
-
-const data = flashDealsData.specialDeals as SpecialDeals;
 
 export default function SpecialDeals() {
   const sliderRef = useRef<HTMLDivElement | null>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const [flashDeal, setFlashDeal] = useState<FlashDeal | null>(null);
+  const [timeLeft, setTimeLeft] = useState({ days: '00', hours: '00', minutes: '00', seconds: '00' });
+  const [loading, setLoading] = useState(true);
 
   const updateScrollState = () => {
     const slider = sliderRef.current;
@@ -70,6 +79,54 @@ export default function SpecialDeals() {
   };
 
   useEffect(() => {
+    async function fetchDeal() {
+      try {
+        const listRes = await fetch("/api/flash-deals");
+        const listJson = await listRes.json();
+        if (listJson.success && listJson.data?.length > 0) {
+          const homepageDeal = listJson.data.find((d: FlashDealListItem) => d.homepage === 1);
+          if (homepageDeal) {
+            const detailRes = await fetch(`/api/flash-deals/details/${homepageDeal.slug}`);
+            const detailJson = await detailRes.json();
+            if (detailJson.success && detailJson.data?.length > 0) {
+              setFlashDeal(detailJson.data[0]);
+            }
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchDeal();
+  }, []);
+
+  useEffect(() => {
+    if (!flashDeal?.end_date) return;
+
+    const interval = setInterval(() => {
+      const now = Math.floor(Date.now() / 1000);
+      const remaining = flashDeal.end_date - now;
+
+      if (remaining <= 0) {
+        setTimeLeft({ days: '00', hours: '00', minutes: '00', seconds: '00' });
+        clearInterval(interval);
+        return;
+      }
+
+      const days = Math.floor(remaining / (3600 * 24)).toString().padStart(2, '0');
+      const hours = Math.floor((remaining % (3600 * 24)) / 3600).toString().padStart(2, '0');
+      const minutes = Math.floor((remaining % 3600) / 60).toString().padStart(2, '0');
+      const seconds = Math.floor(remaining % 60).toString().padStart(2, '0');
+
+      setTimeLeft({ days, hours, minutes, seconds });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [flashDeal?.end_date]);
+
+  useEffect(() => {
     const slider = sliderRef.current;
     if (!slider) return;
     const onScroll = () => updateScrollState();
@@ -82,7 +139,15 @@ export default function SpecialDeals() {
       slider.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
     };
-  }, []);
+  }, [flashDeal]);
+
+  if (loading) {
+    return <div className="h-[400px] w-full animate-pulse bg-gray-100 rounded-xl"></div>;
+  }
+
+  if (!flashDeal) {
+    return null;
+  }
 
   return (
     <section className="mx-auto space-y-6">
@@ -90,50 +155,54 @@ export default function SpecialDeals() {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-wrap items-center gap-3 sm:gap-4">
           <h2 className="text-[18px] font-semibold text-slate-900 sm:text-[2.1rem]">
-            {data.title}
+            {flashDeal.title}
           </h2>
-          <span className="text-slate-300">|</span>
-          <p className="text-xl font-medium text-[#1B57A6] sm:text-[2rem]">
-            {data.specialLabel}
-          </p>
+          {/* {flashDeal.banner_subtitle_top && (
+            <>
+              <span className="text-slate-300">|</span>
+              <p className="text-xl font-medium text-[#1B57A6] sm:text-[2rem] flex items-center gap-2">
+                <span className="text-2xl">★</span> {flashDeal.banner_subtitle_top}
+              </p>
+            </>
+          )} */}
         </div>
 
         <div className="flex flex-wrap items-center gap-3 sm:gap-4">
           <div className="flex items-end gap-1.5 mr-4 text-[#1B57A6] sm:gap-2">
             <div className="text-center">
               <p className="text-xl font-semibold leading-none sm:text-[42px]">
-                {data.countdown.days}
+                {timeLeft.days}
               </p>
               <p className="mt-1 text-xs text-[#6b93cd]">Days</p>
             </div>
             <span className="pb-5 text-2xl">:</span>
             <div className="text-center">
               <p className="text-xl font-semibold leading-none sm:text-[42px]">
-                {data.countdown.hours}
+                {timeLeft.hours}
               </p>
               <p className="mt-1 text-xs text-[#6b93cd]">Hour</p>
             </div>
             <span className="pb-5 text-2xl">:</span>
             <div className="text-center">
               <p className="text-xl font-semibold leading-none sm:text-[42px]">
-                {data.countdown.minutes}
+                {timeLeft.minutes}
               </p>
               <p className="mt-1 text-xs text-[#6b93cd]">Minute</p>
             </div>
             <span className="pb-5 text-2xl">:</span>
             <div className="text-center">
               <p className="text-xl font-semibold leading-none sm:text-[42px]">
-                {data.countdown.seconds}
+                {timeLeft.seconds}
               </p>
               <p className="mt-1 text-xs text-[#6b93cd]">Second</p>
             </div>
           </div>
 
           <Link
-            href={data.allDealsHref}
+            href={`/flash-deals/${flashDeal.slug}`}
             className="inline-flex items-center gap-2 rounded-md border border-[#89a8d6] px-4 py-2 text-lg font-medium text-[#1B57A6] transition hover:bg-[#f4f8ff] sm:text-2xl"
           >
-            {data.allDealsLabel}
+            All Deals
             <span aria-hidden>›</span>
           </Link>
         </div>
@@ -167,33 +236,57 @@ export default function SpecialDeals() {
           ref={sliderRef}
           className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         >
-          {data.products.map((product) => (
-            <div
-              key={product.id}
-              data-special-card
-              className="min-w-[88%] snap-start sm:min-w-[48%] lg:min-w-[32%]"
-            >
-              <ProductCard
-                cardVariant="specialDeal"
-                brand={product.brand}
-                brandLogo={product.brandLogo}
-                title={product.title}
-                image={product.image}
-                type={product.type}
-                dealLabel={product.dealLabel}
-                quickDetailsLabel={product.quickDetailsLabel}
-                dealDays={product.countdown.days}
-                dealHours={product.countdown.hours}
-                dealMinutes={product.countdown.minutes}
-                dealSeconds={product.countdown.seconds}
-                price={product.price}
-                originalPrice={product.originalPrice}
-                saveAmount={product.saveAmount}
-                discountPercent={product.discountPercent}
-                dealImageHeight="260px"
-              />
-            </div>
-          ))}
+          {flashDeal.products?.map((pd: FlashDealProduct) => {
+            const product = pd.product;
+            if (!product) return null;
+
+            const originalPrice = product.unit_price || 0;
+            const discountAmt = pd.discount || 0;
+
+            let finalPrice = originalPrice;
+            let percentStr = "";
+            let saveStr = "";
+
+            if (pd.discount_type === "amount") {
+              finalPrice = originalPrice - discountAmt;
+              saveStr = formatCurrency(discountAmt);
+              percentStr = "-" + Math.round((discountAmt / originalPrice) * 100) + "% Off";
+            } else if (pd.discount_type === "percent") {
+              const calcDiscount = (originalPrice * discountAmt) / 100;
+              finalPrice = originalPrice - calcDiscount;
+              saveStr = formatCurrency(calcDiscount);
+              percentStr = "-" + discountAmt + "% Off";
+            }
+
+            return (
+              <div
+                key={product.id}
+                data-special-card
+                className="min-w-[88%] snap-start sm:min-w-[48%] lg:min-w-[32%]"
+              >
+                <ProductCard
+                  cardVariant="specialDeal"
+                  brand={product.brand?.name}
+                  brandLogo={product.brand?.logo}
+                  title={product.name}
+                  slug={product.slug}
+                  image={product.thumbnail_image}
+                  type={product.category?.name || "Appliance"}
+                  dealLabel={flashDeal.banner_subtitle_top || "Cashback"}
+                  quickDetailsLabel="Quick Details"
+                  dealDays={timeLeft.days}
+                  dealHours={timeLeft.hours}
+                  dealMinutes={timeLeft.minutes}
+                  dealSeconds={timeLeft.seconds}
+                  price={formatCurrency(finalPrice)}
+                  originalPrice={formatCurrency(originalPrice)}
+                  saveAmount={saveStr ? `Save : ${saveStr}` : ""}
+                  discountPercent={percentStr}
+                  dealImageHeight="260px"
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

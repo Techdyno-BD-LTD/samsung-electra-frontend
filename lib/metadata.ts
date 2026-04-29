@@ -22,7 +22,7 @@ export const metadataRegistry: Record<RouteMetadataKey, RouteMetadata> = {
     image: "/og/default.png",
   },
   home: {
-    title: "Electra Commerce",
+    title: "Samsung Electra",
     description: "Bold connected retail experiences for Samsung Bangladesh.",
     image: "/og/home.png",
   },

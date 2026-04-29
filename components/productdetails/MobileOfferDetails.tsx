@@ -1,16 +1,34 @@
 import Image from "next/image";
 
 type MobileOfferDetailsProps = {
-  specialOfferLeft: string;
-  specialOfferOne: string;
-  specialOfferTwo: string;
-  shippingInfo: string;
-  warrantyInfo: string;
-  emiFacilityInfo: string;
-  exchangeInfo: string;
+  productData?: {
+    warranty?: {
+      text?: string;
+      link_label?: string | null;
+    };
+    special_offers?: unknown[];
+    shippingInfo?: string;
+    emi_facility?: {
+      text?: string;
+      link_label?: string | null;
+    };
+    exchange?: {
+      text?: string;
+      link_label?: string | null;
+    };
+  };
+  specialOfferLeft?: string;
+  specialOfferOne?: string;
+  specialOfferTwo?: string;
+  shippingInfo?: string;
+  warrantyInfo?: string;
+  emiFacilityInfo?: string;
+  exchangeInfo?: string;
 };
 
-function renderTextAfterColonBold(text: string) {
+function renderTextAfterColonBold(text?: string) {
+  if (!text) return text;
+  
   const colonIndex = text.indexOf(":");
 
   if (colonIndex === -1) {
@@ -29,13 +47,14 @@ function renderTextAfterColonBold(text: string) {
 }
 
 export default function MobileOfferDetails({
-  specialOfferLeft,
-  specialOfferOne,
-  specialOfferTwo,
-  shippingInfo,
-  warrantyInfo,
-  emiFacilityInfo,
-  exchangeInfo,
+  productData,
+  specialOfferLeft = "Special Offer",
+  specialOfferOne = "Offer 1",
+  specialOfferTwo = "Offer 2",
+  shippingInfo = productData?.shippingInfo || "Shipping information",
+  warrantyInfo = productData?.warranty?.text ? `Warranty: ${productData.warranty.text}` : "Warranty information",
+  emiFacilityInfo = productData?.emi_facility?.text || "EMI information",
+  exchangeInfo = productData?.exchange?.text || "Exchange information",
 }: MobileOfferDetailsProps) {
   return (
     <div className="space-y-3 lg:hidden">
