@@ -247,6 +247,7 @@ export default function AddToCartModal({
       type: finalCategory,
       weight: sourceData?.weight ? `${sourceData.weight}kg` : weight,
       quantity: quantity,
+      productId: sourceData?.id || 0,
     };
   };
 

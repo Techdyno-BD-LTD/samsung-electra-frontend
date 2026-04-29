@@ -4,16 +4,19 @@ import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { FaSearch } from "react-icons/fa";
-import { useAppSelector } from "@/store/hooks";
+import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { useRouter } from "next/navigation";
 import { searchProducts } from "@/lib/productSearchCatalog";
+import { logout } from "@/store/features/auth/authSlice";
 
 export default function MainBar() {
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const [mounted, setMounted] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  
   const cartTotalCount = useAppSelector((state) => 
     state.cart.items.reduce((total, item) => total + item.quantity, 0)
   );
@@ -50,12 +53,14 @@ export default function MainBar() {
 
   const handleSearch = () => {
     const query = searchQuery.trim();
-    if (!query) {
-      return;
-    }
-
+    if (!query) return;
     setShowSuggestions(false);
     router.push(`/shop?q=${encodeURIComponent(query)}`);
+  };
+
+  const handleLogout = () => {
+    dispatch(logout());
+    router.push("/login");
   };
 
   return (
@@ -202,19 +207,50 @@ export default function MainBar() {
     <span className="text-base">Cart</span>
   </Link>
 
-  {/* Login Button */}
+  {/* Login / Profile Dropdown */}
   {mounted && (
     isAuthenticated ? (
-      <Link href="/dashboard" className="flex items-center gap-2 rounded-[5px] bg-[#2b85ff] px-5 py-2.5 text-white shadow-sm hover:bg-blue-600 transition">
-        <Image
-          src={user?.avatar || "/images/loginavatar.png"}
-          alt="User"
-          width={18}
-          height={18}
-          className="brightness-0 invert rounded-full"
-        />
-        <span className="text-[15px] font-medium truncate max-w-[100px]">{user?.name}</span>
-      </Link>
+      <div className="group relative">
+        <button className="flex items-center gap-2 rounded-full border-2 border-gray-100 p-0.5 hover:border-[#2b85ff] transition-all duration-300">
+          <div className="h-10 w-10 overflow-hidden rounded-full border border-gray-50">
+            <Image
+              src={user?.avatar || "/images/loginavatar.png"}
+              alt="User"
+              width={40}
+              height={40}
+              className="h-full w-full object-cover"
+            />
+          </div>
+        </button>
+        
+        {/* Dropdown Menu */}
+        <div className="absolute right-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100]">
+          <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 min-w-[200px] overflow-hidden py-2">
+            <div className="px-4 py-3 border-b border-gray-50">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5">Welcome</p>
+              <p className="text-sm font-bold text-gray-900 truncate">{user?.name}</p>
+            </div>
+            <Link 
+              href="/dashboard" 
+              className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-[#2b85ff] transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              My Dashboard
+            </Link>
+            <button 
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
     ) : (
       <Link href="/login" className="flex items-center gap-2 rounded-[5px] bg-[#2b85ff] px-5 py-2.5 text-white shadow-sm hover:bg-blue-600 transition">
         <Image

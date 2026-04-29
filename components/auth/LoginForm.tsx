@@ -9,7 +9,7 @@ import VerifyOTP from "./VerifyOTP";
 
 import { useAppDispatch } from "@/store/hooks";
 import { setCredentials } from "@/store/features/auth/authSlice";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 type LoginStep = "login" | "verify";
 
@@ -33,6 +33,8 @@ const COUNTRIES: Country[] = [
 export default function LoginForm() {
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect") || "/dashboard";
   const [loginType, setLoginType] = useState<LoginType>("phone");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
@@ -78,8 +80,7 @@ export default function LoginForm() {
 
   const handleVerify = async (code: string) => {
     try {
-      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-      const response = await fetch(`${apiBaseUrl}/api/auth/otp-login`, {
+      const response = await fetch("/api/auth/otp-login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -99,7 +100,7 @@ export default function LoginForm() {
             token: data.token,
           })
         );
-        router.push("/dashboard");
+        router.push(redirect);
       } else {
         alert(data.message || "Invalid OTP or login failed");
       }

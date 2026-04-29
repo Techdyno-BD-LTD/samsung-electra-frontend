@@ -22,6 +22,9 @@ const Checkout = () => {
     const [addressForm, setAddressForm] = useState({ address: '', phone: '', postal_code: '' });
 
     const [paymentMethod, setPaymentMethod] = useState('Online Payment Gateway');
+    const [carriers, setCarriers] = useState<any[]>([]);
+    const [selectedCarrierId, setSelectedCarrierId] = useState<number | null>(null);
+    const [paymentTypes, setPaymentTypes] = useState<{ online: any[], offline: any[] }>({ online: [], offline: [] });
     const [deliveryNote, setDeliveryNote] = useState('');
 
     useEffect(() => {
@@ -46,8 +49,37 @@ const Checkout = () => {
         }
     };
 
+    const fetchCarriers = async () => {
+        try {
+            const response = await fetch("/api/v2/carriers");
+            const payload = await response.json();
+            if (payload.success) {
+                setCarriers(payload.data);
+                if (payload.data.length > 0) setSelectedCarrierId(payload.data[0].id);
+            }
+        } catch (error) {
+            console.error("Failed to fetch carriers", error);
+        }
+    };
+
+    const fetchPaymentTypes = async () => {
+        try {
+            const response = await fetch("/api/v2/payment-types");
+            const payload = await response.json();
+            if (payload.success) {
+                setPaymentTypes(payload.data);
+            }
+        } catch (error) {
+            console.error("Failed to fetch payment types", error);
+        }
+    };
+
     useEffect(() => {
-        if (mounted && token) fetchAddresses();
+        if (mounted) {
+            fetchCarriers();
+            fetchPaymentTypes();
+            if (token) fetchAddresses();
+        }
     }, [mounted, token]);
 
     const handleAddAddress = async (e: React.FormEvent) => {
@@ -123,7 +155,9 @@ const Checkout = () => {
         const originalSubtotal = cartItems.reduce((acc, item) => acc + (parseCurrency(item.originalPrice) * item.quantity), 0);
         const savings = originalSubtotal - subtotal;
         const tax = 0; // Assuming tax is free/0 as per UI
-        const delivery = 0; // Assuming delivery is free as per UI
+        
+        const carrier = carriers.find(c => c.id === selectedCarrierId);
+        const delivery = carrier ? (Number(carrier.cost) || 0) : 0;
         const total = subtotal + tax + delivery;
 
         return {
@@ -135,50 +169,72 @@ const Checkout = () => {
             total,
             savePercent: originalSubtotal > 0 ? Math.round((savings / originalSubtotal) * 100) : 0
         };
-    }, [cartItems]);
+    }, [cartItems, carriers, selectedCarrierId]);
 
-    const handlePlaceOrder = () => {
+    const handlePlaceOrder = async () => {
         if (cartItems.length === 0) {
             alert("Your cart is empty!");
             return;
         }
 
-        const orderId = `#${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
-        const today = new Date();
-        const deliveryDate = new Date(today);
-        deliveryDate.setDate(today.getDate() + 5);
+        const selectedAddress = addresses.find(addr => addr.set_default);
+        if (!selectedAddress) {
+            alert("Please select a shipping address!");
+            return;
+        }
 
-        const formatDate = (date: Date) => {
-            return date.toLocaleDateString('en-GB', {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric'
+        try {
+            const orderPayload = {
+                items: cartItems.map(item => ({
+                    product_id: item.productId,
+                    variation: item.variant || '',
+                    price: parseCurrency(item.price),
+                    quantity: item.quantity,
+                    tax: 0,
+                    shipping_cost: 0
+                })),
+                shipping_address: selectedAddress,
+                shipping_type: "home_delivery",
+                payment_type: paymentMethod === 'Cash On Delivery' ? 'cod' : 'online',
+                coupon_discount: 0,
+                order_from: "web"
+            };
+
+            const response = await fetch("/api/v2/order/store", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify(orderPayload)
             });
-        };
 
-        dispatch(setLastOrder({
-            orderId,
-            paymentMethod: paymentMethod,
-            deliveryDate: formatDate(deliveryDate),
-            items: cartItems.map(item => ({
-                id: item.id,
-                title: item.title,
-                brand: item.brand,
-                image: item.image,
-                price: item.price,
-                originalPrice: item.originalPrice,
-                quantity: item.quantity,
-                color: item.color
-            })),
-            subtotal: totals.subtotal,
-            savings: totals.savings,
-            tax: totals.tax,
-            delivery: totals.delivery,
-            total: totals.total
-        }));
+            const data = await response.json();
 
-        dispatch(clearCart());
-        router.push('/checkout/success');
+            if (data.success || data.result) {
+                const orderId = data.code || `#${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+                
+                dispatch(setLastOrder({
+                    orderId,
+                    paymentMethod: paymentMethod,
+                    deliveryDate: 'Estimated 5-7 days',
+                    items: cartItems.map(item => ({ ...item })),
+                    subtotal: totals.subtotal,
+                    savings: totals.savings,
+                    tax: totals.tax,
+                    delivery: totals.delivery,
+                    total: totals.total
+                }));
+
+                dispatch(clearCart());
+                router.push('/checkout/success');
+            } else {
+                alert(data.message || "Failed to place order.");
+            }
+        } catch (error) {
+            console.error("Order placement failed:", error);
+            alert("An error occurred while placing the order.");
+        }
     };
 
     return (
@@ -265,57 +321,31 @@ const Checkout = () => {
                     </section>
 
                     <section>
-                        <h2 className="lg:text-[24px] text-[18px] font-semibold mb-2 text-gray-900 tracking-wide">Shipping Method</h2>
-
-                        <div className="border border-gray-200 rounded-xl overflow-hidden mb-6">
-                            {/* Express Option */}
-                            <div className="p-4 lg:p-6 border-b border-gray-200 bg-white">
-                                <div className="flex justify-between items-center mb-4">
+                        <h2 className="lg:text-[24px] text-[18px] font-semibold mb-6 text-gray-900 tracking-wide">Shipping Method</h2>
+                        <div className="border border-gray-200 rounded-xl bg-white overflow-hidden mb-6">
+                            {carriers.map((carrier) => (
+                                <div key={carrier.id} className="p-4 lg:p-6 border-b border-gray-100 last:border-0">
                                     <label className="flex items-center space-x-3 cursor-pointer group">
-                                        <input type="radio" name="shipping" className="w-4 h-4 lg:w-[22px] lg:h-[22px] text-[#1877f2] border-[2px] border-[#1877f2] focus:ring-[#1877f2] cursor-pointer" />
-                                        <span className="font-medium text-[16px] lg:text-[19px] text-gray-900 group-hover:text-[#1877f2] transition-colors">Express</span>
+                                        <input
+                                            type="radio"
+                                            name="carrier"
+                                            checked={selectedCarrierId === carrier.id}
+                                            onChange={() => setSelectedCarrierId(carrier.id)}
+                                            className="w-4 h-4 lg:w-[22px] lg:h-[22px] text-[#1877f2] focus:ring-[#1877f2] cursor-pointer"
+                                        />
+                                        <div className="flex-1">
+                                            <div className="flex justify-between items-center">
+                                                <span className="font-medium text-[16px] lg:text-[18px] text-gray-800 group-hover:text-[#1877f2] transition-colors">{carrier.name}</span>
+                                                <span className="font-bold text-gray-900 text-[14px] lg:text-[16px]">৳{carrier.cost || 0}</span>
+                                            </div>
+                                            <p className="text-[12px] lg:text-[14px] text-gray-500 mt-1">Estimated delivery: {carrier.transit_time}</p>
+                                        </div>
                                     </label>
-                                    <span className="bg-[#1f519b] text-white text-[11px] lg:text-[13px] px-4 lg:px-6 py-0.5 lg:py-1 rounded-tl-2xl rounded-br-2xl font-semibold">Free</span>
                                 </div>
-                                <div className="ml-[28px] lg:ml-[34px] text-[13px] lg:text-[15px]">
-                                    <p className="text-gray-500">Estimated Shipping Time</p>
-                                    <p className="text-gray-800 font-medium mt-0.5 lg:mt-1">14 April 2026 - 17 April 2026</p>
-                                </div>
-                            </div>
-
-                            {/* In Store Pickup Option */}
-                            <div className="p-4 lg:p-6 bg-white">
-                                <div className="flex justify-between items-center mb-4">
-                                    <label className="flex items-center space-x-3 cursor-pointer group">
-                                        <input type="radio" name="shipping" className="w-4 h-4 lg:w-[22px] lg:h-[22px] text-[#1877f2] border-[2px] border-[#1877f2] focus:ring-[#1877f2] cursor-pointer" defaultChecked />
-                                        <span className="font-medium text-[16px] lg:text-[19px] text-gray-900 group-hover:text-[#1877f2] transition-colors">In Store Pickup</span>
-                                    </label>
-                                    <span className="bg-[#1f519b] text-white text-[11px] lg:text-[13px] px-4 lg:px-6 py-0.5 lg:py-1 rounded-tl-2xl rounded-br-2xl font-semibold">Free</span>
-                                </div>
-                                <div className="ml-[28px] lg:ml-[34px] text-[13px] lg:text-[15px]">
-                                    <p className="text-gray-500">This item not available in your area</p>
-                                    <div className="flex justify-between items-center mt-3">
-                                        <p className="text-gray-500">Pickup location</p>
-                                        <button className="text-[#1877f2] text-[13px] lg:text-[15px] font-semibold flex items-center hover:underline">
-                                            Select Store <FiArrowRight className="ml-1.5 w-4 h-4" />
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {/* Selected Store Box */}
-                                <div className="ml-[28px] lg:ml-[34px] mt-4 bg-[#f8f9fa] border border-gray-100 rounded-xl p-3 lg:p-5">
-                                    <div className="flex justify-between items-start mb-3">
-                                        <h3 className="font-bold text-gray-900 text-[14px] lg:text-[16px]">Electra International Abdullapur, Dhaka</h3>
-                                        <button className="text-[#1877f2] flex items-center text-[13px] lg:text-[15px] font-semibold hover:underline">
-                                            Change <FiEdit className="ml-1.5 w-4 h-4" />
-                                        </button>
-                                    </div>
-                                    <div className="space-y-2 text-[13px] lg:text-[15px] text-gray-700">
-                                        <p>Mojidullah Matbor Market, Abdullapur Bazar, Abdullapur, Keranigonj, Dhaka</p>
-                                        <p>Phone: +8801713092219</p>
-                                    </div>
-                                </div>
-                            </div>
+                            ))}
+                            {carriers.length === 0 && (
+                                <p className="p-6 text-center text-gray-500 italic">No shipping methods available.</p>
+                            )}
                         </div>
                     </section>
 
@@ -353,114 +383,47 @@ const Checkout = () => {
                     <section>
                         <h2 className="lg:text-[24px] text-[18px] font-semibold lg:mb-6 mb-2 text-gray-900 tracking-wide">Payment Method</h2>
                         <div className="border border-gray-200 rounded-xl overflow-hidden bg-white">
-                            {/* Online Payment Gateway */}
-                            <div className="p-4 lg:p-6 pb-5">
-                                <label className="flex items-center space-x-3 cursor-pointer group mb-5">
-                                    <input
-                                        type="radio"
-                                        name="payment"
-                                        checked={paymentMethod === 'Online Payment Gateway'}
-                                        onChange={() => setPaymentMethod('Online Payment Gateway')}
-                                        className="w-4 h-4 lg:w-[22px] lg:h-[22px] text-[#1877f2] border-[2px] border-[#1877f2] focus:ring-[#1877f2] cursor-pointer"
-                                    />
-                                    <span className="font-medium text-[16px] lg:text-[20px] text-gray-800 group-hover:text-[#1877f2] transition-colors">Online Payment Gateway</span>
-                                </label>
-                                <div className="ml-[34px]">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-[72px] h-[45px] border border-gray-100 rounded bg-[#f8f9fa] flex flex-col justify-center items-center shadow-sm">
-                                            <div className="flex -space-x-1.5"><div className="w-5 h-5 bg-red-500 rounded-full opacity-90"></div><div className="w-5 h-5 bg-yellow-500 rounded-full opacity-90"></div></div>
-                                        </div>
-                                        <div className="w-[72px] h-[45px] border border-gray-100 rounded bg-[#f8f9fa] flex items-center justify-center shadow-sm">
-                                            <span className="text-blue-800 font-black text-[17px] italic tracking-tight">VISA</span>
-                                        </div>
-                                        <div className="w-[72px] h-[45px] border border-gray-100 rounded bg-[#f8f9fa] flex items-center justify-center shadow-sm">
-                                            <span className="text-blue-500 font-bold text-[14px] tracking-tight">AMEX</span>
-                                        </div>
-                                        <div className="w-[72px] h-[45px] border border-gray-100 rounded bg-[#f8f9fa] flex items-center justify-center shadow-sm">
-                                            <span className="text-teal-600 font-bold text-[10px] text-center leading-[1.1]">Nexus<br />Pay</span>
-                                        </div>
+                            {/* Online Payments */}
+                            {paymentTypes.online.map((method) => (
+                                <div key={method.id} className="p-4 lg:p-6 border-b border-gray-100">
+                                    <label className="flex items-center space-x-3 cursor-pointer group">
+                                        <input
+                                            type="radio"
+                                            name="payment"
+                                            checked={paymentMethod === method.name}
+                                            onChange={() => setPaymentMethod(method.name)}
+                                            className="w-4 h-4 lg:w-[22px] lg:h-[22px] text-[#1877f2] focus:ring-[#1877f2] cursor-pointer"
+                                        />
+                                        <span className="font-medium text-[16px] lg:text-[20px] text-gray-800 group-hover:text-[#1877f2] transition-colors">{method.name}</span>
+                                    </label>
+                                </div>
+                            ))}
+
+                            {/* Offline/Manual Payments (including COD) */}
+                            {paymentTypes.offline.map((method) => (
+                                <div key={method.id} className="p-4 lg:p-6 border-b border-gray-100 last:border-0">
+                                    <label className="flex items-center space-x-3 cursor-pointer group flex-wrap gap-y-2">
+                                        <input
+                                            type="radio"
+                                            name="payment"
+                                            checked={paymentMethod === method.heading}
+                                            onChange={() => setPaymentMethod(method.heading)}
+                                            className="w-4 h-4 lg:w-[22px] lg:h-[22px] text-[#1877f2] focus:ring-[#1877f2] cursor-pointer"
+                                        />
+                                        <span className="font-medium text-[16px] lg:text-[20px] text-gray-800 group-hover:text-[#1877f2] transition-colors">{method.heading}</span>
+                                        {method.heading === 'Cash On Delivery' && (
+                                            <span className="text-[#1877f2] text-[13px] lg:text-[15px] xl:ml-2 font-medium">(Advanced pay 10% For Order confirmation)</span>
+                                        )}
+                                    </label>
+                                    <div className="ml-[28px] lg:ml-[34px] mt-2 text-[12px] lg:text-[14px] text-gray-500">
+                                        <div dangerouslySetInnerHTML={{ __html: method.description }}></div>
                                     </div>
-                                    <p className="text-[12px] text-gray-400 mt-2 font-medium">Select Your Gateway</p>
                                 </div>
-                            </div>
+                            ))}
 
-                            {/* EMI Payment */}
-                            <div className="p-4 lg:p-6 py-5">
-                                <label className="flex items-center space-x-3 cursor-pointer group mb-3">
-                                    <input
-                                        type="radio"
-                                        name="payment"
-                                        checked={paymentMethod === 'EMI Payment'}
-                                        onChange={() => setPaymentMethod('EMI Payment')}
-                                        className="w-4 h-4 lg:w-[22px] lg:h-[22px] text-[#1877f2] border-[2px] border-[#1877f2] focus:ring-[#1877f2] cursor-pointer"
-                                    />
-                                    <span className="font-medium text-[16px] lg:text-[20px] text-gray-800 group-hover:text-[#1877f2] transition-colors">EMI Payment (Credit Card only)</span>
-                                </label>
-                                <div className="ml-[28px] lg:ml-[34px] text-[13px] lg:text-[15px] space-y-1.5">
-                                    <p className="text-[#0a3055] font-medium">Only applicable for orders over ৳ 10,000</p>
-                                    <button className="text-[#1877f2] font-semibold hover:underline">EMI Plans</button>
-                                </div>
-                            </div>
-
-                            {/* Mobile Bank Payment */}
-                            <div className="p-4 lg:p-6 py-5">
-                                <label className="flex items-center space-x-3 cursor-pointer group mb-5">
-                                    <input
-                                        type="radio"
-                                        name="payment"
-                                        checked={paymentMethod === 'Mobile Bank Payment'}
-                                        onChange={() => setPaymentMethod('Mobile Bank Payment')}
-                                        className="w-4 h-4 lg:w-[22px] lg:h-[22px] text-[#1877f2] border-[2px] border-[#1877f2] focus:ring-[#1877f2] cursor-pointer"
-                                    />
-                                    <span className="font-medium text-[16px] lg:text-[20px] text-gray-800 group-hover:text-[#1877f2] transition-colors">Mobile Bank Payment</span>
-                                </label>
-                                <div className="ml-[34px]">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-[72px] h-[45px] border border-gray-100 rounded bg-[#f8f9fa] flex items-center justify-center shadow-sm">
-                                            <span className="text-pink-600 font-bold text-[18px]">bKash</span>
-                                        </div>
-                                        <div className="w-[72px] h-[45px] border border-gray-100 rounded bg-[#f8f9fa] flex items-center justify-center shadow-sm">
-                                            <span className="text-orange-500 font-bold text-[18px]">Nagad</span>
-                                        </div>
-                                        <div className="w-[72px] h-[45px] border border-gray-100 rounded bg-[#f8f9fa] flex items-center justify-center shadow-sm">
-                                            <span className="text-blue-900 font-bold text-[18px]">Upay</span>
-                                        </div>
-                                    </div>
-                                    <p className="text-[12px] text-gray-400 mt-2 font-medium">Select Your Gateway</p>
-                                </div>
-                            </div>
-
-                            {/* COD */}
-                            <div className="p-4 lg:p-6 py-5">
-                                <label className="flex items-center space-x-3 cursor-pointer group flex-wrap gap-y-2">
-                                    <input
-                                        type="radio"
-                                        name="payment"
-                                        checked={paymentMethod === 'Cash On Delivery'}
-                                        onChange={() => setPaymentMethod('Cash On Delivery')}
-                                        className="w-4 h-4 lg:w-[22px] lg:h-[22px] text-[#1877f2] border-[2px] border-[#1877f2] focus:ring-[#1877f2] cursor-pointer flex-shrink-0"
-                                    />
-                                    <span className="font-medium text-[16px] lg:text-[20px] text-gray-800 group-hover:text-[#1877f2] transition-colors">Cash On Delivery</span>
-                                    <span className="text-[#1877f2] text-[13px] lg:text-[15px] xl:ml-2 font-medium hover:underline cursor-pointer">(Advanced pay 10% For Order confirmation)</span>
-                                    <span className="text-gray-900 text-[14px] lg:text-[16px] font-bold xl:ml-2">Free Delivery</span>
-                                </label>
-                            </div>
-
-                            {/* Store Pickup */}
-                            <div className="p-4 lg:p-6 pt-5 pb-8">
-                                <label className="flex items-center space-x-3 cursor-pointer group flex-wrap gap-y-2">
-                                    <input
-                                        type="radio"
-                                        name="payment"
-                                        checked={paymentMethod === 'Store Pickup / Showroom Booking'}
-                                        onChange={() => setPaymentMethod('Store Pickup / Showroom Booking')}
-                                        className="w-4 h-4 lg:w-[22px] lg:h-[22px] text-[#1877f2] border-[2px] border-[#1877f2] focus:ring-[#1877f2] cursor-pointer flex-shrink-0"
-                                    />
-                                    <span className="font-medium text-[16px] lg:text-[20px] text-gray-800 group-hover:text-[#1877f2] transition-colors">Store Pickup / Showroom Booking</span>
-                                    <span className="text-[#1877f2] text-[13px] lg:text-[15px] xl:ml-2 font-medium hover:underline cursor-pointer">(Advanced pay 10% For Order confirmation)</span>
-                                    <span className="text-gray-900 text-[14px] lg:text-[16px] font-bold xl:ml-2">Get 5% OFF</span>
-                                </label>
-                            </div>
+                            {paymentTypes.online.length === 0 && paymentTypes.offline.length === 0 && (
+                                <p className="p-6 text-center text-gray-500 italic">No payment methods available.</p>
+                            )}
                         </div>
                     </section>
 
@@ -551,7 +514,7 @@ const Checkout = () => {
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Delivery</span>
-                                    <span className="font-bold text-gray-900">Free/ Charge</span>
+                                    <span className="font-bold text-gray-900">{totals.delivery > 0 ? formatCurrency(totals.delivery) : 'Free'}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Coupon Code</span>
@@ -675,7 +638,7 @@ const Checkout = () => {
                                     </div>
                                     <div className="flex justify-between items-center">
                                         <span>Delivery</span>
-                                        <span className="font-bold text-black">Free/ Charge</span>
+                                        <span className="font-bold text-black">{totals.delivery > 0 ? formatCurrency(totals.delivery) : 'Free'}</span>
                                     </div>
                                     <div className="flex justify-between items-center">
                                         <span>Coupon Code</span>

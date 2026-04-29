@@ -12,14 +12,20 @@ interface DashboardLayoutProps {
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
   const router = useRouter();
+  const [mounted, setMounted] = React.useState(false);
 
   useEffect(() => {
+    setMounted(true);
     // We wait for hydration (mount) to check auth
     const token = localStorage.getItem('auth_token');
     if (!token && !isAuthenticated) {
       router.push('/login');
     }
   }, [isAuthenticated, router]);
+
+  if (!mounted) {
+    return <div className="min-h-[600px]" />;
+  }
 
   if (!isAuthenticated) {
     return <div className="flex items-center justify-center min-h-[600px]">Redirecting to login...</div>;

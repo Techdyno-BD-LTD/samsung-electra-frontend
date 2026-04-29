@@ -80,9 +80,15 @@ export default function CartPage() {
   const deliveryCharge = 0; // Configurable if needed
   const finalTotal = subTotal + deliveryCharge;
 
+  const token = useAppSelector(state => state.auth.token);
+
   const handleCheckout = () => {
     if (cartItems.length > 0) {
-      router.push("/checkout");
+      if (token) {
+        router.push("/checkout");
+      } else {
+        router.push("/login?redirect=/checkout");
+      }
     }
   };
 

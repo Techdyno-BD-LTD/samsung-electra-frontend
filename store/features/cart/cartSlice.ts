@@ -14,6 +14,7 @@ export interface CartItem {
   weight?: string;
   variant?: string;
   slug?: string;
+  productId: number;
   quantity: number;
 }
 
