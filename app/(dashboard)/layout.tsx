@@ -1,11 +1,30 @@
-import React from "react";
+"use client";
+
+import React, { useEffect } from "react";
 import DashboardSidebar from "./_components/DashboardSidebar";
+import { useAppSelector } from "@/store/hooks";
+import { useRouter } from "next/navigation";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
+  const { user, isAuthenticated } = useAppSelector((state) => state.auth);
+  const router = useRouter();
+
+  useEffect(() => {
+    // We wait for hydration (mount) to check auth
+    const token = localStorage.getItem('auth_token');
+    if (!token && !isAuthenticated) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, router]);
+
+  if (!isAuthenticated) {
+    return <div className="flex items-center justify-center min-h-[600px]">Redirecting to login...</div>;
+  }
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[25%_71%] lg:gap-[2%]   mx-auto py-16">
       <div className="w-full">
@@ -13,7 +32,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       </div>
       <div className="min-h-[600px] w-full flex flex-col gap-6">
         <div className="bg-white rounded-2xl p-6 lg:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-black/5">
-          <h1 className="text-2xl lg:text-3xl font-bold text-[#004b91] mb-1">Hi, Amanullah</h1>
+          <h1 className="text-2xl lg:text-3xl font-bold text-[#004b91] mb-1">Hi, {user?.name || 'User'}</h1>
           <p className="text-slate-500 text-sm lg:text-base">Welcome to our account</p>
         </div>
         {children}

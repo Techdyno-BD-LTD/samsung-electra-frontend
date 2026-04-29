@@ -7,6 +7,10 @@ import { FcGoogle } from "react-icons/fc";
 import Link from "next/link";
 import VerifyOTP from "./VerifyOTP";
 
+import { useAppDispatch } from "@/store/hooks";
+import { setCredentials } from "@/store/features/auth/authSlice";
+import { useRouter } from "next/navigation";
+
 type LoginStep = "login" | "verify";
 
 type LoginType = "phone" | "mail";
@@ -27,8 +31,11 @@ const COUNTRIES: Country[] = [
 ];
 
 export default function LoginForm() {
+  const dispatch = useAppDispatch();
+  const router = useRouter();
   const [loginType, setLoginType] = useState<LoginType>("phone");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [email, setEmail] = useState("");
   const [error, setError] = useState(false);
   const [step, setStep] = useState<LoginStep>("login");
   const [selectedCountry, setSelectedCountry] = useState<Country>(COUNTRIES[0]);
@@ -42,24 +49,64 @@ export default function LoginForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Validate based on the selected country's length
-    const cleanNumber = phoneNumber.replace(/\s/g, "");
-    if (loginType === "phone" && cleanNumber.length !== selectedCountry.length) {
-      setError(true);
+    if (loginType === "phone") {
+      const cleanNumber = phoneNumber.replace(/\s/g, "");
+      if (cleanNumber.length !== selectedCountry.length) {
+        setError(true);
+      } else {
+        setError(false);
+        setStep("verify");
+        console.log("Sending OTP to:", `${selectedCountry.prefix}${cleanNumber}`);
+      }
     } else {
-      setError(false);
-      setStep("verify");
-      console.log("Sending OTP to:", `${selectedCountry.prefix}${cleanNumber}`);
+      if (!email || !email.includes("@")) {
+        setError(true);
+      } else {
+        setError(false);
+        setStep("verify");
+        console.log("Sending OTP to email:", email);
+      }
     }
   };
 
   const handlePhoneNumberChange = (val: string) => {
-    // Remove spaces and non-numeric characters
     const numericValue = val.replace(/\D/g, "");
-    // Limit to the selected country's length
     const limitedValue = numericValue.slice(0, selectedCountry.length);
     setPhoneNumber(limitedValue);
     if (error) setError(false);
+  };
+
+  const handleVerify = async (code: string) => {
+    try {
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const response = await fetch(`${apiBaseUrl}/api/auth/otp-login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          emailOrPhone: loginType === "mail" ? email : fullPhoneNumber,
+          otp: code,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.result) {
+        dispatch(
+          setCredentials({
+            user: data.user,
+            token: data.token,
+          })
+        );
+        router.push("/dashboard");
+      } else {
+        alert(data.message || "Invalid OTP or login failed");
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      alert("Something went wrong during login");
+    }
   };
 
   const fullPhoneNumber = `${selectedCountry.prefix}${phoneNumber}`;
@@ -204,13 +251,21 @@ export default function LoginForm() {
                 <label className="block text-[13px] font-semibold text-gray-600 ml-1">
                   Email Address<span className="text-[#0054A6] ml-0.5">*</span>
                 </label>
-                <div className="border border-gray-200 rounded-md h-[50px] px-4 flex items-center transition-all duration-300 bg-gray-50">
+                <div className={`border rounded-md h-[50px] px-4 flex items-center transition-all duration-300 bg-gray-50 ${error ? "border-red-500" : "border-gray-200"}`}>
                   <input
                     type="email"
                     placeholder="example@mail.com"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (error) setError(false);
+                    }}
                     className="flex-1 bg-transparent border-none outline-none focus:outline-none focus:ring-0 text-gray-900 placeholder-gray-300 text-[15px] font-medium"
                   />
                 </div>
+                {error && (
+                  <p className="text-[11px] font-medium text-red-500 mt-2 ml-1">Please enter a valid email address.</p>
+                )}
               </div>
             )}
 
@@ -255,9 +310,9 @@ export default function LoginForm() {
         </>
       ) : (
         <VerifyOTP 
-          phoneNumber={fullPhoneNumber} 
+          phoneNumber={loginType === "phone" ? fullPhoneNumber : email} 
           onBack={() => setStep("login")}
-          onVerify={(code) => console.log("Verifying code:", code)}
+          onVerify={handleVerify}
         />
       )}
     </div>

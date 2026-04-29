@@ -19,9 +19,21 @@ import {
   FiChevronRight,
   FiCamera
 } from "react-icons/fi";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { logout } from "@/store/features/auth/authSlice";
+import { useRouter } from "next/navigation";
 
 const DashboardSidebar = () => {
   const pathname = usePathname();
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const { user } = useAppSelector((state) => state.auth);
+
+  const handleLogout = (e: React.MouseEvent) => {
+    e.preventDefault();
+    dispatch(logout());
+    router.push("/login");
+  };
 
   const navItems = [
     { name: "Orders", icon: <FiShoppingBag />, href: "/dashboard/orders" },
@@ -42,7 +54,7 @@ const DashboardSidebar = () => {
         <div className="relative w-20 h-20 mb-4">
           <div className="w-full h-full rounded-full object-cover bg-slate-100 flex items-center justify-center border-2 border-white shadow-sm overflow-hidden">
             <Image
-              src="https://api.dicebear.com/7.x/avataaars/svg?seed=Mountahina"
+              src={user?.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.name || 'Guest'}`}
               alt="Profile"
               width={80}
               height={80}
@@ -53,8 +65,8 @@ const DashboardSidebar = () => {
             <FiCamera />
           </button>
         </div>
-        <h3 className="text-lg font-semibold text-slate-900 m-0 leading-tight">Mountahina Mimi</h3>
-        <p className="text-[13px] text-slate-500 mb-3">mounta@gmail.com</p>
+        <h3 className="text-lg font-semibold text-slate-900 m-0 leading-tight">{user?.name || "User Name"}</h3>
+        <p className="text-[13px] text-slate-500 mb-3">{user?.email || user?.phone || "Email/Phone"}</p>
         <div className="bg-orange-50 text-orange-500 px-4 py-1 rounded-full text-xs font-semibold border border-orange-100">
           Points : 00
         </div>
@@ -84,11 +96,14 @@ const DashboardSidebar = () => {
       </nav>
 
       <div className="px-4 pt-2 mt-2">
-        <Link href="/logout" className="flex items-center w-full px-4 py-3 bg-slate-50 text-[#2b7fe8] rounded-xl decoration-0 font-semibold text-[15px] transition-all duration-200 hover:bg-slate-100 hover:-translate-y-0.5">
+        <button 
+          onClick={handleLogout}
+          className="flex items-center w-full px-4 py-3 bg-slate-50 text-[#2b7fe8] rounded-xl decoration-0 font-semibold text-[15px] transition-all duration-200 hover:bg-slate-100 hover:-translate-y-0.5 text-left"
+        >
           <FiLogOut className="text-lg" />
           <span className="ml-2.5">Logout</span>
           <span className="ml-auto"><FiChevronRight /></span>
-        </Link>
+        </button>
       </div>
     </div>
   );

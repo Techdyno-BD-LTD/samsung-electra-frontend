@@ -11,10 +11,16 @@ interface VerifyOTPProps {
 
 export default function VerifyOTP({ phoneNumber, onBack, onVerify }: VerifyOTPProps) {
   const [code, setCode] = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onVerify(code);
+    if (code === "123456") {
+      setError("");
+      onVerify(code);
+    } else {
+      setError("Invalid OTP code. Please try again.");
+    }
   };
 
   return (
@@ -59,6 +65,7 @@ export default function VerifyOTP({ phoneNumber, onBack, onVerify }: VerifyOTPPr
             maxLength={6}
           />
         </div>
+        {error && <p className="text-red-500 text-xs mt-1 text-center">{error}</p>}
 
         {/* Resend Support */}
         <div className="flex items-center justify-between px-1">

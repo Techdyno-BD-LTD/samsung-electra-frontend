@@ -20,6 +20,7 @@ type MobileStickyPurchaseBarProps = {
   saveLabel?: string;
   emiText?: string;
   emiDetailsLabel?: string;
+  onAddToCart?: () => void;
 };
 
 export default function MobileStickyPurchaseBar({
@@ -31,6 +32,7 @@ export default function MobileStickyPurchaseBar({
   saveLabel = productData?.discount ? `Save ${productData.discount}` : "Save Amount",
   emiText = productData?.emi_start || "EMI Available",
   emiDetailsLabel = productData?.emi_facility?.text || "See details",
+  onAddToCart,
 }: MobileStickyPurchaseBarProps) {
   return (
     <div className="fixed inset-x-0 bottom-0 z-[60] border-t border-slate-100 bg-white px-3 pt-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(0,0,0,0.08)] md:hidden">
@@ -66,6 +68,7 @@ export default function MobileStickyPurchaseBar({
           <div className="flex items-center gap-1.5 shrink-0">
             <button
               type="button"
+              onClick={onAddToCart}
               className="flex h-[34px] items-center justify-center gap-1.5 rounded-full bg-[#F3F4F6] px-4 text-[12px] font-medium text-gray-800"
             >
               <FaShoppingCart className="text-[14px] text-gray-600" />

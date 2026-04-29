@@ -1,8 +1,8 @@
 "use client";
 
-import { FaHeart, FaBalanceScale, FaShoppingCart, FaStar, FaEye, FaGavel } from "react-icons/fa";
+import { useState } from "react";
+import AddToCartModal from "./AddToCartModal";import { FaHeart, FaBalanceScale, FaShoppingCart, FaStar, FaEye, FaGavel } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { addToCart } from "@/store/features/cart/cartSlice";
 import { toggleWishlist } from "@/store/features/wishlist/wishlistSlice";
 import { toggleCompare } from "@/store/features/compare/compareSlice";
 import Image from "next/image";
@@ -132,11 +132,11 @@ const ProductCard = ({
   bidsCount = "08",
   viewsCount = "1,326",
   startingFrom = "৳ 56,500",
-  bidButtonLabel = "Place Bid",
   dealImageHeight = "180px",
   productData,
 }: ProductCardProps) => {
   const dispatch = useAppDispatch();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const productSlug = productData?.slug || slug || toProductSlug(title);
   const wishlistItemId = productSlug || title;
@@ -146,20 +146,7 @@ const ProductCard = ({
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    dispatch(addToCart({
-      id: productSlug || title,
-      title,
-      brand,
-      image,
-      price,
-      originalPrice,
-      discountPercent,
-      saveAmount,
-      color,
-      type,
-      weight,
-    }));
-    alert("Added to cart!"); // Minimal feedback
+    setIsModalOpen(true);
   };
 
   const handleToggleWishlist = (e: React.MouseEvent) => {
@@ -349,6 +336,15 @@ const ProductCard = ({
             </div>
           </div>
         </div>
+        
+        <AddToCartModal 
+          isOpen={isModalOpen} 
+          onClose={() => setIsModalOpen(false)} 
+          productData={productData}
+          title={title} brand={brand} price={price} originalPrice={originalPrice}
+          image={image} category={category} discountLabel={discountPercent} 
+          saveLabel={saveAmount} weight={weight} color={color} slug={slug}
+        />
       </article>
     );
   }
@@ -437,6 +433,15 @@ const ProductCard = ({
             </div>
           </div>
         </div>
+        
+        <AddToCartModal 
+          isOpen={isModalOpen} 
+          onClose={() => setIsModalOpen(false)} 
+          productData={productData}
+          title={title} brand={brand} price={price} originalPrice={originalPrice}
+          image={image} category={category} discountLabel={discountPercent} 
+          saveLabel={saveAmount} weight={weight} color={color} slug={slug}
+        />
       </article>
     );
   }
@@ -591,6 +596,14 @@ const ProductCard = ({
           </button>
         </div>
 
+        <AddToCartModal 
+          isOpen={isModalOpen} 
+          onClose={() => setIsModalOpen(false)} 
+          productData={productData}
+          title={title} brand={brand} price={price} originalPrice={originalPrice}
+          image={image} category={category} discountLabel={discountPercent} 
+          saveLabel={saveAmount} weight={weight} color={color} slug={slug}
+        />
       </article>
     );
   }
@@ -823,6 +836,14 @@ const ProductCard = ({
       </div>
 
       {/* Add to Cart - show only on hover */}
+      <AddToCartModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        productData={productData}
+        title={title} brand={brand} price={price} originalPrice={originalPrice}
+        image={image} category={category} discountLabel={discountPercent} 
+        saveLabel={saveAmount} weight={weight} color={color} slug={slug}
+      />
     </div>
   );
 };

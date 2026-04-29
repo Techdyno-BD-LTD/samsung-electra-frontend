@@ -12,6 +12,8 @@ export interface CartItem {
   color?: string;
   type?: string;
   weight?: string;
+  variant?: string;
+  slug?: string;
   quantity: number;
 }
 
@@ -50,12 +52,19 @@ export const cartSlice = createSlice({
         item.quantity = newQuantity;
       }
     },
+    updateItemDetails: (state, action: PayloadAction<{ id: string; updates: Partial<CartItem> }>) => {
+      const { id, updates } = action.payload;
+      const index = state.items.findIndex(i => i.id === id);
+      if (index !== -1) {
+        state.items[index] = { ...state.items[index], ...updates };
+      }
+    },
     clearCart: (state) => {
       state.items = [];
     },
   },
 });
 
-export const { setCartItems, addToCart, removeFromCart, updateQuantity, clearCart } = cartSlice.actions;
+export const { setCartItems, addToCart, removeFromCart, updateQuantity, updateItemDetails, clearCart } = cartSlice.actions;
 
 export default cartSlice.reducer;

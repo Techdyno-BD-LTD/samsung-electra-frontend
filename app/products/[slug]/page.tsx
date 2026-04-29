@@ -1,8 +1,8 @@
 'use client';
 
 import Image from "next/image";
-import { FaHeart, FaMinus, FaPlus, FaRegShareSquare, FaStar } from "react-icons/fa";
-import { useEffect, useState } from "react";
+import { FaHeart, FaMinus, FaPlus, FaRegShareSquare, FaStar, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useParams } from "next/navigation";
 
 import ProductDetailsTabs from "@/components/productdetails/ProductDetailsTabs";
@@ -12,6 +12,9 @@ import MobileOfferDetails from "@/components/productdetails/MobileOfferDetails";
 import MobileMadeInFeatures from "@/components/productdetails/MobileMadeInFeatures";
 import MobileBackButton from "@/components/productdetails/MobileBackButton";
 import FooterBreadcrumbPortal from "@/components/productdetails/FooterBreadcrumbPortal";
+import { useAppDispatch } from "@/store/hooks";
+import { addToCart } from "@/store/features/cart/cartSlice";
+import CartSuccessModal from "@/components/common/CartSuccessModal";
 
 interface ProductData {
   id?: number;
@@ -129,6 +132,25 @@ export default function ProductDetailsPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
   const [selectedColorName, setSelectedColorName] = useState("");
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const thumbnailContainerRef = useRef<HTMLDivElement>(null);
+
+  const scrollThumbnails = (direction: 'left' | 'right') => {
+    if (thumbnailContainerRef.current) {
+      const scrollAmount = 150;
+      thumbnailContainerRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  const [quantity, setQuantity] = useState(1);
+  const dispatch = useAppDispatch();
+
+  const handleIncrement = () => setQuantity((prev) => prev + 1);
+  const handleDecrement = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
 
   const toComparable = (value?: string) => value?.trim().toLowerCase() ?? "";
   const isHexColor = (value?: string | null) => /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(value ?? "");
@@ -198,7 +220,7 @@ export default function ProductDetailsPage() {
 
   // Provide defaults for all props to ensure page doesn't crash
   const {
-    category = productData?.category?.name || "Product Category",
+    category = productData?.category_info?.category_name || productData?.category?.name || "Product Category",
     title = productData?.name || "Product Title",
     brand = productData?.brand?.name || "Brand",
     brandLogo = productData?.brand?.logo || "/images/samsung.png",
@@ -266,29 +288,7 @@ export default function ProductDetailsPage() {
     madeInText: productData?.made_in_text ? productData.made_in_text : "Product information",
   };
 
-  // Show loading state
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-gray-600">Loading product details...</p>
-        </div>
-      </div>
-    );
-  }
 
-  // Show error state
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <p className="text-red-600 text-lg">Error: {error}</p>
-          <p className="text-gray-600 mt-2">The product could not be found.</p>
-        </div>
-      </div>
-    );
-  }
 
   const breadcrumbCategory = category
     .split(" ")
@@ -346,10 +346,84 @@ export default function ProductDetailsPage() {
 
   const selectedSku = selectedVariant?.sku || sku;
   const selectedAvailability = (selectedVariant?.qty ?? productData?.current_stock ?? 0) > 0 ? "In Stock" : "Out of Stock";
-  const selectedMainImage = selectedVariant?.image || colorOptions.find((color) => toComparable(color.name) === toComparable(activeColorName))?.image || mainImage;
-  const selectedGallery = selectedMainImage
-    ? [selectedMainImage, ...gallery.filter((image) => image !== selectedMainImage)]
-    : gallery;
+  
+  const displayGallery = useMemo(() => {
+    const images = new Set<string>();
+    const thumb = productData?.thumbnail_image || mainImage || "/images/wm2.png";
+    if (thumb) images.add(thumb);
+    
+    productData?.photos?.forEach((p: any) => {
+      const img = p.path || p.photo;
+      if (img) images.add(img);
+    });
+    
+    variants?.forEach((v: any) => {
+      if (v.image) images.add(v.image);
+    });
+    
+    return Array.from(images);
+  }, [productData, mainImage, variants]);
+
+  // Sync activeImageIndex with selectedVariant or activeColorName
+  useEffect(() => {
+    if (displayGallery.length === 0) return;
+    const selectedImage = selectedVariant?.image || colorOptions.find((color) => toComparable(color.name) === toComparable(activeColorName))?.image;
+    if (selectedImage) {
+      const idx = displayGallery.indexOf(selectedImage);
+      if (idx !== -1) {
+        setActiveImageIndex(idx);
+      }
+    }
+  }, [activeColorName, selectedVariant, displayGallery, colorOptions]);
+
+  const finalMainImage = displayGallery[activeImageIndex] || displayGallery[0];
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+          <p className="mt-4 text-gray-600">Loading product details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <p className="text-red-600 text-lg">Error: {error}</p>
+          <p className="text-gray-600 mt-2">The product could not be found.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const handleAddToCart = () => {
+    const variantName = selectedVariant?.variant || activeColorName || "";
+    const uniqueId = variantName ? `${slug}-${variantName}` : (slug || title || "product");
+    
+    dispatch(addToCart({
+      id: uniqueId,
+      slug: slug,
+      title: title || "Product",
+      brand: brand || "Brand",
+      image: selectedVariant?.image || finalMainImage || "",
+      price: price ? String(price).split('/')[0].trim() : "0",
+      originalPrice: originalPrice ? String(originalPrice).split('/')[0].trim() : "0",
+      discountPercent: discountLabel || "0%",
+      saveAmount: saveLabel || "0",
+      color: activeColorName,
+      variant: selectedVariant?.variant || "",
+      type: category,
+      weight: productData?.weight ? `${productData.weight}kg` : "N/A",
+      quantity: quantity,
+    }));
+    setShowSuccessModal(true);
+  };
 
   return (
     <div className="pb-[118px] md:pb-0 ">
@@ -382,14 +456,14 @@ export default function ProductDetailsPage() {
 
                 <div className="relative mx-auto min-h-[250px] max-w-[520px] sm:min-h-[320px] md:min-h-[700px]">
                   <MobileProductGallery
-                    images={selectedGallery}
+                    images={displayGallery}
                     title={title}
                     warrantyBadgeImage={warrantyBadgeImage}
                   />
 
                   <div className="hidden items-center justify-center md:flex md:min-h-[700px]">
                     <Image
-                      src={selectedMainImage}
+                      src={finalMainImage}
                       alt={title}
                       width={520}
                       height={520}
@@ -408,22 +482,49 @@ export default function ProductDetailsPage() {
                 </div>
               </div>
 
-              <div className="hidden grid-cols-5 gap-2 md:grid">
-                {selectedGallery.map((item, index) => (
+              <div className="relative hidden md:flex items-center group">
+                {displayGallery.length > 5 && (
                   <button
-                    key={`${item}-${index}`}
                     type="button"
-                    className={`rounded-2xl border p-2 ${index === 0 ? "border-slate-700 bg-slate-100" : "border-slate-200 bg-white"}`}
+                    onClick={() => scrollThumbnails('left')}
+                    className="absolute -left-4 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white shadow-sm opacity-0 group-hover:opacity-100 transition-opacity hover:bg-slate-50"
                   >
-                    <Image
-                      src={item}
-                      alt={`${title} preview ${index + 1}`}
-                      width={92}
-                      height={92}
-                      className="mx-auto h-20 w-20 object-contain md:h-28 md:w-28"
-                    />
+                    <FaChevronLeft className="h-4 w-4 text-slate-600" />
                   </button>
-                ))}
+                )}
+                
+                <div 
+                  ref={thumbnailContainerRef}
+                  className="flex gap-2 overflow-x-hidden scroll-smooth w-full px-1"
+                  style={{ scrollbarWidth: 'none' }}
+                >
+                  {displayGallery.map((item, index) => (
+                    <button
+                      key={`${item}-${index}`}
+                      type="button"
+                      onClick={() => setActiveImageIndex(index)}
+                      className={`flex-shrink-0 w-[calc(20%-0.4rem)] rounded-2xl border p-2 transition-all ${index === activeImageIndex ? "border-slate-700 bg-slate-100 ring-2 ring-blue-500" : "border-slate-200 bg-white hover:border-slate-400"}`}
+                    >
+                      <Image
+                        src={item}
+                        alt={`${title} preview ${index + 1}`}
+                        width={92}
+                        height={92}
+                        className="mx-auto h-20 w-20 object-contain md:h-28 md:w-28"
+                      />
+                    </button>
+                  ))}
+                </div>
+
+                {displayGallery.length > 5 && (
+                  <button
+                    type="button"
+                    onClick={() => scrollThumbnails('right')}
+                    className="absolute -right-4 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white shadow-sm opacity-0 group-hover:opacity-100 transition-opacity hover:bg-slate-50"
+                  >
+                    <FaChevronRight className="h-4 w-4 text-slate-600" />
+                  </button>
+                )}
               </div>
             </div>
 
@@ -617,11 +718,11 @@ export default function ProductDetailsPage() {
                   </button>
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-3 rounded-md border border-slate-300 px-7 py-1">
-                      <button type="button" className="text-slate-600">
+                      <button type="button" onClick={handleDecrement} className="text-slate-600">
                         <FaMinus className="h-3.5 w-3.5" />
                       </button>
-                      <span className="w-4 text-center text-[11px] text-slate-700">01</span>
-                      <button type="button" className="text-slate-600">
+                      <span className="w-4 text-center text-[11px] text-slate-700">{quantity.toString().padStart(2, '0')}</span>
+                      <button type="button" onClick={handleIncrement} className="text-slate-600">
                         <FaPlus className="h-3.5 w-3.5" />
                       </button>
                     </div>
@@ -667,11 +768,11 @@ export default function ProductDetailsPage() {
                 <div className="flex-1 space-y-2">
                   <div className="flex flex-wrap items-center gap-4 lg:flex-nowrap">
                     <div className="flex items-center gap-4 rounded-xl border border-slate-300 px-4 py-2 text-base">
-                      <button type="button" className="text-slate-600">
+                      <button type="button" onClick={handleDecrement} className="text-slate-600">
                         <FaMinus className="h-4 w-4" />
                       </button>
-                      <span className="w-6 text-center">01</span>
-                      <button type="button" className="text-slate-600">
+                      <span className="w-6 text-center">{quantity.toString().padStart(2, '0')}</span>
+                      <button type="button" onClick={handleIncrement} className="text-slate-600">
                         <FaPlus className="h-4 w-4" />
                       </button>
                     </div>
@@ -694,7 +795,7 @@ export default function ProductDetailsPage() {
                     <button type="button" className="rounded-full bg-[#2F7FE8] py-1 text-[14px] font-semibold leading-none text-white">
                       Buy Now
                     </button>
-                    <button type="button" className="flex items-center justify-center gap-3 rounded-full border border-[#9CB7D8] py-1 text-[14px] font-semibold leading-none text-slate-900">
+                    <button type="button" onClick={handleAddToCart} className="flex items-center justify-center gap-3 rounded-full border border-[#9CB7D8] py-1 text-[14px] font-semibold leading-none text-slate-900">
                       <Image src="/images/shopping-cart.png" alt="Cart" width={24} height={24} className="h-6 w-6 object-contain" />
                       Add to Cart
                     </button>
@@ -815,6 +916,7 @@ export default function ProductDetailsPage() {
       />
 
       <MobileStickyPurchaseBar
+        productData={productData || undefined}
         availability={selectedAvailability}
         price={price}
         discountLabel={discountLabel}
@@ -822,6 +924,7 @@ export default function ProductDetailsPage() {
         saveLabel={saveLabel}
         emiText={emiText}
         emiDetailsLabel={emiDetailsLabel}
+        onAddToCart={handleAddToCart}
       />
 
       <FooterBreadcrumbPortal>
@@ -839,6 +942,13 @@ export default function ProductDetailsPage() {
         </div>
       </FooterBreadcrumbPortal>
 
+      <CartSuccessModal
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        productName={title || "Product"}
+        productImage={finalMainImage}
+        productPrice={price}
+      />
     </div>
   );
 }

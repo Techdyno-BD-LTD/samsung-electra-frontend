@@ -19,6 +19,7 @@ export default function MainBar() {
   );
   const wishlistTotalCount = useAppSelector((state) => state.wishlist.items.length);
   const compareTotalCount = useAppSelector((state) => state.compare.slots.filter(Boolean).length);
+  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
   const suggestions = useMemo(() => searchProducts(searchQuery, 7), [searchQuery]);
 
   useEffect(() => {
@@ -202,18 +203,33 @@ export default function MainBar() {
   </Link>
 
   {/* Login Button */}
-  <button className="flex items-center gap-2 rounded-[5px] bg-[#2b85ff] px-5 py-2.5 text-white shadow-sm hover:bg-blue-600 transition">
-    <Image
-      src="/images/loginavatar.png"
-      alt="Login"
-      width={18}
-      height={18}
-      quality={100}
-      priority
-      className="brightness-0 invert"
-    />
-    <span className="text-[15px] font-medium">Login</span>
-  </button>
+  {mounted && (
+    isAuthenticated ? (
+      <Link href="/dashboard" className="flex items-center gap-2 rounded-[5px] bg-[#2b85ff] px-5 py-2.5 text-white shadow-sm hover:bg-blue-600 transition">
+        <Image
+          src={user?.avatar || "/images/loginavatar.png"}
+          alt="User"
+          width={18}
+          height={18}
+          className="brightness-0 invert rounded-full"
+        />
+        <span className="text-[15px] font-medium truncate max-w-[100px]">{user?.name}</span>
+      </Link>
+    ) : (
+      <Link href="/login" className="flex items-center gap-2 rounded-[5px] bg-[#2b85ff] px-5 py-2.5 text-white shadow-sm hover:bg-blue-600 transition">
+        <Image
+          src="/images/loginavatar.png"
+          alt="Login"
+          width={18}
+          height={18}
+          quality={100}
+          priority
+          className="brightness-0 invert"
+        />
+        <span className="text-[15px] font-medium">Login</span>
+      </Link>
+    )
+  )}
 </div>
         </div>
       </div>

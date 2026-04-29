@@ -6,10 +6,11 @@ import { BiChevronRight } from "react-icons/bi";
 import { FiHeart, FiTrash2, FiChevronDown } from "react-icons/fi";
 import { BsGearWideConnected } from "react-icons/bs";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
-import { updateQuantity, removeFromCart } from "@/store/features/cart/cartSlice";
 import { formatCurrency, parseCurrency } from "@/lib/currencyUtils";
 import { useRouter } from "next/navigation";
 import PeopleAlsoBought from "@/components/cart/PeopleAlsoBought";
+import { updateQuantity, removeFromCart, updateItemDetails } from "@/store/features/cart/cartSlice";
+import Image from "next/image";
 
 
 export default function CartPage() {
@@ -22,6 +23,49 @@ export default function CartPage() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Sync Cart Images and Variants
+  useEffect(() => {
+    if (!mounted || cartItems.length === 0) return;
+
+    const syncCartImages = async () => {
+      const uniqueSlugs = Array.from(new Set(cartItems.map(item => item.slug).filter(Boolean)));
+      
+      for (const slug of uniqueSlugs) {
+        try {
+          const response = await fetch(`/api/products/${slug}`);
+          if (!response.ok) continue;
+          const data = await response.json();
+          
+          if (data.success && data.data && data.data.length > 0) {
+            const product = data.data[0];
+            const variants = product.variants || [];
+            
+            // Find all items in cart with this slug
+            const itemsToUpdate = cartItems.filter(item => item.slug === slug);
+            
+            for (const item of itemsToUpdate) {
+              const matchedVariant = variants.find((v: any) => 
+                v.variant?.trim().toLowerCase() === item.variant?.trim().toLowerCase() ||
+                v.variant?.trim().toLowerCase() === item.color?.trim().toLowerCase()
+              );
+              
+              if (matchedVariant && matchedVariant.image && matchedVariant.image !== item.image) {
+                dispatch(updateItemDetails({ 
+                  id: item.id, 
+                  updates: { image: matchedVariant.image } 
+                }));
+              }
+            }
+          }
+        } catch (err) {
+          console.error(`Failed to sync image for ${slug}:`, err);
+        }
+      }
+    };
+
+    syncCartImages();
+  }, [mounted, cartItems.length, dispatch]);
 
   const subTotal = cartItems.reduce((acc, item) => {
     return acc + parseCurrency(item.price) * item.quantity;
@@ -87,8 +131,14 @@ export default function CartPage() {
                   {/* Product Info */}
                   <div className="flex gap-2 sm:gap-3 lg:gap-4 items-start w-full">
                     <div className="w-16 h-16 sm:w-20 sm:h-20 2xl:w-28 2xl:h-28 relative flex-shrink-0 border border-gray-200 rounded p-1 bg-white flex items-center justify-center overflow-hidden">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={item.image} alt={item.title} className="w-full h-full object-contain" />
+                      <Image 
+                        key={item.image}
+                        src={item.image || "/images/wm2.png"} 
+                        alt={item.title} 
+                        fill
+                        className="object-contain p-1"
+                        sizes="(max-width: 768px) 80px, 112px"
+                      />
                     </div>
                     <div className="flex flex-col gap-0.5 sm:gap-1 text-[9px] sm:text-[11px] lg:text-[12px] 2xl:text-[13px] leading-tight min-w-0">
                       <div className="font-bold text-[8px] sm:text-[10px] lg:text-[11px] 2xl:text-[12px] text-black">
@@ -98,11 +148,8 @@ export default function CartPage() {
                         {item.title}
                       </div>
                       <div className="text-gray-500 mt-0.5 sm:mt-1 lg:mt-1.5 text-[8px] sm:text-[10px] lg:text-[11px] 2xl:text-[13px]">
-                        {item.type && <span>Type: {item.type} | </span>}
-                        {item.color && <span>Color: {item.color}</span>}
-                      </div>
-                      <div className="text-gray-500 text-[8px] sm:text-[10px] lg:text-[11px] 2xl:text-[13px]">
-                        {item.weight && <span>Weight: {item.weight}</span>}
+                        {item.type && <span>Category: {item.type} | </span>}
+                        {item.variant ? <span>Variant: {item.variant}</span> : item.color ? <span>Color: {item.color}</span> : null}
                       </div>
                       <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 mt-1 sm:mt-2 font-medium flex-wrap">
                         <button className="flex items-center gap-1 text-gray-400 hover:text-black transition-colors">

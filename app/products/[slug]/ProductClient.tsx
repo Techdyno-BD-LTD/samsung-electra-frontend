@@ -23,6 +23,8 @@ import MobileOfferDetails from "@/components/productdetails/MobileOfferDetails";
 import MobileMadeInFeatures from "@/components/productdetails/MobileMadeInFeatures";
 import MobileBackButton from "@/components/productdetails/MobileBackButton";
 import FooterBreadcrumbPortal from "@/components/productdetails/FooterBreadcrumbPortal";
+import { useAppDispatch } from "@/store/hooks";
+import { addToCart } from "@/store/features/cart/cartSlice";
 
 type PageProps = {
   params: { slug: string };
@@ -447,7 +449,12 @@ export default function ProductDetailPage({ slug, initialData }: { slug: string;
   // Color & gallery selection state
   const [selectedColorIndex, setSelectedColorIndex] = useState(0);
   const [selectedGalleryIndex, setSelectedGalleryIndex] = useState(0);
+  const [quantity, setQuantity] = useState(1);
   const [trustSignals, setTrustSignals] = useState<TrustSignal[]>([]);
+  const dispatch = useAppDispatch();
+
+  const handleIncrement = () => setQuantity((prev) => prev + 1);
+  const handleDecrement = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
 
   useEffect(() => {
     fetch("http://localhost:3000/api/homepage/trust-signals")
@@ -485,6 +492,24 @@ export default function ProductDetailPage({ slug, initialData }: { slug: string;
     .join(" ");
   const discountMatch = product.discountLabel.match(/\d+%/);
   const flatOfferPercent = discountMatch ? discountMatch[0] : "10%";
+
+  const handleAddToCart = () => {
+    dispatch(addToCart({
+      id: product?.sku || product?.slug || slug,
+      title: product?.title || "Product",
+      brand: product?.brand || "Brand",
+      image: currentMainImage || product?.mainImage || "",
+      price: product?.price || "0",
+      originalPrice: product?.originalPrice || "0",
+      discountPercent: product?.discountLabel || "0%",
+      saveAmount: product?.saveLabel || "0",
+      color: product?.colorDetails?.[selectedColorIndex]?.name || "N/A",
+      type: product?.category || "Category",
+      weight: "N/A",
+      quantity: quantity,
+    }));
+    alert("Added to cart!");
+  };
 
   return (
     <div className="pb-[118px] md:pb-0">
@@ -748,11 +773,11 @@ export default function ProductDetailPage({ slug, initialData }: { slug: string;
                   </button>
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-3 rounded-md border border-slate-300 px-7 py-1">
-                      <button type="button" className="text-slate-600">
+                      <button type="button" onClick={handleDecrement} className="text-slate-600">
                         <FaMinus className="h-3.5 w-3.5" />
                       </button>
-                      <span className="w-4 text-center text-[11px] text-slate-700">01</span>
-                      <button type="button" className="text-slate-600">
+                      <span className="w-4 text-center text-[11px] text-slate-700">{quantity.toString().padStart(2, '0')}</span>
+                      <button type="button" onClick={handleIncrement} className="text-slate-600">
                         <FaPlus className="h-3.5 w-3.5" />
                       </button>
                     </div>
@@ -798,11 +823,11 @@ export default function ProductDetailPage({ slug, initialData }: { slug: string;
                 <div className="flex-1 space-y-2">
                   <div className="flex flex-wrap items-center gap-4 lg:flex-nowrap">
                     <div className="flex items-center gap-4 rounded-xl border border-slate-300 px-4 py-2 text-base">
-                      <button type="button" className="text-slate-600">
+                      <button type="button" onClick={handleDecrement} className="text-slate-600">
                         <FaMinus className="h-4 w-4" />
                       </button>
-                      <span className="w-6 text-center">01</span>
-                      <button type="button" className="text-slate-600">
+                      <span className="w-6 text-center">{quantity.toString().padStart(2, '0')}</span>
+                      <button type="button" onClick={handleIncrement} className="text-slate-600">
                         <FaPlus className="h-4 w-4" />
                       </button>
                     </div>
@@ -825,7 +850,7 @@ export default function ProductDetailPage({ slug, initialData }: { slug: string;
                     <button type="button" className="rounded-full bg-[#2F7FE8] py-1 text-[14px] font-semibold leading-none text-white">
                       Buy Now
                     </button>
-                    <button type="button" className="flex items-center justify-center gap-3 rounded-full border border-[#9CB7D8] py-1 text-[14px] font-semibold leading-none text-slate-900">
+                    <button type="button" onClick={handleAddToCart} className="flex items-center justify-center gap-3 rounded-full border border-[#9CB7D8] py-1 text-[14px] font-semibold leading-none text-slate-900">
                       <Image src="/images/shopping-cart.png" alt="Cart" width={24} height={24} className="h-6 w-6 object-contain" />
                       Add to Cart
                     </button>
@@ -974,6 +999,7 @@ export default function ProductDetailPage({ slug, initialData }: { slug: string;
         saveLabel={product.saveLabel}
         emiText={product.emiText}
         emiDetailsLabel={product.emiDetailsLabel}
+        onAddToCart={handleAddToCart}
       />
 
       <FooterBreadcrumbPortal>

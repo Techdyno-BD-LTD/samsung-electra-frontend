@@ -6,6 +6,7 @@ import Footer from "@/components/layout/Footer";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
 // import { getRouteMetadata } from "@/lib/metadata";
 import StoreProvider from "@/store/StoreProvider";
+import AuthInit from "@/components/auth/AuthInit";
 
 const openSans = Open_Sans({
   variable: "--font-open-sans",
@@ -67,6 +68,7 @@ export default function RootLayout({
         className={`${openSans.variable} antialiased`}
       >
         <StoreProvider>
+          <AuthInit />
           <Navbar />
           <main className="mainwidth pb-16 pt-8 lg:pt-28  ">
             {children}

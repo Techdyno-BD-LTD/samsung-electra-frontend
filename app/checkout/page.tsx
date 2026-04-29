@@ -3,7 +3,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { FiChevronRight, FiEdit, FiArrowRight, FiChevronDown } from 'react-icons/fi';
 import { HiOutlineTicket } from "react-icons/hi2";
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
-import { clearCart } from '@/store/features/cart/cartSlice';
+import { clearCart, updateItemDetails } from '@/store/features/cart/cartSlice';
 import { setLastOrder } from '@/store/features/order/orderSlice';
 import { formatCurrency, parseCurrency } from "@/lib/currencyUtils";
 import { useRouter } from 'next/navigation';
@@ -15,12 +15,108 @@ const Checkout = () => {
     const dispatch = useAppDispatch();
     const router = useRouter();
     const cartItems = useAppSelector((state) => state.cart.items);
+    const { user, token, isAuthenticated } = useAppSelector((state) => state.auth);
+    const [addresses, setAddresses] = useState<any[]>([]);
+    const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
+    const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+    const [addressForm, setAddressForm] = useState({ address: '', phone: '', postal_code: '' });
+
     const [paymentMethod, setPaymentMethod] = useState('Online Payment Gateway');
     const [deliveryNote, setDeliveryNote] = useState('');
 
     useEffect(() => {
         setMounted(true);
     }, []);
+
+    const fetchAddresses = async () => {
+        if (!token) return;
+        try {
+            const response = await fetch("/api/v2/user/shipping/address", {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            const payload = await response.json();
+            if (payload.success) {
+                setAddresses(payload.data);
+                const defaultAddr = payload.data.find((a: any) => a.set_default === 1);
+                if (defaultAddr) setSelectedAddressId(defaultAddr.id);
+                else if (payload.data.length > 0) setSelectedAddressId(payload.data[0].id);
+            }
+        } catch (error) {
+            console.error("Failed to fetch addresses", error);
+        }
+    };
+
+    useEffect(() => {
+        if (mounted && token) fetchAddresses();
+    }, [mounted, token]);
+
+    const handleAddAddress = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            const response = await fetch("/api/v2/user/shipping/create", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify(addressForm)
+            });
+            const payload = await response.json();
+            if (payload.success) {
+                fetchAddresses();
+                setIsAddressModalOpen(false);
+                setAddressForm({ address: '', phone: '', postal_code: '' });
+            }
+        } catch (error) {
+            console.error("Failed to create address", error);
+        }
+    };
+
+    const selectedAddress = useMemo(() => 
+        addresses.find(a => a.id === selectedAddressId), 
+    [addresses, selectedAddressId]);
+
+    // Sync Cart Images and Variants
+    useEffect(() => {
+        if (!mounted || cartItems.length === 0) return;
+
+        const syncCartImages = async () => {
+            const uniqueSlugs = Array.from(new Set(cartItems.map(item => item.slug).filter(Boolean)));
+            
+            for (const slug of uniqueSlugs) {
+                try {
+                    const response = await fetch(`/api/products/${slug}`);
+                    if (!response.ok) continue;
+                    const data = await response.json();
+                    
+                    if (data.success && data.data && data.data.length > 0) {
+                        const product = data.data[0];
+                        const variants = product.variants || [];
+                        
+                        const itemsToUpdate = cartItems.filter(item => item.slug === slug);
+                        
+                        for (const item of itemsToUpdate) {
+                            const matchedVariant = variants.find((v: any) => 
+                                v.variant?.trim().toLowerCase() === item.variant?.trim().toLowerCase() ||
+                                v.variant?.trim().toLowerCase() === item.color?.trim().toLowerCase()
+                            );
+                            
+                            if (matchedVariant && matchedVariant.image && matchedVariant.image !== item.image) {
+                                dispatch(updateItemDetails({ 
+                                    id: item.id, 
+                                    updates: { image: matchedVariant.image } 
+                                }));
+                            }
+                        }
+                    }
+                } catch (err) {
+                    console.error(`Failed to sync image for ${slug}:`, err);
+                }
+            }
+        };
+
+        syncCartImages();
+    }, [mounted, cartItems.length, dispatch]);
 
     const totals = useMemo(() => {
         const subtotal = cartItems.reduce((acc, item) => acc + (parseCurrency(item.price) * item.quantity), 0);
@@ -104,39 +200,67 @@ const Checkout = () => {
                     <section>
                         <h2 className="lg:text-[24px] text-[18px] font-semibold lg:mb-6 mb-2 text-gray-900 tracking-wide">Shipping Address</h2>
 
-                        {/* Login Box */}
-                        <div className="border border-gray-200 rounded-xl p-3 lg:p-4 flex flex-col lg:flex-row justify-between items-center gap-4 mb-6">
-                            <span className="text-[#a1a1aa] font-medium text-[12px] lg:text-[14px] text-center lg:text-left">Add an address or login to use saved address</span>
-                            <div className="flex space-x-3 w-full md:w-auto">
-                                <button className="flex-1 md:flex-none border border-[#1877f2] text-[#1877f2] rounded-full lg:px-16 lg:py-1 py-1.5 font-medium hover:bg-blue-50 transition-colors text-[11px] lg:text-[15px]">Login</button>
-                                <button className="flex-1 md:flex-none bg-[#1877f2] text-white rounded-full lg:px-10 py-1.5 font-medium hover:bg-blue-600 transition-colors w-max text-[11px] lg:text-[15px]">Add new address</button>
-                            </div>
-                        </div>
-
-                        {/* Selected Address Box */}
-                        <div className="border border-gray-200 rounded-xl p-2 lg:p-3">
-
-                            <div className="bg-[#f8f9fa] border border-gray-100 rounded-xl p-3 mb-4 lg:mb-6">
-                                <div className="flex justify-between lg:items-start items-center mb-1">
-                                    <h3 className="font-semibold text-gray-900 text-[15px] lg:text-[17px]">Aman miya</h3>
-                                    <button className="text-[#1877f2] flex items-center text-[12px] lg:text-[15px] font-semibold hover:underline">
-                                        Change <FiEdit className="ml-1.5 w-4 h-4" />
-                                    </button>
-                                </div>
-                                <div className="space-y-1 text-[12px] lg:text-[15px] text-gray-700 max-w-3xl leading-relaxed">
-                                    <p>Level 4, Techdyno BD LTD, Haq&apos;s Plaza, 4th Floor, , 1, Dhaka, Mohammadpur, Asad Avenue Mohammadpur, 1207</p>
-                                    <p>Phone: +8800190877988</p>
-                                    <p>Email : amanullah.techdynobd@gmail.com</p>
+                        {!isAuthenticated ? (
+                            <div className="border border-gray-200 rounded-xl p-3 lg:p-4 flex flex-col lg:flex-row justify-between items-center gap-4 mb-6">
+                                <span className="text-[#a1a1aa] font-medium text-[12px] lg:text-[14px] text-center lg:text-left">Add an address or login to use saved address</span>
+                                <div className="flex space-x-3 w-full md:w-auto">
+                                    <button onClick={() => router.push('/login')} className="flex-1 md:flex-none border border-[#1877f2] text-[#1877f2] rounded-full lg:px-16 lg:py-1 py-1.5 font-medium hover:bg-blue-50 transition-colors text-[11px] lg:text-[15px]">Login</button>
+                                    <button onClick={() => router.push('/login')} className="flex-1 md:flex-none bg-[#1877f2] text-white rounded-full lg:px-10 py-1.5 font-medium hover:bg-blue-600 transition-colors w-max text-[11px] lg:text-[15px]">Add new address</button>
                                 </div>
                             </div>
+                        ) : (
+                            <div className="border border-gray-200 rounded-xl p-2 lg:p-3">
+                                {addresses.length > 0 ? (
+                                    <>
+                                        <div className="bg-[#f8f9fa] border border-gray-100 rounded-xl p-3 mb-4 lg:mb-6">
+                                            <div className="flex justify-between lg:items-start items-center mb-1">
+                                                <h3 className="font-semibold text-gray-900 text-[15px] lg:text-[17px]">{user?.name}</h3>
+                                                <button onClick={() => setIsAddressModalOpen(true)} className="text-[#1877f2] flex items-center text-[12px] lg:text-[15px] font-semibold hover:underline">
+                                                    Change / Add <FiEdit className="ml-1.5 w-4 h-4" />
+                                                </button>
+                                            </div>
+                                            <div className="space-y-1 text-[12px] lg:text-[15px] text-gray-700 max-w-3xl leading-relaxed">
+                                                {selectedAddress ? (
+                                                    <>
+                                                        <p>{selectedAddress.address}, {selectedAddress.postal_code}</p>
+                                                        <p>Phone: {selectedAddress.phone}</p>
+                                                        <p>Email: {user?.email}</p>
+                                                    </>
+                                                ) : (
+                                                    <p className="text-orange-500">Please select or add a shipping address</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Address Selector */}
+                                        <div className="flex gap-3 overflow-x-auto pb-2 mb-4 no-scrollbar">
+                                            {addresses.map(addr => (
+                                                <button
+                                                    key={addr.id}
+                                                    onClick={() => setSelectedAddressId(addr.id)}
+                                                    className={`flex-shrink-0 px-4 py-2 rounded-lg border text-xs font-medium transition-all ${selectedAddressId === addr.id 
+                                                        ? 'bg-blue-50 border-[#1877f2] text-[#1877f2]' 
+                                                        : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'}`}
+                                                >
+                                                    {addr.address.slice(0, 20)}...
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="text-center py-6">
+                                        <p className="text-gray-500 mb-4 text-sm">No addresses found</p>
+                                        <button onClick={() => setIsAddressModalOpen(true)} className="bg-[#1877f2] text-white rounded-full px-8 py-2 font-medium hover:bg-blue-600 transition-colors text-sm">Add new address</button>
+                                    </div>
+                                )}
 
-                            {/* Checkbox */}
-                            <label className="inline-flex items-center space-x-3 cursor-pointer group mb-1">
-                                <input type="checkbox" className="rounded border-gray-300 text-blue-500 focus:ring-blue-500 w-3.5 h-3.5 lg:w-5 lg:h-5 cursor-pointer" />
-                                <span className="text-gray-700 text-[12px] lg:text-[15px] font-medium group-hover:text-gray-900 transition-colors">Use a different billing address</span>
-                            </label>
-
-                        </div>
+                                {/* Checkbox */}
+                                <label className="inline-flex items-center space-x-3 cursor-pointer group mb-1">
+                                    <input type="checkbox" className="rounded border-gray-300 text-blue-500 focus:ring-blue-500 w-3.5 h-3.5 lg:w-5 lg:h-5 cursor-pointer" />
+                                    <span className="text-gray-700 text-[12px] lg:text-[15px] font-medium group-hover:text-gray-900 transition-colors">Use a different billing address</span>
+                                </label>
+                            </div>
+                        )}
 
                     </section>
 
@@ -375,6 +499,7 @@ const Checkout = () => {
                                 <div key={item.id} className="flex gap-4 p-4 bg-white border border-gray-200 rounded-xl items-start shadow-sm">
                                     <div className="w-[72px] h-[72px] bg-gray-100 rounded-lg flex-shrink-0 relative overflow-hidden flex items-center justify-center border border-gray-100">
                                         <Image
+                                            key={item.image}
                                             src={item.image}
                                             alt={item.title}
                                             fill
@@ -384,8 +509,14 @@ const Checkout = () => {
                                     <div className="flex-1 flex justify-between">
                                         <div className="pr-3">
                                             <p className="text-[14px] text-gray-800 font-medium leading-[1.3]">
-                                                {item.title} | {item.color}
+                                                {item.title}
                                             </p>
+                                            {item.type && (
+                                                <p className="text-[12px] text-gray-500 mt-1">Category: {item.type}</p>
+                                            )}
+                                            {(item.variant || item.color) && (
+                                                <p className="text-[12px] text-gray-500 mt-0.5">Variant: {item.variant || item.color}</p>
+                                            )}
                                             <p className="text-[14px] text-gray-500 mt-2">QTY : {item.quantity}</p>
                                         </div>
                                         <div className="text-right flex flex-col items-end whitespace-nowrap">
@@ -511,6 +642,8 @@ const Checkout = () => {
                                         <div key={item.id} className="flex justify-between items-start text-[13px] sm:text-[14px]">
                                             <div className="flex flex-col gap-0.5 max-w-[60%]">
                                                 <span className="font-bold text-gray-700 leading-tight">{item.title}</span>
+                                                {item.type && <span className="text-[11px] text-gray-500">Category: {item.type}</span>}
+                                                {(item.variant || item.color) && <span className="text-[11px] text-gray-500">Variant: {item.variant || item.color}</span>}
                                                 <span className="text-[11px] text-gray-400 font-medium"> ( {item.quantity} pcs ) </span>
                                             </div>
                                             <div className="text-right flex flex-col items-end">
@@ -559,6 +692,68 @@ const Checkout = () => {
                                 By proceeding, you acknowledge and accept Electra International&apos;s <span className="underline">Terms &amp; Conditions</span>, <span className="underline">Cancellation &amp; Refund Policy</span>, and <span className="underline">Privacy Policy</span>.
                             </p>
                         </div>
+                    </div>
+                </div>
+            )}
+            {/* Address Modal */}
+            {isAddressModalOpen && (
+                <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl">
+                        <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+                            <h3 className="text-xl font-bold text-gray-900">Add New Address</h3>
+                            <button onClick={() => setIsAddressModalOpen(false)} className="text-gray-400 hover:text-gray-600">✕</button>
+                        </div>
+                        <form onSubmit={handleAddAddress} className="p-6 space-y-4">
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700 mb-1.5">Detailed Address</label>
+                                <textarea
+                                    required
+                                    value={addressForm.address}
+                                    onChange={(e) => setAddressForm({ ...addressForm, address: e.target.value })}
+                                    placeholder="Street, House No, Area..."
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#1877f2]/20 focus:border-[#1877f2] transition-all outline-none min-h-[100px]"
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-1.5">Phone Number</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={addressForm.phone}
+                                        onChange={(e) => setAddressForm({ ...addressForm, phone: e.target.value })}
+                                        placeholder="017********"
+                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 h-12 text-sm focus:ring-2 focus:ring-[#1877f2]/20 focus:border-[#1877f2] transition-all outline-none"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-1.5">Postal Code</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={addressForm.postal_code}
+                                        onChange={(e) => setAddressForm({ ...addressForm, postal_code: e.target.value })}
+                                        placeholder="1207"
+                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 h-12 text-sm focus:ring-2 focus:ring-[#1877f2]/20 focus:border-[#1877f2] transition-all outline-none"
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex gap-4 pt-4">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsAddressModalOpen(false)}
+                                    className="flex-1 px-6 h-12 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition-all border border-gray-100"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="flex-1 bg-[#1877f2] text-white px-6 h-12 rounded-xl font-bold hover:bg-blue-600 transition-all shadow-lg shadow-blue-500/20"
+                                >
+                                    Save Address
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             )}
