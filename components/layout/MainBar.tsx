@@ -23,7 +23,8 @@ export default function MainBar() {
   const wishlistTotalCount = useAppSelector((state) => state.wishlist.items.length);
   const compareTotalCount = useAppSelector((state) => state.compare.slots.filter(Boolean).length);
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
-  const suggestions = useMemo(() => searchProducts(searchQuery, 7), [searchQuery]);
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -51,11 +52,35 @@ export default function MainBar() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSuggestions([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setIsLoadingSuggestions(true);
+      try {
+        const response = await fetch(`/api/products/search?name=${encodeURIComponent(searchQuery)}`);
+        if (response.ok) {
+          const payload = await response.json();
+          setSuggestions(payload.data?.slice(0, 7) || []);
+        }
+      } catch (error) {
+        console.error("Error fetching suggestions:", error);
+      } finally {
+        setIsLoadingSuggestions(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   const handleSearch = () => {
     const query = searchQuery.trim();
     if (!query) return;
     setShowSuggestions(false);
-    router.push(`/shop?q=${encodeURIComponent(query)}`);
+    router.push(`/search?q=${encodeURIComponent(query)}`);
   };
 
   const handleLogout = () => {
@@ -126,14 +151,14 @@ export default function MainBar() {
                   {suggestions.map((item) => (
                     <Link
                       key={item.id}
-                      href={`/products/${item.id}`}
+                      href={`/products/${item.slug || item.id}`}
                       onClick={() => setShowSuggestions(false)}
                       className="flex items-center gap-3 border-b border-slate-100 px-3 py-2.5 hover:bg-slate-50 last:border-b-0"
                     >
-                      <Image src={item.image} alt={item.title} width={42} height={42} className="h-10 w-10 rounded object-cover" />
+                      <Image src={item.thumbnail_image || item.image} alt={item.name || item.title} width={42} height={42} className="h-10 w-10 rounded object-cover" />
                       <div className="min-w-0">
-                        <p className="line-clamp-1 text-xs font-semibold text-slate-800">{item.title}</p>
-                        <p className="line-clamp-1 text-[11px] text-slate-500">{item.category || "Product"}</p>
+                        <p className="line-clamp-1 text-xs font-semibold text-slate-800">{item.name || item.title}</p>
+                        <p className="line-clamp-1 text-[11px] text-slate-500">{item.category_name || item.category || "Product"}</p>
                       </div>
                     </Link>
                   ))}
