@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import AddToCartModal from "./AddToCartModal";import { FaHeart, FaBalanceScale, FaShoppingCart, FaStar, FaEye, FaGavel } from "react-icons/fa";
+import AddToCartModal from "./AddToCartModal"; import { FaHeart, FaBalanceScale, FaShoppingCart, FaStar, FaEye, FaGavel } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { toggleWishlist } from "@/store/features/wishlist/wishlistSlice";
 import { toggleCompare } from "@/store/features/compare/compareSlice";
@@ -48,48 +48,48 @@ interface ProductCardProps {
   bidButtonLabel?: string;
   dealImageHeight?: string;
   productData?: {
-    id: number;
-    slug: string;
-    name: string;
-    category_id: number;
-    category: {
-      name: string;
-      slug: string;
+    id?: number | string;
+    slug?: string;
+    name?: string;
+    category_id?: number;
+    category?: {
+      name?: string;
+      slug?: string;
     };
-    weight: number;
-    model_number: string;
-    connection_type: string;
-    thumbnail_image: string;
-    price_high_low: string;
-    has_discount: boolean;
-    discount: string;
-    stroked_price: string;
-    main_price: string;
-    calculable_price: number;
-    rating: number;
-    rating_count: number;
-    sales: number;
-    current_stock: number;
-    unit: string;
-    emi_start: string;
-    links: {
-      details: string;
+    weight?: number;
+    model_number?: string;
+    connection_type?: string;
+    thumbnail_image?: string;
+    price_high_low?: string;
+    has_discount?: boolean;
+    discount?: string;
+    stroked_price?: string;
+    main_price?: string;
+    calculable_price?: number;
+    rating?: number;
+    rating_count?: number;
+    sales?: number;
+    current_stock?: number;
+    unit?: string;
+    emi_start?: string;
+    links?: {
+      details?: string;
     };
     brand?: {
-      id: number;
-      slug: string;
-      name: string;
-      logo: string;
+      id?: number;
+      slug?: string;
+      name?: string;
+      logo?: string;
     };
-    variants: Array<{
-      variant: string;
-      price: number;
-      sku: string;
-      qty: number;
-      image: string | null;
+    variants?: Array<{
+      variant?: string;
+      price?: number;
+      sku?: string;
+      qty?: number;
+      image?: string | null;
     }>;
-    other_features: string;
-    tags: string[];
+    other_features?: string;
+    tags?: string[];
     badge_tag?: string;
     badge_value?: string;
     product_sold?: number;
@@ -336,13 +336,13 @@ const ProductCard = ({
             </div>
           </div>
         </div>
-        
-        <AddToCartModal 
-          isOpen={isModalOpen} 
-          onClose={() => setIsModalOpen(false)} 
+
+        <AddToCartModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
           productData={productData}
           title={title} brand={brand} price={price} originalPrice={originalPrice}
-          image={image} category={category} discountLabel={discountPercent} 
+          image={image} category={category} discountLabel={discountPercent}
           saveLabel={saveAmount} weight={weight} color={color} slug={slug}
         />
       </article>
@@ -433,13 +433,13 @@ const ProductCard = ({
             </div>
           </div>
         </div>
-        
-        <AddToCartModal 
-          isOpen={isModalOpen} 
-          onClose={() => setIsModalOpen(false)} 
+
+        <AddToCartModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
           productData={productData}
           title={title} brand={brand} price={price} originalPrice={originalPrice}
-          image={image} category={category} discountLabel={discountPercent} 
+          image={image} category={category} discountLabel={discountPercent}
           saveLabel={saveAmount} weight={weight} color={color} slug={slug}
         />
       </article>
@@ -461,21 +461,21 @@ const ProductCard = ({
 
     return (
       <article className="group relative w-full max-w-full overflow-hidden rounded-t-2xl border border-border bg-card shadow-sm transition-shadow duration-300 hover:shadow-lg">
-         {displayBadgeLabel && (
-        <div
-          className="absolute top-8 right-2 z-20 flex h-12 w-12 items-center justify-center bg-[#0081FF] p-1 text-center text-[9px] font-semibold leading-tight text-white sm:top-14 sm:right-6 sm:h-[70px] sm:w-[70px] sm:p-2 sm:text-[12px]"
-          style={{ clipPath: "polygon(50% 0%, 61% 18%, 80% 8%, 82% 28%, 100% 38%, 84% 50%, 100% 62%, 82% 72%, 80% 92%, 61% 82%, 50% 100%, 39% 82%, 20% 92%, 18% 72%, 0% 62%, 16% 50%, 0% 38%, 18% 28%, 20% 8%, 39% 18%)" }}
-        >
-          {displayBadgeLabel}
-        </div>
-      )}
+        {displayBadgeLabel && (
+          <div
+            className="absolute top-8 right-2 z-20 flex h-12 w-12 items-center justify-center bg-[#0081FF] p-1 text-center text-[9px] font-semibold leading-tight text-white sm:top-14 sm:right-6 sm:h-[70px] sm:w-[70px] sm:p-2 sm:text-[12px]"
+            style={{ clipPath: "polygon(50% 0%, 61% 18%, 80% 8%, 82% 28%, 100% 38%, 84% 50%, 100% 62%, 82% 72%, 80% 92%, 61% 82%, 50% 100%, 39% 82%, 20% 92%, 18% 72%, 0% 62%, 16% 50%, 0% 38%, 18% 28%, 20% 8%, 39% 18%)" }}
+          >
+            {displayBadgeLabel}
+          </div>
+        )}
 
-      {/* Primary Product Badge (Sale/New/Hot/Sold Out/Special) */}
-      {badgeStyleTag && (
-        <span className={`absolute top-0 left-0 z-10 rounded-br-2xl px-2 py-1 text-[10px] font-semibold text-white sm:px-4 sm:py-1.5 sm:text-xs ${badgeClassName}`}>
-          {badgeStyleTag}
-        </span>
-      )}
+        {/* Primary Product Badge (Sale/New/Hot/Sold Out/Special) */}
+        {badgeStyleTag && (
+          <span className={`absolute top-0 left-0 z-10 rounded-br-2xl px-2 py-1 text-[10px] font-semibold text-white sm:px-4 sm:py-1.5 sm:text-xs ${badgeClassName}`}>
+            {badgeStyleTag}
+          </span>
+        )}
 
         <div className="absolute right-3 top-3 z-10 hidden flex-row gap-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100 sm:flex">
           <button onClick={handleToggleWishlist} aria-label="Toggle wishlist" className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-white shadow-md transition-colors hover:bg-gray-100">
@@ -562,8 +562,8 @@ const ProductCard = ({
 
         <div className="px-2 pb-1 sm:px-4">
           <div className="h-1.5 w-full rounded-full bg-slate-200">
-            <div 
-              className="h-1.5 rounded-full bg-[#2B7FE8]" 
+            <div
+              className="h-1.5 rounded-full bg-[#2B7FE8]"
               style={{ width: `${Math.min(100, Math.max(0, ((productData?.product_sold || 0) / (productData?.current_stock || 1)) * 100))}%` }}
             />
           </div>
@@ -596,12 +596,12 @@ const ProductCard = ({
           </button>
         </div>
 
-        <AddToCartModal 
-          isOpen={isModalOpen} 
-          onClose={() => setIsModalOpen(false)} 
+        <AddToCartModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
           productData={productData}
           title={title} brand={brand} price={price} originalPrice={originalPrice}
-          image={image} category={category} discountLabel={discountPercent} 
+          image={image} category={category} discountLabel={discountPercent}
           saveLabel={saveAmount} weight={weight} color={color} slug={slug}
         />
       </article>
@@ -734,37 +734,40 @@ const ProductCard = ({
 
       {/* Pricing */}
       <div className="flex flex-wrap items-center gap-1.5 px-2 pb-2 sm:gap-2 sm:px-4">
-        <span className="text-[20px] font-bold text-[#0081FF] sm:text-[17px]">{productData?.main_price}</span>
+        <span className="text-[20px] font-bold text-[#0081FF] sm:text-[17px]">
+          {productData?.main_price}
+        </span>
         <span className="text-[11px] text-[#909090] line-through sm:text-[13px]">
           {productData?.stroked_price}
         </span>
         <span className="text-[10px] font-semibold text-red-600 sm:text-xs">
           {productData?.discount}
         </span>
-        <div className="">
-          <span className="inline-block rounded-tl-2xl rounded-br-2xl bg-red-600 px-2 py-0.5 text-[9px] font-medium text-white uppercase sm:px-3 sm:py-1 sm:text-[10px]"> Save:
-            {(() => {
-              const cleanNumber = (str?: string) => {
-                if (!str) return 0;
-                // Remove everything except digits, dots and commas
-                const s = str.replace(/[^\d.,]/g, '');
-                // Identify decimal separator: if last comma is after last dot, it's decimal
-                if (s.lastIndexOf(',') > s.lastIndexOf('.')) {
-                  return parseFloat(s.replace(/\./g, '').replace(',', '.')) || 0;
-                }
-                // Otherwise dot is decimal (or no decimal), just remove commas
-                return parseFloat(s.replace(/,/g, '')) || 0;
-              };
 
-              const original = cleanNumber(productData?.stroked_price);
-              const current = cleanNumber(productData?.main_price);
-              const savings = original - current;
+        <div>
+          {(() => {
+            const parsePrice = (priceStr?: string) => {
+              if (!priceStr) return 0;
+              // Remove currency symbols, commas, and whitespace
+              // This regex keeps only digits and the decimal point
+              const normalized = priceStr.replace(/[^\d.]/g, '');
+              return parseFloat(normalized) || 0;
+            };
 
-              return savings.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-            })()}
-          </span>
+            const original = parsePrice(productData?.stroked_price);
+            const current = parsePrice(productData?.main_price);
+            const savings = original - current;
+
+            // Only show the badge if there is an actual saving
+            if (savings <= 0) return null;
+
+            return (
+              <span className="inline-block rounded-tl-2xl rounded-br-2xl bg-red-600 px-2 py-0.5 text-[9px] font-medium text-white uppercase sm:px-3 sm:py-1 sm:text-[10px]">
+                Save: {savings.toLocaleString('en-US', { minimumFractionDigits: 0 })}
+              </span>
+            );
+          })()}
         </div>
-
       </div>
 
       {/* Savings Badge */}
@@ -836,12 +839,12 @@ const ProductCard = ({
       </div>
 
       {/* Add to Cart - show only on hover */}
-      <AddToCartModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
+      <AddToCartModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
         productData={productData}
         title={title} brand={brand} price={price} originalPrice={originalPrice}
-        image={image} category={category} discountLabel={discountPercent} 
+        image={image} category={category} discountLabel={discountPercent}
         saveLabel={saveAmount} weight={weight} color={color} slug={slug}
       />
     </div>

@@ -1,4 +1,4 @@
-import { getRouteMetadata } from "@/lib/metadata";
+
 
 import HeroSection from "@/components/home/HeroSection";
 import ServiceHighlights from "@/components/home/ServiceHighlights";
@@ -32,7 +32,7 @@ const fallbackCategorySections: HomepageCategoryWiseProductSection[] = [
     categorySlug: "air-conditionar",
     title: "Air Conditioner Products",
     subtitle: "",
-    seeMoreHref: "/products/category/air-conditioner",
+    seeMoreHref: "/category/air-conditionar",
   },
   {
     categoryId: 2,
@@ -40,7 +40,7 @@ const fallbackCategorySections: HomepageCategoryWiseProductSection[] = [
     categorySlug: "refrigerator",
     title: "Refrigerator Products",
     subtitle: "",
-    seeMoreHref: "/products/category/refrigerator",
+    seeMoreHref: "/category/refrigerator",
   },
   {
     categoryId: 3,
@@ -48,7 +48,7 @@ const fallbackCategorySections: HomepageCategoryWiseProductSection[] = [
     categorySlug: "washing-machine",
     title: "Washing Machine Products",
     subtitle: "",
-    seeMoreHref: "/products/category/washing-machine",
+    seeMoreHref: "/category/washing-machine",
   },
   {
     categoryId: 4,
@@ -56,7 +56,7 @@ const fallbackCategorySections: HomepageCategoryWiseProductSection[] = [
     categorySlug: "microwave",
     title: "Microwave Products",
     subtitle: "",
-    seeMoreHref: "/products/category/microwave-oven",
+    seeMoreHref: "/category/microwave-oven",
   },
 ];
 

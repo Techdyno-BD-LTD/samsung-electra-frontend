@@ -30,30 +30,30 @@ export default function CartPage() {
 
     const syncCartImages = async () => {
       const uniqueSlugs = Array.from(new Set(cartItems.map(item => item.slug).filter(Boolean)));
-      
+
       for (const slug of uniqueSlugs) {
         try {
           const response = await fetch(`/api/products/${slug}`);
           if (!response.ok) continue;
           const data = await response.json();
-          
+
           if (data.success && data.data && data.data.length > 0) {
             const product = data.data[0];
             const variants = product.variants || [];
-            
+
             // Find all items in cart with this slug
             const itemsToUpdate = cartItems.filter(item => item.slug === slug);
-            
+
             for (const item of itemsToUpdate) {
-              const matchedVariant = variants.find((v: any) => 
+              const matchedVariant = variants.find((v: { variant?: string; image?: string }) =>
                 v.variant?.trim().toLowerCase() === item.variant?.trim().toLowerCase() ||
                 v.variant?.trim().toLowerCase() === item.color?.trim().toLowerCase()
               );
-              
+
               if (matchedVariant && matchedVariant.image && matchedVariant.image !== item.image) {
-                dispatch(updateItemDetails({ 
-                  id: item.id, 
-                  updates: { image: matchedVariant.image } 
+                dispatch(updateItemDetails({
+                  id: item.id,
+                  updates: { image: matchedVariant.image }
                 }));
               }
             }
@@ -65,7 +65,7 @@ export default function CartPage() {
     };
 
     syncCartImages();
-  }, [mounted, cartItems.length, dispatch]);
+  }, [mounted, cartItems, dispatch]);
 
   const subTotal = cartItems.reduce((acc, item) => {
     return acc + parseCurrency(item.price) * item.quantity;
@@ -137,10 +137,10 @@ export default function CartPage() {
                   {/* Product Info */}
                   <div className="flex gap-2 sm:gap-3 lg:gap-4 items-start w-full">
                     <div className="w-16 h-16 sm:w-20 sm:h-20 2xl:w-28 2xl:h-28 relative flex-shrink-0 border border-gray-200 rounded p-1 bg-white flex items-center justify-center overflow-hidden">
-                      <Image 
+                      <Image
                         key={item.image}
-                        src={item.image || "/images/wm2.png"} 
-                        alt={item.title} 
+                        src={item.image || "/images/wm2.png"}
+                        alt={item.title}
                         fill
                         className="object-contain p-1"
                         sizes="(max-width: 768px) 80px, 112px"
@@ -302,22 +302,8 @@ export default function CartPage() {
                 {mounted ? formatCurrency(totalSavings) : "৳0"}
               </span>
             </div>
-            <div className="flex justify-between items-center">
-              <span>Store Pickup</span>
-              <span className="font-bold text-black text-[14px] lg:text-[15px] 2xl:text-[16px]">Free</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span>TAX</span>
-              <span className="font-bold text-black text-[14px] lg:text-[15px] 2xl:text-[16px]">Free</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span>Delivery</span>
-              <span className="font-bold text-black text-[14px] lg:text-[15px] 2xl:text-[16px]">Free</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span>Coupon Code</span>
-              <span className="font-bold text-black text-[14px] lg:text-[15px] 2xl:text-[16px]">0</span>
-            </div>
+
+
           </div>
 
           <hr className="border-gray-200 my-4 lg:my-5" />

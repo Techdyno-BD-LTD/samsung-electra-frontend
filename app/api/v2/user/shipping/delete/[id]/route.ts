@@ -27,7 +27,7 @@ export async function GET(
 
     const data = await response.json();
     return NextResponse.json(data, { status: response.status });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ success: false, message: "Backend unreachable" }, { status: 500 });
   }
 }

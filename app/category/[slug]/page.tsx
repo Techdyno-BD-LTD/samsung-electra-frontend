@@ -1,51 +1,85 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import categories from "@/database/categories.json";
 import CategorySidebar from "@/components/category/CategorySidebar";
 import CategoryHeroBanner from "@/components/category/CategoryHeroBanner";
 import CategoryFilterPanel from "@/components/category/CategoryFilterPanel";
 import CategoryProductGrid from "@/components/category/CategoryProductGrid";
 import CategoryFAQ from "@/components/category/CategoryFAQ";
+import { HiChevronLeft } from "react-icons/hi2";
 
-type CategoryEntry = {
+type ApiCategory = {
   id: number;
   name: string;
   slug: string;
-  subcategories: { name: string; count: number }[];
+  parent_id: number;
+  icon: string | null;
+  cover_image: string | null;
+  number_of_products: number;
 };
 
 type PageProps = {
   params: { slug: string };
 };
 
-const typedCategories = categories as CategoryEntry[];
-
-function getCategoryBySlug(slug: string): CategoryEntry | undefined {
-  return typedCategories.find((cat) => cat.slug === slug);
-}
-
-export async function generateStaticParams() {
-  return typedCategories.map((cat) => ({ slug: cat.slug }));
+async function getCategoryData(slug: string) {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  
+  try {
+    const res = await fetch(`${siteUrl}/api/categories`, {
+      cache: 'no-store'
+    });
+    
+    if (!res.ok) return null;
+    
+    const payload = await res.json();
+    const categories: ApiCategory[] = payload.data || [];
+    
+    // Find the current category by slug
+    // We normalize the slug matching to be more resilient
+    const currentCategory = categories.find(c => 
+      c.slug === slug || 
+      c.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") === slug
+    );
+    
+    if (!currentCategory) return null;
+    
+    // Find subcategories
+    const subcategories = categories
+      .filter(c => c.parent_id === currentCategory.id)
+      .map(c => ({
+        name: c.name,
+        count: c.number_of_products || 0,
+        slug: c.slug
+      }));
+      
+    return {
+      ...currentCategory,
+      subcategories
+    };
+  } catch (error) {
+    console.error("Error fetching category data:", error);
+    return null;
+  }
 }
 
 export async function generateMetadata({ params }: PageProps) {
-  const category = getCategoryBySlug(params.slug);
+  const category = await getCategoryData(params.slug);
+  
   if (!category) {
     return {
       title: "Category not found | Electra",
       description: "We can't locate the requested category.",
     };
   }
+  
   return {
     title: `${category.name} | Samsung Electra`,
     description: `Browse ${category.name} products at Samsung Electra. Find ${category.subcategories.map((s) => s.name).join(", ")} and more.`,
   };
 }
 
-import { HiChevronLeft } from "react-icons/hi2";
-
-export default function CategoryPage({ params }: PageProps) {
-  const category = getCategoryBySlug(params.slug);
+export default async function CategoryPage({ params }: PageProps) {
+  const category = await getCategoryData(params.slug);
 
   if (!category) {
     notFound();

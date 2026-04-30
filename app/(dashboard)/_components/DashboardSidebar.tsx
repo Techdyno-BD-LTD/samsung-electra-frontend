@@ -37,6 +37,7 @@ const DashboardSidebar = () => {
 
   const navItems = [
     { name: "Orders", icon: <FiShoppingBag />, href: "/dashboard/orders" },
+    { name: "Profile", icon: <FiUserCheck />, href: "/dashboard/profile" },
     { name: "Shipping Address", icon: <FiMapPin />, href: "/dashboard/address" },
     { name: "Wishlist", icon: <FiHeart />, href: "/dashboard/wishlist" },
     { name: "My Offers", icon: <FiGift />, href: "/dashboard/offers" },
@@ -54,16 +55,16 @@ const DashboardSidebar = () => {
         <div className="relative w-20 h-20 mb-4">
           <div className="w-full h-full rounded-full object-cover bg-slate-100 flex items-center justify-center border-2 border-white shadow-sm overflow-hidden">
             <Image
-              src={user?.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.name || 'Guest'}`}
+              src={user?.avatar_original || user?.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.name || 'Guest'}`}
               alt="Profile"
               width={80}
               height={80}
               className="w-full h-full object-cover"
             />
           </div>
-          <button className="absolute bottom-0 right-0 bg-white w-6 h-6 rounded-full flex items-center justify-center text-[10px] text-slate-500 shadow border border-slate-100 cursor-pointer transition-transform hover:scale-110 hover:text-[#2b7fe8]" title="Edit Profile Picture">
+          <Link href="/dashboard/profile" className="absolute bottom-0 right-0 bg-white w-6 h-6 rounded-full flex items-center justify-center text-[10px] text-slate-500 shadow border border-slate-100 cursor-pointer transition-transform hover:scale-110 hover:text-[#2b7fe8]" title="Edit Profile">
             <FiCamera />
-          </button>
+          </Link>
         </div>
         <h3 className="text-lg font-semibold text-slate-900 m-0 leading-tight">{user?.name || "User Name"}</h3>
         <p className="text-[13px] text-slate-500 mb-3">{user?.email || user?.phone || "Email/Phone"}</p>

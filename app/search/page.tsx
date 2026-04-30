@@ -11,6 +11,7 @@ import { HiChevronLeft } from "react-icons/hi2";
 export default function SearchPage() {
   const searchParams = useSearchParams();
   const query = searchParams.get("q") || "";
+  const categoryId = searchParams.get("cat");
 
   return (
     <div className="mainwidth mx-auto px-4 lg:px-0">
@@ -37,7 +38,7 @@ export default function SearchPage() {
           <span className="text-slate-400">›</span>
           <span className="text-slate-700">Search Results</span>
           <span className="text-slate-400">›</span>
-          <span className="text-slate-700">"{query}"</span>
+          <span className="text-slate-700">&quot;{query}&quot;</span>
         </nav>
 
         {/* ═══════════════ MAIN LAYOUT ═══════════════ */}
@@ -64,7 +65,7 @@ export default function SearchPage() {
 
           {/* Product grid */}
           <div className="min-w-0 flex-1 lg:w-[73%]">
-            <SearchProductGrid query={query} />
+            <SearchProductGrid query={query} categoryId={categoryId} />
           </div>
         </div>
 

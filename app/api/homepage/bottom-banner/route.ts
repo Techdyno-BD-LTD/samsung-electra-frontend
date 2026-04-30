@@ -52,7 +52,7 @@ export async function GET() {
     }
 
     return NextResponse.json(payload, { status: 200 });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       {
         success: false,

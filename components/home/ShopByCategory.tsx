@@ -17,6 +17,7 @@ type ApiCategory = {
   cover_image: string | null;
   icon: string | null;
   parent_id?: number;
+  number_of_products?: number;
 };
 
 async function getCategories(): Promise<CategoryItem[]> {
@@ -35,7 +36,7 @@ async function getCategories(): Promise<CategoryItem[]> {
       id: item.id,
       name: item.name,
       slug: item.slug,
-      itemCount: "150+ Items",
+      itemCount: `${item.number_of_products || 0}+ Items`,
       imageSrc: item.cover_image || item.icon || "/images/placeholder.png",
       imageAlt: item.name,
     }));

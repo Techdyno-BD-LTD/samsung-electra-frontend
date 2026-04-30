@@ -25,6 +25,7 @@ type RecentViewedProduct = {
   discountPercent?: string;
   saveAmount?: string;
   tags?: string[];
+  id?: string | number;
 };
 
 type RecentViewedProductCardProps = {
@@ -52,6 +53,7 @@ export default function RecentViewedProductCard({ product }: RecentViewedProduct
         color: product.color,
         type: product.type,
         weight: product.weight,
+        productId: Number(product.id || 0),
       })
     );
   };

@@ -1,17 +1,41 @@
 "use client"
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 import { HiOutlineSquares2X2, HiOutlineBars3 } from "react-icons/hi2";
 import ProductCard from "@/components/common/ProductCard";
-import products from "@/database/products.json";
 import MobileFilterDrawer from "./MobileFilterDrawer";
 
 export default function CategoryProductGrid() {
+  const params = useParams();
+  const categorySlug = params.slug as string;
+  
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [sortOption, setSortOption] = useState("default");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [displayProducts, setDisplayProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Use all products for now — later this will be filtered by category
-  const displayProducts = products;
+  useEffect(() => {
+    if (!categorySlug) return;
+
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/products/category/${categorySlug}`);
+        const data = await response.json();
+        if (data.success) {
+          setDisplayProducts(data.data || []);
+        }
+      } catch (error) {
+        console.error("Error fetching category products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [categorySlug]);
+
   const totalItems = displayProducts.length;
 
   return (
@@ -144,9 +168,19 @@ export default function CategoryProductGrid() {
             : "flex flex-col gap-4"
         }
       >
-        {displayProducts.map((product) => (
-          <ProductCard key={product.id} {...product} />
-        ))}
+        {loading ? (
+          <div className="flex w-full items-center justify-center py-20 col-span-full">
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#0054A6] border-t-transparent" />
+          </div>
+        ) : displayProducts.length === 0 ? (
+          <div className="flex w-full items-center justify-center py-20 text-slate-500 col-span-full">
+            No products found in this category.
+          </div>
+        ) : (
+          displayProducts.map((product) => (
+            <ProductCard key={product.id} productData={product} />
+          ))
+        )}
       </div>
 
       {/* Filter Drawer */}

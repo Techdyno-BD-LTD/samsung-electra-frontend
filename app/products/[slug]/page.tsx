@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { FaHeart, FaMinus, FaPlus, FaRegShareSquare, FaStar, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useEffect, useState, useMemo, useRef } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 import ProductDetailsTabs from "@/components/productdetails/ProductDetailsTabs";
 import MobileProductGallery from "@/components/productdetails/MobileProductGallery";
@@ -12,7 +12,7 @@ import MobileOfferDetails from "@/components/productdetails/MobileOfferDetails";
 import MobileMadeInFeatures from "@/components/productdetails/MobileMadeInFeatures";
 import MobileBackButton from "@/components/productdetails/MobileBackButton";
 import FooterBreadcrumbPortal from "@/components/productdetails/FooterBreadcrumbPortal";
-import { useAppDispatch } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { addToCart } from "@/store/features/cart/cartSlice";
 import CartSuccessModal from "@/components/common/CartSuccessModal";
 
@@ -24,6 +24,9 @@ interface ProductData {
   category?: {
     name?: string;
     slug?: string;
+  };
+  category_info?: {
+    category_name?: string;
   };
   brand?: {
     name?: string;
@@ -126,6 +129,9 @@ interface ApiResponse {
 export default function ProductDetailsPage() {
   const params = useParams();
   const slug = params.slug as string;
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
 
   const [productData, setProductData] = useState<ProductData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -134,6 +140,7 @@ export default function ProductDetailsPage() {
   const [selectedColorName, setSelectedColorName] = useState("");
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [quantity, setQuantity] = useState(1);
   const thumbnailContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollThumbnails = (direction: 'left' | 'right') => {
@@ -145,9 +152,6 @@ export default function ProductDetailsPage() {
       });
     }
   };
-
-  const [quantity, setQuantity] = useState(1);
-  const dispatch = useAppDispatch();
 
   const handleIncrement = () => setQuantity((prev) => prev + 1);
   const handleDecrement = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
@@ -218,11 +222,10 @@ export default function ProductDetailsPage() {
     setSelectedColorName(productData.color_details?.[0]?.name ?? "");
   }, [productData]);
 
-  // Provide defaults for all props to ensure page doesn't crash
   const {
     category = productData?.category_info?.category_name || productData?.category?.name || "Product Category",
     title = productData?.name || "Product Title",
-    brand = productData?.brand?.name || "Brand",
+    brandName = productData?.brand?.name || "Brand",
     brandLogo = productData?.brand?.logo || "/images/samsung.png",
     ratingCount = productData?.rating_count?.toString() || "0",
     model = productData?.model_number || "Model",
@@ -238,7 +241,6 @@ export default function ProductDetailsPage() {
     features = productData?.tags || [],
     descriptionHtml = productData?.description || "",
     featuresList = parseHtmlFeatures(productData?.other_features) || productData?.tags || [],
-    gallery = productData?.photos?.map((p: { photo?: string; path?: string }) => p.path || p.photo || "") || [productData?.thumbnail_image || "/images/wm2.png"],
     mainImage = productData?.thumbnail_image || "/images/wm2.png",
     warrantyBadgeImage = "/images/warrantybadge.png",
     specialOfferLeft = "Special Offer",
@@ -253,78 +255,50 @@ export default function ProductDetailsPage() {
     exchangeInfo = productData?.exchange?.text ? productData.exchange.text : "Exchange information",
     exchangeLinkLabel = productData?.exchange?.link_label ? productData.exchange.link_label : "Available Showrooms",
     madeInText = productData?.made_in_text ? productData.made_in_text : "Product information",
-  } = {
-    category: productData?.category?.name || "Product Category",
-    title: productData?.name || "Product Title",
-    brand: productData?.brand?.name || "Brand",
-    brandLogo: productData?.brand?.logo || "/images/samsung.png",
-    ratingCount: productData?.rating_count?.toString() || "0",
-    model: productData?.model_number || "Model",
-    sku: productData?.variants?.[0]?.sku || "SKU",
-    price: productData?.main_price || "Price",
-    originalPrice: productData?.stroked_price || "Price",
-    discountLabel: productData?.discount || "0% Off",
-    saveLabel: productData?.discount || "Save Amount",
-    offersLabel: "View offers",
-    emiText: productData?.emi_start || "EMI Available",
-    emiDetailsLabel: productData?.emi_facility?.link_label ? productData.emi_facility.link_label : "See details",
-    colorLabel: "Color",
-    features: productData?.tags || [],
-    descriptionHtml: productData?.description || "",
-    gallery: productData?.photos?.map((p: { photo?: string; path?: string }) => p.path || p.photo || "") || [productData?.thumbnail_image || "/images/wm2.png"],
-    mainImage: productData?.thumbnail_image || "/images/wm2.png",
-    warrantyBadgeImage: "/images/warrantybadge.png",
-    specialOfferLeft: "Special Offer",
-    specialOfferOne: "Offer 1",
-    specialOfferTwo: "Offer 2",
-    showroomTitle: productData?.book_in_showroom_title ? productData.book_in_showroom_title : "Book in showroom Get 5% Off",
-    shippingInfo: productData?.estimated_shipping_text ? productData.estimated_shipping_text : "Shipping information",
-    warrantyInfo: productData?.warranty?.text ? productData.warranty.text : productData?.warranty?.warranty_type ? `Warranty: ${productData.warranty.warranty_type}` : "Warranty information",
-    warrantyLinkLabel: productData?.warranty?.link_label ? productData.warranty.link_label : "View policy",
-    emiFacilityInfo: productData?.emi_facility?.text ? productData.emi_facility.text : "EMI information",
-    emiLinkLabel: productData?.emi_facility?.link_label ? productData.emi_facility.link_label : "See EMI Details",
-    exchangeInfo: productData?.exchange?.text ? productData.exchange.text : "Exchange information",
-    exchangeLinkLabel: productData?.exchange?.link_label ? productData.exchange.link_label : "Available Showrooms",
-    madeInText: productData?.made_in_text ? productData.made_in_text : "Product information",
-  };
+  } = productData || {};
 
+  const categoryName = productData?.category_info?.category_name || 
+                       (typeof productData?.category === 'object' ? productData.category?.name : productData?.category) || 
+                       "Category";
 
-
-  const breadcrumbCategory = category
+  const breadcrumbCategory = categoryName
     .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .map((word) => (word.charAt(0) || "").toUpperCase() + word.slice(1))
     .join(" ");
-  const flatOfferPercent = discountLabel.match(/\d+%/)?.[0] ?? "0%";
+  const flatOfferPercent = (discountLabel || "0%").toString().match(/\d+%/)?.[0] ?? "0%";
 
   const attributesForUi = (productData?.attributes ?? []).filter((attribute) => {
     return (attribute.values?.length ?? 0) > 0;
   });
 
-  const variants = productData?.variants ?? [];
-  const fallbackColorDetails = (productData?.colors ?? []).map((color) => ({
+  const variants = useMemo(() => productData?.variants ?? [], [productData]);
+  const fallbackColorDetails = useMemo(() => (productData?.colors ?? []).map((color) => ({
     name: color,
     code: isHexColor(color) ? color : null,
-  }));
-  const colorsForUi = (productData?.color_details?.length ?? 0) > 0
+  })), [productData?.colors]);
+
+  const colorsForUi = useMemo(() => (productData?.color_details?.length ?? 0) > 0
     ? (productData?.color_details ?? [])
-    : fallbackColorDetails;
+    : fallbackColorDetails, [productData?.color_details, fallbackColorDetails]);
 
-  const colorOptions = colorsForUi.map((color, index) => {
-    const colorName = color.name ?? color.code ?? `Color ${index + 1}`;
-    const colorNameComparable = toComparable(color.name);
-    const matchedVariant = variants.find((variant) => {
-      const variantName = toComparable(variant.variant);
-      if (!variantName || !colorNameComparable) return false;
-      return variantName === colorNameComparable || variantName.startsWith(`${colorNameComparable}-`);
+  const colorOptions = useMemo(() => {
+    return colorsForUi.map((color, index) => {
+      const colorName = color.name ?? color.code ?? `Color ${index + 1}`;
+      const colorNameComparable = toComparable(color.name);
+      const matchedVariant = variants.find((variant) => {
+        const variantName = toComparable(variant.variant);
+        if (!variantName || !colorNameComparable) return false;
+        return variantName === colorNameComparable || variantName.startsWith(`${colorNameComparable}-`);
+      });
+
+      return {
+        key: `${colorName}-${index}`,
+        name: colorName,
+        code: color.code,
+        image: matchedVariant?.image ?? productData?.thumbnail_image ?? "/images/wm2.png",
+      };
     });
-
-    return {
-      key: `${colorName}-${index}`,
-      name: colorName,
-      code: color.code,
-      image: matchedVariant?.image ?? productData?.thumbnail_image ?? "/images/wm2.png",
-    };
-  });
+  }, [colorsForUi, variants, productData?.thumbnail_image]);
 
   const activeColorName = selectedColorName || colorOptions[0]?.name || "";
   const selectedVariant = variants.find((variant) => {
@@ -352,19 +326,18 @@ export default function ProductDetailsPage() {
     const thumb = productData?.thumbnail_image || mainImage || "/images/wm2.png";
     if (thumb) images.add(thumb);
     
-    productData?.photos?.forEach((p: any) => {
+    productData?.photos?.forEach((p: { path?: string; photo?: string }) => {
       const img = p.path || p.photo;
       if (img) images.add(img);
     });
     
-    variants?.forEach((v: any) => {
+    (productData?.variants ?? []).forEach((v: { image?: string }) => {
       if (v.image) images.add(v.image);
     });
     
     return Array.from(images);
-  }, [productData, mainImage, variants]);
+  }, [productData, mainImage]);
 
-  // Sync activeImageIndex with selectedVariant or activeColorName
   useEffect(() => {
     if (displayGallery.length === 0) return;
     const selectedImage = selectedVariant?.image || colorOptions.find((color) => toComparable(color.name) === toComparable(activeColorName))?.image;
@@ -378,7 +351,44 @@ export default function ProductDetailsPage() {
 
   const finalMainImage = displayGallery[activeImageIndex] || displayGallery[0];
 
-  // Show loading state
+  const buildCartPayload = () => {
+    const variantName = selectedVariant?.variant || activeColorName || "";
+    const uniqueId = variantName ? `${slug}-${variantName}` : (slug || title || "product");
+    return {
+      id: uniqueId,
+      slug: slug,
+      title: title || "Product",
+      brand: brandName || "Brand",
+      image: selectedVariant?.image || finalMainImage || "",
+      price: price ? String(price).split('/')[0].trim() : "0",
+      originalPrice: originalPrice ? String(originalPrice).split('/')[0].trim() : "0",
+      discountPercent: discountLabel || "0%",
+      saveAmount: saveLabel || "0",
+      color: activeColorName,
+      variant: selectedVariant?.variant || "",
+      type: category,
+      weight: productData?.weight ? `${productData.weight}kg` : "N/A",
+      quantity: quantity,
+      productId: Number(productData?.id || 0),
+    };
+  };
+
+  const handleAddToCart = () => {
+    if (!productData) return;
+    dispatch(addToCart(buildCartPayload()));
+    setShowSuccessModal(true);
+  };
+
+  const handleBuyNow = () => {
+    if (!productData) return;
+    dispatch(addToCart(buildCartPayload()));
+    if (!isAuthenticated) {
+      router.push("/login?redirect=/checkout");
+    } else {
+      router.push("/checkout");
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -390,7 +400,6 @@ export default function ProductDetailsPage() {
     );
   }
 
-  // Show error state
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -402,32 +411,8 @@ export default function ProductDetailsPage() {
     );
   }
 
-  const handleAddToCart = () => {
-    const variantName = selectedVariant?.variant || activeColorName || "";
-    const uniqueId = variantName ? `${slug}-${variantName}` : (slug || title || "product");
-    
-    dispatch(addToCart({
-      id: uniqueId,
-      slug: slug,
-      title: title || "Product",
-      brand: brand || "Brand",
-      image: selectedVariant?.image || finalMainImage || "",
-      price: price ? String(price).split('/')[0].trim() : "0",
-      originalPrice: originalPrice ? String(originalPrice).split('/')[0].trim() : "0",
-      discountPercent: discountLabel || "0%",
-      saveAmount: saveLabel || "0",
-      color: activeColorName,
-      variant: selectedVariant?.variant || "",
-      type: category,
-      weight: productData?.weight ? `${productData.weight}kg` : "N/A",
-      quantity: quantity,
-    }));
-    setShowSuccessModal(true);
-  };
-
   return (
     <div className="pb-[118px] md:pb-0 ">
-      {/* Product Image and Buy now Section */}
       <section className="  mt-16  ">
         <div className="mb-3 px-4 lg:hidden">
           <MobileBackButton />
@@ -529,12 +514,12 @@ export default function ProductDetailsPage() {
             </div>
 
             <div className="w-full lg:space-y-3 space-y-2  lg:w-[47%]">
-              <p className="text-[12px] lg:text-[18px]  text-slate-600">{category}</p>
+              <p className="text-[12px] lg:text-[18px]  text-slate-600">{categoryName}</p>
               <h1 className="text-[16px] lg:text-3xl font-semibold leading-tight text-slate-900">{title}</h1>
 
               <div className="space-y-1 text-[12px] text-slate-500 lg:hidden">
                 <div className="flex items-center gap-2 whitespace-nowrap">
-                  <Image src={brandLogo} alt={brand} width={60} height={24} className="h-4 w-auto object-contain" />
+                  <Image src={brandLogo} alt={brandName} width={60} height={24} className="h-4 w-auto object-contain" />
                   <div className="flex items-center gap-0.5 text-[#F59E0B]">
                     <FaStar className="h-2.5 w-2.5" />
                     <FaStar className="h-2.5 w-2.5" />
@@ -555,7 +540,7 @@ export default function ProductDetailsPage() {
               </div>
 
               <div className="hidden flex-wrap items-center gap-3 text-sm text-slate-500 lg:flex">
-                <Image src={brandLogo} alt={brand} width={60} height={24} className="h-6 w-auto object-contain" />
+                <Image src={brandLogo} alt={brandName} width={60} height={24} className="h-6 w-auto object-contain" />
                 <div className="flex items-center gap-1 text-[#F59E0B]">
                   <FaStar className="h-3 w-3" />
                   <FaStar className="h-3 w-3" />
@@ -585,26 +570,25 @@ export default function ProductDetailsPage() {
               </div>
 
               <div className="hidden flex-wrap items-center gap-8 lg:flex">
-  <p className="text-4xl font-medium text-[#0C73DA]">{price}</p>
-  
-  <div className="flex flex-col items-center">
-    <p className="text-base font-semibold text-[#15A85B]">{discountLabel}</p>
-    <p className="text-md text-slate-400 line-through">{originalPrice}</p>
-  </div>
+                <p className="text-4xl font-medium text-[#0C73DA]">{price}</p>
+                
+                <div className="flex flex-col items-center">
+                  <p className="text-base font-semibold text-[#15A85B]">{discountLabel}</p>
+                  <p className="text-md text-slate-400 line-through">{originalPrice}</p>
+                </div>
 
-  {/* Updated Section Below */}
-  <span className="rounded-tl-3xl rounded-br-3xl bg-[#F13D36] px-6 py-1 text-sm font-semibold text-white">
-  SAVE : { (Number(originalPrice.replace(/[^0-9.-]+/g, "")) - Number(price.replace(/[^0-9.-]+/g, ""))).toFixed(2) }
-</span>
+                <span className="rounded-tl-3xl rounded-br-3xl bg-[#F13D36] px-6 py-1 text-sm font-semibold text-white">
+                  SAVE : { (Number(originalPrice.replace(/[^0-9.-]+/g, "")) - Number(price.replace(/[^0-9.-]+/g, ""))).toFixed(2) }
+                </span>
 
-  <button type="button" className="text-sm font-semibold text-[#0C73DA]">
-    {offersLabel}
-  </button>
-</div>
+                <button type="button" className="text-sm font-semibold text-[#0C73DA]">
+                  {offersLabel}
+                </button>
+              </div>
 
               <div className="flex items-center  gap-2 border-b border-slate-200 pb-3 text-[12px] lg:text-[16px] text-slate-700">
                 <Image src="/images/EMI.png" alt="EMI" width={20} height={20} className="lg:h-5 h-4 w-4 lg:w-5 object-contain" />
-                 EMI Starts From <span >{emiText}</span>
+                  EMI Starts From <span >{emiText}</span>
                 <button type="button" className="font-semibold text-[#0C73DA]">
                   | {emiDetailsLabel}
                 </button>
@@ -688,7 +672,6 @@ export default function ProductDetailsPage() {
                 )}
               </div>
 
-              {/* Mobile-only offer/actions layout */}
               <div className="flex items-start gap-2 lg:hidden">
                 <div className="relative h-[55px] w-[65px] overflow-hidden rounded-lg">
                   <Image
@@ -737,8 +720,6 @@ export default function ProductDetailsPage() {
                       Share
                     </button>
                   </div>
-
-
                 </div>
               </div>
 
@@ -763,7 +744,6 @@ export default function ProductDetailsPage() {
                     </div>
                   </div>
                 </div>
-
 
                 <div className="flex-1 space-y-2">
                   <div className="flex flex-wrap items-center gap-4 lg:flex-nowrap">
@@ -792,7 +772,11 @@ export default function ProductDetailsPage() {
                   </div>
 
                   <div className="sm:grid gap-3 sm:grid-cols-2 hidden ">
-                    <button type="button" className="rounded-full bg-[#2F7FE8] py-1 text-[14px] font-semibold leading-none text-white">
+                    <button
+                      type="button"
+                      onClick={handleBuyNow}
+                      className="h-[34px] rounded-full bg-[#0081FF] px-4 text-[12px] font-medium text-white whitespace-nowrap active:bg-[#006ED9]"
+                    >
                       Buy Now
                     </button>
                     <button type="button" onClick={handleAddToCart} className="flex items-center justify-center gap-3 rounded-full border border-[#9CB7D8] py-1 text-[14px] font-semibold leading-none text-slate-900">
@@ -872,7 +856,6 @@ export default function ProductDetailsPage() {
 
               <div className="hidden lg:block lg:space-y-2 lg:border-b lg:border-slate-200 lg:pb-3 lg:text-xs lg:text-slate-600 lg:md:text-sm">
                 <p className="flex items-center gap-5">
-                 
                   <Image src="/images/shippingtime.png" alt="Shipping time" width={24} height={24} unoptimized className="h-7 w-7 object-contain" />
                   <span>Shipping Timeline:</span>{shippingInfo}
                 </p>
@@ -903,8 +886,6 @@ export default function ProductDetailsPage() {
         </div>
       </section>
 
-      {/* Detailed Product Details */}
-
       <ProductDetailsTabs
         title={`${title} | ${model}`}
         descriptionHtml={descriptionHtml}
@@ -915,7 +896,7 @@ export default function ProductDetailsPage() {
         reviews={productData?.reviews}
       />
 
-      <MobileStickyPurchaseBar
+      <MobileStickyPurchaseBar 
         productData={productData || undefined}
         availability={selectedAvailability}
         price={price}

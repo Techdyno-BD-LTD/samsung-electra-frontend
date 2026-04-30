@@ -13,7 +13,7 @@ const Success = () => {
         return (
             <div className="max-w-7xl mx-auto px-4 py-20 text-center">
                 <h1 className="text-2xl font-semibold mb-4">No order found</h1>
-                <button 
+                <button
                     onClick={() => router.push('/')}
                     className="bg-[#1877f2] text-white px-6 py-2 rounded-lg"
                 >
@@ -118,17 +118,10 @@ const Success = () => {
                             <span className="font-normal">Save</span>
                             <span className="font-normal text-gray-900 text-[16px]">৳{lastOrder.savings.toLocaleString()}</span>
                         </div>
-                        <div className="flex justify-between items-center text-gray-600 font-normal">
-                            <span className="font-normal">Store Pickup</span>
-                            <span className="font-normal text-gray-900 text-[16px]">Free</span>
-                        </div>
-                        <div className="flex justify-between items-center text-gray-600 font-normal">
-                            <span className="font-normal">TAX</span>
-                            <span className="font-normal text-gray-900 text-[16px]">Free</span>
-                        </div>
+
                         <div className="flex justify-between items-center text-gray-600 font-normal">
                             <span className="font-normal">Delivery</span>
-                            <span className="font-normal text-gray-900 text-[16px]">Free/ Charge</span>
+                            <span className="font-normal text-gray-900 text-[16px]">৳{lastOrder.delivery.toLocaleString()}</span>
                         </div>
                         <div className="flex justify-between items-center text-gray-600 font-normal">
                             <span className="font-normal">Coupon Code</span>

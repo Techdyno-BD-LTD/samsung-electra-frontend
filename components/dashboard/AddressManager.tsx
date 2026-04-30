@@ -1,18 +1,22 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { FiEdit, FiTrash2, FiPlus } from "react-icons/fi";
+import React, { useState, useEffect, useCallback } from "react";
+import { FiEdit, FiTrash2, FiPlus, FiChevronDown } from "react-icons/fi";
 import { useAppSelector } from "@/store/hooks";
 
 interface Address {
   id: number;
   user_id: number;
+  name: string;
+  email: string;
   address: string;
   phone: string;
   postal_code: string;
   set_default: number;
   city_id?: number;
   state_id?: number;
+  area_id?: number;
+  area?: string;
   country_id?: number;
 }
 
@@ -24,13 +28,23 @@ export default function AddressManager() {
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
 
   const [formData, setFormData] = useState({
+    name: user?.name || "",
+    email: user?.email || "",
     address: "",
-    phone: "",
+    phone: user?.phone || "",
     postal_code: "",
+    country_id: "",
+    state_id: "",
+    city_id: "",
+    area_id: "",
+    area: "",
     set_default: 0
   });
 
-  const fetchAddresses = async () => {
+  const [districts, setDistricts] = useState<any[]>([]);
+  const [thanas, setThanas] = useState<any[]>([]);
+
+  const fetchAddresses = useCallback(async () => {
     if (!token) return;
     try {
       const response = await fetch("/api/v2/user/shipping/address", {
@@ -47,11 +61,33 @@ export default function AddressManager() {
     } finally {
       setLoading(false);
     }
+  }, [token]);
+
+  const fetchDistricts = useCallback(async () => {
+    try {
+      const response = await fetch("/api/v2/districts");
+      const payload = await response.json();
+      if (payload.success) setDistricts(payload.data);
+    } catch (error) {
+      console.error("Failed to fetch districts", error);
+    }
+  }, []);
+
+  const fetchThanas = async (districtId: string) => {
+    if (!districtId) return;
+    try {
+      const response = await fetch(`/api/v2/thanas-by-district/${districtId}`);
+      const payload = await response.json();
+      if (payload.success) setThanas(payload.data);
+    } catch (error) {
+      console.error("Failed to fetch thanas", error);
+    }
   };
 
   useEffect(() => {
     fetchAddresses();
-  }, [token]);
+    fetchDistricts();
+  }, [fetchAddresses, fetchDistricts]);
 
   const handleDelete = async (id: number) => {
     if (!confirm("Are you sure you want to delete this address?")) return;
@@ -93,7 +129,17 @@ export default function AddressManager() {
         fetchAddresses();
         setShowModal(false);
         setEditingAddress(null);
-        setFormData({ address: "", phone: "", postal_code: "", set_default: 0 });
+        setFormData({ 
+          name: user?.name || "", 
+          email: user?.email || "", 
+          address: "", 
+          phone: user?.phone || "", 
+          postal_code: "", 
+          state_id: "",
+          city_id: "",
+          area_id: "",
+          set_default: 0 
+        });
       }
     } catch (error) {
       console.error("Failed to save address", error);
@@ -103,11 +149,18 @@ export default function AddressManager() {
   const openEdit = (address: Address) => {
     setEditingAddress(address);
     setFormData({
+      name: address.name || user?.name || "",
+      email: address.email || user?.email || "",
       address: address.address,
       phone: address.phone,
       postal_code: address.postal_code,
+      state_id: address.state_id?.toString() || "",
+      city_id: address.city_id?.toString() || "",
+      area_id: address.area_id?.toString() || "",
+      area: address.area || "",
       set_default: address.set_default
     });
+    if (address.country_id) fetchThanas(address.country_id.toString());
     setShowModal(true);
   };
 
@@ -118,13 +171,24 @@ export default function AddressManager() {
       <div className="bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-black/5 overflow-hidden">
         <div className="p-6 lg:p-6 border-b border-slate-100 flex justify-between items-center">
           <h2 className="text-xl lg:text-2xl font-semibold text-slate-800">Manage Addresses</h2>
-          <button 
+            <button 
             onClick={() => {
               setEditingAddress(null);
-              setFormData({ address: "", phone: "", postal_code: "", set_default: 0 });
+              setFormData({ 
+                name: user?.name || "", 
+                email: user?.email || "", 
+                address: "", 
+                phone: user?.phone || "", 
+                postal_code: "", 
+                state_id: "",
+                city_id: "",
+                area_id: "",
+                area: "",
+                set_default: 0 
+              });
               setShowModal(true);
             }}
-            className="bg-[#2b7fe8] text-white px-6 py-2 rounded-full font-semibold flex items-center gap-2 hover:bg-[#1a6ed9] transition-all"
+            className="bg-[#1877f2] text-white px-6 py-2 rounded-full font-semibold flex items-center gap-2 hover:bg-blue-600 transition-all"
           >
             <FiPlus /> Add new address
           </button>
@@ -140,13 +204,13 @@ export default function AddressManager() {
               <div key={addr.id} className="flex flex-col lg:flex-row items-center justify-between gap-6 bg-gray-50 rounded-xl p-6 border border-gray-100">
                 <div className="flex-1 w-full">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-lg font-semibold text-slate-900">{user?.name}</h3>
+                    <h3 className="text-lg font-semibold text-slate-900">{addr.name || user?.name}</h3>
                     {addr.set_default === 1 && (
                       <span className="bg-blue-100 text-blue-600 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Default</span>
                     )}
                   </div>
                   <p className="text-sm text-slate-700 mb-1">{addr.phone}</p>
-                  <p className="text-sm text-slate-700 mb-1">{user?.email}</p>
+                  <p className="text-sm text-slate-700 mb-1">{addr.email || user?.email}</p>
                   <p className="text-sm text-slate-600 leading-relaxed">
                     {addr.address}, {addr.postal_code}
                   </p>
@@ -182,17 +246,32 @@ export default function AddressManager() {
               </h3>
             </div>
             <form onSubmit={handleSave} className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1.5">Detailed Address</label>
-                <textarea
-                  required
-                  value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  placeholder="Street, House No, Area..."
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#2b7fe8]/20 focus:border-[#2b7fe8] transition-all outline-none min-h-[100px]"
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1.5">Full Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="Enter full name"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 h-12 text-sm focus:ring-2 focus:ring-[#2b7fe8]/20 focus:border-[#2b7fe8] transition-all outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1.5">Email Address</label>
+                  <input
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    placeholder="Enter email"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 h-12 text-sm focus:ring-2 focus:ring-[#2b7fe8]/20 focus:border-[#2b7fe8] transition-all outline-none"
+                  />
+                </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-1.5">Phone Number</label>
                   <input
@@ -216,6 +295,76 @@ export default function AddressManager() {
                   />
                 </div>
               </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1.5">Street Address / House / Road</label>
+                <input
+                  type="text"
+                  required
+                  value={formData.address}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  placeholder="e.g. 123 Street Name"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 h-12 text-sm focus:ring-2 focus:ring-[#2b7fe8]/20 focus:border-[#2b7fe8] transition-all outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1.5">District</label>
+                  <div className="relative">
+                    <select
+                      required
+                      value={formData.country_id}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setFormData({ ...formData, country_id: val, state_id: "" });
+                        fetchThanas(val);
+                      }}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 h-12 text-sm focus:ring-2 focus:ring-[#2b7fe8]/20 focus:border-[#2b7fe8] transition-all outline-none appearance-none"
+                    >
+                      <option value="">Select District</option>
+                      {districts.map((d: any) => (
+                        <option key={d.id} value={d.id}>{d.name}</option>
+                      ))}
+                    </select>
+                    <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1.5">Thana / Upazilla</label>
+                  <div className="relative">
+                    <select
+                      required
+                      value={formData.state_id}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setFormData({ ...formData, state_id: val });
+                      }}
+                      disabled={!formData.country_id}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 h-12 text-sm focus:ring-2 focus:ring-[#2b7fe8]/20 focus:border-[#2b7fe8] transition-all outline-none appearance-none disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    >
+                      <option value="">Select Thana</option>
+                      {thanas.map((t: any) => (
+                        <option key={t.id} value={t.id}>{t.name}</option>
+                      ))}
+                    </select>
+                    <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1.5">Area</label>
+                <input
+                  type="text"
+                  required
+                  value={formData.area}
+                  onChange={(e) => setFormData({ ...formData, area: e.target.value })}
+                  placeholder="Enter area"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 h-12 text-sm focus:ring-2 focus:ring-[#2b7fe8]/20 focus:border-[#2b7fe8] transition-all outline-none"
+                />
+              </div>
+
               <div className="flex items-center gap-2 pt-2">
                 <input
                   type="checkbox"

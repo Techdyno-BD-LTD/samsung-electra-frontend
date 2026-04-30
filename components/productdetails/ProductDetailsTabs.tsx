@@ -1,7 +1,8 @@
 'use client';
 
-import Image from 'next/image';
+
 import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import popularProducts from '@/database/popularproducts.json';
 import RecentViewedProductCard from '@/components/productdetails/RecentViewedProductCard';
 
@@ -187,20 +188,19 @@ export default function ProductDetailsTabs({
 
           <div className="px-2 pb-3 pt-3 sm:px-3 sm:pb-4 sm:pt-4">
             <div className="mb-5 grid grid-cols-5 gap-1.5 sm:mb-6 sm:gap-2.5 lg:mb-8 lg:gap-3">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => scrollToSection(tab.ref)}
-                className={`w-full min-w-0 truncate whitespace-nowrap rounded-md px-0.5 py-1.5 text-center text-[10px] font-semibold leading-tight transition sm:px-1 sm:text-[11px] lg:rounded-lg lg:px-0 lg:py-3 lg:text-sm ${
-                  activeTab === tab.id
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => scrollToSection(tab.ref)}
+                  className={`w-full min-w-0 truncate whitespace-nowrap rounded-md px-0.5 py-1.5 text-center text-[10px] font-semibold leading-tight transition sm:px-1 sm:text-[11px] lg:rounded-lg lg:px-0 lg:py-3 lg:text-sm ${activeTab === tab.id
                     ? 'bg-black text-white'
                     : 'bg-slate-100 text-slate-800 hover:bg-slate-200'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
+                    }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
             </div>
 
             <div className="space-y-10">
@@ -275,7 +275,7 @@ export default function ProductDetailsTabs({
 
                       return (
                         <article key={`${featureTitle}-${index}`} className="rounded border border-slate-200 bg-white p-4 shadow-sm">
-                          <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
+                          <div className="flex flex-col gap-4  lg:items-start">
                             <div>
                               <h3 className="mb-1.5 text-[16px] font-semibold sm:text-[20px] lg:text-[24px]">
                                 {featureTitle}
@@ -289,13 +289,14 @@ export default function ProductDetailsTabs({
                                   Feature description is not available right now.
                                 </p>
                               )}
+                              {featureImage ? (
+                                <div className="relative mt-5 h-96 w-full overflow-hidden">
+                                  <Image src={featureImage} alt={featureTitle} fill className="object-fit" />
+                                </div>
+                              ) : null}
                             </div>
 
-                            {featureImage ? (
-                              <div className="overflow-hidden rounded-sm border border-slate-200 bg-slate-50">
-                                <img src={featureImage} alt={featureTitle} className="h-full w-full object-cover" />
-                              </div>
-                            ) : null}
+
                           </div>
                         </article>
                       );

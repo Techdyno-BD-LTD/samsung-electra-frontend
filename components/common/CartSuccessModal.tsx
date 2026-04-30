@@ -24,7 +24,7 @@ export default function CartSuccessModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/10  p-4 animate-in fade-in duration-300">
       <div className="relative w-full max-w-[450px] rounded-md bg-white px-6 py-8 shadow-xl animate-in zoom-in-95 slide-in-from-bottom-4 duration-300 ease-out">
         <button
           onClick={onClose}
@@ -42,10 +42,10 @@ export default function CartSuccessModal({
 
         <div className="flex items-center gap-6 mb-8 px-4">
           <div className="relative h-20 w-16 flex-shrink-0">
-            <Image 
-              src={productImage || "/images/wm2.png"} 
-              alt={productName} 
-              fill 
+            <Image
+              src={productImage || "/images/wm2.png"}
+              alt={productName}
+              fill
               className="object-contain"
             />
           </div>

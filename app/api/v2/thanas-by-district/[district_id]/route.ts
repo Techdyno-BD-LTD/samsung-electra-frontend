@@ -2,23 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(req: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { district_id: string } }
+) {
   const baseUrl = process.env.API_BASE_URL;
   const systemKey = process.env.API_SYSTEM_KEY;
-  const authHeader = req.headers.get("authorization");
+  const districtId = params.district_id;
 
   if (!baseUrl || !systemKey) {
     return NextResponse.json({ success: false, message: "Server config error" }, { status: 500 });
   }
 
   try {
-    const response = await fetch(`${baseUrl}/api/v2/user/shipping/address`, {
-      method: "GET",
-      headers: {
-        "x-system-key": systemKey,
-        ...(authHeader ? { "authorization": authHeader } : {}),
-      },
-      cache: "no-store",
+    const response = await fetch(`${baseUrl}/api/v2/states-by-country/${districtId}`, {
+      headers: { "x-system-key": systemKey },
     });
 
     const data = await response.json();

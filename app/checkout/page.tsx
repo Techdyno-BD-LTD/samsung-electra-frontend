@@ -1,5 +1,5 @@
 "use client"
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { FiChevronRight, FiEdit, FiChevronDown } from 'react-icons/fi';
 // import { HiOutlineTicket } from "react-icons/hi2";
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
@@ -19,19 +19,32 @@ const Checkout = () => {
     const [addresses, setAddresses] = useState<any[]>([]);
     const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
     const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
-    const [addressForm, setAddressForm] = useState({ address: '', phone: '', postal_code: '' });
+    const [addressForm, setAddressForm] = useState({
+        name: user?.name || '',
+        email: user?.email || '',
+        phone: user?.phone || '',
+        address: '',
+        postal_code: '',
+        country_id: '',
+        state_id: '',
+        area: '',
+    });
+
+    const [districts, setDistricts] = useState<any[]>([]);
+    const [thanas, setThanas] = useState<any[]>([]);
 
     const [paymentMethod, setPaymentMethod] = useState('Online Payment Gateway');
     const [carriers, setCarriers] = useState<any[]>([]);
     const [selectedCarrierId, setSelectedCarrierId] = useState<number | null>(null);
     const [paymentTypes, setPaymentTypes] = useState<{ online: any[], offline: any[] }>({ online: [], offline: [] });
     const [deliveryNote, setDeliveryNote] = useState('');
+    const [agreedToTerms, setAgreedToTerms] = useState(true);
 
     useEffect(() => {
         setMounted(true);
     }, []);
 
-    const fetchAddresses = async () => {
+    const fetchAddresses = useCallback(async () => {
         if (!token) return;
         try {
             const response = await fetch("/api/v2/user/shipping/address", {
@@ -40,16 +53,42 @@ const Checkout = () => {
             const payload = await response.json();
             if (payload.success) {
                 setAddresses(payload.data);
-                const defaultAddr = payload.data.find((a: any) => a.set_default === 1);
+                const defaultAddr = (payload.data as { id: number; set_default: number }[]).find((a) => a.set_default === 1);
                 if (defaultAddr) setSelectedAddressId(defaultAddr.id);
                 else if (payload.data.length > 0) setSelectedAddressId(payload.data[0].id);
             }
         } catch (error) {
             console.error("Failed to fetch addresses", error);
         }
+    }, [token]);
+
+    const fetchDistricts = useCallback(async () => {
+        try {
+            const response = await fetch("/api/v2/districts");
+            const payload = await response.json();
+            if (payload.success) setDistricts(payload.data);
+        } catch (error) {
+            console.error("Failed to fetch districts", error);
+        }
+    }, []);
+
+    const fetchThanas = async (districtId: string) => {
+        if (!districtId) return;
+        try {
+            const response = await fetch(`/api/v2/thanas-by-district/${districtId}`);
+            const payload = await response.json();
+            if (payload.success) setThanas(payload.data);
+        } catch (error) {
+            console.error("Failed to fetch thanas", error);
+        }
     };
 
-    const fetchCarriers = async () => {
+    useEffect(() => {
+        fetchAddresses();
+        fetchDistricts();
+    }, [fetchAddresses, fetchDistricts]);
+
+    const fetchCarriers = useCallback(async () => {
         try {
             const response = await fetch("/api/v2/carriers");
             const payload = await response.json();
@@ -60,9 +99,9 @@ const Checkout = () => {
         } catch (error) {
             console.error("Failed to fetch carriers", error);
         }
-    };
+    }, []);
 
-    const fetchPaymentTypes = async () => {
+    const fetchPaymentTypes = useCallback(async () => {
         try {
             const response = await fetch("/api/v2/payment-types");
             const payload = await response.json();
@@ -72,15 +111,25 @@ const Checkout = () => {
         } catch (error) {
             console.error("Failed to fetch payment types", error);
         }
-    };
+    }, []);
 
     useEffect(() => {
         if (mounted) {
             fetchCarriers();
             fetchPaymentTypes();
-            if (token) fetchAddresses();
         }
-    }, [mounted, token]);
+    }, [mounted, fetchCarriers, fetchPaymentTypes]);
+
+    useEffect(() => {
+        if (user) {
+            setAddressForm(prev => ({
+                ...prev,
+                name: user.name || '',
+                email: user.email || '',
+                phone: user.phone || ''
+            }));
+        }
+    }, [user]);
 
     const handleAddAddress = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -95,18 +144,30 @@ const Checkout = () => {
             });
             const payload = await response.json();
             if (payload.success) {
-                fetchAddresses();
+                await fetchAddresses();
                 setIsAddressModalOpen(false);
-                setAddressForm({ address: '', phone: '', postal_code: '' });
+                if (payload.data && payload.data.id) {
+                    setSelectedAddressId(payload.data.id);
+                }
+                setAddressForm({
+                    name: user?.name || '',
+                    email: user?.email || '',
+                    phone: user?.phone || '',
+                    address: '',
+                    postal_code: '',
+                    country_id: '',
+                    state_id: '',
+                    area: '',
+                });
             }
         } catch (error) {
             console.error("Failed to create address", error);
         }
     };
 
-    const selectedAddress = useMemo(() => 
-        addresses.find(a => a.id === selectedAddressId), 
-    [addresses, selectedAddressId]);
+    const selectedAddress = useMemo(() =>
+        (addresses as { id: number; address: string; phone: string; postal_code: string; name: string; email: string }[]).find(a => a.id === selectedAddressId),
+        [addresses, selectedAddressId]);
 
     // Sync Cart Images and Variants
     useEffect(() => {
@@ -114,29 +175,29 @@ const Checkout = () => {
 
         const syncCartImages = async () => {
             const uniqueSlugs = Array.from(new Set(cartItems.map(item => item.slug).filter(Boolean)));
-            
+
             for (const slug of uniqueSlugs) {
                 try {
                     const response = await fetch(`/api/products/${slug}`);
                     if (!response.ok) continue;
                     const data = await response.json();
-                    
+
                     if (data.success && data.data && data.data.length > 0) {
                         const product = data.data[0];
                         const variants = product.variants || [];
-                        
+
                         const itemsToUpdate = cartItems.filter(item => item.slug === slug);
-                        
+
                         for (const item of itemsToUpdate) {
-                            const matchedVariant = variants.find((v: any) => 
+                            const matchedVariant = variants.find((v: { variant?: string; image?: string }) =>
                                 v.variant?.trim().toLowerCase() === item.variant?.trim().toLowerCase() ||
                                 v.variant?.trim().toLowerCase() === item.color?.trim().toLowerCase()
                             );
-                            
+
                             if (matchedVariant && matchedVariant.image && matchedVariant.image !== item.image) {
-                                dispatch(updateItemDetails({ 
-                                    id: item.id, 
-                                    updates: { image: matchedVariant.image } 
+                                dispatch(updateItemDetails({
+                                    id: item.id,
+                                    updates: { image: matchedVariant.image }
                                 }));
                             }
                         }
@@ -148,15 +209,15 @@ const Checkout = () => {
         };
 
         syncCartImages();
-    }, [mounted, cartItems.length, dispatch]);
+    }, [mounted, cartItems, dispatch]);
 
     const totals = useMemo(() => {
         const subtotal = cartItems.reduce((acc, item) => acc + (parseCurrency(item.price) * item.quantity), 0);
         const originalSubtotal = cartItems.reduce((acc, item) => acc + (parseCurrency(item.originalPrice) * item.quantity), 0);
         const savings = originalSubtotal - subtotal;
         const tax = 0; // Assuming tax is free/0 as per UI
-        
-        const carrier = carriers.find(c => c.id === selectedCarrierId);
+
+        const carrier = (carriers as { id: number; cost: string }[]).find(c => c.id === selectedCarrierId);
         const delivery = carrier ? (Number(carrier.cost) || 0) : 0;
         const total = subtotal + tax + delivery;
 
@@ -194,6 +255,8 @@ const Checkout = () => {
                 })),
                 shipping_address: selectedAddress,
                 shipping_type: "home_delivery",
+                carrier_id: selectedCarrierId,
+                shipping_cost: totals.delivery,
                 payment_type: paymentMethod === 'Cash On Delivery' ? 'cod' : 'online',
                 coupon_discount: 0,
                 order_from: "web"
@@ -212,7 +275,7 @@ const Checkout = () => {
 
             if (data.success || data.result) {
                 const orderId = data.code || `#${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
-                
+
                 dispatch(setLastOrder({
                     orderId,
                     paymentMethod: paymentMethod,
@@ -236,279 +299,295 @@ const Checkout = () => {
         }
     };
 
+    if (!mounted) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#1877f2]"></div>
+            </div>
+        );
+    }
+
     return (
         <>
-            <div className="px-2 mt-10 ">
-            {/* Breadcrumb */}
-            <nav className="text-sm text-gray-400 mb-2 flex items-center space-x-2">
-                <span className="cursor-pointer hover:text-gray-900" onClick={() => router.push('/')}>Home</span>
-                <FiChevronRight className="w-4 h-4" />
-                <span className="text-gray-800 font-medium">Cart</span>
-                <FiChevronRight className="w-4 h-4" />
-                <span className="cursor-pointer hover:text-gray-900">Checkout</span>
+            <div className="px-2 mt-16 ">
+                {/* Breadcrumb */}
+                <nav className="text-sm text-gray-400 mb-2 flex items-center space-x-2">
+                    <span className="cursor-pointer hover:text-gray-900" onClick={() => router.push('/')}>Home</span>
+                    <FiChevronRight className="w-4 h-4" />
+                    <span className="text-gray-800 font-medium">Cart</span>
+                    <FiChevronRight className="w-4 h-4" />
+                    <span className="cursor-pointer hover:text-gray-900">Checkout</span>
 
-            </nav>
+                </nav>
 
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-                {/* Left Column */}
-                <div className="lg:col-span-3 flex flex-col gap-6 lg:gap-10">
-                    <section>
-                        <h2 className="lg:text-[24px] text-[18px] font-semibold lg:mb-6 mb-2 text-gray-900 tracking-wide">Shipping Address</h2>
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                    {/* Left Column */}
+                    <div className="lg:col-span-3 flex flex-col gap-6 lg:gap-10">
+                        <section>
+                            <h2 className="lg:text-[24px] text-[18px] font-semibold lg:mb-6 mb-2 text-gray-900 tracking-wide">Shipping Address</h2>
 
-                        {!isAuthenticated ? (
-                            <div className="border border-gray-200 rounded-xl p-3 lg:p-4 flex flex-col lg:flex-row justify-between items-center gap-4 mb-6">
-                                <span className="text-[#a1a1aa] font-medium text-[12px] lg:text-[14px] text-center lg:text-left">Add an address or login to use saved address</span>
-                                <div className="flex space-x-3 w-full md:w-auto">
-                                    <button onClick={() => router.push('/login')} className="flex-1 md:flex-none border border-[#1877f2] text-[#1877f2] rounded-full lg:px-16 lg:py-1 py-1.5 font-medium hover:bg-blue-50 transition-colors text-[11px] lg:text-[15px]">Login</button>
-                                    <button onClick={() => router.push('/login')} className="flex-1 md:flex-none bg-[#1877f2] text-white rounded-full lg:px-10 py-1.5 font-medium hover:bg-blue-600 transition-colors w-max text-[11px] lg:text-[15px]">Add new address</button>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="border border-gray-200 rounded-xl p-2 lg:p-3">
-                                {addresses.length > 0 ? (
-                                    <>
-                                        <div className="bg-[#f8f9fa] border border-gray-100 rounded-xl p-3 mb-4 lg:mb-6">
-                                            <div className="flex justify-between lg:items-start items-center mb-1">
-                                                <h3 className="font-semibold text-gray-900 text-[15px] lg:text-[17px]">{user?.name}</h3>
-                                                <button onClick={() => setIsAddressModalOpen(true)} className="text-[#1877f2] flex items-center text-[12px] lg:text-[15px] font-semibold hover:underline">
-                                                    Change / Add <FiEdit className="ml-1.5 w-4 h-4" />
-                                                </button>
-                                            </div>
-                                            <div className="space-y-1 text-[12px] lg:text-[15px] text-gray-700 max-w-3xl leading-relaxed">
-                                                {selectedAddress ? (
-                                                    <>
-                                                        <p>{selectedAddress.address}, {selectedAddress.postal_code}</p>
-                                                        <p>Phone: {selectedAddress.phone}</p>
-                                                        <p>Email: {user?.email}</p>
-                                                    </>
-                                                ) : (
-                                                    <p className="text-orange-500">Please select or add a shipping address</p>
-                                                )}
-                                            </div>
-                                        </div>
-                                        
-                                        {/* Address Selector */}
-                                        <div className="flex gap-3 overflow-x-auto pb-2 mb-4 no-scrollbar">
-                                            {addresses.map(addr => (
-                                                <button
-                                                    key={addr.id}
-                                                    onClick={() => setSelectedAddressId(addr.id)}
-                                                    className={`flex-shrink-0 px-4 py-2 rounded-lg border text-xs font-medium transition-all ${selectedAddressId === addr.id 
-                                                        ? 'bg-blue-50 border-[#1877f2] text-[#1877f2]' 
-                                                        : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'}`}
-                                                >
-                                                    {addr.address.slice(0, 20)}...
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </>
-                                ) : (
-                                    <div className="text-center py-6">
-                                        <p className="text-gray-500 mb-4 text-sm">No addresses found</p>
-                                        <button onClick={() => setIsAddressModalOpen(true)} className="bg-[#1877f2] text-white rounded-full px-8 py-2 font-medium hover:bg-blue-600 transition-colors text-sm">Add new address</button>
-                                    </div>
-                                )}
-
-                                {/* Checkbox */}
-                                <label className="inline-flex items-center space-x-3 cursor-pointer group mb-1">
-                                    <input type="checkbox" className="rounded border-gray-300 text-blue-500 focus:ring-blue-500 w-3.5 h-3.5 lg:w-5 lg:h-5 cursor-pointer" />
-                                    <span className="text-gray-700 text-[12px] lg:text-[15px] font-medium group-hover:text-gray-900 transition-colors">Use a different billing address</span>
-                                </label>
-                            </div>
-                        )}
-
-                    </section>
-
-                    <section>
-                        <h2 className="lg:text-[24px] text-[18px] font-semibold mb-6 text-gray-900 tracking-wide">Shipping Method</h2>
-                        <div className="border border-gray-200 rounded-xl bg-white overflow-hidden mb-6">
-                            {carriers.map((carrier) => (
-                                <div key={carrier.id} className="p-4 lg:p-6 border-b border-gray-100 last:border-0">
-                                    <label className="flex items-center space-x-3 cursor-pointer group">
-                                        <input
-                                            type="radio"
-                                            name="carrier"
-                                            checked={selectedCarrierId === carrier.id}
-                                            onChange={() => setSelectedCarrierId(carrier.id)}
-                                            className="w-4 h-4 lg:w-[22px] lg:h-[22px] text-[#1877f2] focus:ring-[#1877f2] cursor-pointer"
-                                        />
-                                        <div className="flex-1">
-                                            <div className="flex justify-between items-center">
-                                                <span className="font-medium text-[16px] lg:text-[18px] text-gray-800 group-hover:text-[#1877f2] transition-colors">{carrier.name}</span>
-                                                <span className="font-bold text-gray-900 text-[14px] lg:text-[16px]">৳{carrier.cost || 0}</span>
-                                            </div>
-                                            <p className="text-[12px] lg:text-[14px] text-gray-500 mt-1">Estimated delivery: {carrier.transit_time}</p>
-                                        </div>
-                                    </label>
-                                </div>
-                            ))}
-                            {carriers.length === 0 && (
-                                <p className="p-6 text-center text-gray-500 italic">No shipping methods available.</p>
-                            )}
-                        </div>
-                    </section>
-
-                    {/* Available Offers */}
-                 
-
-                    {/* Payment Method */}
-                    <section>
-                        <h2 className="lg:text-[24px] text-[18px] font-semibold lg:mb-6 mb-2 text-gray-900 tracking-wide">Payment Method</h2>
-                        <div className="border border-gray-200 rounded-xl overflow-hidden bg-white">
-                            {/* Online Payments */}
-                            {paymentTypes.online.map((method) => (
-                                <div key={method.id} className="p-4 lg:p-6 border-b border-gray-100">
-                                    <label className="flex items-center space-x-3 cursor-pointer group">
-                                        <input
-                                            type="radio"
-                                            name="payment"
-                                            checked={paymentMethod === method.name}
-                                            onChange={() => setPaymentMethod(method.name)}
-                                            className="w-4 h-4 lg:w-[22px] lg:h-[22px] text-[#1877f2] focus:ring-[#1877f2] cursor-pointer"
-                                        />
-                                        <span className="font-medium text-[16px] lg:text-[20px] text-gray-800 group-hover:text-[#1877f2] transition-colors">{method.name}</span>
-                                    </label>
-                                </div>
-                            ))}
-
-                            {/* Offline/Manual Payments (including COD) */}
-                            {paymentTypes.offline.map((method) => (
-                                <div key={method.id} className="p-4 lg:p-6 border-b border-gray-100 last:border-0">
-                                    <label className="flex items-center space-x-3 cursor-pointer group flex-wrap gap-y-2">
-                                        <input
-                                            type="radio"
-                                            name="payment"
-                                            checked={paymentMethod === method.heading}
-                                            onChange={() => setPaymentMethod(method.heading)}
-                                            className="w-4 h-4 lg:w-[22px] lg:h-[22px] text-[#1877f2] focus:ring-[#1877f2] cursor-pointer"
-                                        />
-                                        <span className="font-medium text-[16px] lg:text-[20px] text-gray-800 group-hover:text-[#1877f2] transition-colors">{method.heading}</span>
-                                        {method.heading === 'Cash On Delivery' && (
-                                            <span className="text-[#1877f2] text-[13px] lg:text-[15px] xl:ml-2 font-medium">(Advanced pay 10% For Order confirmation)</span>
-                                        )}
-                                    </label>
-                                    <div className="ml-[28px] lg:ml-[34px] mt-2 text-[12px] lg:text-[14px] text-gray-500">
-                                        <div dangerouslySetInnerHTML={{ __html: method.description }}></div>
+                            {!isAuthenticated ? (
+                                <div className="border border-gray-200 rounded-xl p-3 lg:p-4 flex flex-col lg:flex-row justify-between items-center gap-4 mb-6">
+                                    <span className="text-[#a1a1aa] font-medium text-[12px] lg:text-[14px] text-center lg:text-left">Add an address or login to use saved address</span>
+                                    <div className="flex space-x-3 w-full md:w-auto">
+                                        <button onClick={() => router.push('/login')} className="flex-1 md:flex-none border border-[#1877f2] text-[#1877f2] rounded-full lg:px-16 lg:py-1 py-1.5 font-medium hover:bg-blue-50 transition-colors text-[11px] lg:text-[15px]">Login</button>
+                                        <button onClick={() => router.push('/login')} className="flex-1 md:flex-none bg-[#1877f2] text-white rounded-full lg:px-10 py-1.5 font-medium hover:bg-blue-600 transition-colors w-max text-[11px] lg:text-[15px]">Add new address</button>
                                     </div>
                                 </div>
-                            ))}
+                            ) : (
+                                <div className="border border-gray-200 rounded-xl p-2 lg:p-3">
+                                    {addresses.length > 0 ? (
+                                        <>
+                                            <div className="bg-[#f8f9fa] border border-gray-100 rounded-xl p-3 mb-4 lg:mb-6">
+                                                <div className="flex justify-between lg:items-start items-center mb-1">
+                                                    <h3 className="font-semibold text-gray-900 text-[15px] lg:text-[17px]">
+                                                        {(selectedAddress as any)?.name || user?.name}
+                                                    </h3>
+                                                    <button onClick={() => setIsAddressModalOpen(true)} className="text-[#1877f2] flex items-center text-[12px] lg:text-[15px] font-semibold hover:underline">
+                                                        Change / Add <FiEdit className="ml-1.5 w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                                <div className="space-y-1 text-[12px] lg:text-[15px] text-gray-700 max-w-3xl leading-relaxed">
+                                                    {selectedAddress ? (
+                                                        <>
+                                                            <p>{(selectedAddress as { address: string }).address}, {(selectedAddress as { postal_code: string }).postal_code}</p>
+                                                            <p>Phone: {(selectedAddress as { phone: string }).phone}</p>
+                                                            <p>Email: {(selectedAddress as any).email || user?.email}</p>
+                                                        </>
+                                                    ) : (
+                                                        <p className="text-orange-500">Please select or add a shipping address</p>
+                                                    )}
+                                                </div>
+                                            </div>
 
-                            {paymentTypes.online.length === 0 && paymentTypes.offline.length === 0 && (
-                                <p className="p-6 text-center text-gray-500 italic">No payment methods available.</p>
+                                            {/* Address Selector */}
+                                            <div className="flex gap-3 overflow-x-auto pb-2 mb-4 no-scrollbar">
+                                                {(addresses as { id: number; address: string }[]).map(addr => (
+                                                    <button
+                                                        key={addr.id}
+                                                        onClick={() => setSelectedAddressId(addr.id)}
+                                                        className={`flex-shrink-0 px-4 py-2 rounded-lg border text-xs font-medium transition-all ${selectedAddressId === addr.id
+                                                            ? 'bg-blue-50 border-[#1877f2] text-[#1877f2]'
+                                                            : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'}`}
+                                                    >
+                                                        {addr.address.slice(0, 20)}...
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="text-center py-6">
+                                            <p className="text-gray-500 mb-4 text-sm">No addresses found</p>
+                                            <button onClick={() => setIsAddressModalOpen(true)} className="bg-[#1877f2] text-white rounded-full px-8 py-2 font-medium hover:bg-blue-600 transition-colors text-sm">Add new address</button>
+                                        </div>
+                                    )}
+
+                                    {/* Checkbox */}
+                                    <label className="inline-flex items-center space-x-3 cursor-pointer group mb-1">
+                                        <input type="checkbox" className="rounded border-gray-300 text-blue-500 focus:ring-blue-500 w-3.5 h-3.5 lg:w-5 lg:h-5 cursor-pointer" />
+                                        <span className="text-gray-700 text-[12px] lg:text-[15px] font-medium group-hover:text-gray-900 transition-colors">Use a different billing address</span>
+                                    </label>
+                                </div>
                             )}
-                        </div>
-                    </section>
 
-                    {/* Delivery Note */}
-                    <section>
-                        <h2 className="lg:text-[24px] text-[18px] font-semibold lg:mb-6 mb-2 text-gray-900 tracking-wide">Delivery Note</h2>
-                        <textarea
-                            value={deliveryNote}
-                            onChange={(e) => setDeliveryNote(e.target.value)}
-                            className="w-full border border-gray-200 rounded-xl p-4 lg:p-5 text-[13px] lg:text-[15px] text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#1877f2] focus:border-[#1877f2] min-h-[120px] lg:min-h-[160px] resize-y bg-white"
-                            placeholder="Enter your instruction message"
-                        ></textarea>
-                    </section>
-                </div>
+                        </section>
 
-                {/* Right Column */}
-                <div className="lg:col-span-2 sticky top-[230px] self-start hidden lg:block">
-                    <div className="bg-[#f8f9fa] rounded-2xl p-6 lg:p-7 shadow-sm">
-                        <div className="flex justify-between items-start mb-6">
-                            <h2 className="text-[18px] lg:text-[22px] font-bold flex items-center text-gray-900 tracking-tight cursor-pointer">
-                                Order Total <FiChevronDown className="ml-2 w-5 h-5 lg:w-6 lg:h-6 text-gray-500" />
-                            </h2>
-                            <div className="flex flex-col items-end">
-                                <span className="text-[20px] lg:text-[26px] font-bold text-[#1877f2] tracking-tight">
-                                    {mounted ? formatCurrency(totals.total) : "৳0"}
-                                </span>
-                                {mounted && totals.savePercent > 0 && (
-                                    <span className="bg-[#ff3b30] text-white text-[10px] lg:text-[12px] px-2 lg:px-2.5 py-0.5 lg:py-1 rounded mt-1 font-medium">Saving : {totals.savePercent}%</span>
+                        <section>
+                            <h2 className="lg:text-[24px] text-[18px] font-semibold mb-6 text-gray-900 tracking-wide">Shipping Method</h2>
+                            <div className="border border-gray-200 rounded-xl bg-white overflow-hidden mb-6">
+                                {(carriers as { id: number; name: string; cost: string; transit_time: string }[]).map((carrier) => (
+                                    <div key={carrier.id} className="p-4 lg:p-6 border-b border-gray-100 last:border-0">
+                                        <label className="flex items-center space-x-3 cursor-pointer group">
+                                            <input
+                                                type="radio"
+                                                name="carrier"
+                                                checked={selectedCarrierId === carrier.id}
+                                                onChange={() => setSelectedCarrierId(carrier.id)}
+                                                className="w-4 h-4 lg:w-[22px] lg:h-[22px] text-[#1877f2] focus:ring-[#1877f2] cursor-pointer"
+                                            />
+                                            <div className="flex-1">
+                                                <div className="flex justify-between items-center">
+                                                    <span className="font-medium text-[16px] lg:text-[18px] text-gray-800 group-hover:text-[#1877f2] transition-colors">{carrier.name}</span>
+                                                    <span className="font-bold text-gray-900 text-[14px] lg:text-[16px]">৳{carrier.cost || 0}</span>
+                                                </div>
+                                                <p className="text-[12px] lg:text-[14px] text-gray-500 mt-1">Estimated delivery: {carrier.transit_time}</p>
+                                            </div>
+                                        </label>
+                                    </div>
+                                ))}
+                                {carriers.length === 0 && (
+                                    <p className="p-6 text-center text-gray-500 italic">No shipping methods available.</p>
                                 )}
                             </div>
-                        </div>
+                        </section>
 
-                        {/* Order Items */}
-                        <div className="space-y-4 mb-8">
-                            {mounted && cartItems.map((item) => (
-                                <div key={item.id} className="flex gap-4 p-4 bg-white border border-gray-200 rounded-xl items-start shadow-sm">
-                                    <div className="w-[72px] h-[72px] bg-gray-100 rounded-lg flex-shrink-0 relative overflow-hidden flex items-center justify-center border border-gray-100">
-                                        <Image
-                                            key={item.image}
-                                            src={item.image}
-                                            alt={item.title}
-                                            fill
-                                            className="object-contain p-1"
-                                        />
-                                    </div>
-                                    <div className="flex-1 flex justify-between">
-                                        <div className="pr-3">
-                                            <p className="text-[14px] text-gray-800 font-medium leading-[1.3]">
-                                                {item.title}
-                                            </p>
-                                            {item.type && (
-                                                <p className="text-[12px] text-gray-500 mt-1">Category: {item.type}</p>
-                                            )}
-                                            {(item.variant || item.color) && (
-                                                <p className="text-[12px] text-gray-500 mt-0.5">Variant: {item.variant || item.color}</p>
-                                            )}
-                                            <p className="text-[14px] text-gray-500 mt-2">QTY : {item.quantity}</p>
-                                        </div>
-                                        <div className="text-right flex flex-col items-end whitespace-nowrap">
-                                            <span className="text-[11px] lg:text-[13px] text-[#a1a1aa] line-through font-medium">{item.originalPrice}</span>
-                                            <span className="font-bold text-[15px] lg:text-[18px] mt-0.5 text-black">{item.price}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                            {mounted && cartItems.length === 0 && (
-                                <p className="text-center text-gray-500 py-4 italic">Your cart is empty</p>
-                            )}
-                        </div>
+                        {/* Available Offers */}
 
-                        {/* Sub-Total */}
-                        <div className="pt-2">
-                            <h3 className="text-[17px] lg:text-[20px] font-bold mb-4 lg:mb-5 text-gray-900">Sub -Total</h3>
-                            <div className="space-y-3 lg:space-y-3.5 text-[14px] lg:text-[16px]">
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600">Save</span>
-                                    <span className="font-bold text-gray-900">
-                                        {mounted ? formatCurrency(totals.savings) : "৳0"}
-                                    </span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600">Store Pickup</span>
-                                    <span className="font-bold text-gray-900">Free</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600">TAX</span>
-                                    <span className="font-bold text-gray-900">Free</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600">Delivery</span>
-                                    <span className="font-bold text-gray-900">{totals.delivery > 0 ? formatCurrency(totals.delivery) : 'Free'}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600">Coupon Code</span>
-                                    <span className="font-bold text-gray-900">0</span>
-                                </div>
+
+                        {/* Payment Method */}
+                        <section>
+                            <h2 className="lg:text-[24px] text-[18px] font-semibold lg:mb-6 mb-2 text-gray-900 tracking-wide">Payment Method</h2>
+                            <div className="border border-gray-200 rounded-xl overflow-hidden bg-white">
+                                {/* Online Payments */}
+                                {(paymentTypes.online as { id: number; name: string }[]).map((method) => (
+                                    <div key={method.id} className="p-4 lg:p-6 border-b border-gray-100">
+                                        <label className="flex items-center space-x-3 cursor-pointer group">
+                                            <input
+                                                type="radio"
+                                                name="payment"
+                                                checked={paymentMethod === method.name}
+                                                onChange={() => setPaymentMethod(method.name)}
+                                                className="w-4 h-4 lg:w-[22px] lg:h-[22px] text-[#1877f2] focus:ring-[#1877f2] cursor-pointer"
+                                            />
+                                            <span className="font-medium text-[16px] lg:text-[20px] text-gray-800 group-hover:text-[#1877f2] transition-colors">{method.name}</span>
+                                        </label>
+                                    </div>
+                                ))}
+
+                                {/* Offline/Manual Payments (including COD) */}
+                                {(paymentTypes.offline as { id: number; heading: string; description: string }[]).map((method) => (
+                                    <div key={method.id} className="p-4 lg:p-6 border-b border-gray-100 last:border-0">
+                                        <label className="flex items-center space-x-3 cursor-pointer group flex-wrap gap-y-2">
+                                            <input
+                                                type="radio"
+                                                name="payment"
+                                                checked={paymentMethod === method.heading}
+                                                onChange={() => setPaymentMethod(method.heading)}
+                                                className="w-4 h-4 lg:w-[22px] lg:h-[22px] text-[#1877f2] focus:ring-[#1877f2] cursor-pointer"
+                                            />
+                                            <span className="font-medium text-[16px] lg:text-[20px] text-gray-800 group-hover:text-[#1877f2] transition-colors">{method.heading}</span>
+                                            {method.heading === 'Cash On Delivery' && (
+                                                <span className="text-[#1877f2] text-[13px] lg:text-[15px] xl:ml-2 font-medium">(Advanced pay 10% For Order confirmation)</span>
+                                            )}
+                                        </label>
+                                        <div className="ml-[28px] lg:ml-[34px] mt-2 text-[12px] lg:text-[14px] text-gray-500">
+                                            <div dangerouslySetInnerHTML={{ __html: method.description }}></div>
+                                        </div>
+                                    </div>
+                                ))}
+
+                                {paymentTypes.online.length === 0 && paymentTypes.offline.length === 0 && (
+                                    <p className="p-6 text-center text-gray-500 italic">No payment methods available.</p>
+                                )}
                             </div>
-                        </div>
+                        </section>
 
-                        <button
-                            onClick={handlePlaceOrder}
-                            disabled={mounted ? cartItems.length === 0 : true}
-                            className={`w-full bg-[#1877f2] hover:bg-blue-600 text-white font-semibold py-3 lg:py-4 rounded-xl mt-6 lg:mt-8 shadow-sm transition-colors text-[15px] lg:text-[17px] ${mounted && cartItems.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        >
-                            Place Order
-                        </button>
+                        {/* Delivery Note */}
+                        <section>
+                            <h2 className="lg:text-[24px] text-[18px] font-semibold lg:mb-6 mb-2 text-gray-900 tracking-wide">Delivery Note</h2>
+                            <textarea
+                                value={deliveryNote}
+                                onChange={(e) => setDeliveryNote(e.target.value)}
+                                className="w-full border border-gray-200 rounded-xl p-4 lg:p-5 text-[13px] lg:text-[15px] text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#1877f2] focus:border-[#1877f2] min-h-[120px] lg:min-h-[160px] resize-y bg-white"
+                                placeholder="Enter your instruction message"
+                            ></textarea>
+                        </section>
                     </div>
 
-                    <p className="text-[12px] text-gray-500 text-center mt-6 px-4 leading-relaxed tracking-tight">
-                        By proceeding, you acknowledge and accept Electra<br />International&apos;s <span className="font-bold text-gray-700">Terms &amp; Conditions, Cancellation &amp; Refund Policy</span>, and <span className="font-bold text-gray-700">Privacy Policy</span>.
-                    </p>
+                    {/* Right Column */}
+                    <div className="lg:col-span-2 sticky top-[230px] self-start hidden lg:block">
+                        <div className="bg-[#f8f9fa] rounded-2xl p-6 lg:p-7 shadow-sm">
+                            <div className="flex justify-between items-start mb-6">
+                                <h2 className="text-[18px] lg:text-[22px] font-bold flex items-center text-gray-900 tracking-tight cursor-pointer">
+                                    Order Total <FiChevronDown className="ml-2 w-5 h-5 lg:w-6 lg:h-6 text-gray-500" />
+                                </h2>
+                                <div className="flex flex-col items-end">
+                                    <span className="text-[20px] lg:text-[26px] font-bold text-[#1877f2] tracking-tight">
+                                        {mounted ? formatCurrency(totals.total) : "৳0"}
+                                    </span>
+                                    {mounted && totals.savePercent > 0 && (
+                                        <span className="bg-[#ff3b30] text-white text-[10px] lg:text-[12px] px-2 lg:px-2.5 py-0.5 lg:py-1 rounded mt-1 font-medium">Saving : {totals.savePercent}%</span>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Order Items */}
+                            <div className="space-y-4 mb-8">
+                                {mounted && cartItems.map((item) => (
+                                    <div key={item.id} className="flex gap-4 p-4 bg-white border border-gray-200 rounded-xl items-start shadow-sm">
+                                        <div className="w-[72px] h-[72px] bg-gray-100 rounded-lg flex-shrink-0 relative overflow-hidden flex items-center justify-center border border-gray-100">
+                                            <Image
+                                                key={item.image}
+                                                src={item.image}
+                                                alt={item.title}
+                                                fill
+                                                className="object-contain p-1"
+                                            />
+                                        </div>
+                                        <div className="flex-1 flex justify-between">
+                                            <div className="pr-3">
+                                                <p className="text-[14px] text-gray-800 font-medium leading-[1.3]">
+                                                    {item.title}
+                                                </p>
+                                                {item.type && (
+                                                    <p className="text-[12px] text-gray-500 mt-1">Category: {item.type}</p>
+                                                )}
+                                                {(item.variant || item.color) && (
+                                                    <p className="text-[12px] text-gray-500 mt-0.5">Variant: {item.variant || item.color}</p>
+                                                )}
+                                                <p className="text-[14px] text-gray-500 mt-2">QTY : {item.quantity}</p>
+                                            </div>
+                                            <div className="text-right flex flex-col items-end whitespace-nowrap">
+                                                <span className="text-[11px] lg:text-[13px] text-[#a1a1aa] line-through font-medium">{item.originalPrice}</span>
+                                                <span className="font-bold text-[15px] lg:text-[18px] mt-0.5 text-black">{item.price}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                                {mounted && cartItems.length === 0 && (
+                                    <p className="text-center text-gray-500 py-4 italic">Your cart is empty</p>
+                                )}
+                            </div>
+
+                            {/* Sub-Total */}
+                            <div className="pt-2">
+                                <h3 className="text-[17px] lg:text-[20px] font-bold mb-4 lg:mb-5 text-gray-900">Sub -Total</h3>
+                                <div className="space-y-3 lg:space-y-3.5 text-[14px] lg:text-[16px]">
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">Save</span>
+                                        <span className="font-bold text-gray-900">
+                                            {formatCurrency(totals.savings)}
+                                        </span>
+                                    </div>
+                                    {/* <div className="flex justify-between">
+                                        <span className="text-gray-600">Store Pickup</span>
+                                        <span className="font-bold text-gray-900">Free</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">TAX</span>
+                                        <span className="font-bold text-gray-900">Free</span>
+                                    </div> */}
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">Delivery</span>
+                                        <span className="font-bold text-gray-900">{totals.delivery > 0 ? formatCurrency(totals.delivery) : 'Free'}</span>
+                                    </div>
+                                    {/* <div className="flex justify-between">
+                                        <span className="text-gray-600">Coupon Code</span>
+                                        <span className="font-bold text-gray-900">0</span>
+                                    </div> */}
+                                </div>
+                            </div>
+
+                            {/* Terms and Conditions Checkbox */}
+                            <div className="mt-8 mb-4 flex items-start space-x-3 cursor-pointer group" onClick={() => setAgreedToTerms(!agreedToTerms)}>
+                                <div className={`flex-shrink-0 w-5 h-5 rounded border flex items-center justify-center transition-all ${agreedToTerms ? 'bg-[#1877f2] border-[#1877f2]' : 'bg-white border-gray-300'}`}>
+                                    {agreedToTerms && <span className="text-white text-[10px]">✓</span>}
+                                </div>
+                                <p className="text-[12px] text-gray-600 leading-tight select-none">
+                                    By proceeding, you acknowledge and accept Electra International&apos;s <span className="font-bold text-gray-700">Terms &amp; Conditions, Cancellation &amp; Refund Policy</span>, and <span className="font-bold text-gray-700">Privacy Policy</span>.
+                                </p>
+                            </div>
+
+                            <button
+                                onClick={handlePlaceOrder}
+                                disabled={cartItems.length === 0 || !agreedToTerms}
+                                className={`w-full bg-[#1877f2] hover:bg-blue-600 text-white font-semibold py-3 lg:py-4 rounded-xl shadow-sm transition-colors text-[15px] lg:text-[17px] ${(cartItems.length === 0 || !agreedToTerms) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            >
+                                Place Order
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </div>
             </div>
             {/* Mobile Fixed Bottom Bar / Bottom Sheet */}
             {mounted && cartItems.length > 0 && (
@@ -560,7 +639,8 @@ const Checkout = () => {
 
                             <button
                                 onClick={handlePlaceOrder}
-                                className="bg-[#1877f2] text-white px-6 sm:px-10 py-2.5 rounded-full font-semibold text-[12px] sm:text-[15px] shadow-md active:scale-95 transition-all"
+                                disabled={!agreedToTerms}
+                                className={`bg-[#1877f2] text-white px-6 sm:px-10 py-2.5 rounded-full font-semibold text-[12px] sm:text-[15px] shadow-md active:scale-95 transition-all ${!agreedToTerms ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
                                 Place Order
                             </button>
@@ -623,67 +703,159 @@ const Checkout = () => {
                                     <span className="font-bold text-[22px] text-gray-900">{formatCurrency(totals.total)}</span>
                                 </div>
                             </div>
-                            <p className="mt-8 text-[10px] text-gray-400 text-center leading-relaxed px-4">
-                                By proceeding, you acknowledge and accept Electra International&apos;s <span className="underline">Terms &amp; Conditions</span>, <span className="underline">Cancellation &amp; Refund Policy</span>, and <span className="underline">Privacy Policy</span>.
-                            </p>
+                            <div className="mt-8 flex items-start space-x-3 cursor-pointer group px-4 pb-8" onClick={() => setAgreedToTerms(!agreedToTerms)}>
+                                <div className={`flex-shrink-0 w-5 h-5 rounded border flex items-center justify-center transition-all ${agreedToTerms ? 'bg-[#1877f2] border-[#1877f2]' : 'bg-white border-gray-300'}`}>
+                                    {agreedToTerms && <span className="text-white text-[10px]">✓</span>}
+                                </div>
+                                <p className="text-[10px] text-gray-500 leading-relaxed select-none">
+                                    By proceeding, you acknowledge and accept Electra International&apos;s <span className="underline">Terms &amp; Conditions</span>, <span className="underline">Cancellation &amp; Refund Policy</span>, and <span className="underline">Privacy Policy</span>.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
             )}
             {/* Address Modal */}
             {isAddressModalOpen && (
-                <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-                    <div className="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl">
-                        <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-                            <h3 className="text-xl font-bold text-gray-900">Add New Address</h3>
-                            <button onClick={() => setIsAddressModalOpen(false)} className="text-gray-400 hover:text-gray-600">✕</button>
+                <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
+                    <div className="bg-white rounded-3xl w-full max-w-2xl my-8 overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200">
+                        <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 z-10">
+                            <h3 className="text-xl font-bold text-gray-800">Shipping Details</h3>
+                            <button onClick={() => setIsAddressModalOpen(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
+                                <span className="text-2xl">×</span>
+                            </button>
                         </div>
-                        <form onSubmit={handleAddAddress} className="p-6 space-y-4">
+                        <form onSubmit={handleAddAddress} className="p-6 space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar">
+                            {/* Contact Person Section */}
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-1.5">Detailed Address</label>
-                                <textarea
-                                    required
-                                    value={addressForm.address}
-                                    onChange={(e) => setAddressForm({ ...addressForm, address: e.target.value })}
-                                    placeholder="Street, House No, Area..."
-                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#1877f2]/20 focus:border-[#1877f2] transition-all outline-none min-h-[100px]"
-                                />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-1.5">Phone Number</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        value={addressForm.phone}
-                                        onChange={(e) => setAddressForm({ ...addressForm, phone: e.target.value })}
-                                        placeholder="017********"
-                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 h-12 text-sm focus:ring-2 focus:ring-[#1877f2]/20 focus:border-[#1877f2] transition-all outline-none"
-                                    />
+                                <h4 className="text-lg font-bold text-gray-800 mb-4">Contact Person</h4>
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-[13px] font-semibold text-gray-600 mb-1.5">Full Name<span className="text-red-500">*</span></label>
+                                        <input
+                                            type="text"
+                                            required
+                                            value={addressForm.name}
+                                            onChange={(e) => setAddressForm({ ...addressForm, name: e.target.value })}
+                                            placeholder="Enter full name"
+                                            className="w-full bg-white border border-gray-200 rounded-xl px-4 h-12 text-sm focus:ring-2 focus:ring-[#1877f2]/20 focus:border-[#1877f2] transition-all outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[13px] font-semibold text-gray-600 mb-1.5">Phone Number<span className="text-red-500">*</span></label>
+                                        <input
+                                            type="text"
+                                            required
+                                            value={addressForm.phone}
+                                            onChange={(e) => setAddressForm({ ...addressForm, phone: e.target.value })}
+                                            placeholder="+88801**********"
+                                            className="w-full bg-white border border-gray-200 rounded-xl px-4 h-12 text-sm focus:ring-2 focus:ring-[#1877f2]/20 focus:border-[#1877f2] transition-all outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[13px] font-semibold text-gray-600 mb-1.5">E-Mail Address<span className="text-red-500">*</span></label>
+                                        <input
+                                            type="email"
+                                            required
+                                            value={addressForm.email}
+                                            onChange={(e) => setAddressForm({ ...addressForm, email: e.target.value })}
+                                            placeholder="Enter email address"
+                                            className="w-full bg-white border border-gray-200 rounded-xl px-4 h-12 text-sm focus:ring-2 focus:ring-[#1877f2]/20 focus:border-[#1877f2] transition-all outline-none"
+                                        />
+                                    </div>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-1.5">Postal Code</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        value={addressForm.postal_code}
-                                        onChange={(e) => setAddressForm({ ...addressForm, postal_code: e.target.value })}
-                                        placeholder="1207"
-                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 h-12 text-sm focus:ring-2 focus:ring-[#1877f2]/20 focus:border-[#1877f2] transition-all outline-none"
-                                    />
+                            </div>
+
+                            {/* Shipping Address Section */}
+                            <div>
+                                <h4 className="text-lg font-bold text-gray-800 mb-4">Shipping address</h4>
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-[13px] font-semibold text-gray-600 mb-1.5">Enter House/Street/Road<span className="text-red-500">*</span></label>
+                                        <input
+                                            type="text"
+                                            required
+                                            value={addressForm.address}
+                                            onChange={(e) => setAddressForm({ ...addressForm, address: e.target.value })}
+                                            placeholder="Enter house- street- road"
+                                            className="w-full bg-white border border-gray-200 rounded-xl px-4 h-12 text-sm focus:ring-2 focus:ring-[#1877f2]/20 focus:border-[#1877f2] transition-all outline-none"
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-[13px] font-semibold text-gray-600 mb-1.5">District<span className="text-red-500">*</span></label>
+                                            <div className="relative">
+                                                <select
+                                                    required
+                                                    value={addressForm.country_id}
+                                                    onChange={(e) => {
+                                                        const val = e.target.value;
+                                                        setAddressForm({ ...addressForm, country_id: val, state_id: '' });
+                                                        fetchThanas(val);
+                                                    }}
+                                                    className="w-full bg-white border border-gray-200 rounded-xl px-4 h-12 text-sm focus:ring-2 focus:ring-[#1877f2]/20 focus:border-[#1877f2] transition-all outline-none appearance-none"
+                                                >
+                                                    <option value="">Select District</option>
+                                                    {districts.map((d: any) => (
+                                                        <option key={d.id} value={d.id}>{d.name}</option>
+                                                    ))}
+                                                </select>
+                                                <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="block text-[13px] font-semibold text-gray-600 mb-1.5">Thana / Upazilla<span className="text-red-500">*</span></label>
+                                            <div className="relative">
+                                                <select
+                                                    required
+                                                    value={addressForm.state_id}
+                                                    onChange={(e) => {
+                                                        const val = e.target.value;
+                                                        setAddressForm({ ...addressForm, state_id: val });
+                                                    }}
+                                                    disabled={!addressForm.country_id}
+                                                    className="w-full bg-white border border-gray-200 rounded-xl px-4 h-12 text-sm focus:ring-2 focus:ring-[#1877f2]/20 focus:border-[#1877f2] transition-all outline-none appearance-none disabled:bg-gray-50 disabled:cursor-not-allowed"
+                                                >
+                                                    <option value="">Select Thana</option>
+                                                    {thanas.map((t: any) => (
+                                                        <option key={t.id} value={t.id}>{t.name}</option>
+                                                    ))}
+                                                </select>
+                                                <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-[13px] font-semibold text-gray-600 mb-1.5">Area<span className="text-red-500">*</span></label>
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                required
+                                                value={addressForm.area}
+                                                onChange={(e) => setAddressForm({ ...addressForm, area: e.target.value })}
+                                                placeholder="Enter area"
+                                                className="w-full bg-white border border-gray-200 rounded-xl px-4 h-12 text-sm focus:ring-2 focus:ring-[#1877f2]/20 focus:border-[#1877f2] transition-all outline-none"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-[13px] font-semibold text-gray-600 mb-1.5">Postal Code<span className="text-red-500">*</span></label>
+                                        <input
+                                            type="text"
+                                            required
+                                            value={addressForm.postal_code}
+                                            onChange={(e) => setAddressForm({ ...addressForm, postal_code: e.target.value })}
+                                            placeholder="Enter code"
+                                            className="w-full bg-white border border-gray-200 rounded-xl px-4 h-12 text-sm focus:ring-2 focus:ring-[#1877f2]/20 focus:border-[#1877f2] transition-all outline-none"
+                                        />
+                                    </div>
                                 </div>
                             </div>
-                            <div className="flex gap-4 pt-4">
-                                <button
-                                    type="button"
-                                    onClick={() => setIsAddressModalOpen(false)}
-                                    className="flex-1 px-6 h-12 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition-all border border-gray-100"
-                                >
-                                    Cancel
-                                </button>
+
+                            <div className="pt-4">
                                 <button
                                     type="submit"
-                                    className="flex-1 bg-[#1877f2] text-white px-6 h-12 rounded-xl font-bold hover:bg-blue-600 transition-all shadow-lg shadow-blue-500/20"
+                                    className="w-full bg-[#1877f2] text-white h-14 rounded-xl font-bold hover:bg-blue-600 transition-all shadow-lg shadow-blue-500/20 text-lg"
                                 >
                                     Save Address
                                 </button>

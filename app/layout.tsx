@@ -18,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const baseUrl = process.env.API_BASE_URL;
   const systemKey = process.env.API_SYSTEM_KEY;
 
-  let settings: any[] = [];
+  let settings: unknown[] = [];
   try {
     const res = await fetch(`${baseUrl}/api/v2/business-settings`, {
       headers: { "x-system-key": systemKey || "" },
@@ -30,7 +30,7 @@ export async function generateMetadata(): Promise<Metadata> {
     console.error("Failed to fetch business settings for metadata", e);
   }
 
-  const findSetting = (type: string) => settings.find((s: any) => s.type === type)?.value;
+  const findSetting = (type: string) => (settings as { type: string; value: string }[]).find((s) => s.type === type)?.value;
 
   const siteTitle = findSetting("meta_title") || "Samsung Electra";
   const siteDescription = findSetting("meta_description") || "Next-gen connected retail operating system for Samsung Bangladesh.";

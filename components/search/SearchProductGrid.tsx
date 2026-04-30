@@ -6,13 +6,19 @@ import MobileFilterDrawer from "@/components/category/MobileFilterDrawer";
 
 type SearchProductGridProps = {
   query: string;
+  categoryId?: string | null;
 };
 
-export default function SearchProductGrid({ query }: SearchProductGridProps) {
+interface SearchProduct {
+  id: string | number;
+  [key: string]: unknown;
+}
+
+export default function SearchProductGrid({ query, categoryId }: SearchProductGridProps) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [sortOption, setSortOption] = useState("default");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<SearchProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
 
@@ -20,7 +26,11 @@ export default function SearchProductGrid({ query }: SearchProductGridProps) {
     async function fetchProducts() {
       setIsLoading(true);
       try {
-        const response = await fetch(`/api/products/search?name=${encodeURIComponent(query)}`);
+        let url = `/api/products/search?name=${encodeURIComponent(query)}`;
+        if (categoryId) {
+          url += `&category_id=${categoryId}`;
+        }
+        const response = await fetch(url);
         if (response.ok) {
           const payload = await response.json();
           setProducts(payload.data || []);
@@ -36,7 +46,7 @@ export default function SearchProductGrid({ query }: SearchProductGridProps) {
     if (query) {
       fetchProducts();
     }
-  }, [query]);
+  }, [query, categoryId]);
 
   if (isLoading) {
     return (
@@ -53,7 +63,7 @@ export default function SearchProductGrid({ query }: SearchProductGridProps) {
         <div className="flex items-center gap-4">
           <span className="text-[13px] font-medium text-slate-500">
             <span className="font-semibold text-[#2B7FE8]">{totalItems}</span>{" "}
-            Items Found for "{query}"
+            Items Found for &quot;{query}&quot;
           </span>
 
           <div className="hidden items-center gap-1 sm:flex">
@@ -157,7 +167,7 @@ export default function SearchProductGrid({ query }: SearchProductGridProps) {
       </div>
 
       <h2 className="text-[14px] font-semibold text-slate-800 -mt-1 mb-2 px-1">
-        {totalItems} Items Found for "{query}"
+        {totalItems} Items Found for &quot;{query}&quot;
       </h2>
 
       {/* ═══════════════ PRODUCT GRID ═══════════════ */}
@@ -181,7 +191,7 @@ export default function SearchProductGrid({ query }: SearchProductGridProps) {
             </svg>
           </div>
           <h3 className="text-xl font-semibold text-slate-700">No products found</h3>
-          <p className="mt-2 text-slate-500">We couldn't find any products matching your search query.</p>
+          <p className="mt-2 text-slate-500">We couldn&apos;t find any products matching your search query.</p>
         </div>
       )}
 

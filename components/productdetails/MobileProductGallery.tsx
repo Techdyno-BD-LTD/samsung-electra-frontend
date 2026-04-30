@@ -20,9 +20,11 @@ export default function MobileProductGallery({
   title = "Product",
   warrantyBadgeImage = "/images/warrantybadge.png",
 }: MobileProductGalleryProps) {
-  const productImages = productData?.photos?.map((photo) => photo.path || photo.photo || "").filter(Boolean) || [];
   const galleryImages = useMemo(
-    () => (productImages.length > 0 ? productImages : images.length > 0 ? images : [productData?.thumbnail_image || '/images/wm2.png']),
+    () => {
+      const productImages = productData?.photos?.map((photo) => photo.path || photo.photo || "").filter(Boolean) || [];
+      return (productImages.length > 0 ? productImages : images.length > 0 ? images : [productData?.thumbnail_image || '/images/wm2.png']);
+    },
     [images, productData?.photos, productData?.thumbnail_image]
   );
   const productTitle = productData?.name || title;
