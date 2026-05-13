@@ -7,8 +7,10 @@ import { HiOutlineArrowsRightLeft } from "react-icons/hi2";
 import { toProductSlug } from "@/lib/productSlug";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { addToCart } from "@/store/features/cart/cartSlice";
-import { toggleWishlist } from "@/store/features/wishlist/wishlistSlice";
+import { addToWishlistAsync, removeFromWishlistAsync, WishlistItem } from "@/store/features/wishlist/wishlistSlice";
 import { toggleCompare } from "@/store/features/compare/compareSlice";
+import { useRouter } from "next/navigation";
+import { showToast } from "@/store/features/toast/toastSlice";
 
 type RecentViewedProduct = {
   title?: string;
@@ -34,6 +36,9 @@ type RecentViewedProductCardProps = {
 
 export default function RecentViewedProductCard({ product }: RecentViewedProductCardProps) {
   const dispatch = useAppDispatch();
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
+  const router = useRouter();
+
   const productSlug = toProductSlug(product.title ?? "product");
   const productHref = `/products/${productSlug}`;
   const isWishlisted = useAppSelector((state) => state.wishlist.items.some((item) => item.id === productSlug));
@@ -59,16 +64,24 @@ export default function RecentViewedProductCard({ product }: RecentViewedProduct
   };
 
   const handleToggleWishlist = () => {
-    dispatch(
-      toggleWishlist({
+    if (!isAuthenticated) {
+      router.push(`/login?redirect=${window.location.pathname}`);
+      return;
+    }
+
+    if (isWishlisted) {
+      dispatch(removeFromWishlistAsync(productSlug));
+    } else {
+      const item: WishlistItem = {
         id: productSlug,
+        productId: Number(product.id || 0),
         title: product.title ?? "Product",
         brand: product.brandLogo ? "Brand" : "",
         image: product.image ?? "/images/wm2.png",
-        price: product.price ?? "৳ 1,50,000",
-        originalPrice: product.originalPrice ?? "৳ 1,80,000",
-        discountPercent: product.discountPercent ?? "-10% Off",
-        saveAmount: product.saveAmount ?? "Save : ৳30,00",
+        price: product.price ?? "0",
+        originalPrice: product.originalPrice,
+        discountLabel: product.discountPercent,
+        saveAmount: product.saveAmount,
         color: product.color,
         type: product.type,
         weight: product.weight,
@@ -77,8 +90,21 @@ export default function RecentViewedProductCard({ product }: RecentViewedProduct
         brandLogo: product.brandLogo,
         emiPrice: product.emiPrice,
         tags: product.tags,
-      })
-    );
+      };
+      dispatch(addToWishlistAsync(item)).then((result) => {
+        if (addToWishlistAsync.fulfilled.match(result)) {
+          dispatch(showToast({
+            message: "Added to Wishlist!",
+            type: 'success',
+            productName: item.title,
+            productImage: item.image,
+            productPrice: String(item.price),
+            actionLabel: "View Wishlist",
+            actionLink: "/dashboard/wishlist"
+          }));
+        }
+      });
+    }
   };
 
   const handleToggleCompare = () => {

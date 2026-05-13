@@ -1,7 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface CompareItem {
-  id: string;
+  id: string | number;
+  slug: string;
   title: string;
   brand: string;
   brandLogo?: string;
@@ -16,6 +17,7 @@ export interface CompareItem {
   color?: string;
   rating?: number;
   ratingCount?: string;
+  specifications?: Array<{ label: string; value: string }>;
 }
 
 type CompareState = {

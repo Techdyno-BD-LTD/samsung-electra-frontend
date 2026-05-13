@@ -5,21 +5,25 @@ import Image from "next/image";
 import { FaMinus, FaPlus, FaTimes, FaHeart, FaRegShareSquare, FaStar, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { addToCart } from "@/store/features/cart/cartSlice";
+import { addToWishlistAsync, removeFromWishlistAsync, WishlistItem } from "@/store/features/wishlist/wishlistSlice";
+import { showToast } from "@/store/features/toast/toastSlice";
 import { useRouter } from "next/navigation";
 import CartSuccessModal from "@/components/common/CartSuccessModal";
 import { toProductSlug } from "@/lib/productSlug";
+import { formatCurrency } from "@/lib/currencyUtils";
 
 const toComparable = (value?: string) => value?.trim().toLowerCase() ?? "";
 const isHexColor = (value?: string | null) => /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(value ?? "");
 
-interface ProductData {
-  id?: number;
+export interface ProductData {
+  id?: number | string;
   slug?: string;
   name?: string;
   description?: string;
+  category_id?: number;
   category?: { name?: string; slug?: string };
   category_info?: { category_name?: string };
-  brand?: { name?: string; slug?: string; logo?: string };
+  brand?: { id?: number; name?: string; slug?: string; logo?: string };
   thumbnail_image?: string;
   photos?: Array<{ photo?: string; path?: string; variant?: string }>;
   main_price?: string;
@@ -30,14 +34,21 @@ interface ProductData {
   unit?: string;
   rating?: number;
   rating_count?: number;
+  sales?: number;
+  calculable_price?: number;
+  price_high_low?: string;
+  connection_type?: string;
   model_number?: string;
   variants?: Array<{
     variant?: string;
     price?: number;
     sku?: string;
     qty?: number;
-    image?: string;
+    image?: string | null;
   }>;
+  links?: {
+    details?: string;
+  };
   emi_start?: string;
   book_in_showroom_title?: string;
   made_in_text?: string;
@@ -61,6 +72,12 @@ interface ProductData {
     code?: string;
   }>;
   colors?: string[];
+  badge_tag?: string;
+  badge_value?: string;
+  product_sold?: number;
+  higher_sale?: boolean;
+  down_payment?: number;
+  monthly_installment?: number;
   [key: string]: unknown;
 }
 
@@ -93,12 +110,8 @@ export default function AddToCartModal({
   title: fallbackTitle,
   brand: fallbackBrand,
   brandLogo: fallbackBrandLogo,
-  price: fallbackPrice,
-  originalPrice: fallbackOriginalPrice,
   image: fallbackImage,
   category: fallbackCategory,
-  discountLabel: fallbackDiscountLabel,
-  saveLabel: fallbackSaveLabel,
   weight: fallbackWeight,
   color: fallbackColor
 }: AddToCartModalProps) {
@@ -114,6 +127,15 @@ export default function AddToCartModal({
   const [isHidingModal, setIsHidingModal] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const thumbnailContainerRef = useRef<HTMLDivElement>(null);
+
+  const title = fallbackTitle || productData?.name || initialData?.name || "Product Title";
+  const brandLogo = fallbackBrandLogo || productData?.brand?.logo || "/images/samsung.png";
+  const ratingCount = productData?.rating_count?.toString() || "0";
+  const model = productData?.model_number || "Model";
+  const sku = productData?.variants?.[0]?.sku || "SKU";
+
+  const productSlug = initialSlug || initialData?.slug || (title ? toProductSlug(title) : "");
+  const isWishlisted = useAppSelector((state) => state.wishlist.items.some((item) => item.id === productSlug));
 
   const scrollThumbnails = (direction: 'left' | 'right') => {
     if (thumbnailContainerRef.current) {
@@ -152,7 +174,15 @@ export default function AddToCartModal({
   useEffect(() => {
     if (!productData) return;
     const nextSelectedAttributes: Record<string, string> = {};
-    (productData.attributes ?? []).forEach((attribute) => {
+    let attrs = productData.attributes || [];
+    if (typeof attrs === 'string') {
+      try {
+        attrs = JSON.parse(attrs);
+      } catch {
+        attrs = [];
+      }
+    }
+    (Array.isArray(attrs) ? attrs : []).forEach((attribute: { attribute_id?: number | string; name?: string; values?: string[] }) => {
       const attributeKey = String(attribute.attribute_id ?? attribute.name ?? "");
       const firstValue = attribute.values?.[0];
       if (attributeKey && firstValue) {
@@ -164,16 +194,6 @@ export default function AddToCartModal({
     setQuantity(1);
     setActiveImageIndex(0);
   }, [productData]);
-
-  const title = fallbackTitle || productData?.name || "Product Title";
-  const brandLogo = fallbackBrandLogo || productData?.brand?.logo || "/images/samsung.png";
-  const ratingCount = productData?.rating_count?.toString() || "0";
-  const model = productData?.model_number || "Model";
-  const sku = productData?.variants?.[0]?.sku || "SKU";
-  const price = fallbackPrice || productData?.main_price || "Price";
-  const originalPrice = fallbackOriginalPrice || productData?.stroked_price || "Price";
-  const discountLabel = fallbackDiscountLabel || productData?.discount || "0% Off";
-  const saveLabel = fallbackSaveLabel || productData?.discount || "Save Amount";
   const emiText = productData?.emi_start || "EMI Available";
   const emiDetailsLabel = productData?.emi_facility?.link_label || "See details";
   const colorLabel = "Color";
@@ -196,16 +216,59 @@ export default function AddToCartModal({
     "Category";
 
 
-  const attributesForUi = (productData?.attributes ?? []).filter((attribute) => (attribute.values?.length ?? 0) > 0);
-  const variants = useMemo(() => productData?.variants ?? [], [productData]);
-  const fallbackColorDetails = useMemo(() => (productData?.colors ?? []).map((color) => ({
-    name: color,
-    code: isHexColor(color) ? color : null,
-  })), [productData?.colors]);
+  const attributesForUi = useMemo(() => {
+    let attrs = productData?.attributes || [];
+    if (typeof attrs === 'string') {
+      try {
+        attrs = JSON.parse(attrs);
+      } catch {
+        attrs = [];
+      }
+    }
+    return (Array.isArray(attrs) ? attrs : []).filter((attribute) => (attribute.values?.length ?? 0) > 0);
+  }, [productData?.attributes]);
 
-  const colorsForUi = useMemo(() => (productData?.color_details?.length ?? 0) > 0
-    ? (productData?.color_details ?? [])
-    : fallbackColorDetails, [productData?.color_details, fallbackColorDetails]);
+  const variants = useMemo(() => {
+    let v = productData?.variants || [];
+    if (typeof v === 'string') {
+      try {
+        v = JSON.parse(v);
+      } catch {
+        v = [];
+      }
+    }
+    return Array.isArray(v) ? v : [];
+  }, [productData]);
+
+  const fallbackColorDetails = useMemo(() => {
+    let cols = productData?.colors || [];
+    if (typeof cols === 'string') {
+      const colString = cols as string;
+      try {
+        cols = JSON.parse(colString);
+      } catch {
+        cols = colString.split(',').map(c => c.trim()).filter(Boolean);
+      }
+    }
+    return (Array.isArray(cols) ? cols : []).map((color: string | { name?: string; value?: string; code?: string }) => ({
+      name: typeof color === 'string' ? color : color.name || color.value || 'Color',
+      code: typeof color === 'string' ? (isHexColor(color) ? color : null) : color.code || color.value || null,
+    }));
+  }, [productData?.colors]);
+
+  const colorsForUi = useMemo(() => {
+    let colorDetails = productData?.color_details || [];
+    if (typeof colorDetails === 'string') {
+      try {
+        colorDetails = JSON.parse(colorDetails);
+      } catch {
+        colorDetails = [];
+      }
+    }
+    return (Array.isArray(colorDetails) && colorDetails.length > 0)
+      ? colorDetails
+      : fallbackColorDetails;
+  }, [productData?.color_details, fallbackColorDetails]);
 
   const colorOptions = useMemo(() => {
     return colorsForUi.map((color, index) => {
@@ -235,22 +298,83 @@ export default function AddToCartModal({
       const attributeKey = String(attribute.attribute_id ?? attribute.name ?? "");
       const selectedValue = selectedAttributes[attributeKey];
       if (!selectedValue) return true;
-      return variantName.includes(toComparable(selectedValue));
+      const normalizedValue = toComparable(selectedValue).replace(/[\s-]/g, "");
+      const normalizedVariant = variantName.replace(/[\s-]/g, "");
+      return normalizedVariant.includes(normalizedValue);
     });
   });
 
   const selectedSku = selectedVariant?.sku || sku;
   const selectedAvailability = (selectedVariant?.qty ?? productData?.current_stock ?? 0) > 0 ? "In Stock" : "Out of Stock";
 
+  // Dynamic Pricing Logic
+  const discountValue = Number(productData?.discount_value || 0);
+  const discountType = (productData?.discount_type as string) || "percent";
+
+  const basePriceNum = selectedVariant ? Number(selectedVariant.price) : Number(productData?.calculable_price || 0);
+
+  let finalPriceNum = basePriceNum;
+  let originalPriceNum = basePriceNum;
+  let saveAmountNum = 0;
+
+  if (discountValue > 0) {
+    if (discountType === "percent") {
+      if (selectedVariant) {
+        saveAmountNum = basePriceNum * (discountValue / 100);
+        finalPriceNum = basePriceNum - saveAmountNum;
+        originalPriceNum = basePriceNum;
+      } else {
+        finalPriceNum = Number(productData?.calculable_price || 0);
+        const stroked = productData?.stroked_price ? Number(String(productData.stroked_price).replace(/[^0-9.-]+/g, "")) : 0;
+        originalPriceNum = stroked || (finalPriceNum / (1 - discountValue / 100));
+        saveAmountNum = originalPriceNum - finalPriceNum;
+      }
+    } else {
+      if (selectedVariant) {
+        saveAmountNum = discountValue;
+        finalPriceNum = basePriceNum - discountValue;
+        originalPriceNum = basePriceNum;
+      } else {
+        finalPriceNum = Number(productData?.calculable_price || 0);
+        saveAmountNum = discountValue;
+        originalPriceNum = finalPriceNum + discountValue;
+      }
+    }
+  }
+
+  const price = formatCurrency(finalPriceNum);
+  const originalPrice = formatCurrency(originalPriceNum);
+  const discountLabel = productData?.discount || (discountValue > 0 ? (discountType === "percent" ? `${discountValue}% Off` : `${formatCurrency(discountValue)} Off`) : "0% Off");
+  const saveLabel = `Save : ${formatCurrency(saveAmountNum)}`;
+
   const displayGallery = useMemo(() => {
     const images = new Set<string>();
     const thumb = productData?.thumbnail_image || mainImage || "/images/wm2.png";
     if (thumb) images.add(thumb);
-    productData?.photos?.forEach((p: { path?: string; photo?: string }) => {
-      const img = p.path || p.photo;
+
+    let photos = productData?.photos || [];
+    if (typeof photos === 'string') {
+      try {
+        photos = JSON.parse(photos);
+      } catch {
+        photos = [];
+      }
+    }
+
+    (Array.isArray(photos) ? photos : []).forEach((p: { path?: string; photo?: string }) => {
+      const img = p.path || p.photo || (typeof p === 'string' ? p : null);
       if (img) images.add(img);
     });
-    (productData?.variants ?? []).forEach((v: { image?: string }) => {
+
+    let variantsData = productData?.variants || [];
+    if (typeof variantsData === 'string') {
+      try {
+        variantsData = JSON.parse(variantsData);
+      } catch {
+        variantsData = [];
+      }
+    }
+    (Array.isArray(variantsData) ? variantsData : []).forEach((v: { image?: string | null }) => {
       if (v.image) images.add(v.image);
     });
     return Array.from(images);
@@ -306,6 +430,49 @@ export default function AddToCartModal({
       router.push("/login?redirect=/checkout");
     } else {
       router.push("/checkout");
+    }
+  };
+
+  const handleToggleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!isAuthenticated) {
+      router.push(`/login?redirect=${window.location.pathname}`);
+      return;
+    }
+
+    if (isWishlisted) {
+      dispatch(removeFromWishlistAsync(productSlug));
+    } else {
+      const item: WishlistItem = {
+        id: productSlug,
+        productId: Number(productData?.id || 0),
+        title,
+        brand: brandName,
+        image: finalMainImage,
+        price,
+        originalPrice,
+        discountLabel,
+        saveAmount: saveLabel,
+        color: activeColorName,
+        type: categoryName,
+        weight: (fallbackWeight || productData?.weight) ? `${fallbackWeight || productData?.weight}kg` : "N/A",
+        model,
+      };
+      dispatch(addToWishlistAsync(item)).then((result) => {
+        if (addToWishlistAsync.fulfilled.match(result)) {
+          dispatch(showToast({
+            message: "Added to Wishlist!",
+            type: 'success',
+            productName: title,
+            productImage: finalMainImage,
+            productPrice: price,
+            actionLabel: "View Wishlist",
+            actionLink: "/dashboard/wishlist"
+          }));
+        }
+      });
     }
   };
 
@@ -427,13 +594,17 @@ export default function AddToCartModal({
 
                 <div className="flex items-center gap-6 ">
                   <p className="text-2xl font-semibold text-[#0C73DA]">{price}</p>
-                  <div className="flex flex-col justify-center">
-                    <p className="text-[12px] font-semibold text-[#15A85B] uppercase tracking-wide">{discountLabel}</p>
-                    <p className="text-[14px] text-slate-400 line-through">{originalPrice}</p>
-                  </div>
-                  <span className="rounded-tl-2xl rounded-br-2xl bg-[#F13D36] px-4 py-1 text-xs font-medium text-white shadow-sm">
-                    SAVE: {(Number(originalPrice.replace(/[^0-9.-]+/g, "")) - Number(price.replace(/[^0-9.-]+/g, ""))).toFixed(2)}
-                  </span>
+                  {saveAmountNum > 0 && (
+                    <>
+                      <div className="flex flex-col justify-center">
+                        <p className="text-[12px] font-semibold text-[#15A85B] uppercase tracking-wide">{discountLabel}</p>
+                        <p className="text-[14px] text-slate-400 line-through">{originalPrice}</p>
+                      </div>
+                      <span className="rounded-tl-2xl rounded-br-2xl bg-[#F13D36] px-4 py-1 text-xs font-medium text-white shadow-sm">
+                        {saveLabel}
+                      </span>
+                    </>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-3 border-y border-slate-100 py-2 text-sm text-slate-700">
@@ -503,7 +674,11 @@ export default function AddToCartModal({
                       </button>
                     </div>
 
-                    <button type="button" className="p-2 rounded-full border border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-100 hover:bg-red-50 transition-all">
+                    <button
+                      type="button"
+                      onClick={handleToggleWishlist}
+                      className={`p-2 rounded-full border transition-all ${isWishlisted ? "text-red-500 border-red-100 bg-red-50" : "text-slate-400 border-slate-200 hover:text-red-500 hover:border-red-100 hover:bg-red-50"}`}
+                    >
                       <FaHeart className="h-4 w-4" />
                     </button>
                     <button type="button" className="p-2 rounded-full border border-slate-200 text-slate-400 hover:text-blue-500 hover:border-blue-100 hover:bg-blue-50 transition-all">
@@ -557,12 +732,24 @@ export default function AddToCartModal({
                   <div className="rounded-xl border border-blue-100 bg-blue-50/30 p-3">
                     <p className="text-xs font-bold text-[#0C73DA] mb-2">*{specialOfferLeft} =</p>
                     <div className="flex flex-wrap gap-4">
-                      {productData?.special_offers?.map((offer, index) => (
-                        <div key={index} className="flex items-center gap-2 text-xs font-semibold text-slate-800">
-                          {offer.image && <Image src={offer.image} alt="Offer" width={32} height={20} className="h-5 w-auto object-contain" />}
-                          {offer.text}
-                        </div>
-                      )) || (
+                      {(() => {
+                        let offers = productData?.special_offers || [];
+                        if (typeof offers === 'string') {
+                          try {
+                            offers = JSON.parse(offers);
+                          } catch {
+                            offers = [];
+                          }
+                        }
+                        if (Array.isArray(offers) && offers.length > 0) {
+                          return offers.map((offer: { image?: string | null; text?: string }, index: number) => (
+                            <div key={index} className="flex items-center gap-2 text-xs font-semibold text-slate-800">
+                              {offer.image && <Image src={offer.image} alt="Offer" width={32} height={20} className="h-5 w-auto object-contain" />}
+                              {offer.text}
+                            </div>
+                          ));
+                        }
+                        return (
                           <>
                             <div className="flex items-center gap-2 text-xs font-semibold text-slate-800">
                               <Image src="/images/ebl.png" alt="EBL" width={32} height={20} className="h-5 w-auto object-contain" />
@@ -573,7 +760,8 @@ export default function AddToCartModal({
                               {specialOfferTwo}
                             </div>
                           </>
-                        )}
+                        );
+                      })()}
                     </div>
                   </div>
 

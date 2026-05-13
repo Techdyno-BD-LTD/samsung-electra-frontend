@@ -22,7 +22,15 @@ export default function MobileProductGallery({
 }: MobileProductGalleryProps) {
   const galleryImages = useMemo(
     () => {
-      const productImages = productData?.photos?.map((photo) => photo.path || photo.photo || "").filter(Boolean) || [];
+      let photos = productData?.photos || [];
+      if (typeof photos === 'string') {
+        try {
+          photos = JSON.parse(photos);
+        } catch {
+          photos = [];
+        }
+      }
+      const productImages = (Array.isArray(photos) ? photos : []).map((photo) => photo.path || photo.photo || "").filter(Boolean) || [];
       return (productImages.length > 0 ? productImages : images.length > 0 ? images : [productData?.thumbnail_image || '/images/wm2.png']);
     },
     [images, productData?.photos, productData?.thumbnail_image]

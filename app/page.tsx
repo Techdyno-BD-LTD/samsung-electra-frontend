@@ -102,8 +102,8 @@ export default async function Home() {
 
   return (
     <div className="space-y-16">
-      <section className=" mx-auto  py-8 mt-8">
-        <HeroSection/>
+      <section className=" mx-auto mt-0 lg:mt-8  py-6 ">
+        <HeroSection />
         <div className="mt-5">
           <ServiceHighlights />
         </div>
@@ -111,9 +111,9 @@ export default async function Home() {
           <ShopByCategory />
         </div>
         <div className="lg:mt-14 mt-5">
-          <PopularProducts/>
+          <PopularProducts />
         </div>
-         <div className="lg:mt-14 mt-5">
+        <div className="lg:mt-14 mt-5">
           <StoreBanner />
         </div>
         <div className="lg:mt-14 mt-5 ">
@@ -143,7 +143,7 @@ export default async function Home() {
         <div className="lg:mt-14 mt-5">
           <SingleWideBanner />
         </div>
-      
+
         {secondarySections.map((section) => (
           <div className="lg:mt-14 mt-5" key={`${section.categoryId}-${section.categorySlug}`}>
             <CategoryWiseProducts
@@ -155,7 +155,7 @@ export default async function Home() {
           </div>
         ))}
 
-          <div className="lg:mt-14 mt-5">
+        <div className="lg:mt-14 mt-5">
           <Newsletter />
         </div>
         <div className="lg:mt-14 mt-5">
@@ -164,8 +164,8 @@ export default async function Home() {
         <div className="lg:mt-14 mt-5">
           <AboutElectraHtmlSection />
         </div>
-       
-        
+
+
       </section>
     </div>
   );

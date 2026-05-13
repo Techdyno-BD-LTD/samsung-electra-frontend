@@ -1,25 +1,73 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FiShoppingBag, FiCalendar } from "react-icons/fi";
 
+interface CampingOffer {
+  id: number;
+  title: string;
+  slug: string;
+  banner: string;
+  start_date: number;
+  end_date: number;
+  created_at: string;
+}
+
+const formatUnixDate = (unix: number | null) => {
+  if (!unix) return "N/A";
+  const date = new Date(unix * 1000);
+  return date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
+
+const getTimeAgo = (dateStr: string | null) => {
+  if (!dateStr) return "";
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  if (diffInSeconds < 60) return "Just now";
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  if (diffInMinutes < 60) return `${diffInMinutes} Minute${diffInMinutes > 1 ? "s" : ""} Ago`;
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) return `${diffInHours} Hour${diffInHours > 1 ? "s" : ""} Ago`;
+  const diffInDays = Math.floor(diffInHours / 24);
+  return `${diffInDays} Day${diffInDays > 1 ? "s" : ""} Ago`;
+};
+
 const OffersPage = () => {
-  const offers = [
-    {
-      id: 1,
-      image: "/images/slider01.png",
-      dateRange: "22 Jan 2026 - 22 Feb 2026",
-      timeAgo: "2 Hour Ago"
-    },
-    {
-      id: 2,
-      image: "/images/slider02.png", // Assuming slider02 exists as seen in previous list_dir
-      dateRange: "22 Jan 2026 - 22 Feb 2026",
-      timeAgo: "2 Hour Ago"
+  const [offers, setOffers] = useState<CampingOffer[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchOffers() {
+      try {
+        const res = await fetch("/api/v2/camping-offers");
+        const json = await res.json();
+        if (json.success) {
+          setOffers(json.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch dashboard offers:", err);
+      } finally {
+        setLoading(false);
+      }
     }
-  ];
+    fetchOffers();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[400px] items-center justify-center bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-black/5">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-300 border-t-blue-600"></div>
+      </div>
+    );
+  }
 
   if (offers.length === 0) {
     return (
@@ -60,20 +108,22 @@ const OffersPage = () => {
         <div className="p-6 lg:p-6 space-y-8">
           {offers.map((offer) => (
             <div key={offer.id} className="group">
-              <div className="relative w-full aspect-[3/1] lg:aspect-[4/1] rounded-2xl overflow-hidden border border-slate-100 shadow-sm transition-transform duration-300 hover:scale-[1.01]">
-                <Image
-                  src={offer.image}
-                  alt="Offer Banner"
-                  fill
-                  className="object-cover"
-                />
-              </div>
+              <Link href={`/camping/details/${offer.slug}`}>
+                <div className="relative w-full aspect-[3/1] lg:aspect-[4/1] rounded-2xl overflow-hidden border border-slate-100 shadow-sm transition-transform duration-300 hover:scale-[1.01]">
+                  <Image
+                    src={offer.banner}
+                    alt={offer.title}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              </Link>
               <div className="mt-4 flex flex-col gap-1 px-2">
                 <div className="flex items-center gap-2 text-[13px] text-slate-600 font-medium">
                   <FiCalendar className="text-slate-400" />
-                  <span>{offer.dateRange}</span>
+                  <span>{formatUnixDate(offer.start_date)} - {formatUnixDate(offer.end_date)}</span>
                 </div>
-                <p className="text-[11px] text-slate-400 px-5">{offer.timeAgo}</p>
+                <p className="text-[11px] text-slate-400 px-5">{getTimeAgo(offer.created_at)}</p>
               </div>
               <div className="h-[1px] bg-slate-50 mt-8 group-last:hidden"></div>
             </div>

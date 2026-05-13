@@ -1,9 +1,211 @@
 "use client";
 
-import React from "react";
-import { FiImage, FiChevronDown } from "react-icons/fi";
+import React, { useState, useEffect } from "react";
+import { FiImage, FiChevronDown, FiLoader } from "react-icons/fi";
+import { useAppSelector, useAppDispatch } from "@/store/hooks";
+import { showToast } from "@/store/features/toast/toastSlice";
+
+interface DeliveredProduct {
+  product_id: number;
+  product_name: string;
+  product_slug: string;
+  product_thumbnail: string;
+  order_code: string;
+  order_date: string;
+  variation: string | null;
+}
 
 const ComplainPage = () => {
+  const dispatch = useAppDispatch();
+  const { token, user } = useAppSelector((state) => state.auth);
+  const [products, setProducts] = useState<DeliveredProduct[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+
+  const [formData, setFormData] = useState({
+    full_name: user?.name || "",
+    mobile_number: user?.phone || "",
+    email: user?.email || "",
+    product_id: "",
+    order_code: "",
+    purchase_date: "",
+    category: "",
+    description: "",
+    documents: ""
+  });
+
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        full_name: user.name || "",
+        mobile_number: user.phone || "",
+        email: user.email || ""
+      }));
+    }
+  }, [user]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [productsRes, categoriesRes] = await Promise.all([
+          fetch("/api/v2/complains/delivered-products", {
+            headers: { Authorization: `Bearer ${token}` }
+          }),
+          fetch("/api/v2/complains/categories")
+        ]);
+
+        const productsData = await productsRes.json();
+        const categoriesData = await categoriesRes.json();
+
+        if (productsData.success) setProducts(productsData.data);
+        if (categoriesData.success) setCategories(categoriesData.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (token) {
+      fetchData();
+    }
+  }, [token]);
+
+  const handleProductChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const productId = e.target.value;
+    const selectedProduct = products.find(p => String(p.product_id) === productId);
+    
+    if (selectedProduct) {
+      setFormData(prev => ({
+        ...prev,
+        product_id: productId,
+        order_code: selectedProduct.order_code,
+        purchase_date: selectedProduct.order_date ? new Date(Number(selectedProduct.order_date) * 1000).toISOString().split('T')[0] : ""
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        product_id: productId
+      }));
+    }
+  };
+
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [uploadedDocs, setUploadedDocs] = useState<string[]>([]);
+  const [uploadingDoc, setUploadingDoc] = useState(false);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingDoc(true);
+    const formDataUpload = new FormData();
+    formDataUpload.append("document", file);
+
+    try {
+      const response = await fetch("/api/v2/complains/upload", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: formDataUpload
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setUploadedDocs(prev => [...prev, result.data.url]);
+        dispatch(showToast({
+          message: "Document uploaded successfully",
+          type: 'success'
+        }));
+      } else {
+        dispatch(showToast({
+          message: result.message || "Upload failed",
+          type: 'error'
+        }));
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      dispatch(showToast({
+        message: "Upload failed",
+        type: 'error'
+      }));
+    } finally {
+      setUploadingDoc(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.category || !formData.description) {
+      dispatch(showToast({
+        message: "Please fill all required fields",
+        type: 'error'
+      }));
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const submissionData = {
+        ...formData,
+        documents: uploadedDocs.join(",")
+      };
+
+      const response = await fetch("/api/v2/complains/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(submissionData)
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        dispatch(showToast({
+          message: "Complaint submitted successfully",
+          type: 'success'
+        }));
+        setFormData(prev => ({
+          ...prev,
+          product_id: "",
+          order_code: "",
+          purchase_date: "",
+          category: "",
+          description: "",
+          documents: ""
+        }));
+        setUploadedDocs([]);
+      } else {
+        dispatch(showToast({
+          message: result.message || "Failed to submit complaint",
+          type: 'error'
+        }));
+      }
+    } catch (error) {
+      console.error("Error submitting complain:", error);
+      dispatch(showToast({
+        message: "Something went wrong",
+        type: 'error'
+      }));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <FiLoader className="w-8 h-8 animate-spin text-blue-500" />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-6 ">
       <div className="bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-black/5 overflow-hidden">
@@ -12,22 +214,43 @@ const ComplainPage = () => {
         </div>
 
         <div className="p-6 lg:p-8">
-           <form className="space-y-6">
+           <form className="space-y-6" onSubmit={handleSubmit}>
               {/* Row 1 */}
               <div className="space-y-1.5">
                  <label className="text-[13px] font-semibold text-slate-700 ml-1">Full Name<span className="text-blue-400">*</span></label>
-                 <input type="text" placeholder="Enter last name" className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm font-medium focus:outline-none focus:border-[#2b7fe8] transition-colors shadow-sm" />
+                 <input 
+                  type="text" 
+                  placeholder="Enter full name" 
+                  value={formData.full_name}
+                  onChange={e => setFormData({...formData, full_name: e.target.value})}
+                  className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm font-medium focus:outline-none focus:border-[#2b7fe8] transition-colors shadow-sm" 
+                  required
+                 />
               </div>
 
               {/* Row 2 */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                  <div className="space-y-1.5">
                     <label className="text-[13px] font-semibold text-slate-700 ml-1">Mobile Number<span className="text-blue-400">*</span></label>
-                    <input type="text" placeholder="Enter number" className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm font-medium focus:outline-none focus:border-[#2b7fe8] transition-colors shadow-sm" />
+                    <input 
+                      type="text" 
+                      placeholder="Enter number" 
+                      value={formData.mobile_number}
+                      onChange={e => setFormData({...formData, mobile_number: e.target.value})}
+                      className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm font-medium focus:outline-none focus:border-[#2b7fe8] transition-colors shadow-sm" 
+                      required
+                    />
                  </div>
                  <div className="space-y-1.5">
                     <label className="text-[13px] font-semibold text-slate-700 ml-1">E-mail Address<span className="text-blue-400">*</span></label>
-                    <input type="email" placeholder="Enter email" className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm font-medium focus:outline-none focus:border-[#2b7fe8] transition-colors shadow-sm" />
+                    <input 
+                      type="email" 
+                      placeholder="Enter email" 
+                      value={formData.email}
+                      onChange={e => setFormData({...formData, email: e.target.value})}
+                      className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm font-medium focus:outline-none focus:border-[#2b7fe8] transition-colors shadow-sm" 
+                      required
+                    />
                  </div>
               </div>
 
@@ -35,11 +258,33 @@ const ComplainPage = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                  <div className="space-y-1.5">
                     <label className="text-[13px] font-semibold text-slate-700 ml-1">Product Name<span className="text-blue-400">*</span></label>
-                    <input type="text" placeholder="name" className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm font-medium focus:outline-none focus:border-[#2b7fe8] transition-colors shadow-sm" />
+                    <div className="relative">
+                       <select 
+                        value={formData.product_id}
+                        onChange={handleProductChange}
+                        className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm font-medium text-slate-700 appearance-none outline-none focus:border-[#2b7fe8] transition-colors shadow-sm"
+                        required
+                       >
+                          <option value="">Select Product</option>
+                          {products.map(p => (
+                            <option key={`${p.product_id}-${p.order_code}`} value={p.product_id}>
+                              {p.product_name} ({p.order_code})
+                            </option>
+                          ))}
+                       </select>
+                       <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                    </div>
                  </div>
                  <div className="space-y-1.5">
                     <label className="text-[13px] font-semibold text-slate-700 ml-1">Order Code<span className="text-blue-400">*</span></label>
-                    <input type="text" placeholder="enter code" className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm font-medium focus:outline-none focus:border-[#2b7fe8] transition-colors shadow-sm" />
+                    <input 
+                      type="text" 
+                      placeholder="enter code" 
+                      value={formData.order_code}
+                      onChange={e => setFormData({...formData, order_code: e.target.value})}
+                      className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm font-medium focus:outline-none focus:border-[#2b7fe8] transition-colors shadow-sm" 
+                      readOnly
+                    />
                  </div>
               </div>
 
@@ -47,13 +292,27 @@ const ComplainPage = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                  <div className="space-y-1.5">
                     <label className="text-[13px] font-semibold text-slate-700 ml-1">Date of purchase<span className="text-blue-400">*</span></label>
-                    <input type="date" className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm font-medium text-slate-400 outline-none focus:border-[#2b7fe8] transition-colors shadow-sm" />
+                    <input 
+                      type="date" 
+                      value={formData.purchase_date}
+                      onChange={e => setFormData({...formData, purchase_date: e.target.value})}
+                      className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm font-medium text-slate-700 outline-none focus:border-[#2b7fe8] transition-colors shadow-sm" 
+                      readOnly
+                    />
                  </div>
                  <div className="space-y-1.5">
                     <label className="text-[13px] font-semibold text-slate-700 ml-1">Complain Category<span className="text-blue-400">*</span></label>
                     <div className="relative">
-                       <select className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm font-medium text-slate-400 appearance-none outline-none focus:border-[#2b7fe8] transition-colors shadow-sm">
-                          <option>select category</option>
+                       <select 
+                        value={formData.category}
+                        onChange={e => setFormData({...formData, category: e.target.value})}
+                        className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm font-medium text-slate-700 appearance-none outline-none focus:border-[#2b7fe8] transition-colors shadow-sm"
+                        required
+                       >
+                          <option value="">select category</option>
+                          {categories.map(cat => (
+                            <option key={cat} value={cat}>{cat}</option>
+                          ))}
                        </select>
                        <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                     </div>
@@ -63,20 +322,66 @@ const ComplainPage = () => {
               {/* Row 5 */}
               <div className="space-y-1.5">
                  <label className="text-[13px] font-semibold text-slate-700 ml-1">Detailed Description of the Complaint<span className="text-blue-400">*</span></label>
-                 <textarea rows={6} placeholder="write" className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-[#2b7fe8] transition-colors resize-none overflow-hidden shadow-sm" defaultValue={""} />
+                 <textarea 
+                  rows={6} 
+                  placeholder="write" 
+                  value={formData.description}
+                  onChange={e => setFormData({...formData, description: e.target.value})}
+                  className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-[#2b7fe8] transition-colors resize-none shadow-sm" 
+                  required
+                 />
               </div>
 
               {/* Row 6: Upload */}
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pt-4">
-                 <div className="flex items-center gap-4 cursor-pointer group">
+              <div className="space-y-4 pt-4">
+                 <div 
+                  className="flex items-center gap-4 cursor-pointer group"
+                  onClick={() => fileInputRef.current?.click()}
+                 >
                     <div className="w-12 h-12 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center text-slate-400 group-hover:text-[#2b7fe8] transition-colors">
-                       <FiImage className="text-xl" />
+                       {uploadingDoc ? <FiLoader className="animate-spin text-xl" /> : <FiImage className="text-xl" />}
                     </div>
                     <div>
-                       <p className="text-[11px] text-slate-400 font-medium group-hover:text-slate-600">Upload Supporting Documents (if any)</p>
+                       <p className="text-[11px] text-slate-400 font-medium group-hover:text-slate-600">
+                         {uploadingDoc ? "Uploading..." : "Upload Supporting Documents (if any)"}
+                       </p>
                     </div>
+                    <input 
+                      type="file"
+                      ref={fileInputRef}
+                      className="hidden"
+                      onChange={handleFileChange}
+                      accept="image/*,.pdf"
+                    />
                  </div>
-                 <button type="button" className="bg-[#2b7fe8] text-white px-12 py-3 rounded-lg text-sm font-semibold hover:bg-[#1a6ed9] transition-all shadow-md">Submit</button>
+
+                 {uploadedDocs.length > 0 && (
+                   <div className="flex flex-wrap gap-2">
+                     {uploadedDocs.map((doc, idx) => (
+                       <div key={idx} className="bg-slate-50 border border-slate-100 rounded-lg px-3 py-1 text-[10px] text-slate-600 flex items-center gap-2">
+                         <span>Document {idx + 1}</span>
+                         <button 
+                          type="button" 
+                          onClick={() => setUploadedDocs(prev => prev.filter((_, i) => i !== idx))}
+                          className="text-red-400 hover:text-red-600"
+                         >
+                           ×
+                         </button>
+                       </div>
+                     ))}
+                   </div>
+                 )}
+
+                 <div className="flex justify-end">
+                    <button 
+                      type="submit" 
+                      disabled={submitting || uploadingDoc}
+                      className="bg-[#2b7fe8] text-white px-12 py-3 rounded-lg text-sm font-semibold hover:bg-[#1a6ed9] transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    >
+                      {submitting && <FiLoader className="animate-spin" />}
+                      {submitting ? "Submitting..." : "Submit"}
+                    </button>
+                 </div>
               </div>
            </form>
         </div>
@@ -84,5 +389,6 @@ const ComplainPage = () => {
     </div>
   );
 };
+
 
 export default ComplainPage;

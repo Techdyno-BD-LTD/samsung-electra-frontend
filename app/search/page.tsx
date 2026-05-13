@@ -1,5 +1,3 @@
-"use client"
-import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import CategorySidebar from "@/components/category/CategorySidebar";
 import CategoryHeroBanner from "@/components/category/CategoryHeroBanner";
@@ -8,10 +6,23 @@ import SearchProductGrid from "@/components/search/SearchProductGrid";
 import CategoryFAQ from "@/components/category/CategoryFAQ";
 import { HiChevronLeft } from "react-icons/hi2";
 
-export default function SearchPage() {
-  const searchParams = useSearchParams();
-  const query = searchParams.get("q") || "";
-  const categoryId = searchParams.get("cat");
+export default async function SearchPage({ searchParams }: { searchParams: { q?: string; cat?: string } }) {
+  const query = searchParams.q || "";
+  const categoryId = searchParams.cat || null;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+
+  let filteringAttributes = [];
+  try {
+    const attrRes = await fetch(`${siteUrl}/api/filtering-attributes`, {
+      cache: 'no-store'
+    });
+    if (attrRes.ok) {
+      const attrPayload = await attrRes.json();
+      filteringAttributes = attrPayload.data || [];
+    }
+  } catch (err) {
+    console.error("Error fetching search filtering attributes:", err);
+  }
 
   return (
     <div className="mainwidth mx-auto px-4 lg:px-0">
@@ -60,12 +71,16 @@ export default function SearchPage() {
         <div className="mt-2 lg:mt-6 flex gap-[1%]">
           {/* Desktop Filter panel */}
           <aside className="hidden w-[24%] shrink-0 lg:block">
-            <CategoryFilterPanel />
+            <CategoryFilterPanel filteringAttributes={filteringAttributes} />
           </aside>
 
           {/* Product grid */}
           <div className="min-w-0 flex-1 lg:w-[73%]">
-            <SearchProductGrid query={query} categoryId={categoryId} />
+            <SearchProductGrid 
+              query={query} 
+              categoryId={categoryId} 
+              filteringAttributes={filteringAttributes} 
+            />
           </div>
         </div>
 

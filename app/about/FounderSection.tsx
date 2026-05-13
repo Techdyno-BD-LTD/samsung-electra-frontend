@@ -5,9 +5,10 @@ interface FounderSectionProps {
     name: string;
     year: string;
     description: string;
+    image?: string;
 }
 
-const FounderSection: React.FC<FounderSectionProps> = ({ sectionTitle, name, year, description }) => {
+const FounderSection: React.FC<FounderSectionProps> = ({ sectionTitle, name, year, description, image }) => {
     return (
         <section className="mx-auto w-full max-w-[1400px] p-6 md:p-10 ">
             <div className="flex flex-col md:flex-row items-center gap-8 md:gap-16">
@@ -26,11 +27,19 @@ const FounderSection: React.FC<FounderSectionProps> = ({ sectionTitle, name, yea
                 {/* Smaller Image Placeholder */}
                 <div className="w-full md:w-1/3 lg:w-[35%]">
                     <div className="relative aspect-[1/1] bg-[#F4F4F4] rounded-sm flex items-center justify-center overflow-hidden border border-slate-100/50">
-                        <div className="flex flex-col items-center gap-2 opacity-50">
-                            <svg className="w-32 h-32 text-[#4A90E2]" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" />
-                            </svg>
-                        </div>
+                        {image ? (
+                            <img 
+                                src={image} 
+                                alt={name} 
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            <div className="flex flex-col items-center gap-2 opacity-50">
+                                <svg className="w-32 h-32 text-[#4A90E2]" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" />
+                                </svg>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

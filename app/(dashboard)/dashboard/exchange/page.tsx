@@ -1,42 +1,79 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { FiShoppingBag } from "react-icons/fi";
+import { FiShoppingBag, FiLoader, FiX } from "react-icons/fi";
+
+export const forceDynamic = "force-dynamic";
+
+interface ExchangeProduct {
+  id: number;
+  name: string;
+  image: string;
+  description: string;
+}
 
 const ExchangeProductPage = () => {
+  const [products, setProducts] = useState<ExchangeProduct[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedProduct, setSelectedProduct] = useState<ExchangeProduct | null>(null);
 
-  const categories = [
-    { name: "Refrigerator", image: "/images/electrafridge.png" },
-    { name: "Washing Machine", image: "/images/electrawm.png" },
-    { name: "Deep Freezer", image: "/images/electradeep.png" },
-    { name: "LED TV", image: "/images/electratv.png" }
-  ];
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch("/api/v2/exchange-products");
+        const payload = await response.json();
+        if (payload.success) {
+          setProducts(payload.data || []);
+        }
+      } catch (error) {
+        console.error("Failed to fetch exchange products", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   return (
-    <div className="flex flex-col gap-6 ">
+    <div className="flex flex-col gap-6">
       <div className="bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-black/5 overflow-hidden">
         <div className="p-6 lg:p-8 border-slate-100">
           <h2 className="text-xl lg:text-xl font-semibold text-slate-800 mb-6">Select below what you want to exchange.</h2>
           
-          {/* Product Category Grid */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            {categories.map((cat, i) => (
-              <div key={i} className="bg-slate-50/80 border border-slate-100 rounded-2xl p-6 flex flex-col items-center justify-between group cursor-pointer transition-all hover:shadow-md hover:bg-white hover:-translate-y-1">
-                <div className="relative w-full aspect-square mb-4">
-                  <Image
-                    src={cat.image}
-                    alt={cat.name}
-                    fill
-                    className="object-contain"
-                  />
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-20 gap-4">
+              <FiLoader className="text-4xl text-blue-500 animate-spin" />
+              <p className="text-slate-400 font-medium">Loading products...</p>
+            </div>
+          ) : products.length > 0 ? (
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+              {products.map((product) => (
+                <div 
+                  key={product.id} 
+                  onClick={() => setSelectedProduct(product)}
+                  className="bg-slate-50/80 border border-slate-100 rounded-2xl p-6 flex flex-col items-center justify-between group cursor-pointer transition-all hover:shadow-md hover:bg-white hover:-translate-y-1"
+                >
+                  <div className="relative w-full aspect-square mb-4">
+                    <Image
+                      src={product.image || "/images/placeholder.png"}
+                      alt={product.name}
+                      fill
+                      className="object-contain p-2"
+                    />
+                  </div>
+                  <h3 className="text-sm font-semibold text-slate-800 text-center">
+                    {product.name}
+                  </h3>
                 </div>
-                <h3 className="text-sm font-semibold text-slate-800 text-center">
-                  {cat.name}
-                </h3>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="py-12 text-center text-slate-400 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
+              <p>No exchange products found.</p>
+            </div>
+          )}
         </div>
 
         {/* Empty State / Application Section */}
@@ -64,6 +101,36 @@ const ExchangeProductPage = () => {
           </button>
         </div>
       </div>
+
+      {/* Modal for Detailed Description */}
+      {selectedProduct && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl w-full max-w-2xl my-auto overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 sticky top-0 z-10 backdrop-blur-md">
+              <h3 className="text-xl font-bold text-slate-800">{selectedProduct.name}</h3>
+              <button 
+                onClick={() => setSelectedProduct(null)}
+                className="p-2 hover:bg-white rounded-full transition-colors text-slate-400 hover:text-slate-600 shadow-sm"
+              >
+                <FiX size={24} />
+              </button>
+            </div>
+            <div className="p-8 max-h-[70vh] overflow-y-auto no-scrollbar">
+              <div className="relative w-full aspect-video rounded-2xl overflow-hidden mb-8 bg-slate-50 border border-slate-100 p-8">
+                 <Image 
+                   src={selectedProduct.image || "/images/placeholder.png"} 
+                   fill 
+                   className="object-contain p-4" 
+                   alt={selectedProduct.name} 
+                 />
+              </div>
+              <div className="rich-text-content">
+                 <div dangerouslySetInnerHTML={{ __html: selectedProduct.description }} />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

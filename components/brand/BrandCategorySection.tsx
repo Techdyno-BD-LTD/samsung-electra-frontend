@@ -11,7 +11,7 @@ interface Brand {
 	tabLogo: string;
 }
 
-interface CategoryProduct {
+export interface CategoryProduct {
 	id: number;
 	brand: string;
 	[key: string]: unknown;

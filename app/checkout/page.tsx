@@ -1,13 +1,34 @@
 "use client"
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
-import { FiChevronRight, FiEdit, FiChevronDown } from 'react-icons/fi';
-// import { HiOutlineTicket } from "react-icons/hi2";
+import { FiChevronRight, FiEdit, FiChevronDown, FiX, FiCheck, FiSearch, FiMapPin, FiMap } from 'react-icons/fi';
+import { HiOutlineTicket } from "react-icons/hi2";
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { clearCart, updateItemDetails } from '@/store/features/cart/cartSlice';
 import { setLastOrder } from '@/store/features/order/orderSlice';
 import { formatCurrency, parseCurrency } from "@/lib/currencyUtils";
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+
+interface Carrier {
+    id: number;
+    name: string;
+    cost: number;
+    transit_time: string;
+    is_pickup?: boolean;
+}
+
+interface PickupPoint {
+    id: number;
+    name: string;
+    address: string;
+    phone: string;
+    type?: string;
+    embedded_map_link?: string;
+    images?: string;
+    district?: string;
+    division?: string;
+    area?: string;
+}
 
 const Checkout = () => {
     const [mounted, setMounted] = useState(false);
@@ -16,7 +37,7 @@ const Checkout = () => {
     const router = useRouter();
     const cartItems = useAppSelector((state) => state.cart.items);
     const { user, token, isAuthenticated } = useAppSelector((state) => state.auth);
-    const [addresses, setAddresses] = useState<any[]>([]);
+    const [addresses, setAddresses] = useState<{ id: number; address: string; phone: string; postal_code: string; name: string; email: string }[]>([]);
     const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
     const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
     const [addressForm, setAddressForm] = useState({
@@ -30,15 +51,33 @@ const Checkout = () => {
         area: '',
     });
 
-    const [districts, setDistricts] = useState<any[]>([]);
-    const [thanas, setThanas] = useState<any[]>([]);
+    const [districts, setDistricts] = useState<{ id: number; name: string }[]>([]);
+    const [thanas, setThanas] = useState<{ id: number; name: string }[]>([]);
 
-    const [paymentMethod, setPaymentMethod] = useState('Online Payment Gateway');
-    const [carriers, setCarriers] = useState<any[]>([]);
+    const [paymentMethod, setPaymentMethod] = useState('');
+    const [carriers, setCarriers] = useState<Carrier[]>([]);
     const [selectedCarrierId, setSelectedCarrierId] = useState<number | null>(null);
-    const [paymentTypes, setPaymentTypes] = useState<{ online: any[], offline: any[] }>({ online: [], offline: [] });
+    const [selectedPickupPointId, setSelectedPickupPointId] = useState<number | null>(null);
+    const [isPickupModalOpen, setIsPickupModalOpen] = useState(false);
+    const [pickupPoints, setPickupPoints] = useState<PickupPoint[]>([]);
+    const [pickupSearchQuery, setPickupSearchQuery] = useState("");
+    const [pickupTypeFilter, setPickupTypeFilter] = useState("All Types");
+    const [pickupDivisionFilter, setPickupDivisionFilter] = useState("All Divisions");
+    const [pickupDistrictFilter, setPickupDistrictFilter] = useState("All Districts");
+    const [previewPickupPointId, setPreviewPickupPointId] = useState<number | null>(null);
+    const [paymentTypes, setPaymentTypes] = useState<{
+        online: { id: number; name: string; thumbnail: string }[],
+        offline: { id: number; heading: string; description: string }[]
+    }>({ online: [], offline: [] });
     const [deliveryNote, setDeliveryNote] = useState('');
     const [agreedToTerms, setAgreedToTerms] = useState(true);
+
+    const [couponCode, setCouponCode] = useState('');
+    const [appliedCoupon, setAppliedCoupon] = useState<{ id: number; code: string; discount: number; type: string; discount_type: string; min_shopping?: number; max_discount?: number; end_date?: number } | null>(null);
+    const [couponDiscount, setCouponDiscount] = useState(0);
+    const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
+    const [allCoupons, setAllCoupons] = useState<{ id: number; code: string; discount: number; type: string; discount_type: string; min_shopping?: number; max_discount?: number; end_date?: number }[]>([]);
+    const [couponError, setCouponError] = useState<string | null>(null);
 
     useEffect(() => {
         setMounted(true);
@@ -101,12 +140,81 @@ const Checkout = () => {
         }
     }, []);
 
+    const fetchPickupPoints = useCallback(async () => {
+        try {
+            const response = await fetch("/api/v2/pickup-list");
+            const payload = await response.json();
+            if (payload.success) {
+                setPickupPoints(payload.data.locations);
+            }
+        } catch (error) {
+            console.error("Failed to fetch pickup points", error);
+        }
+    }, []);
+
+    const fetchCoupons = useCallback(async () => {
+        try {
+            const response = await fetch("/api/coupon/list");
+            const payload = await response.json();
+            if (payload.success) setAllCoupons(payload.data);
+        } catch (error) {
+            console.error("Failed to fetch coupons", error);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchCoupons();
+    }, [fetchCoupons]);
+
+    const handleApplyCoupon = async () => {
+        if (!couponCode) return;
+        setCouponError(null);
+        try {
+            const subtotal = cartItems.reduce((acc, item) => acc + (parseCurrency(item.price) * item.quantity), 0);
+            const response = await fetch("/api/coupon/apply", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    code: couponCode,
+                    total_amount: subtotal,
+                    cart_items: cartItems.map(item => ({
+                        product_id: item.productId,
+                        price: parseCurrency(item.price),
+                        quantity: item.quantity
+                    }))
+                })
+            });
+            const payload = await response.json();
+            if (payload.success) {
+                setAppliedCoupon(payload.data);
+                setCouponDiscount(payload.data.discount);
+                setCouponError(null);
+            } else {
+                setCouponError(payload.message || "Failed to apply coupon");
+            }
+        } catch {
+            setCouponError("An error occurred while applying the coupon.");
+        }
+    };
+
+    const handleRemoveCoupon = () => {
+        setAppliedCoupon(null);
+        setCouponDiscount(0);
+        setCouponCode('');
+        setCouponError(null);
+    };
+
     const fetchPaymentTypes = useCallback(async () => {
         try {
             const response = await fetch("/api/v2/payment-types");
             const payload = await response.json();
             if (payload.success) {
                 setPaymentTypes(payload.data);
+                if (payload.data.online && payload.data.online.length > 0) {
+                    setPaymentMethod(payload.data.online[0].name);
+                } else if (payload.data.offline && payload.data.offline.length > 0) {
+                    setPaymentMethod(payload.data.offline[0].heading);
+                }
             }
         } catch (error) {
             console.error("Failed to fetch payment types", error);
@@ -117,8 +225,9 @@ const Checkout = () => {
         if (mounted) {
             fetchCarriers();
             fetchPaymentTypes();
+            fetchPickupPoints();
         }
-    }, [mounted, fetchCarriers, fetchPaymentTypes]);
+    }, [mounted, fetchCarriers, fetchPaymentTypes, fetchPickupPoints]);
 
     useEffect(() => {
         if (user) {
@@ -169,6 +278,49 @@ const Checkout = () => {
         (addresses as { id: number; address: string; phone: string; postal_code: string; name: string; email: string }[]).find(a => a.id === selectedAddressId),
         [addresses, selectedAddressId]);
 
+    const filteredPickupPoints = useMemo(() => {
+        let result = pickupPoints;
+
+        if (pickupSearchQuery.trim()) {
+            const text = pickupSearchQuery.trim().toLowerCase();
+            result = result.filter((point) => {
+                const haystack = `${point.name} ${point.address} ${point.phone} ${point.area}`.toLowerCase();
+                return haystack.includes(text);
+            });
+        }
+
+        if (pickupTypeFilter !== "All Types") {
+            result = result.filter(s => (s.type === "service_center" ? "Service Center" : s.type === "store" ? "Brand Shop" : s.type) === pickupTypeFilter);
+        }
+        if (pickupDivisionFilter !== "All Divisions") {
+            result = result.filter(s => s.division === pickupDivisionFilter);
+        }
+        if (pickupDistrictFilter !== "All Districts") {
+            result = result.filter(s => s.district === pickupDistrictFilter);
+        }
+
+        return result;
+    }, [pickupSearchQuery, pickupPoints, pickupTypeFilter, pickupDivisionFilter, pickupDistrictFilter]);
+
+    const pickupFilterOptions = useMemo(() => {
+        const types = new Set<string>(["All Types"]);
+        const divisions = new Set<string>(["All Divisions"]);
+        const districts = new Set<string>(["All Districts"]);
+
+        pickupPoints.forEach(s => {
+            const type = s.type === "service_center" ? "Service Center" : s.type === "store" ? "Brand Shop" : s.type;
+            if (type) types.add(type);
+            if (s.division) divisions.add(s.division);
+            if (s.district) districts.add(s.district);
+        });
+
+        return {
+            types: Array.from(types),
+            divisions: Array.from(divisions),
+            districts: Array.from(districts)
+        };
+    }, [pickupPoints]);
+
     // Sync Cart Images and Variants
     useEffect(() => {
         if (!mounted || cartItems.length === 0) return;
@@ -217,9 +369,9 @@ const Checkout = () => {
         const savings = originalSubtotal - subtotal;
         const tax = 0; // Assuming tax is free/0 as per UI
 
-        const carrier = (carriers as { id: number; cost: string }[]).find(c => c.id === selectedCarrierId);
-        const delivery = carrier ? (Number(carrier.cost) || 0) : 0;
-        const total = subtotal + tax + delivery;
+        const carrier = carriers.find(c => c.id === selectedCarrierId);
+        const delivery = carrier ? (carrier.cost || 0) : 0;
+        const total = (subtotal + tax + delivery) - couponDiscount;
 
         return {
             subtotal,
@@ -228,9 +380,10 @@ const Checkout = () => {
             tax,
             delivery,
             total,
+            couponDiscount,
             savePercent: originalSubtotal > 0 ? Math.round((savings / originalSubtotal) * 100) : 0
         };
-    }, [cartItems, carriers, selectedCarrierId]);
+    }, [cartItems, carriers, selectedCarrierId, couponDiscount]);
 
     const handlePlaceOrder = async () => {
         if (cartItems.length === 0) {
@@ -238,8 +391,25 @@ const Checkout = () => {
             return;
         }
 
-        if (!selectedAddress) {
-            alert("Please select a shipping address!");
+        if (!token) {
+            alert("Please login to place order");
+            return;
+        }
+
+        const selectedCarrier = carriers.find(c => c.id === selectedCarrierId);
+        if (!selectedCarrier) {
+            alert("Please select a shipping method");
+            return;
+        }
+
+        const isPickup = selectedCarrier.is_pickup;
+        if (isPickup && !selectedPickupPointId) {
+            alert("Please select a pickup store");
+            return;
+        }
+
+        if (!isPickup && !selectedAddressId) {
+            alert("Please select a shipping address");
             return;
         }
 
@@ -254,11 +424,13 @@ const Checkout = () => {
                     shipping_cost: 0
                 })),
                 shipping_address: selectedAddress,
-                shipping_type: "home_delivery",
+                shipping_type: isPickup ? "pickup" : "home_delivery",
+                pickup_point_id: isPickup ? selectedPickupPointId : 0,
                 carrier_id: selectedCarrierId,
                 shipping_cost: totals.delivery,
-                payment_type: paymentMethod === 'Cash On Delivery' ? 'cod' : 'online',
-                coupon_discount: 0,
+                payment_type: paymentMethod === 'Cash On Delivery' ? 'cod' : (paymentMethod === 'sslcommerz' ? 'sslcommerz' : 'online'),
+                coupon_discount: couponDiscount,
+                coupon_code: appliedCoupon?.code || '',
                 order_from: "web"
             };
 
@@ -274,7 +446,8 @@ const Checkout = () => {
             const data = await response.json();
 
             if (data.success || data.result) {
-                const orderId = data.code || `#${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+                const responseData = data.data || data;
+                const orderId = responseData?.code || data?.code || `#${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
 
                 dispatch(setLastOrder({
                     orderId,
@@ -284,11 +457,38 @@ const Checkout = () => {
                     subtotal: totals.subtotal,
                     savings: totals.savings,
                     tax: totals.tax,
-                    delivery: totals.delivery,
+                    delivery: totals?.delivery,
+                    couponCode: appliedCoupon?.code || '',
+                    couponDiscount: totals.couponDiscount,
                     total: totals.total
                 }));
 
                 dispatch(clearCart());
+
+                // SSLCommerz Redirect Logic
+                if (paymentMethod === 'sslcommerz') {
+                    try {
+                        const initResponse = await fetch("/api/v2/payment/ssl-init", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${token}`
+                            },
+                            body: JSON.stringify({ order_id: responseData.order_id || responseData.id })
+                        });
+                        const initData = await initResponse.json();
+                        if (initData.success && initData.url) {
+                            window.location.href = initData.url;
+                            return;
+                        } else {
+                            alert(initData.message || "Failed to initialize payment gateway.");
+                        }
+                    } catch (error) {
+                        console.error("SSLCommerz initialization failed:", error);
+                        alert("An error occurred while connecting to the payment gateway.");
+                    }
+                }
+
                 router.push('/checkout/success');
             } else {
                 alert(data.message || "Failed to place order.");
@@ -341,7 +541,7 @@ const Checkout = () => {
                                             <div className="bg-[#f8f9fa] border border-gray-100 rounded-xl p-3 mb-4 lg:mb-6">
                                                 <div className="flex justify-between lg:items-start items-center mb-1">
                                                     <h3 className="font-semibold text-gray-900 text-[15px] lg:text-[17px]">
-                                                        {(selectedAddress as any)?.name || user?.name}
+                                                        {((selectedAddress as unknown) as { name?: string })?.name || user?.name}
                                                     </h3>
                                                     <button onClick={() => setIsAddressModalOpen(true)} className="text-[#1877f2] flex items-center text-[12px] lg:text-[15px] font-semibold hover:underline">
                                                         Change / Add <FiEdit className="ml-1.5 w-4 h-4" />
@@ -352,7 +552,7 @@ const Checkout = () => {
                                                         <>
                                                             <p>{(selectedAddress as { address: string }).address}, {(selectedAddress as { postal_code: string }).postal_code}</p>
                                                             <p>Phone: {(selectedAddress as { phone: string }).phone}</p>
-                                                            <p>Email: {(selectedAddress as any).email || user?.email}</p>
+                                                            <p>Email: {((selectedAddress as unknown) as { email?: string })?.email || user?.email}</p>
                                                         </>
                                                     ) : (
                                                         <p className="text-orange-500">Please select or add a shipping address</p>
@@ -395,7 +595,7 @@ const Checkout = () => {
                         <section>
                             <h2 className="lg:text-[24px] text-[18px] font-semibold mb-6 text-gray-900 tracking-wide">Shipping Method</h2>
                             <div className="border border-gray-200 rounded-xl bg-white overflow-hidden mb-6">
-                                {(carriers as { id: number; name: string; cost: string; transit_time: string }[]).map((carrier) => (
+                                {carriers.map((carrier) => (
                                     <div key={carrier.id} className="p-4 lg:p-6 border-b border-gray-100 last:border-0">
                                         <label className="flex items-center space-x-3 cursor-pointer group">
                                             <input
@@ -407,12 +607,50 @@ const Checkout = () => {
                                             />
                                             <div className="flex-1">
                                                 <div className="flex justify-between items-center">
-                                                    <span className="font-medium text-[16px] lg:text-[18px] text-gray-800 group-hover:text-[#1877f2] transition-colors">{carrier.name}</span>
-                                                    <span className="font-bold text-gray-900 text-[14px] lg:text-[16px]">৳{carrier.cost || 0}</span>
+                                                    <span className="font-semibold text-[18px] lg:text-[22px] text-gray-800 group-hover:text-[#1877f2] transition-colors">{carrier.name}</span>
+                                                    <span className={`px-4 py-1 rounded-full text-xs font-bold ${carrier.cost === 0 ? 'bg-[#1E5AA4] text-white' : 'text-gray-900'}`}>
+                                                        {carrier.cost === 0 ? 'Free' : `৳${carrier.cost}`}
+                                                    </span>
                                                 </div>
-                                                <p className="text-[12px] lg:text-[14px] text-gray-500 mt-1">Estimated delivery: {carrier.transit_time}</p>
+                                                {!carrier.is_pickup && <p className="text-[12px] lg:text-[14px] text-gray-500 mt-1">Estimated delivery: {carrier.transit_time}</p>}
                                             </div>
                                         </label>
+
+                                        {carrier.is_pickup && selectedCarrierId === carrier.id && (
+                                            <div className="mt-4 ml-[28px] lg:ml-[34px]">
+                                                {/* <p className="text-gray-500 text-sm mb-4">This item not available in your area</p> */}
+                                                <div className="flex justify-between items-center mb-4">
+                                                    <span className="text-gray-600 font-medium">Pickup location</span>
+                                                    <button
+                                                        onClick={() => setIsPickupModalOpen(true)}
+                                                        className="text-[#1877f2] flex items-center gap-1 font-semibold hover:underline"
+                                                    >
+                                                        Select Store <FiChevronRight />
+                                                    </button>
+                                                </div>
+
+                                                {selectedPickupPointId ? (
+                                                    <div className="bg-gray-50 rounded-xl p-4 lg:p-6 border border-gray-100">
+                                                        <div className="flex justify-between items-start mb-2">
+                                                            <h3 className="font-bold text-gray-900">{pickupPoints.find(p => p.id === selectedPickupPointId)?.name}</h3>
+                                                            <button onClick={() => setIsPickupModalOpen(true)} className="text-[#1877f2] flex items-center gap-1 text-sm font-medium">
+                                                                Change <FiEdit className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
+                                                        <p className="text-sm text-gray-600 leading-relaxed">
+                                                            {pickupPoints.find(p => p.id === selectedPickupPointId)?.address}
+                                                        </p>
+                                                        <p className="text-sm text-gray-900 font-semibold mt-2">
+                                                            Phone: {pickupPoints.find(p => p.id === selectedPickupPointId)?.phone}
+                                                        </p>
+                                                    </div>
+                                                ) : (
+                                                    <div className="bg-gray-50 rounded-xl p-6 border border-dashed border-gray-300 text-center">
+                                                        <p className="text-gray-500 text-sm italic">Please select a pickup store</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
                                 ))}
                                 {carriers.length === 0 && (
@@ -422,25 +660,84 @@ const Checkout = () => {
                         </section>
 
                         {/* Available Offers */}
+                        <section className="mb-8">
+                            <div className="flex justify-between items-center mb-6">
+                                <h2 className="lg:text-[24px] text-[18px] font-semibold text-gray-900 tracking-wide">Available Offers</h2>
+                                <button
+                                    onClick={() => setIsCouponModalOpen(true)}
+                                    className="text-[#1877f2] font-semibold text-[14px] lg:text-[16px] hover:underline"
+                                >
+                                    See All Coupon
+                                </button>
+                            </div>
+                            <div className="border border-gray-200 rounded-xl bg-white p-4 lg:p-6 shadow-sm">
+                                {appliedCoupon && (
+                                    <div className="mb-4 flex items-center justify-between bg-blue-50 border border-blue-100 rounded-lg p-3">
+                                        <div className="flex items-center space-x-2">
+                                            <div className="bg-blue-600 rounded-full p-1.5 text-white">
+                                                <HiOutlineTicket className="w-4 h-4" />
+                                            </div>
+                                            <div>
+                                                <p className="text-[14px] font-bold text-blue-900">Coupon- {appliedCoupon.code}</p>
+                                                <p className="text-[12px] text-blue-700">Discount of {formatCurrency(couponDiscount)} applied</p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={handleRemoveCoupon}
+                                            className="text-red-500 hover:text-red-700 transition-colors p-1"
+                                            title="Remove Coupon"
+                                        >
+                                            <FiX className="w-5 h-5" />
+                                        </button>
+                                    </div>
+                                )}
 
-
-                        {/* Payment Method */}
+                                <div className="flex flex-col lg:flex-row gap-4">
+                                    <div className="flex-1 relative">
+                                        <input
+                                            type="text"
+                                            placeholder="Enter Coupon Code"
+                                            value={couponCode}
+                                            onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                                            disabled={!!appliedCoupon}
+                                            className={`w-full h-[50px] lg:h-[56px] px-4 rounded-lg border ${couponError ? 'border-red-500' : 'border-gray-200'} focus:ring-2 focus:ring-[#1877f2] focus:border-transparent outline-none transition-all text-[15px] lg:text-[16px] disabled:bg-gray-50 disabled:cursor-not-allowed`}
+                                        />
+                                        {couponError && (
+                                            <p className="text-red-500 text-[12px] mt-1 absolute left-0 -bottom-5">{couponError}</p>
+                                        )}
+                                    </div>
+                                    <button
+                                        onClick={appliedCoupon ? handleRemoveCoupon : handleApplyCoupon}
+                                        className={`h-[50px] lg:h-[56px] px-8 rounded-lg font-bold text-[15px] lg:text-[16px] transition-all min-w-[200px] ${appliedCoupon ? 'bg-red-500 hover:bg-red-600 text-white' : 'bg-[#1877f2] hover:bg-[#1565c0] text-white shadow-lg shadow-blue-100'}`}
+                                    >
+                                        {appliedCoupon ? 'Remove Coupon' : 'Apply Coupon/Gift Code'}
+                                    </button>
+                                </div>
+                            </div>
+                        </section>
                         <section>
                             <h2 className="lg:text-[24px] text-[18px] font-semibold lg:mb-6 mb-2 text-gray-900 tracking-wide">Payment Method</h2>
                             <div className="border border-gray-200 rounded-xl overflow-hidden bg-white">
                                 {/* Online Payments */}
-                                {(paymentTypes.online as { id: number; name: string }[]).map((method) => (
+                                {(paymentTypes.online as { id: number; name: string; frontend_name?: string; image?: string }[]).map((method) => (
                                     <div key={method.id} className="p-4 lg:p-6 border-b border-gray-100">
-                                        <label className="flex items-center space-x-3 cursor-pointer group">
-                                            <input
-                                                type="radio"
-                                                name="payment"
-                                                checked={paymentMethod === method.name}
-                                                onChange={() => setPaymentMethod(method.name)}
-                                                className="w-4 h-4 lg:w-[22px] lg:h-[22px] text-[#1877f2] focus:ring-[#1877f2] cursor-pointer"
-                                            />
-                                            <span className="font-medium text-[16px] lg:text-[20px] text-gray-800 group-hover:text-[#1877f2] transition-colors">{method.name}</span>
-                                        </label>
+                                        <div className="flex flex-col gap-2">
+                                            <label className="flex items-center space-x-3 cursor-pointer group">
+                                                <input
+                                                    type="radio"
+                                                    name="payment"
+                                                    checked={paymentMethod === method.name}
+                                                    onChange={() => setPaymentMethod(method.name)}
+                                                    className="w-4 h-4 lg:w-[22px] lg:h-[22px] text-[#1877f2] focus:ring-[#1877f2] cursor-pointer"
+                                                />
+                                                <span className="font-medium text-[16px] lg:text-[20px] text-gray-800 group-hover:text-[#1877f2] transition-colors">{method.frontend_name || method.name}</span>
+                                            </label>
+                                            {method.image && (
+                                                <div className="ml-[28px] lg:ml-[34px]">
+                                                    <Image src={method.image} alt={method.frontend_name || method.name} width={280} height={50} className="h-auto object-contain" />
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 ))}
 
@@ -561,10 +858,12 @@ const Checkout = () => {
                                         <span className="text-gray-600">Delivery</span>
                                         <span className="font-bold text-gray-900">{totals.delivery > 0 ? formatCurrency(totals.delivery) : 'Free'}</span>
                                     </div>
-                                    {/* <div className="flex justify-between">
-                                        <span className="text-gray-600">Coupon Code</span>
-                                        <span className="font-bold text-gray-900">0</span>
-                                    </div> */}
+                                    {totals.couponDiscount > 0 && (
+                                        <div className="flex justify-between text-green-600 animate-fadeIn">
+                                            <span className="font-medium">Coupon Discount</span>
+                                            <span className="font-bold">- {formatCurrency(totals.couponDiscount)}</span>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
@@ -796,7 +1095,7 @@ const Checkout = () => {
                                                     className="w-full bg-white border border-gray-200 rounded-xl px-4 h-12 text-sm focus:ring-2 focus:ring-[#1877f2]/20 focus:border-[#1877f2] transition-all outline-none appearance-none"
                                                 >
                                                     <option value="">Select District</option>
-                                                    {districts.map((d: any) => (
+                                                    {districts.map((d: { id: number; name: string }) => (
                                                         <option key={d.id} value={d.id}>{d.name}</option>
                                                     ))}
                                                 </select>
@@ -817,7 +1116,7 @@ const Checkout = () => {
                                                     className="w-full bg-white border border-gray-200 rounded-xl px-4 h-12 text-sm focus:ring-2 focus:ring-[#1877f2]/20 focus:border-[#1877f2] transition-all outline-none appearance-none disabled:bg-gray-50 disabled:cursor-not-allowed"
                                                 >
                                                     <option value="">Select Thana</option>
-                                                    {thanas.map((t: any) => (
+                                                    {thanas.map((t: { id: number; name: string }) => (
                                                         <option key={t.id} value={t.id}>{t.name}</option>
                                                     ))}
                                                 </select>
@@ -861,6 +1160,208 @@ const Checkout = () => {
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+            {/* Coupon Modal */}
+            {isCouponModalOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
+                    <div className="bg-white rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl animate-scaleUp">
+                        <div className="flex justify-between items-center p-6 border-b border-gray-100">
+                            <div>
+                                <h3 className="text-[20px] lg:text-[24px] font-bold text-gray-900">All Coupons</h3>
+                                <p className="text-[14px] text-gray-500 mt-1">Select and copy a code to apply</p>
+                            </div>
+                            <button onClick={() => setIsCouponModalOpen(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                                <FiX className="w-6 h-6 text-gray-500" />
+                            </button>
+                        </div>
+                        <div className="p-6 max-h-[60vh] overflow-y-auto custom-scrollbar">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {allCoupons.length > 0 ? (
+                                    allCoupons.map((coupon) => (
+                                        <div key={coupon.id} className="relative group overflow-hidden rounded-xl border border-dashed border-blue-200 bg-blue-50/30 p-5 hover:border-blue-400 hover:bg-blue-50 transition-all cursor-pointer"
+                                            onClick={() => {
+                                                setCouponCode(coupon.code);
+                                                setIsCouponModalOpen(false);
+                                            }}
+                                        >
+                                            <div className="absolute top-0 right-0 w-12 h-12 bg-blue-600/10 rounded-bl-3xl flex items-center justify-center">
+                                                <HiOutlineTicket className="w-5 h-5 text-blue-600" />
+                                            </div>
+                                            <div className="pr-8">
+                                                <span className="inline-block px-3 py-1 bg-blue-600 text-white rounded text-[12px] font-bold mb-3 uppercase tracking-wider">
+                                                    {coupon.type.replace('_', ' ')}
+                                                </span>
+                                                <h4 className="text-[18px] font-bold text-gray-900 mb-1">{coupon.code}</h4>
+                                                <p className="text-[14px] text-blue-800 font-medium mb-3">
+                                                    {coupon.discount_type === 'percent' ? `${coupon.discount}% OFF` : `৳${formatCurrency(coupon.discount)} OFF`}
+                                                </p>
+                                                <div className="space-y-1">
+                                                    <p className="text-[12px] text-gray-500 flex items-center">
+                                                        <FiCheck className="w-3 h-3 mr-1 text-green-500" /> Min. Buy: ৳{formatCurrency(coupon.min_shopping || 0)}
+                                                    </p>
+                                                    {(coupon.max_discount || 0) > 0 && (
+                                                        <p className="text-[12px] text-gray-500 flex items-center">
+                                                            <FiCheck className="w-3 h-3 mr-1 text-green-500" /> Max Discount: ৳{formatCurrency(coupon.max_discount || 0)}
+                                                        </p>
+                                                    )}
+                                                    {coupon.end_date && (
+                                                        <p className="text-[12px] text-gray-400 mt-2 italic">Valid till: {new Date(coupon.end_date * 1000).toLocaleDateString()}</p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div className="mt-4 pt-4 border-t border-blue-100/50 flex justify-between items-center">
+                                                <span className="text-[12px] font-semibold text-blue-600 group-hover:underline">Click to use</span>
+                                                <FiChevronRight className="w-4 h-4 text-blue-400 group-hover:translate-x-1 transition-transform" />
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="col-span-2 py-10 text-center">
+                                        <HiOutlineTicket className="w-12 h-12 text-gray-200 mx-auto mb-3" />
+                                        <p className="text-gray-400">No available coupons at this time.</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {isPickupModalOpen && (
+                <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl w-full max-w-[1000px] max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
+                        <div className="flex justify-between items-center p-6 border-b border-gray-100">
+                            <h3 className="text-[20px] lg:text-[24px] font-bold text-gray-900">Select Store Location</h3>
+                            <button onClick={() => setIsPickupModalOpen(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                                <FiX className="w-6 h-6 text-gray-500" />
+                            </button>
+                        </div>
+
+                        <div className="p-4 bg-gray-50 border-b border-gray-100 space-y-4">
+                            {/* Search bar top full width */}
+                            <div className="relative w-full">
+                                <input
+                                    type="text"
+                                    placeholder="Enter - district- thana etc...."
+                                    value={pickupSearchQuery}
+                                    onChange={(e) => setPickupSearchQuery(e.target.value)}
+                                    className="h-12 w-full rounded-lg border border-gray-200 bg-white px-4 pr-12 text-sm focus:border-[#1877f2] outline-none shadow-sm"
+                                />
+                                <div className="absolute right-2 top-1/2 -translate-y-1/2 bg-[#001B33] p-2 rounded text-white">
+                                    <FiSearch size={18} />
+                                </div>
+                            </div>
+
+                            {/* Filters below search */}
+                            <div className="flex flex-col lg:flex-row gap-3">
+                                <div className="flex-1 grid grid-cols-2 lg:grid-cols-3 gap-3">
+                                    <select value={pickupTypeFilter} onChange={(e) => setPickupTypeFilter(e.target.value)} className="h-10 rounded-lg border border-gray-200 bg-white px-3 text-xs outline-none focus:border-[#1877f2]">
+                                        {pickupFilterOptions.types.map(t => <option key={t} value={t}>{t}</option>)}
+                                    </select>
+                                    <select value={pickupDivisionFilter} onChange={(e) => setPickupDivisionFilter(e.target.value)} className="h-10 rounded-lg border border-gray-200 bg-white px-3 text-xs outline-none focus:border-[#1877f2]">
+                                        {pickupFilterOptions.divisions.map(t => <option key={t} value={t}>{t}</option>)}
+                                    </select>
+                                    <select value={pickupDistrictFilter} onChange={(e) => setPickupDistrictFilter(e.target.value)} className="h-10 rounded-lg border border-gray-200 bg-white px-3 text-xs outline-none focus:border-[#1877f2]">
+                                        {pickupFilterOptions.districts.map(t => <option key={t} value={t}>{t}</option>)}
+                                    </select>
+                                </div>
+                                <button className="bg-[#1877f2] text-white rounded-lg px-6 h-10 text-xs font-bold flex items-center justify-center gap-2">
+                                    <FiMapPin /> Search Locations
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="flex-1 overflow-hidden flex flex-col lg:flex-row">
+                            <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+                                {filteredPickupPoints.map(point => {
+                                    const isPreviewed = previewPickupPointId === point.id;
+                                    return (
+                                        <div
+                                            key={point.id}
+                                            onClick={() => setPreviewPickupPointId(point.id)}
+                                            className={`border rounded-xl p-4 relative group transition-all cursor-pointer ${isPreviewed ? 'border-[#1877f2] bg-blue-50/30' : 'border-gray-200 hover:border-[#1877f2]'}`}
+                                        >
+                                            <div className="absolute right-0 top-0 h-9 w-9 overflow-hidden">
+                                                <div className="absolute right-[-10px] top-[8px] rotate-45 bg-[#1f68bf] px-4 py-[1px] text-[8px] font-semibold uppercase tracking-wide text-white">
+                                                    {point.type?.replace('_', ' ')}
+                                                </div>
+                                            </div>
+                                            <h4 className="font-bold text-gray-900 mb-1">{point.name}</h4>
+                                            <p className="text-xs text-gray-600 mb-2">{point.address}</p>
+                                            <p className="text-xs text-gray-900 font-semibold mb-3">Phone: {point.phone}</p>
+
+                                            <div className="flex gap-2">
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setSelectedPickupPointId(point.id);
+                                                        setIsPickupModalOpen(false);
+                                                    }}
+                                                    className="flex-1 h-9 bg-[#1877f2] text-white rounded-lg text-xs font-bold hover:bg-blue-600 transition-colors"
+                                                >
+                                                    Select this store
+                                                </button>
+                                                <button
+                                                    disabled
+                                                    className="flex-1 h-9 bg-gray-100 text-gray-400 rounded-lg text-xs font-bold cursor-not-allowed"
+                                                >
+                                                    Available this showroom
+                                                </button>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                                {filteredPickupPoints.length === 0 && (
+                                    <div className="py-20 text-center text-gray-400">No stores found.</div>
+                                )}
+                            </div>
+                            <div className="w-full lg:w-[450px] bg-gray-100 p-4 border-l border-gray-100 hidden lg:block">
+                                <div className="rounded-xl overflow-hidden border border-gray-200 h-full bg-white relative">
+                                    {(() => {
+                                        const point = pickupPoints.find(p => p.id === previewPickupPointId) || filteredPickupPoints[0];
+                                        if (point) {
+                                            if (point.embedded_map_link) {
+                                                const isIframeTag = point.embedded_map_link.includes('<iframe');
+                                                if (isIframeTag) {
+                                                    return (
+                                                        <div
+                                                            className="h-full w-full [&>iframe]:w-full [&>iframe]:h-full"
+                                                            dangerouslySetInnerHTML={{
+                                                                __html: point.embedded_map_link.replace(/width="[^"]*"/, 'width="100%"').replace(/height="[^"]*"/, 'height="100%"')
+                                                            }}
+                                                        />
+                                                    );
+                                                }
+                                                return (
+                                                    <iframe
+                                                        src={point.embedded_map_link}
+                                                        width="100%"
+                                                        height="100%"
+                                                        style={{ border: 0 }}
+                                                        allowFullScreen
+                                                        loading="lazy"
+                                                        referrerPolicy="no-referrer-when-downgrade"
+                                                    ></iframe>
+                                                );
+                                            }
+                                            return (
+                                                <div className="h-full flex flex-col items-center justify-center p-6 text-center">
+                                                    <FiMapPin className="w-12 h-12 text-gray-200 mb-4" />
+                                                    <p className="text-gray-400 text-sm italic">No map link available for {point.name}</p>
+                                                </div>
+                                            );
+                                        }
+                                        return (
+                                            <div className="h-full flex flex-col items-center justify-center p-6 text-center">
+                                                <FiMap className="w-12 h-12 text-gray-200 mb-4" />
+                                                <p className="text-gray-400 text-sm italic">Select a store to view its location</p>
+                                            </div>
+                                        );
+                                    })()}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}

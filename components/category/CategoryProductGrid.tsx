@@ -1,20 +1,22 @@
 "use client"
-import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useState, useEffect, useMemo } from "react";
+import { useParams, useSearchParams } from "next/navigation";
 import { HiOutlineSquares2X2, HiOutlineBars3 } from "react-icons/hi2";
 import ProductCard from "@/components/common/ProductCard";
 import MobileFilterDrawer from "./MobileFilterDrawer";
 
-export default function CategoryProductGrid() {
+export default function CategoryProductGrid({ filteringAttributes }: { filteringAttributes?: { id: number; name: string; values: { id: number; name: string; code?: string }[] }[] }) {
   const params = useParams();
+  const searchParams = useSearchParams();
   const categorySlug = params.slug as string;
   
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [sortOption, setSortOption] = useState("default");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [displayProducts, setDisplayProducts] = useState<any[]>([]);
+  const [sourceProducts, setSourceProducts] = useState<{ id: number; name: string; slug: string; calculable_price: number; brand_name?: string; brand?: { name: string }; attributes?: { name: string; values: string[] }[]; color_name?: string }[]>([]);
   const [loading, setLoading] = useState(true);
 
+  /* ---- Fetch Products ---- */
   useEffect(() => {
     if (!categorySlug) return;
 
@@ -24,7 +26,7 @@ export default function CategoryProductGrid() {
         const response = await fetch(`/api/products/category/${categorySlug}`);
         const data = await response.json();
         if (data.success) {
-          setDisplayProducts(data.data || []);
+          setSourceProducts(data.data || []);
         }
       } catch (error) {
         console.error("Error fetching category products:", error);
@@ -36,13 +38,60 @@ export default function CategoryProductGrid() {
     fetchProducts();
   }, [categorySlug]);
 
-  const totalItems = displayProducts.length;
+  /* ---- Client-Side Filtering ---- */
+  const filteredProducts = useMemo(() => {
+    let filtered = [...sourceProducts];
+
+    // 1. Price Filtering
+    const minPrice = Number(searchParams.get("minPrice")) || 0;
+    const maxPrice = Number(searchParams.get("maxPrice")) || Infinity;
+    filtered = filtered.filter(p => {
+      const price = p.calculable_price || 0;
+      return price >= minPrice && price <= maxPrice;
+    });
+
+    // 2. Brand Filtering
+    const selectedBrands = searchParams.get("brands")?.split(",").filter(Boolean) || [];
+    if (selectedBrands.length > 0) {
+      filtered = filtered.filter(p => selectedBrands.includes(p.brand_name || p.brand?.name || ""));
+    }
+
+    // 3. Attribute Filtering
+    searchParams.forEach((value, key) => {
+      if (key.startsWith("attr_")) {
+        const attrName = key.replace("attr_", "");
+        const selectedValues = value.split(/[|,]/).filter(Boolean);
+        if (selectedValues.length > 0) {
+          const selectedValuesLower = selectedValues.map(v => v.toLowerCase());
+          filtered = filtered.filter(p => {
+            const pAttrs = p.attributes || [];
+            return pAttrs.some((pa: { name: string; values: string[] }) => 
+              pa.name.toLowerCase() === attrName && 
+              pa.values.some((v: string) => selectedValuesLower.includes(v.toLowerCase()))
+            ) || (attrName === 'color' && selectedValuesLower.includes((p.color_name || '').toLowerCase()));
+          });
+        }
+      }
+    });
+
+    // 4. Sorting
+    if (sortOption === "price-low") {
+      filtered.sort((a, b) => (a.calculable_price || 0) - (b.calculable_price || 0));
+    } else if (sortOption === "price-high") {
+      filtered.sort((a, b) => (b.calculable_price || 0) - (a.calculable_price || 0));
+    } else if (sortOption === "newest") {
+      filtered.sort((a, b) => b.id - a.id);
+    }
+
+    return filtered;
+  }, [sourceProducts, searchParams, sortOption]);
+
+  const totalItems = filteredProducts.length;
 
   return (
     <div className="flex flex-col gap-4">
       {/* ═══════════════ DESKTOP TOOLBAR (Hidden on Mobile) ═══════════════ */}
       <div className="hidden lg:flex items-center justify-between rounded-md border border-slate-200 bg-[#f4f4f4] px-4 py-2.5">
-        {/* Left: items found + view toggle */}
         <div className="flex items-center gap-4">
           <span className="text-[13px] font-medium text-slate-500">
             <span className="font-semibold text-[#2B7FE8]">{totalItems}</span>{" "}
@@ -56,27 +105,20 @@ export default function CategoryProductGrid() {
             <button
               type="button"
               onClick={() => setViewMode("grid")}
-              className={`flex h-8 w-8 items-center justify-center rounded transition-colors ${viewMode === "grid"
-                ? "bg-slate-100 text-[#2B7FE8]"
-                : "text-slate-400 hover:text-slate-600"
-                }`}
+              className={`flex h-8 w-8 items-center justify-center rounded transition-colors ${viewMode === "grid" ? "bg-slate-100 text-[#2B7FE8]" : "text-slate-400 hover:text-slate-600"}`}
             >
               <HiOutlineSquares2X2 className="h-5 w-5" />
             </button>
             <button
               type="button"
               onClick={() => setViewMode("list")}
-              className={`flex h-8 w-8 items-center justify-center rounded transition-colors ${viewMode === "list"
-                ? "bg-slate-100 text-[#2B7FE8]"
-                : "text-slate-400 hover:text-slate-600"
-                }`}
+              className={`flex h-8 w-8 items-center justify-center rounded transition-colors ${viewMode === "list" ? "bg-slate-100 text-[#2B7FE8]" : "text-slate-400 hover:text-slate-600"}`}
             >
               <HiOutlineBars3 className="h-5 w-5" />
             </button>
           </div>
         </div>
 
-        {/* Right: sort dropdown */}
         <div className="relative">
           <select
             value={sortOption}
@@ -89,26 +131,15 @@ export default function CategoryProductGrid() {
             <option value="newest">Newest First</option>
             <option value="popular">Most Popular</option>
           </select>
-          {/* Custom dropdown arrow */}
-          <svg
-            className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-              clipRule="evenodd"
-            />
+          <svg className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
           </svg>
         </div>
       </div>
 
-      {/* ═══════════════ MOBILE TOOLBAR (Visible on Mobile) ═══════════════ */}
-      <div className="flex lg:hidden flex-col gap-3 -mx-4 px-4 py-2 bg-[#F4F4F4] border-y border-slate-100">
+      {/* ═══════════════ MOBILE TOOLBAR ═══════════════ */}
+      <div className="flex lg:hidden flex-col gap-3 px-1 py-2 bg-[#F4F4F4] border-y border-slate-100">
         <div className="flex items-center gap-2">
-          {/* Sort Dropdown */}
           <div className="relative flex-1">
             <select
               value={sortOption}
@@ -121,17 +152,11 @@ export default function CategoryProductGrid() {
               <option value="newest">Newest First</option>
               <option value="popular">Most Popular</option>
             </select>
-            <svg
-              className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
+            <svg className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
             </svg>
           </div>
 
-          {/* Filter Button */}
           <button
             type="button"
             onClick={() => setIsFilterOpen(true)}
@@ -141,10 +166,8 @@ export default function CategoryProductGrid() {
               <line x1="4" y1="21" x2="4" y2="14" /><line x1="4" y1="10" x2="4" y2="3" /><line x1="12" y1="21" x2="12" y2="12" /><line x1="12" y1="8" x2="12" y2="3" /><line x1="20" y1="21" x2="20" y2="16" /><line x1="20" y1="12" x2="20" y2="3" /><line x1="1" y1="14" x2="7" y2="14" /><line x1="9" y1="8" x2="15" y2="8" /><line x1="17" y1="16" x2="23" y2="16" />
             </svg>
             <span>Filter</span>
-            <span className="text-slate-400 font-normal leading-none mb-0.5 ml-0.5 text-[16px]">›</span>
           </button>
 
-          {/* Grid Toggle */}
           <button
             type="button"
             onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}
@@ -155,38 +178,31 @@ export default function CategoryProductGrid() {
         </div>
       </div>
 
-      {/* Items Found Text */}
       <h2 className="text-[14px] font-semibold text-slate-800 -mt-1 mb-2 px-1">
         {totalItems} Items Found
       </h2>
 
       {/* ═══════════════ PRODUCT GRID ═══════════════ */}
-      <div
-        className={
-          viewMode === "grid"
-            ? "grid grid-cols-2 gap-4 lg:grid-cols-3"
-            : "flex flex-col gap-4"
-        }
-      >
+      <div className={viewMode === "grid" ? "grid grid-cols-2 gap-4 lg:grid-cols-3" : "flex flex-col gap-4"}>
         {loading ? (
           <div className="flex w-full items-center justify-center py-20 col-span-full">
             <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#0054A6] border-t-transparent" />
           </div>
-        ) : displayProducts.length === 0 ? (
+        ) : filteredProducts.length === 0 ? (
           <div className="flex w-full items-center justify-center py-20 text-slate-500 col-span-full">
-            No products found in this category.
+            No products found matching your filters.
           </div>
         ) : (
-          displayProducts.map((product) => (
+          filteredProducts.map((product) => (
             <ProductCard key={product.id} productData={product} />
           ))
         )}
       </div>
 
-      {/* Filter Drawer */}
       <MobileFilterDrawer
         isOpen={isFilterOpen}
         onClose={() => setIsFilterOpen(false)}
+        filteringAttributes={filteringAttributes}
       />
     </div>
   );

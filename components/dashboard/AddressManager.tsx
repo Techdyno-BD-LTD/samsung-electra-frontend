@@ -41,8 +41,8 @@ export default function AddressManager() {
     set_default: 0
   });
 
-  const [districts, setDistricts] = useState<any[]>([]);
-  const [thanas, setThanas] = useState<any[]>([]);
+  const [districts, setDistricts] = useState<{ id: number; name: string }[]>([]);
+  const [thanas, setThanas] = useState<{ id: number; name: string }[]>([]);
 
   const fetchAddresses = useCallback(async () => {
     if (!token) return;
@@ -135,9 +135,11 @@ export default function AddressManager() {
           address: "", 
           phone: user?.phone || "", 
           postal_code: "", 
+          country_id: "",
           state_id: "",
           city_id: "",
           area_id: "",
+          area: "",
           set_default: 0 
         });
       }
@@ -154,6 +156,7 @@ export default function AddressManager() {
       address: address.address,
       phone: address.phone,
       postal_code: address.postal_code,
+      country_id: address.country_id?.toString() || "",
       state_id: address.state_id?.toString() || "",
       city_id: address.city_id?.toString() || "",
       area_id: address.area_id?.toString() || "",
@@ -180,6 +183,7 @@ export default function AddressManager() {
                 address: "", 
                 phone: user?.phone || "", 
                 postal_code: "", 
+                country_id: "",
                 state_id: "",
                 city_id: "",
                 area_id: "",
@@ -323,7 +327,7 @@ export default function AddressManager() {
                       className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 h-12 text-sm focus:ring-2 focus:ring-[#2b7fe8]/20 focus:border-[#2b7fe8] transition-all outline-none appearance-none"
                     >
                       <option value="">Select District</option>
-                      {districts.map((d: any) => (
+                      {districts.map((d: { id: number; name: string }) => (
                         <option key={d.id} value={d.id}>{d.name}</option>
                       ))}
                     </select>
@@ -344,7 +348,7 @@ export default function AddressManager() {
                       className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 h-12 text-sm focus:ring-2 focus:ring-[#2b7fe8]/20 focus:border-[#2b7fe8] transition-all outline-none appearance-none disabled:bg-gray-100 disabled:cursor-not-allowed"
                     >
                       <option value="">Select Thana</option>
-                      {thanas.map((t: any) => (
+                      {thanas.map((t: { id: number; name: string }) => (
                         <option key={t.id} value={t.id}>{t.name}</option>
                       ))}
                     </select>

@@ -292,8 +292,8 @@ export default function HeroSection() {
                 href={categoryUrl}
                 onMouseEnter={() => handleCategoryHover(category)}
                 className={`flex w-full items-center justify-between rounded-md border px-2 py-3 text-left shadow-md transition lg:px-2 lg:py-2 xl:px-2 xl:py-2 2xl:px-3 2xl:py-4 ${hoveredCategory?.id === category.id
-                    ? "border-blue-400 bg-blue-50/50"
-                    : "border-slate-100 bg-white hover:border-blue-300 hover:bg-white"
+                  ? "border-blue-400 bg-blue-50/50"
+                  : "border-slate-100 bg-white hover:border-blue-300 hover:bg-white"
                   }`}
               >
                 <div className="flex items-center gap-2 lg:gap-1.5 xl:gap-1.5 2xl:gap-2">
@@ -328,6 +328,19 @@ export default function HeroSection() {
             </div>
           </div>
         </div>
+        {/* 
+        <div className="lg:hidden block bg-[#0e56af] rounded-xl px-2 py-1  mx-1">
+          <div className="mx-auto w-6/12 overflow-hidden">
+
+            <div className="marquee-track text-white text-[8px] font-semibold py-0.5">
+              {heroData.promoBarText}
+            </div>
+
+          </div>
+
+
+        </div> */}
+
 
         <div className="relative w-full overflow-hidden rounded-xl border border-slate-200 shadow-sm" onMouseLeave={() => handleCategoryHover(null)}>
           {/* Mega Menu Overlay */}

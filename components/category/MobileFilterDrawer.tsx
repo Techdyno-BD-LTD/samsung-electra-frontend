@@ -7,9 +7,14 @@ import CategoryFilterPanel from "./CategoryFilterPanel";
 interface MobileFilterDrawerProps {
   isOpen: boolean;
   onClose: () => void;
+  filteringAttributes?: { 
+    id: number; 
+    name: string; 
+    values: { id: number; name: string; code?: string }[] 
+  }[];
 }
 
-const MobileFilterDrawer: React.FC<MobileFilterDrawerProps> = ({ isOpen, onClose }) => {
+const MobileFilterDrawer: React.FC<MobileFilterDrawerProps> = ({ isOpen, onClose, filteringAttributes }) => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -56,7 +61,7 @@ const MobileFilterDrawer: React.FC<MobileFilterDrawerProps> = ({ isOpen, onClose
 
           {/* Filter Content */}
           <div className="flex-1 overflow-y-auto bg-slate-50 p-4">
-            <CategoryFilterPanel />
+            <CategoryFilterPanel filteringAttributes={filteringAttributes} />
           </div>
 
           {/* Footer / Apply Button (Optional, usually filters apply live in this design) */}

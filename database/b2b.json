@@ -1,0 +1,94 @@
+{
+  "breadcrumb": {
+    "home": "Home",
+    "current": "b2b dealership"
+  },
+  "enquiryForm": {
+    "title": "Details",
+    "fields": {
+      "companyName": { "label": "Your Company Name", "placeholder": "Enter last name" },
+      "yourName": { "label": "Your Name", "placeholder": "Enter last name" },
+      "mobileNumber": { "label": "Mobile Number", "placeholder": "Enter number" },
+      "emailAddress": { "label": "E-mail Address", "placeholder": "Enter email" },
+      "fullAddress": { "label": "Full-address", "placeholder": "Enter full address" },
+      "division": { "label": "Division", "placeholder": "Enter number" },
+      "district": { "label": "Select District", "placeholder": "Enter email" },
+      "country": { "label": "Country", "value": "Bangladesh" }
+    },
+    "enquiryType": {
+      "title": "Enquiry Type",
+      "options": ["Corporate Business", "Dealer Business"]
+    },
+    "preferredCategory": {
+      "title": "Preferred Category",
+      "options": [
+        "Tv | Audio",
+        "Refrigerator | Freezer",
+        "Air Conditioner",
+        "Microwave Oven",
+        "Washing Machine",
+        "Small Appliances"
+      ]
+    },
+    "details": {
+      "title": "Details / Qty",
+      "label": "Enquiry",
+      "placeholder": ""
+    }
+  },
+  "corporateClients": {
+    "title": "Our Corporate Clients",
+    "subtitle": "Building long-term partnerships with trusted corporate clients",
+    "clients": [
+      { "name": "Shahjalal Islami Bank", "logo": "/images/clients/shahjalal.png" },
+      { "name": "Brac", "logo": "/images/clients/brac.png" },
+      { "name": "Envoy Group", "logo": "/images/clients/envoy.png" },
+      { "name": "Community Bank", "logo": "/images/clients/community-bank.png" },
+      { "name": "Ha-Meem Group", "logo": "/images/clients/hameem.png" },
+      { "name": "Bank Asia", "logo": "/images/clients/bank-asia.png" },
+      { "name": "Exim Bank", "logo": "/images/clients/exim.png" },
+      { "name": "Islami Bank", "logo": "/images/clients/islami-bank.png" },
+      { "name": "Incepta", "logo": "/images/clients/incepta.png" },
+      { "name": "Renata Limited", "logo": "/images/clients/renata.png" },
+      { "name": "Sheltech", "logo": "/images/clients/sheltech.png" },
+      { "name": "Runner", "logo": "/images/clients/runner.png" }
+    ]
+  },
+  "nominatedDealers": {
+    "title": "Our Nominated Dealers",
+    "subtitle": "Working closely with authorized and reliable dealers nationwide",
+    "searchLabel": "Search your area dealer",
+    "dealers": [
+      {
+        "name": "SEEZ M/S Ittadi Electronics",
+        "address": "V5, nur-jahan road, Mohammadpur, Dhaka.",
+        "type": "Dealer"
+      },
+      {
+        "name": "SEEZ M/S Ittadi Electronics",
+        "address": "V5, nur-jahan road, Mohammadpur, Dhaka.",
+        "type": "Dealer"
+      },
+      {
+        "name": "SEEZ M/S Ittadi Electronics",
+        "address": "V5, nur-jahan road, Mohammadpur, Dhaka.",
+        "type": "Dealer"
+      },
+      {
+        "name": "SEEZ M/S Ittadi Electronics",
+        "address": "V5, nur-jahan road, Mohammadpur, Dhaka.",
+        "type": "Dealer"
+      },
+      {
+        "name": "SEEZ M/S Ittadi Electronics",
+        "address": "V5, nur-jahan road, Mohammadpur, Dhaka.",
+        "type": "Dealer"
+      },
+      {
+        "name": "SEEZ M/S Ittadi Electronics",
+        "address": "V5, nur-jahan road, Mohammadpur, Dhaka.",
+        "type": "Dealer"
+      }
+    ]
+  }
+}

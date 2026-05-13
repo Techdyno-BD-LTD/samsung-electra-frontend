@@ -1,5 +1,6 @@
 "use client"
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 import { HiOutlineSquares2X2, HiOutlineBars3 } from "react-icons/hi2";
 import ProductCard from "@/components/common/ProductCard";
 import MobileFilterDrawer from "@/components/category/MobileFilterDrawer";
@@ -7,21 +8,22 @@ import MobileFilterDrawer from "@/components/category/MobileFilterDrawer";
 type SearchProductGridProps = {
   query: string;
   categoryId?: string | null;
+  filteringAttributes?: { 
+    id: number; 
+    name: string; 
+    values: { id: number; name: string; code?: string }[] 
+  }[];
 };
 
-interface SearchProduct {
-  id: string | number;
-  [key: string]: unknown;
-}
-
-export default function SearchProductGrid({ query, categoryId }: SearchProductGridProps) {
+export default function SearchProductGrid({ query, categoryId, filteringAttributes }: SearchProductGridProps) {
+  const searchParams = useSearchParams();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [sortOption, setSortOption] = useState("default");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [products, setProducts] = useState<SearchProduct[]>([]);
+  const [sourceProducts, setSourceProducts] = useState<{ id: number; name: string; slug: string; calculable_price: number; brand_name?: string; brand?: { name: string }; attributes?: { name: string; values: string[] }[]; color_name?: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [totalItems, setTotalItems] = useState(0);
 
+  /* ---- Fetch Products ---- */
   useEffect(() => {
     async function fetchProducts() {
       setIsLoading(true);
@@ -33,8 +35,7 @@ export default function SearchProductGrid({ query, categoryId }: SearchProductGr
         const response = await fetch(url);
         if (response.ok) {
           const payload = await response.json();
-          setProducts(payload.data || []);
-          setTotalItems(payload.meta?.total || payload.data?.length || 0);
+          setSourceProducts(payload.data || []);
         }
       } catch (error) {
         console.error("Error fetching search results:", error);
@@ -47,6 +48,56 @@ export default function SearchProductGrid({ query, categoryId }: SearchProductGr
       fetchProducts();
     }
   }, [query, categoryId]);
+
+  /* ---- Client-Side Filtering ---- */
+  const filteredProducts = useMemo(() => {
+    let filtered = [...sourceProducts];
+
+    // 1. Price Filtering
+    const minPrice = Number(searchParams.get("minPrice")) || 0;
+    const maxPrice = Number(searchParams.get("maxPrice")) || Infinity;
+    filtered = filtered.filter(p => {
+      const price = p.calculable_price || 0;
+      return price >= minPrice && price <= maxPrice;
+    });
+
+    // 2. Brand Filtering
+    const selectedBrands = searchParams.get("brands")?.split(",").filter(Boolean) || [];
+    if (selectedBrands.length > 0) {
+      filtered = filtered.filter(p => selectedBrands.includes(p.brand_name || p.brand?.name || ""));
+    }
+
+    // 3. Attribute Filtering
+    searchParams.forEach((value, key) => {
+      if (key.startsWith("attr_")) {
+        const attrName = key.replace("attr_", "");
+        const selectedValues = value.split(/[|,]/).filter(Boolean);
+        if (selectedValues.length > 0) {
+          const selectedValuesLower = selectedValues.map(v => v.toLowerCase());
+          filtered = filtered.filter(p => {
+            const pAttrs = p.attributes || [];
+            return pAttrs.some((pa: { name: string; values: string[] }) => 
+              pa.name.toLowerCase() === attrName && 
+              pa.values.some((v: string) => selectedValuesLower.includes(v.toLowerCase()))
+            ) || (attrName === 'color' && selectedValuesLower.includes((p.color_name || '').toLowerCase()));
+          });
+        }
+      }
+    });
+
+    // 4. Sorting
+    if (sortOption === "price-low") {
+      filtered.sort((a, b) => (a.calculable_price || 0) - (b.calculable_price || 0));
+    } else if (sortOption === "price-high") {
+      filtered.sort((a, b) => (b.calculable_price || 0) - (a.calculable_price || 0));
+    } else if (sortOption === "newest") {
+      filtered.sort((a, b) => (b.id || 0) - (a.id || 0));
+    }
+
+    return filtered;
+  }, [sourceProducts, searchParams, sortOption]);
+
+  const totalItems = filteredProducts.length;
 
   if (isLoading) {
     return (
@@ -73,20 +124,14 @@ export default function SearchProductGrid({ query, categoryId }: SearchProductGr
             <button
               type="button"
               onClick={() => setViewMode("grid")}
-              className={`flex h-8 w-8 items-center justify-center rounded transition-colors ${viewMode === "grid"
-                ? "bg-slate-100 text-[#2B7FE8]"
-                : "text-slate-400 hover:text-slate-600"
-                }`}
+              className={`flex h-8 w-8 items-center justify-center rounded transition-colors ${viewMode === "grid" ? "bg-slate-100 text-[#2B7FE8]" : "text-slate-400 hover:text-slate-600"}`}
             >
               <HiOutlineSquares2X2 className="h-5 w-5" />
             </button>
             <button
               type="button"
               onClick={() => setViewMode("list")}
-              className={`flex h-8 w-8 items-center justify-center rounded transition-colors ${viewMode === "list"
-                ? "bg-slate-100 text-[#2B7FE8]"
-                : "text-slate-400 hover:text-slate-600"
-                }`}
+              className={`flex h-8 w-8 items-center justify-center rounded transition-colors ${viewMode === "list" ? "bg-slate-100 text-[#2B7FE8]" : "text-slate-400 hover:text-slate-600"}`}
             >
               <HiOutlineBars3 className="h-5 w-5" />
             </button>
@@ -105,23 +150,14 @@ export default function SearchProductGrid({ query, categoryId }: SearchProductGr
             <option value="newest">Newest First</option>
             <option value="popular">Most Popular</option>
           </select>
-          <svg
-            className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-              clipRule="evenodd"
-            />
+          <svg className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
           </svg>
         </div>
       </div>
 
       {/* ═══════════════ MOBILE TOOLBAR ═══════════════ */}
-      <div className="flex lg:hidden flex-col gap-3 -mx-4 px-4 py-2 bg-[#F4F4F4] border-y border-slate-100">
+      <div className="flex lg:hidden flex-col gap-3 px-1 py-2 bg-[#F4F4F4] border-y border-slate-100">
         <div className="flex items-center gap-2">
           <div className="relative flex-1">
             <select
@@ -135,12 +171,7 @@ export default function SearchProductGrid({ query, categoryId }: SearchProductGr
               <option value="newest">Newest First</option>
               <option value="popular">Most Popular</option>
             </select>
-            <svg
-              className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
+            <svg className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
             </svg>
           </div>
@@ -171,19 +202,13 @@ export default function SearchProductGrid({ query, categoryId }: SearchProductGr
       </h2>
 
       {/* ═══════════════ PRODUCT GRID ═══════════════ */}
-      <div
-        className={
-          viewMode === "grid"
-            ? "grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4"
-            : "flex flex-col gap-4"
-        }
-      >
-        {products.map((product) => (
+      <div className={viewMode === "grid" ? "grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4" : "flex flex-col gap-4"}>
+        {filteredProducts.map((product) => (
           <ProductCard key={product.id} productData={product} />
         ))}
       </div>
 
-      {products.length === 0 && !isLoading && (
+      {filteredProducts.length === 0 && !isLoading && (
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <div className="mb-4 text-slate-300">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -191,7 +216,7 @@ export default function SearchProductGrid({ query, categoryId }: SearchProductGr
             </svg>
           </div>
           <h3 className="text-xl font-semibold text-slate-700">No products found</h3>
-          <p className="mt-2 text-slate-500">We couldn&apos;t find any products matching your search query.</p>
+          <p className="mt-2 text-slate-500">We couldn&apos;t find any products matching your search query or filters.</p>
         </div>
       )}
 
@@ -199,6 +224,7 @@ export default function SearchProductGrid({ query, categoryId }: SearchProductGr
       <MobileFilterDrawer
         isOpen={isFilterOpen}
         onClose={() => setIsFilterOpen(false)}
+        filteringAttributes={filteringAttributes}
       />
     </div>
   );

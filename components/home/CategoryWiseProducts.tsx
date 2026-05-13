@@ -9,48 +9,48 @@ import { Product } from "@/types/product";
 type ProductBadge = "New" | "Hot" | "Sold Out" | "Special" | "";
 
 type CategoryWiseProductsProps = {
-  title: string;
+	title: string;
 	subtitle?: string;
-  products?: Product[];
-  categorySlug?: string;
-  seeMoreHref?: string;
+	products?: Product[];
+	categorySlug?: string;
+	seeMoreHref?: string;
 };
 
 const fallbackStatusBadges: ProductBadge[] = ["New", "Hot", "Sold Out", "Special", ""];
 
 export default function CategoryWiseProducts({
-  title,
+	title,
 	subtitle,
-  products = [],
-  categorySlug,
-  seeMoreHref = "/products",
+	products = [],
+	categorySlug,
+	seeMoreHref = "/products",
 }: CategoryWiseProductsProps) {
-  const [dynamicProducts, setDynamicProducts] = useState<Product[]>(products);
-  const [loading, setLoading] = useState(!!categorySlug);
-  const sliderRef = useRef<HTMLDivElement | null>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
+	const [dynamicProducts, setDynamicProducts] = useState<Product[]>(products);
+	const [loading, setLoading] = useState(!!categorySlug);
+	const sliderRef = useRef<HTMLDivElement | null>(null);
+	const [canScrollLeft, setCanScrollLeft] = useState(false);
+	const [canScrollRight, setCanScrollRight] = useState(true);
 
-  useEffect(() => {
-    if (!categorySlug) return;
+	useEffect(() => {
+		if (!categorySlug) return;
 
-    async function fetchProducts() {
-      try {
-        const res = await fetch(`/api/products/category/${categorySlug}`);
-        const data = await res.json();
-        if (data.success) {
-          setDynamicProducts(data.data);
-        }
-      } catch (error) {
-        console.error(`Error fetching products for category ${categorySlug}:`, error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchProducts();
-  }, [categorySlug]);
+		async function fetchProducts() {
+			try {
+				const res = await fetch(`/api/products/category/${categorySlug}`);
+				const data = await res.json();
+				if (data.success) {
+					setDynamicProducts(data.data);
+				}
+			} catch (error) {
+				console.error(`Error fetching products for category ${categorySlug}:`, error);
+			} finally {
+				setLoading(false);
+			}
+		}
+		fetchProducts();
+	}, [categorySlug]);
 
-  const featuredProducts = dynamicProducts.slice(0, 8);
+	const featuredProducts = dynamicProducts.slice(0, 8);
 
 	const updateScrollState = () => {
 		const slider = sliderRef.current;
@@ -133,9 +133,9 @@ export default function CategoryWiseProducts({
 					onClick={() => scrollByOneCard(-1)}
 					disabled={!canScrollLeft}
 					aria-label={`Show previous ${title} product`}
-					className="absolute left-2 top-[220px] z-10 inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-[#1D3C61] shadow-md transition hover:border-[#2F73BD] hover:text-[#2F73BD] disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300 sm:left-0 sm:h-11 sm:w-11 sm:-translate-x-1/2 sm:top-[235px] lg:top-[250px]"
+					className="absolute left-1 top-[120px] lg:left-5 sm:top-[220px] lg:top-[250px] z-50 inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 bg-white text-[#1D3C61] shadow-md transition hover:border-[#2F73BD] hover:text-[#2F73BD] disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300 sm:left-0 sm:h-11 sm:w-11 sm:-translate-x-1/2 "
 				>
-					<FaChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
+					<FaChevronLeft className="h-2 w-2 sm:h-4 sm:w-4" />
 				</button>
 
 				<button
@@ -143,38 +143,38 @@ export default function CategoryWiseProducts({
 					onClick={() => scrollByOneCard(1)}
 					disabled={!canScrollRight}
 					aria-label={`Show next ${title} product`}
-					className="absolute right-2 top-[220px] z-10 inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-[#1D3C61] shadow-md transition hover:border-[#2F73BD] hover:text-[#2F73BD] disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300 sm:right-0 sm:h-11 sm:w-11 sm:translate-x-1/2 sm:top-[235px] lg:top-[250px]"
+					className="absolute right-1 top-[120px] lg:right-7 sm:top-[220px] lg:top-[250px] z-50 inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 bg-white text-[#1D3C61] shadow-md transition hover:border-[#2F73BD] hover:text-[#2F73BD] disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300 sm:right-0 sm:h-11 sm:w-11 sm:translate-x-1/2 "
 				>
-					<FaChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
+					<FaChevronRight className="h-2 w-2 sm:h-4 sm:w-4" />
 				</button>
 
-        <div
-          ref={sliderRef}
-          className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-        >
-          {loading ? (
-            <div className="flex w-full items-center justify-center py-20">
-              <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#0054A6] border-t-transparent" />
-            </div>
-          ) : featuredProducts.length === 0 ? (
-            <div className="flex w-full items-center justify-center py-20 text-slate-500">
-              No products found in this category.
-            </div>
-          ) : (
-            featuredProducts.map((product, index) => (
-              <div
-                key={product.id}
-                data-category-card
-                className="min-w-[48%] snap-start sm:min-w-[48%] lg:min-w-[31.5%] xl:min-w-[24%] 2xl:min-w-[19%]"
-              >
-                <ProductCard
-                  productData={product}
-                  statusBadge={String(product.statusBadge || fallbackStatusBadges[index] || "")}
-                />
-              </div>
-            ))
-          )}
-        </div>
+				<div
+					ref={sliderRef}
+					className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+				>
+					{loading ? (
+						<div className="flex w-full items-center justify-center py-20">
+							<div className="h-10 w-10 animate-spin rounded-full border-4 border-[#0054A6] border-t-transparent" />
+						</div>
+					) : featuredProducts.length === 0 ? (
+						<div className="flex w-full items-center justify-center py-20 text-slate-500">
+							No products found in this category.
+						</div>
+					) : (
+						featuredProducts.map((product, index) => (
+							<div
+								key={product.id}
+								data-category-card
+								className="min-w-[65%] snap-start sm:min-w-[48%] lg:min-w-[31.5%] xl:min-w-[24%] 2xl:min-w-[19%]"
+							>
+								<ProductCard
+									productData={product}
+									statusBadge={String(product.statusBadge || fallbackStatusBadges[index] || "")}
+								/>
+							</div>
+						))
+					)}
+				</div>
 			</div>
 		</section>
 	);

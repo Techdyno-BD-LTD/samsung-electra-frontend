@@ -20,6 +20,8 @@ export interface LastOrder {
   savings: number;
   tax: number;
   delivery: number;
+  couponCode: string;
+  couponDiscount: number;
   total: number;
 }
 
@@ -27,8 +29,20 @@ interface OrderState {
   lastOrder: LastOrder | null;
 }
 
+const getInitialLastOrder = (): LastOrder | null => {
+  if (typeof window !== "undefined") {
+    try {
+      const saved = localStorage.getItem("samsung-electra-last-order");
+      return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+  return null;
+};
+
 const initialState: OrderState = {
-  lastOrder: null,
+  lastOrder: getInitialLastOrder(),
 };
 
 export const orderSlice = createSlice({

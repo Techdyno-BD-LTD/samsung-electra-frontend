@@ -1,13 +1,73 @@
 "use client";
 
-import React from 'react'
+import React, { useEffect, useState, Suspense } from 'react'
 import Image from 'next/image'
 import { useAppSelector } from '@/store/hooks';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { formatCurrency } from '@/lib/currencyUtils';
+import { LastOrder, OrderItem } from '@/store/features/order/orderSlice';
 
-const Success = () => {
+const SuccessContent = () => {
     const router = useRouter();
-    const lastOrder = useAppSelector((state) => state.order.lastOrder);
+    const searchParams = useSearchParams();
+    const orderCode = searchParams.get('order_code');
+    const reduxLastOrder = useAppSelector((state) => state.order.lastOrder);
+    const [lastOrder, setLastOrder] = useState<LastOrder | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (reduxLastOrder) {
+            setLastOrder(reduxLastOrder);
+            setLoading(false);
+        } else if (orderCode) {
+            // Fetch order details if not in Redux (e.g. after redirect)
+            const fetchOrder = async () => {
+                try {
+                    const response = await fetch(`/api/v2/order/track?order_code=${orderCode}`);
+                    const payload = await response.json();
+                    if (payload.success && payload.data && payload.data.length > 0) {
+                        const order = payload.data[0];
+                        setLastOrder({
+                            orderId: order.code,
+                            paymentMethod: 'Online Payment',
+                            deliveryDate: 'Estimated 5-7 days',
+                            items: order.items.map((it: { id: number; name: string; thumbnail: string; quantity: number; price: number }) => ({
+                                id: it.id.toString(),
+                                title: it.name,
+                                image: it.thumbnail,
+                                quantity: it.quantity,
+                                price: formatCurrency(it.price),
+                                originalPrice: formatCurrency(it.price), 
+                                brand: 'Samsung'
+                            })),
+                            subtotal: order.subtotal || 0,
+                            savings: 0,
+                            tax: order.tax || 0,
+                            delivery: order.shipping_cost,
+                            couponCode: '',
+                            couponDiscount: order.coupon_discount,
+                            total: order.grand_total
+                        });
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch order", error);
+                } finally {
+                    setLoading(false);
+                }
+            };
+            fetchOrder();
+        } else {
+            setLoading(false);
+        }
+    }, [reduxLastOrder, orderCode]);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#1877f2]"></div>
+            </div>
+        );
+    }
 
     if (!lastOrder) {
         return (
@@ -29,7 +89,7 @@ const Success = () => {
             <div className="text-center mb-8 flex flex-col items-center">
                 <div className="mb-4">
                     <Image
-                        src="/images/approve.png" // User will replace this top icon
+                        src="/images/approve.png"
                         alt="Success"
                         width={80}
                         height={80}
@@ -37,8 +97,8 @@ const Success = () => {
                         className="object-contain"
                     />
                 </div>
-                <h1 className="text-[24px] font-semibold text-gray-900 mb-2 tracking-tight">Thank You! Your Payment Was Successful</h1>
-                <p className="text-gray-500 text-[14px] font-normal max-w-xl px-4">Your payment has been completed successfully. Thank you for choosing Samsung Electra.</p>
+                <h1 className="text-[24px] font-semibold text-gray-900 mb-2 tracking-tight">Thank You! Your Order Was Successful</h1>
+                <p className="text-gray-500 text-[14px] font-normal max-w-xl px-4">Your order has been completed successfully. Thank you for choosing Samsung Electra.</p>
             </div>
 
             {/* Order Info Bar */}
@@ -59,8 +119,11 @@ const Success = () => {
                         <p className="font-normal text-[16px] text-gray-900 tracking-tight">{lastOrder.deliveryDate}</p>
                     </div>
                 </div>
-                <div className="flex  flex-col gap-2 w-full md:w-auto">
-                    <button className="border border-[#1877f2] text-[#1877f2] font-semibold px-4 py-2 rounded-lg text-[11px] hover:bg-blue-50 transition-colors uppercase tracking-wider whitespace-nowrap">
+                <div className="flex flex-col gap-2 w-full md:w-auto">
+                    <button 
+                        onClick={() => router.push(`/orders/track?code=${lastOrder.orderId}`)}
+                        className="border border-[#1877f2] text-[#1877f2] font-semibold px-4 py-2 rounded-lg text-[11px] hover:bg-blue-50 transition-colors uppercase tracking-wider whitespace-nowrap"
+                    >
                         Track your order
                     </button>
                     <button className="bg-[#1877f2] text-white font-semibold px-4 py-2 rounded-lg text-[11px] hover:bg-blue-600 transition-colors uppercase tracking-wider shadow-sm whitespace-nowrap">
@@ -77,7 +140,7 @@ const Success = () => {
                 </div>
 
                 <div className="space-y-3">
-                    {lastOrder.items.map((item) => (
+                    {lastOrder.items.map((item: OrderItem) => (
                         <div key={item.id} className="bg-white rounded-xl p-3 md:p-4 flex flex-col md:flex-row gap-6 items-center border border-gray-100 shadow-sm">
                             <div className="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0 relative flex items-center justify-center p-2 border border-gray-100">
                                 <Image
@@ -93,14 +156,14 @@ const Success = () => {
                                     <div className="flex items-center gap-2 mb-1">
                                         <span className="font-semibold text-gray-900 text-[11px] tracking-tight">{item.brand}</span>
                                         <span className="text-gray-300">|</span>
-                                        <span className="text-gray-400 text-[11px] font-normal uppercase">Washing Machine</span>
+                                        <span className="text-gray-400 text-[11px] font-normal uppercase">Electronics</span>
                                     </div>
                                     <h3 className="font-semibold text-gray-900 text-[16px] leading-[1.3] group-hover:text-[#1877f2] transition-colors cursor-pointer capitalize">
                                         {item.title}
                                     </h3>
                                     <div className="text-[11px] text-gray-400 font-normal uppercase tracking-wide mt-1 space-y-0.5">
                                         <p>Quantity : <span className="text-gray-900 ml-1">{item.quantity}</span> | Color : <span className="text-gray-900 ml-1">{item.color || 'N/A'}</span></p>
-                                        <p>Original Price : <span className="text-gray-800 ml-1">{item.originalPrice}</span></p>
+                                        <p>Unit Price : <span className="text-gray-800 ml-1">{item.price}</span></p>
                                     </div>
                                 </div>
                                 <div className="text-right flex flex-col justify-center">
@@ -114,19 +177,25 @@ const Success = () => {
                 {/* Final Billing Summary */}
                 <div className="mt-6 bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
                     <div className="space-y-3 text-[14px]">
-                        <div className="flex justify-between items-center text-gray-600 font-normal">
-                            <span className="font-normal">Save</span>
-                            <span className="font-normal text-gray-900 text-[16px]">৳{lastOrder.savings.toLocaleString()}</span>
-                        </div>
+                        {lastOrder.savings > 0 && (
+                            <div className="flex justify-between items-center text-gray-600 font-normal">
+                                <span className="font-normal">Save</span>
+                                <span className="font-normal text-gray-900 text-[16px]">৳{lastOrder.savings.toLocaleString()}</span>
+                            </div>
+                        )}
 
                         <div className="flex justify-between items-center text-gray-600 font-normal">
                             <span className="font-normal">Delivery</span>
                             <span className="font-normal text-gray-900 text-[16px]">৳{lastOrder.delivery.toLocaleString()}</span>
                         </div>
-                        <div className="flex justify-between items-center text-gray-600 font-normal">
-                            <span className="font-normal">Coupon Code</span>
-                            <span className="font-normal text-gray-900 text-[16px]">0</span>
-                        </div>
+                        {lastOrder.couponDiscount > 0 && (
+                            <div className="flex justify-between items-center text-gray-600 font-normal">
+                                <span className="font-normal">Coupon ({lastOrder.couponCode || 'Discount'})</span>
+                                <span className="font-normal text-gray-900 text-[16px]">
+                                    - ৳{lastOrder.couponDiscount.toLocaleString()}
+                                </span>
+                            </div>
+                        )}
                         <div className="pt-3 border-t border-gray-100 flex justify-between items-center text-gray-900">
                             <span className="text-[16px] font-semibold">Total Amount :</span>
                             <span className="text-[22px] font-semibold tracking-tight text-[#1877f2]">৳{lastOrder.total.toLocaleString()}</span>
@@ -138,4 +207,16 @@ const Success = () => {
     )
 }
 
-export default Success
+const Success = () => {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#1877f2]"></div>
+            </div>
+        }>
+            <SuccessContent />
+        </Suspense>
+    );
+}
+
+export default Success;

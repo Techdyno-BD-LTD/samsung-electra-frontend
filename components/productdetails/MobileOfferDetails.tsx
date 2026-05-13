@@ -6,7 +6,11 @@ type MobileOfferDetailsProps = {
       text?: string;
       link_label?: string | null;
     };
-    special_offers?: unknown[];
+    special_offers?: Array<{
+      text?: string;
+      image?: string | null;
+    }>;
+    special_offer_title?: string;
     shippingInfo?: string;
     emi_facility?: {
       text?: string;
@@ -17,9 +21,7 @@ type MobileOfferDetailsProps = {
       link_label?: string | null;
     };
   };
-  specialOfferLeft?: string;
-  specialOfferOne?: string;
-  specialOfferTwo?: string;
+  specialOfferTitle?: string;
   shippingInfo?: string;
   warrantyInfo?: string;
   emiFacilityInfo?: string;
@@ -48,14 +50,15 @@ function renderTextAfterColonBold(text?: string) {
 
 export default function MobileOfferDetails({
   productData,
-  specialOfferLeft = "Special Offer",
-  specialOfferOne = "Offer 1",
-  specialOfferTwo = "Offer 2",
+  specialOfferTitle = productData?.special_offer_title || "Special Offer",
   shippingInfo = productData?.shippingInfo || "Shipping information",
   warrantyInfo = productData?.warranty?.text ? `Warranty: ${productData.warranty.text}` : "Warranty information",
   emiFacilityInfo = productData?.emi_facility?.text || "EMI information",
   exchangeInfo = productData?.exchange?.text || "Exchange information",
-}: MobileOfferDetailsProps) {
+  showroomTitle = "Book in showroom Get 5% Off",
+}: MobileOfferDetailsProps & { showroomTitle?: string }) {
+  const offers = productData?.special_offers || [];
+
   return (
     <div className="space-y-3 lg:hidden">
       <p className="flex items-start gap-3 text-[12px] text-slate-700">
@@ -63,28 +66,37 @@ export default function MobileOfferDetails({
         <span>{renderTextAfterColonBold(warrantyInfo)}</span>
       </p>
 
+      {offers.length > 0 && (
+        <>
+          <button
+            type="button"
+            className="w-full rounded border border-[#9CB7D8] bg-[#EDF4FF] py-1.5 text-[14px] font-semibold leading-none text-[#0C73DA]"
+          >
+            {specialOfferTitle}
+          </button>
+
+          <div className="space-y-2 text-[13px] text-slate-800">
+            {offers.map((offer, index) => (
+              <div key={index} className="flex items-center justify-between border border-slate-200 px-3 py-2">
+                <span className="flex items-center gap-2">
+                  {offer.image && (
+                    <Image src={offer.image} alt={offer.text || "Offer"} width={22} height={22} className="h-5 w-5 object-contain" />
+                  )}
+                  {offer.text}
+                </span>
+                <span className="text-xs text-slate-400">*{offer.text}</span>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
       <button
         type="button"
-        className="w-full rounded border border-[#9CB7D8] bg-[#EDF4FF] py-1.5 text-[14px] font-semibold leading-none text-[#0C73DA]"
+        className="w-full rounded border border-[#9CB7D8] bg-[#EDF4FF] py-2 text-[14px] font-semibold leading-none text-[#0C73DA]"
       >
-        {specialOfferLeft}
+        {showroomTitle}
       </button>
-
-      <div className="space-y-2 text-[13px] text-slate-800">
-        <div className="flex items-center justify-between border border-slate-200 px-3 py-2">
-          <span className="flex items-center gap-2">
-            <Image src="/images/ebl.png" alt="EBL" width={22} height={22} className="h-5 w-5 object-contain" />
-            {specialOfferOne}
-          </span>
-          <span>*{specialOfferOne}</span>
-        </div>
-
-        <div className="flex items-center justify-center gap-2 border border-slate-200 px-3 py-2 text-[24px] text-red-600">
-          <Image src="/images/nogod.png" alt="Nagad" width={22} height={22} className="h-5 w-5 object-contain" />
-        
-          <span className="text-[13px] text-slate-800">{specialOfferTwo}</span>
-        </div>
-      </div>
 
       <div className="space-y-3 border-b border-slate-200 pb-3 text-[12px] text-slate-700">
         <p className="flex items-start gap-3">
@@ -106,4 +118,4 @@ export default function MobileOfferDetails({
       </div>
     </div>
   );
-}
+}

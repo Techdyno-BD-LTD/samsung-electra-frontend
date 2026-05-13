@@ -148,12 +148,13 @@ export default function FlashDeals() {
         {/* Mobile Divider */}
         <div className="h-[2px] w-[200px] bg-gradient-to-r from-[#2F73BD] via-[#2F73BD]/50 to-transparent" />
 
-        {/* Mobile Grid: 2 columns, max 4 products */}
-        <div className="grid grid-cols-2 gap-3">
-          {activeDeal.products.slice(0, 4).map((product) => (
+        {/* Mobile Slider: Horizontal scroll with peek */}
+        <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+          {activeDeal.products.map((product) => (
             <div
               key={`${activeDeal.id}-${product.id}`}
               data-flash-card
+              className="min-w-[65%] snap-start"
             >
               <ProductCard
                 cardVariant="flashDeal"

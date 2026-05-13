@@ -8,6 +8,7 @@ export async function POST(req: NextRequest) {
         const apiBaseUrl = process.env.API_BASE_URL || "http://localhost:5000";
         const systemKey = process.env.API_SYSTEM_KEY || "";
         const authHeader = req.headers.get("authorization") || "";
+        console.log(`[OrderStore Proxy] Target: ${apiBaseUrl}, Auth: ${authHeader ? 'YES' : 'NO'}`);
 
         const response = await fetch(`${apiBaseUrl}/api/v2/order/store`, {
             method: "POST",

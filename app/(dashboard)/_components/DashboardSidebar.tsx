@@ -4,23 +4,24 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { 
+import {
   FiShoppingBag,
-  FiMapPin, 
-  FiHeart, 
-  FiGift, 
-  FiCreditCard, 
-  FiMessageSquare, 
-  FiHome, 
-  FiRepeat, 
-  FiUserCheck, 
-  FiAlertCircle, 
+  FiMapPin,
+  FiHeart,
+  FiGift,
+
+  FiMessageSquare,
+  FiHome,
+  FiRepeat,
+  FiUserCheck,
+  FiAlertCircle,
   FiLogOut,
   FiChevronRight,
   FiCamera
 } from "react-icons/fi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { logout } from "@/store/features/auth/authSlice";
+import { clearWishlist } from "@/store/features/wishlist/wishlistSlice";
 import { useRouter } from "next/navigation";
 
 const DashboardSidebar = () => {
@@ -32,6 +33,7 @@ const DashboardSidebar = () => {
   const handleLogout = (e: React.MouseEvent) => {
     e.preventDefault();
     dispatch(logout());
+    dispatch(clearWishlist());
     router.push("/login");
   };
 
@@ -41,7 +43,7 @@ const DashboardSidebar = () => {
     { name: "Shipping Address", icon: <FiMapPin />, href: "/dashboard/address" },
     { name: "Wishlist", icon: <FiHeart />, href: "/dashboard/wishlist" },
     { name: "My Offers", icon: <FiGift />, href: "/dashboard/offers" },
-    { name: "Payment Method", icon: <FiCreditCard />, href: "/dashboard/payment" },
+    // { name: "Payment Method", icon: <FiCreditCard />, href: "/dashboard/payment" },
     { name: "Review", icon: <FiMessageSquare />, href: "/dashboard/reviews" },
     { name: "Store Location", icon: <FiHome />, href: "/dashboard/stores" },
     { name: "Exchange Product", icon: <FiRepeat />, href: "/dashboard/exchange" },
@@ -55,7 +57,11 @@ const DashboardSidebar = () => {
         <div className="relative w-20 h-20 mb-4">
           <div className="w-full h-full rounded-full object-cover bg-slate-100 flex items-center justify-center border-2 border-white shadow-sm overflow-hidden">
             <Image
-              src={user?.avatar_original || user?.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.name || 'Guest'}`}
+              src={(typeof user?.avatar_original === 'string' && (user.avatar_original.startsWith('/') || user.avatar_original.startsWith('http')))
+                ? user.avatar_original
+                : (typeof user?.avatar === 'string' && (user.avatar.startsWith('/') || user.avatar.startsWith('http')))
+                  ? user.avatar
+                  : `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.name || 'Guest'}`}
               alt="Profile"
               width={80}
               height={80}
@@ -68,9 +74,9 @@ const DashboardSidebar = () => {
         </div>
         <h3 className="text-lg font-semibold text-slate-900 m-0 leading-tight">{user?.name || "User Name"}</h3>
         <p className="text-[13px] text-slate-500 mb-3">{user?.email || user?.phone || "Email/Phone"}</p>
-        <div className="bg-orange-50 text-orange-500 px-4 py-1 rounded-full text-xs font-semibold border border-orange-100">
+        {/* <div className="bg-orange-50 text-orange-500 px-4 py-1 rounded-full text-xs font-semibold border border-orange-100">
           Points : 00
-        </div>
+        </div> */}
       </div>
 
       <nav className="flex flex-col">
@@ -97,7 +103,7 @@ const DashboardSidebar = () => {
       </nav>
 
       <div className="px-4 pt-2 mt-2">
-        <button 
+        <button
           onClick={handleLogout}
           className="flex items-center w-full px-4 py-3 bg-slate-50 text-[#2b7fe8] rounded-xl decoration-0 font-semibold text-[15px] transition-all duration-200 hover:bg-slate-100 hover:-translate-y-0.5 text-left"
         >

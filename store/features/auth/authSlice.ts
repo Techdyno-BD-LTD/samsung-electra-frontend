@@ -7,6 +7,8 @@ interface User {
   phone: string | null;
   user_type: string;
   avatar?: string;
+  avatar_original?: string;
+  address?: string;
 }
 
 interface AuthState {

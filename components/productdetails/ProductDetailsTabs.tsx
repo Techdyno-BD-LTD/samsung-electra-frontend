@@ -3,6 +3,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { useAppSelector } from '@/store/hooks';
 import popularProducts from '@/database/popularproducts.json';
 import RecentViewedProductCard from '@/components/productdetails/RecentViewedProductCard';
 
@@ -40,6 +41,7 @@ type ProductReviews = {
 };
 
 type ProductDetailsTabsProps = {
+  productId?: number;
   title?: string;
   descriptionHtml?: string;
   specificationsHtml?: string;
@@ -65,6 +67,7 @@ function splitPlainText(value?: string): string[] {
 }
 
 export default function ProductDetailsTabs({
+  productId,
   title,
   descriptionHtml,
   specificationsHtml,
@@ -77,7 +80,67 @@ export default function ProductDetailsTabs({
   policyContent,
   reviews,
 }: ProductDetailsTabsProps) {
+  const { isAuthenticated, user, token } = useAppSelector((state) => state.auth);
   const [activeTab, setActiveTab] = useState('description');
+
+  // Review states
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [reviewTitle, setReviewTitle] = useState('');
+  const [comment, setComment] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+  const handleSubmitReview = async () => {
+    if (!isAuthenticated) {
+      setSubmitMessage({ type: 'error', text: 'Please login to submit a review' });
+      return;
+    }
+
+    if (rating === 0) {
+      setSubmitMessage({ type: 'error', text: 'Please select a rating' });
+      return;
+    }
+
+    if (!comment.trim()) {
+      setSubmitMessage({ type: 'error', text: 'Please share your feedback' });
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitMessage(null);
+
+    try {
+      const response = await fetch('/api/v2/reviews/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          product_id: productId,
+          rating: rating,
+          comment: comment,
+          title: reviewTitle // Though backend might not use title yet, we send it
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setSubmitMessage({ type: 'success', text: 'Review submitted successfully! It will be visible after admin approval.' });
+        setRating(0);
+        setReviewTitle('');
+        setComment('');
+      } else {
+        setSubmitMessage({ type: 'error', text: data.message || 'Failed to submit review' });
+      }
+    } catch {
+      setSubmitMessage({ type: 'error', text: 'An error occurred. Please try again.' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   const descriptionRef = useRef<HTMLDivElement>(null);
   const specificationsRef = useRef<HTMLDivElement>(null);
   const featuresRef = useRef<HTMLDivElement>(null);
@@ -290,7 +353,7 @@ export default function ProductDetailsTabs({
                                 </p>
                               )}
                               {featureImage ? (
-                                <div className="relative mt-5 h-96 w-full overflow-hidden">
+                                <div className="relative mt-5 lg:h-96 h-36 w-full overflow-hidden">
                                   <Image src={featureImage} alt={featureTitle} fill className="object-fit" />
                                 </div>
                               ) : null}
@@ -346,12 +409,61 @@ export default function ProductDetailsTabs({
                     </div>
 
                     <h3 className="mb-1.5 mt-4 text-[15px] font-semibold text-slate-900">Add Reviews</h3>
-                    <p className="mb-2 text-xs text-slate-500">★★★★★ ( add rating )</p>
-                    <input className="mb-2 w-full rounded border border-slate-300 px-2.5 py-1.5 text-xs" placeholder="Please Enter Your Name" />
-                    <input className="mb-2 w-full rounded border border-slate-300 px-2.5 py-1.5 text-xs" placeholder="Please Enter Your Review Title" />
-                    <textarea className="mb-2.5 w-full rounded border border-slate-300 px-2.5 py-1.5 text-xs" rows={3} placeholder="Please Share Your Feedback About The Product." />
+                    <div className="mb-2 flex items-center gap-1.5">
+                      <div className="flex">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            type="button"
+                            onMouseEnter={() => setHoverRating(star)}
+                            onMouseLeave={() => setHoverRating(0)}
+                            onClick={() => setRating(star)}
+                            className="text-[18px] focus:outline-none"
+                          >
+                            <span className={star <= (hoverRating || rating) ? 'text-orange-500' : 'text-slate-300'}>
+                              {star <= (hoverRating || rating) ? '★' : '☆'}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                      <span className="text-xs text-slate-500">( add rating )</span>
+                    </div>
+
+                    <input
+                      className="mb-2 w-full rounded border border-slate-300 px-2.5 py-1.5 text-xs"
+                      placeholder="Your Name"
+                      value={user?.name || ''}
+                      readOnly
+                    />
+                    <input
+                      className="mb-2 w-full rounded border border-slate-300 px-2.5 py-1.5 text-xs"
+                      placeholder="Please Enter Your Review Title"
+                      value={reviewTitle}
+                      onChange={(e) => setReviewTitle(e.target.value)}
+                    />
+                    <textarea
+                      className="mb-2.5 w-full rounded border border-slate-300 px-2.5 py-1.5 text-xs"
+                      rows={3}
+                      placeholder="Please Share Your Feedback About The Product."
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                    />
+
+                    {submitMessage && (
+                      <div className={`mb-2.5 text-xs p-2 rounded ${submitMessage.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                        {submitMessage.text}
+                      </div>
+                    )}
+
                     <div className="flex justify-end">
-                      <button type="button" className="rounded bg-[#2F7FE8] px-4 py-1.5 text-xs font-semibold text-white">Submit Review</button>
+                      <button
+                        type="button"
+                        onClick={handleSubmitReview}
+                        disabled={isSubmitting}
+                        className={`rounded bg-[#2F7FE8] px-4 py-1.5 text-xs font-semibold text-white transition-opacity ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'}`}
+                      >
+                        {isSubmitting ? 'Submitting...' : 'Submit Review'}
+                      </button>
                     </div>
                   </div>
 

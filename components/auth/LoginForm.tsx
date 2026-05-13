@@ -49,25 +49,46 @@ export default function LoginForm() {
     setError(false);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const identifier = loginType === "phone" ? fullPhoneNumber : email;
+
     if (loginType === "phone") {
       const cleanNumber = phoneNumber.replace(/\s/g, "");
       if (cleanNumber.length !== selectedCountry.length) {
         setError(true);
-      } else {
-        setError(false);
-        setStep("verify");
-        console.log("Sending OTP to:", `${selectedCountry.prefix}${cleanNumber}`);
+        return;
       }
     } else {
       if (!email || !email.includes("@")) {
         setError(true);
-      } else {
-        setError(false);
-        setStep("verify");
-        console.log("Sending OTP to email:", email);
+        return;
       }
+    }
+
+    setError(false);
+
+    try {
+      const response = await fetch("/api/auth/send-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          emailOrPhone: identifier,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.result) {
+        setStep("verify");
+      } else {
+        alert(data.message || "Failed to send OTP");
+      }
+    } catch (err) {
+      console.error("Send OTP error:", err);
+      alert("Something went wrong while sending OTP");
     }
   };
 
@@ -110,7 +131,8 @@ export default function LoginForm() {
     }
   };
 
-  const fullPhoneNumber = `${selectedCountry.prefix}${phoneNumber}`;
+  const cleanPhoneNumber = selectedCountry.code === "BD" && phoneNumber.startsWith("0") ? phoneNumber.substring(1) : phoneNumber;
+  const fullPhoneNumber = `${selectedCountry.prefix}${cleanPhoneNumber}`;
 
   return (
     <div className="w-full max-w-[420px] mx-auto bg-white p-8 md:p-10 mt-10 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-gray-100 min-h-[500px] flex flex-col justify-center">

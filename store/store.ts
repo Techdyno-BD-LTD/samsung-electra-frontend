@@ -4,6 +4,7 @@ import orderReducer from './features/order/orderSlice';
 import wishlistReducer from './features/wishlist/wishlistSlice';
 import compareReducer from './features/compare/compareSlice';
 import authReducer from './features/auth/authSlice';
+import toastReducer from './features/toast/toastSlice';
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     wishlist: wishlistReducer,
     compare: compareReducer,
     auth: authReducer,
+    toast: toastReducer,
   },
 });
 
@@ -23,6 +25,7 @@ store.subscribe(() => {
       localStorage.setItem("samsung-electra-cart", JSON.stringify(state.cart.items));
       localStorage.setItem("samsung-electra-wishlist", JSON.stringify(state.wishlist.items));
       localStorage.setItem("samsung-electra-compare", JSON.stringify(state.compare.slots));
+      localStorage.setItem("samsung-electra-last-order", JSON.stringify(state.order.lastOrder));
     } catch (e) {
       console.error("Could not save cart state", e);
     }

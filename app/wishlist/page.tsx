@@ -1,31 +1,32 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useAppSelector } from "@/store/hooks";
 import ProductCard from "@/components/common/ProductCard";
 
-type WishlistProduct = {
-  id: string;
-  title: string;
-  brand: string;
-  image: string;
-  price: string;
-  originalPrice: string;
-  discountPercent: string;
-  saveAmount: string;
-  color?: string;
-  type?: string;
-  weight?: string;
-  rating?: number;
-  ratingCount?: string;
-  brandLogo?: string;
-  emiPrice?: string;
-  emiPercent?: string;
-  tags?: string[];
-};
-
 export default function WishlistPage() {
-  const wishlistItems = useAppSelector((state) => state.wishlist.items) as WishlistProduct[];
+  const router = useRouter();
+  const { items: wishlistItems } = useAppSelector((state) => state.wishlist);
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push("/login?redirect=/wishlist");
+    }
+  }, [isAuthenticated, router]);
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600 mb-4"></div>
+          <p className="text-slate-600">Redirecting to login...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <main className="mt-20 pb-10 sm:mt-24 sm:pb-14 lg:mt-16">
@@ -64,13 +65,13 @@ export default function WishlistPage() {
               image={item.image}
               rating={item.rating ?? 0}
               ratingCount={item.ratingCount ?? "(0.0)"}
-              type={item.type}
+              type={item.type || item.category}
               weight={item.weight}
               color={item.color}
-              price={item.price}
-              originalPrice={item.originalPrice}
-              discountPercent={item.discountPercent}
-              saveAmount={item.saveAmount}
+              price={String(item.price)}
+              originalPrice={item.originalPrice ? String(item.originalPrice) : undefined}
+              discountPercent={item.discountLabel}
+              saveAmount={item.saveAmount ? String(item.saveAmount) : undefined}
               emiPrice={item.emiPrice}
               emiPercent={item.emiPercent}
               tags={item.tags ?? ["Cash On Delivery", "0% EMI", "Free Delivery"]}

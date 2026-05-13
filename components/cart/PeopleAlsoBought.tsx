@@ -3,17 +3,54 @@
 import { useEffect, useRef, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import ProductCard from "@/components/common/ProductCard";
-import products from "@/database/popularproducts.json";
+import { useAppSelector } from "@/store/hooks";
 
-type ProductBadge = "New" | "Hot" | "Sold Out" | "Special" | "";
 
-const fallbackStatusBadges: ProductBadge[] = ["New", "Hot", "Sold Out", "Special", ""];
+
+// const fallbackStatusBadges: ProductBadge[] = ["New", "Hot", "Sold Out", "Special", ""];
+
+type RecommendedProduct = {
+  id: number;
+  name: string;
+  slug: string;
+  thumbnail_image: string;
+  main_price: string;
+  stroked_price: string;
+  badge_value?: string;
+};
 
 export default function PeopleAlsoBought() {
-  const featuredProducts = products.slice(0, 8);
+  const cartItems = useAppSelector(state => state.cart.items);
+  const [recommendedProducts, setRecommendedProducts] = useState<RecommendedProduct[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const sliderRef = useRef<HTMLDivElement | null>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+
+  useEffect(() => {
+    const fetchRecommendations = async () => {
+      setLoading(true);
+      const productIds = cartItems.map(item => item.productId).filter(Boolean);
+      try {
+        const response = await fetch('/api/v2/people-also-bought', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ product_ids: productIds })
+        });
+        const result = await response.json();
+        if (result.success) {
+          setRecommendedProducts(result.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch recommendations:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecommendations();
+  }, [cartItems]);
 
   const updateScrollState = () => {
     const slider = sliderRef.current;
@@ -64,7 +101,15 @@ export default function PeopleAlsoBought() {
       slider.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
     };
-  }, []);
+  }, [recommendedProducts]);
+
+  if (cartItems.length === 0) {
+    return null;
+  }
+
+  if (!loading && recommendedProducts.length === 0) {
+    return null;
+  }
 
   return (
     <section className="w-full max-w-full overflow-hidden mx-auto space-y-6 mt-12 lg:mt-16 2xl:mt-24">
@@ -75,7 +120,7 @@ export default function PeopleAlsoBought() {
         </div>
       </div>
 
-      <div className="relative w-full max-w-full">
+      <div className="relative w-full max-full">
         <button
           type="button"
           onClick={() => scrollByOneCard(-1)}
@@ -100,18 +145,30 @@ export default function PeopleAlsoBought() {
           ref={sliderRef}
           className="flex snap-x snap-mandatory gap-3 sm:gap-4 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         >
-          {featuredProducts.map((product, index) => (
-            <div
-              key={product.id}
-              data-popular-card
-              className="w-[calc(50%-6px)] flex-shrink-0 overflow-hidden snap-start sm:w-[calc(50%-8px)] lg:w-[calc(33.333%-11px)] xl:w-[calc(25%-12px)] 2xl:w-[calc(20%-13px)]"
-            >
-              <ProductCard
-                {...product}
-                statusBadge={product.statusBadge || fallbackStatusBadges[index] || ""}
-              />
-            </div>
-          ))}
+          {loading ? (
+            // Skeleton or loading state
+            Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="w-[calc(50%-6px)] flex-shrink-0 animate-pulse bg-gray-100 h-64 rounded-xl sm:w-[calc(50%-8px)] lg:w-[calc(33.333%-11px)] xl:w-[calc(25%-12px)] 2xl:w-[calc(20%-13px)]" />
+            ))
+          ) : (
+            recommendedProducts.map((product) => (
+              <div
+                key={product.id}
+                data-popular-card
+                className="w-[calc(50%-6px)] flex-shrink-0 overflow-hidden snap-start sm:w-[calc(50%-8px)] lg:w-[calc(33.333%-11px)] xl:w-[calc(25%-12px)] 2xl:w-[calc(20%-13px)]"
+              >
+                <ProductCard
+                  title={product.name}
+                  slug={product.slug}
+                  image={product.thumbnail_image}
+                  price={product.main_price}
+                  originalPrice={product.stroked_price}
+                  statusBadge={product.badge_value || ""}
+                  productData={product}
+                />
+              </div>
+            ))
+          )}
         </div>
       </div>
     </section>

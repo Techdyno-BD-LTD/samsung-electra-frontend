@@ -106,7 +106,7 @@ export default function MobileNavbar() {
 
   return (
     <>
-      <div className="lg:hidden bg-white border-b border-slate-200 sticky top-0 z-50">
+      <div className="lg:hidden bg-white border-b border-slate-200 relative">
         <div className="flex items-center justify-between px-4 py-3">
           {logoUrl ? (
             <Link href="/" className="flex items-center">

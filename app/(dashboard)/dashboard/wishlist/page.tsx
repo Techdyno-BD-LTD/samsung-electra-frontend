@@ -1,42 +1,73 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FiShoppingBag, FiTrash2 } from "react-icons/fi";
 import { formatCurrency } from "@/lib/currencyUtils";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchWishlist, removeFromWishlistAsync } from "@/store/features/wishlist/wishlistSlice";
+import { showToast } from "@/store/features/toast/toastSlice";
+import { addToCart } from "@/store/features/cart/cartSlice";
 
 const WishlistPage = () => {
-  const [items, setItems] = useState([
-    {
-      id: 1,
-      name: "Samsung Front Loading Washing Machine- 8KG | WW80AGAS21AXLP",
-      brand: "SAMSUNG",
-      category: "Washing Machine",
-      image: "/images/electrawm.png", // Attempting best match from public/images
-      price: 456900,
-      oldPrice: 470900,
-      discount: "10% Off",
-      saving: 10000,
-      capacity: "8-Kg",
-      color: "Black",
-      model: "WW80AGAS21AXLP"
-    },
-    {
-      id: 2,
-      name: "Samsung Front Loading Washing Machine- 8KG | WW80AGAS21AXLP",
-      brand: "SAMSUNG",
-      category: "Washing Machine",
-      image: "/images/electrawm.png",
-      price: 456900,
-      oldPrice: 470900,
-      discount: "10% Off",
-      saving: 10000,
-      capacity: "8-Kg",
-      color: "Black",
-      model: "WW80AGAS21AXLP"
+  const dispatch = useAppDispatch();
+  const { items, loading } = useAppSelector((state) => state.wishlist);
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchWishlist());
     }
-  ]);
+  }, [dispatch, isAuthenticated]);
+
+  const handleRemove = (slug: string) => {
+    dispatch(removeFromWishlistAsync(slug)).then((result) => {
+      if (removeFromWishlistAsync.fulfilled.match(result)) {
+        dispatch(showToast({
+          message: "Removed from Wishlist",
+          type: 'info',
+        }));
+      }
+    });
+  };
+
+  const handleAddToCart = (item: {
+    id: string;
+    productId: number;
+    title: string;
+    brand: string;
+    image: string;
+    price: string | number;
+    originalPrice?: string | number;
+    discountLabel?: string;
+    saveAmount?: string | number;
+    category?: string;
+  }) => {
+    dispatch(addToCart({
+      id: item.id,
+      productId: item.productId,
+      title: item.title,
+      brand: item.brand,
+      image: item.image,
+      price: String(item.price),
+      originalPrice: String(item.originalPrice || item.price),
+      discountPercent: item.discountLabel || "0%",
+      saveAmount: String(item.saveAmount || "0"),
+      quantity: 1,
+      slug: item.id,
+      type: item.category || 'Product',
+    }));
+  };
+
+  if (loading && items.length === 0) {
+    return (
+      <div className="bg-white rounded-2xl p-12 lg:p-20 shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-black/5 flex flex-col items-center justify-center text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600 mb-4"></div>
+        <p className="text-slate-600">Loading your wishlist...</p>
+      </div>
+    );
+  }
 
   if (items.length === 0) {
     return (
@@ -81,8 +112,10 @@ const WishlistPage = () => {
               {/* Product Image */}
               <div className="w-48 h-48 rounded-xl border border-slate-100 flex items-center justify-center p-4">
                 <Image
-                  src={item.image}
-                  alt={item.name}
+                  src={(typeof item.image === 'string' && (item.image.startsWith('/') || item.image.startsWith('http'))) 
+                    ? item.image 
+                    : "/images/electrawm.png"}
+                  alt={item.title}
                   width={160}
                   height={160}
                   className="object-contain"
@@ -94,18 +127,19 @@ const WishlistPage = () => {
                 <p className="text-[13px] text-slate-400 font-semibold uppercase tracking-wide">
                   {item.brand} | <span className="font-medium normal-case">{item.category}</span>
                 </p>
-                <h4 className="text-lg lg:text-xl font-semibold text-slate-800 leading-tight">
-                  {item.name}
-                </h4>
-                <div className="text-[13px] text-slate-500 font-medium mt-1">
-                  Capacity : {item.capacity} | Color : {item.color}
-                </div>
-                <div className="text-[13px] text-slate-500 font-medium">
-                  Model : {item.model}
-                </div>
+                <Link href={`/products/${item.id}`} className="hover:text-[#2b7fe8] transition-colors">
+                  <h4 className="text-lg lg:text-xl font-semibold text-slate-800 leading-tight">
+                    {item.title}
+                  </h4>
+                </Link>
+                {item.model && (
+                  <div className="text-[13px] text-slate-500 font-medium mt-1">
+                    Model : {item.model}
+                  </div>
+                )}
                 
                 <button 
-                  onClick={() => setItems(items.filter(i => i.id !== item.id))}
+                  onClick={() => handleRemove(item.id)}
                   className="flex items-center justify-center lg:justify-start gap-1.5 text-red-500 hover:text-red-600 transition-colors text-xs font-semibold mt-4"
                 >
                   <FiTrash2 className="text-sm" />
@@ -117,23 +151,32 @@ const WishlistPage = () => {
               <div className="flex flex-col items-center lg:items-end gap-3 min-w-[200px]">
                 <div className="flex flex-col items-center lg:items-end">
                   <div className="text-2xl lg:text-3xl font-semibold text-[#2b7fe8] leading-none mb-1">
-                    {formatCurrency(item.price)}
+                    {formatCurrency(Number(item.price))}
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-slate-400 line-through">
-                      {formatCurrency(item.oldPrice)}
-                    </span>
-                    <span className="text-xs font-bold text-emerald-500">
-                      {item.discount}
-                    </span>
-                  </div>
+                  {item.originalPrice && Number(item.originalPrice) > Number(item.price) && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-slate-400 line-through">
+                        {formatCurrency(Number(item.originalPrice))}
+                      </span>
+                      {item.discountLabel && (
+                        <span className="text-xs font-bold text-emerald-500">
+                          {item.discountLabel}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
                 
-                <div className="bg-red-600 text-white text-[11px] font-bold px-4 py-1.5 rounded-lg mb-2">
-                  Save : {formatCurrency(item.saving)}
-                </div>
+                {item.saveAmount && (
+                  <div className="bg-red-600 text-white text-[11px] font-bold px-4 py-1.5 rounded-lg mb-2">
+                    Save : {typeof item.saveAmount === 'number' ? formatCurrency(item.saveAmount) : item.saveAmount}
+                  </div>
+                )}
 
-                <button className="bg-[#2b7fe8] text-white w-full lg:w-fit px-12 py-3 rounded-lg text-sm font-semibold hover:bg-[#1a6ed9] transition-all shadow-sm">
+                <button 
+                  onClick={() => handleAddToCart(item)}
+                  className="bg-[#2b7fe8] text-white w-full lg:w-fit px-12 py-3 rounded-lg text-sm font-semibold hover:bg-[#1a6ed9] transition-all shadow-sm"
+                >
                   Add to cart
                 </button>
               </div>

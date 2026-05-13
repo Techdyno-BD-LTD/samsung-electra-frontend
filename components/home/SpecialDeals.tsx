@@ -217,7 +217,7 @@ export default function SpecialDeals() {
           onClick={() => scrollByOneCard(-1)}
           disabled={!canScrollLeft}
           aria-label="Show previous special deals"
-          className="absolute left-2 top-[240px] z-10 inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-[#1D3C61] shadow-md transition hover:border-[#2F73BD] hover:text-[#2F73BD] disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300 sm:left-0 sm:h-11 sm:w-11 sm:-translate-x-1/2 sm:top-[280px]"
+          className="absolute left-1 top-[220px] lg:left-5 sm:top-[220px] lg:top-[250px] z-10 inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-[#1D3C61] shadow-md transition hover:border-[#2F73BD] hover:text-[#2F73BD] disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300 sm:left-0 sm:h-11 sm:w-11 sm:-translate-x-1/2 "
         >
           <FaChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
         </button>
@@ -227,7 +227,7 @@ export default function SpecialDeals() {
           onClick={() => scrollByOneCard(1)}
           disabled={!canScrollRight}
           aria-label="Show next special deals"
-          className="absolute right-2 top-[240px] z-10 inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-[#1D3C61] shadow-md transition hover:border-[#2F73BD] hover:text-[#2F73BD] disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300 sm:right-0 sm:h-11 sm:w-11 sm:translate-x-1/2 sm:top-[280px]"
+          className="absolute right-1 top-[220px] lg:right-7 sm:top-[220px] lg:top-[250px] z-10 inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-[#1D3C61] shadow-md transition hover:border-[#2F73BD] hover:text-[#2F73BD] disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300 sm:right-0 sm:h-11 sm:w-11 sm:translate-x-1/2 "
         >
           <FaChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
         </button>
@@ -262,7 +262,7 @@ export default function SpecialDeals() {
               <div
                 key={product.id}
                 data-special-card
-                className="min-w-[88%] snap-start sm:min-w-[48%] lg:min-w-[32%]"
+                className="min-w-[65%] snap-start sm:min-w-[48%] lg:min-w-[32%]"
               >
                 <ProductCard
                   cardVariant="specialDeal"

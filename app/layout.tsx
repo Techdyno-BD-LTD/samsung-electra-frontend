@@ -7,6 +7,7 @@ import MobileBottomNav from "@/components/layout/MobileBottomNav";
 // import { getRouteMetadata } from "@/lib/metadata";
 import StoreProvider from "@/store/StoreProvider";
 import AuthInit from "@/components/auth/AuthInit";
+import GlobalToast from "@/components/common/GlobalToast";
 
 const openSans = Open_Sans({
   variable: "--font-open-sans",
@@ -69,8 +70,9 @@ export default function RootLayout({
       >
         <StoreProvider>
           <AuthInit />
+          <GlobalToast />
           <Navbar />
-          <main className="mainwidth pb-16 pt-8 lg:pt-28  ">
+          <main className="mainwidth pb-20 pt-20 lg:pt-32 min-h-screen-safe overflow-x-hidden">
             {children}
           </main>
           <div id="footer-breadcrumb-target" className="lg:hidden mx-auto mainwidthmore mb-4 px-4"></div>

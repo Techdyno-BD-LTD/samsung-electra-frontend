@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
     try {
         const apiBaseUrl = process.env.API_BASE_URL || "http://localhost:5000";
         const systemKey = process.env.API_SYSTEM_KEY || "";

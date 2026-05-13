@@ -24,7 +24,7 @@ export default function MobileBottomBar() {
   ];
 
   return (
-    <nav className="lg:hidden mainwidth bg-white border-b border-slate-200">
+    <nav className="lg:hidden w-full bg-white border-b border-slate-200 overflow-x-auto no-scrollbar">
       <div className="px-4">
         <ul className="flex items-center justify-around ">
           {navLinks.map((link, index) => (

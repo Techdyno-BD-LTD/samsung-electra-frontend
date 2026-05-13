@@ -51,7 +51,7 @@ export default function TopBar() {
     };
   }, []);
 
-  const renderLink = (key: string | number, href: string, children: JSX.Element, className: string) =>
+  const renderLink = (key: string | number, href: string, children: React.ReactNode, className: string) =>
     /^https?:\/\//i.test(href) ? (
       <a key={key} href={href} target="_blank" rel="noopener noreferrer" className={className}>
         {children}
@@ -66,7 +66,7 @@ export default function TopBar() {
     <div className="bg-white h-[38px] py-0.5 border-b border-slate-200">
       <div className="mainwidth mx-auto">
         <div className="flex items-center justify-between py-1.5 text-[12px]">
-          
+
           {supportText ? (
             <div className="flex items-center">
               <span className="text-slate-600 font-normal tracking-wide">{supportText}</span>
@@ -86,16 +86,16 @@ export default function TopBar() {
 
               {promoButtonLabel && promoButtonLink
                 ? renderLink(
-                    promoButtonLabel,
-                    promoButtonLink,
-                    <>
-                      <span>{promoButtonLabel}</span>
-                      <div className="bg-[#1e90ff] rounded-full px-1 flex items-center justify-center">
-                        <HiOutlineArrowLongRight className="text-white text-[10px]" />
-                      </div>
-                    </>,
-                    "flex items-center gap-2 bg-black text-white px-3 py-0.5 rounded-full hover:bg-slate-800 transition-all text-[11px]"
-                  )
+                  promoButtonLabel,
+                  promoButtonLink,
+                  <>
+                    <span>{promoButtonLabel}</span>
+                    <div className="bg-[#1e90ff] rounded-full px-1 flex items-center justify-center">
+                      <HiOutlineArrowLongRight className="text-white text-[10px]" />
+                    </div>
+                  </>,
+                  "flex items-center gap-2 bg-black text-white px-3 py-0.5 rounded-full hover:bg-slate-800 transition-all text-[11px]"
+                )
                 : null}
             </div>
           ) : null}
@@ -124,6 +124,12 @@ export default function TopBar() {
 
               return renderLink(item.id, linkHref, content, "flex items-center gap-2 text-slate-600 hover:text-slate-900 transition");
             })}
+            {/* <Link href="/higher-sale-products" className="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition font-medium">
+              Higher Sale
+            </Link>
+            <Link href="/track-order" className="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition font-medium">
+              Track Order
+            </Link> */}
           </div>
 
         </div>

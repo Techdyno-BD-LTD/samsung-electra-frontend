@@ -1,58 +1,115 @@
 "use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import { FaSearch, FaShareAlt, FaTrashAlt } from "react-icons/fa";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { buildCompareAttributes, ProductSearchItem, searchProducts } from "@/lib/productSearchCatalog";
-import { clearCompare, removeAtIndex, setCompareAtIndex } from "@/store/features/compare/compareSlice";
+// Forced refresh to fix cached ReferenceError
+import { clearCompare, removeAtIndex, setCompareAtIndex, CompareItem } from "@/store/features/compare/compareSlice";
 
-type CompareSlot = ProductSearchItem | null;
+type CompareSlot = CompareItem | null;
 
-function getCommonAttributeKeys(items: ProductSearchItem[]) {
-  if (items.length === 0) {
-    return [] as string[];
-  }
-
-  const maps = items.map((item) => buildCompareAttributes(item));
-  return Object.keys(maps[0]).filter((key) => maps.every((map) => key in map));
+function getUniversalKeys() {
+  return ["Brand", "Category"];
 }
 
 export default function ComparePage() {
   const dispatch = useAppDispatch();
   const slots = useAppSelector((state) => state.compare.slots) as CompareSlot[];
   const [queries, setQueries] = useState(["", "", ""]);
+  const [suggestions, setSuggestions] = useState<Array<any[]>>([[], [], []]);
+  const [isLoading, setIsLoading] = useState([false, false, false]);
+
   const compareGridClass =
     "grid grid-cols-[180px_minmax(0,1fr)] lg:grid-cols-[240px_repeat(2,minmax(0,1fr))] 2xl:grid-cols-[300px_repeat(3,minmax(0,1fr))]";
   const mobileSlots = slots.slice(0, 2);
-  const mobileSlotAttributes = mobileSlots.map((slot) => (slot ? buildCompareAttributes(slot) : null));
 
-  const selectedItems = slots.filter(Boolean) as ProductSearchItem[];
-  const commonKeys = useMemo(() => getCommonAttributeKeys(selectedItems), [selectedItems]);
+  const selectedItems = slots.filter(Boolean) as CompareItem[];
+  const universalKeys = useMemo(() => getUniversalKeys(), []);
 
   const categorySpecific = useMemo(() => {
     const grouped = new Map<string, string[]>();
 
     selectedItems.forEach((item) => {
       const category = item.category || "Other";
-      const map = buildCompareAttributes(item);
-      const extraKeys = Object.keys(map).filter((key) => !commonKeys.includes(key));
+      const keys: string[] = [];
+      if (item.specifications) {
+        item.specifications.forEach(s => {
+          if (!keys.includes(s.label)) {
+            keys.push(s.label);
+          }
+        });
+      }
+
       const existing = grouped.get(category) || [];
-      extraKeys.forEach((key) => {
+      keys.forEach((key) => {
         if (!existing.includes(key)) {
           existing.push(key);
         }
       });
-      grouped.set(category, existing);
+      if (existing.length > 0) {
+        grouped.set(category, existing);
+      }
     });
 
     return Array.from(grouped.entries());
-  }, [commonKeys, selectedItems]);
+  }, [selectedItems]);
 
-  const handleSetSlot = (index: number, item: ProductSearchItem) => {
-    dispatch(setCompareAtIndex({ index, item }));
-    setQueries((prev) => prev.map((value, idx) => (idx === index ? "" : value)));
+  useEffect(() => {
+    queries.forEach((query, index) => {
+      if (query.trim().length > 1) {
+        const timer = setTimeout(async () => {
+          setIsLoading(prev => prev.map((v, i) => i === index ? true : v));
+          try {
+            const res = await fetch(`/api/products/search?name=${encodeURIComponent(query)}`);
+            const json = await res.json();
+            if (json.success && json.data) {
+              setSuggestions(prev => prev.map((v, i) => i === index ? json.data : v));
+            }
+          } catch (err) {
+            console.error(err);
+          } finally {
+            setIsLoading(prev => prev.map((v, i) => i === index ? false : v));
+          }
+        }, 500);
+        return () => clearTimeout(timer);
+      } else {
+        setSuggestions(prev => prev.map((v, i) => i === index ? [] : v));
+      }
+    });
+  }, [queries]);
+
+  const handleSetSlot = async (index: number, backendItem: any) => {
+    // Clear query and suggestions first
+    setQueries(prev => prev.map((v, i) => i === index ? "" : v));
+    setSuggestions(prev => prev.map((v, i) => i === index ? [] : v));
+
+    // Fetch full details for specifications
+    try {
+      const res = await fetch(`/api/products/${backendItem.slug}`);
+      const json = await res.json();
+      if (json.success && json.data && json.data.length > 0) {
+        const fullItem = json.data[0];
+        const compareItem: CompareItem = {
+          id: fullItem.id,
+          slug: fullItem.slug,
+          title: fullItem.name,
+          brand: fullItem.brand_name || fullItem.brand?.name || "",
+          image: fullItem.thumbnail_image,
+          price: fullItem.main_price,
+          originalPrice: fullItem.stroked_price,
+          discountPercent: fullItem.discount,
+          saveAmount: "", // Backend doesn't provide this directly in mini/detail
+          category: fullItem.category?.name,
+          specifications: fullItem.specifications || [],
+          rating: fullItem.rating,
+          ratingCount: String(fullItem.rating_count),
+        };
+        dispatch(setCompareAtIndex({ index, item: compareItem }));
+      }
+    } catch (err) {
+      console.error("Failed to fetch product details for compare", err);
+    }
   };
 
   return (
@@ -96,7 +153,8 @@ export default function ComparePage() {
         <div className="rounded-md bg-[#ececec] p-3">
           <div className="grid grid-cols-2 gap-3">
             {mobileSlots.map((slot, index) => {
-              const suggestions = searchProducts(queries[index], 6);
+              const currentSuggestions = suggestions[index];
+
               return (
                 <div key={`mobile-search-${index}`} className="relative">
                   <p className="mb-2 text-[12px] font-semibold text-slate-800">Compare with</p>
@@ -113,17 +171,17 @@ export default function ComparePage() {
                       <FaSearch className="h-3.5 w-3.5" />
                     </button>
 
-                    {queries[index].trim() && suggestions.length > 0 && (
+                    {queries[index].trim() && currentSuggestions.length > 0 && (
                       <div className="absolute top-12 z-20 max-h-64 w-full overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-xl">
-                        {suggestions.map((item) => (
+                        {currentSuggestions.map((item) => (
                           <button
                             key={`${item.id}-mobile-${index}`}
                             type="button"
                             onClick={() => handleSetSlot(index, item)}
                             className="flex w-full items-center gap-2 border-b border-slate-100 px-3 py-2 text-left hover:bg-slate-50 last:border-b-0"
                           >
-                            <Image src={item.image} alt={item.title} width={36} height={36} className="h-9 w-9 rounded object-cover" />
-                            <span className="line-clamp-2 text-[11px] font-semibold text-slate-800">{item.title}</span>
+                            <Image src={item.thumbnail_image} alt={item.name} width={36} height={36} className="h-9 w-9 rounded object-cover" />
+                            <span className="line-clamp-2 text-[11px] font-semibold text-slate-800">{item.name}</span>
                           </button>
                         ))}
                       </div>
@@ -178,7 +236,7 @@ export default function ComparePage() {
                       Remove
                     </button>
                     <Link
-                      href={`/products/${slot.id}`}
+                      href={`/products/${slot.slug}`}
                       className="inline-flex h-6 min-w-[80px] items-center justify-center rounded-full bg-[#2b7fe8] px-3 text-[11px] font-semibold text-white"
                     >
                       Shop Now
@@ -197,12 +255,12 @@ export default function ComparePage() {
         </div>
 
         <div className="mt-4 overflow-hidden rounded-md border border-slate-200 bg-white">
-          {commonKeys.map((key) => (
+          {universalKeys.map((key) => (
             <div key={`mobile-common-${key}`} className="border-b border-slate-200 last:border-b-0">
               <div className="bg-[#f4f4f4] px-3 py-3 text-[13px] font-semibold uppercase tracking-wide text-slate-800">{key}</div>
               <div className="grid grid-cols-2 divide-x divide-slate-200 text-[12px] text-slate-700">
                 {mobileSlots.map((slot, index) => {
-                  const value = slot ? buildCompareAttributes(slot)[key] || "-" : "-";
+                  const value = slot ? (key === "Brand" ? slot.brand : key === "Category" ? slot.category : "-") : "-";
                   return (
                     <div key={`mobile-common-${key}-${index}`} className="min-h-[58px] px-3 py-3 leading-5">
                       {value}
@@ -220,8 +278,8 @@ export default function ComparePage() {
                 <div key={`mobile-${category}-${key}`} className="border-t border-slate-200">
                   <div className="px-3 py-3 text-[13px] font-medium text-slate-800">{key}</div>
                   <div className="grid grid-cols-2 divide-x divide-slate-200 text-[12px] text-slate-700">
-                    {mobileSlotAttributes.map((attrs, index) => {
-                      const value = attrs && key in attrs ? attrs[key] : "-";
+                    {mobileSlots.map((slot, index) => {
+                      const value = slot ? (slot.specifications?.find(s => s.label === key)?.value || "-") : "-";
                       return (
                         <div key={`mobile-${category}-${key}-${index}`} className="min-h-[58px] px-3 py-3 leading-5">
                           {value}
@@ -247,7 +305,7 @@ export default function ComparePage() {
             </div>
 
             {slots.map((slot, index) => {
-              const suggestions = searchProducts(queries[index], 6);
+              const currentSuggestions = suggestions[index];
               const slotVisibilityClass = index === 0 ? "" : index === 1 ? "hidden lg:block" : "hidden 2xl:block";
               return (
                 <div key={index} className={`relative min-h-[320px] border-r border-slate-300 p-3 sm:min-h-[340px] sm:p-4 last:border-r-0 ${slotVisibilityClass}`}>
@@ -264,17 +322,17 @@ export default function ComparePage() {
                       <FaSearch className="h-3.5 w-3.5" />
                     </button>
 
-                    {queries[index].trim() && suggestions.length > 0 && (
+                    {queries[index].trim() && currentSuggestions.length > 0 && (
                       <div className="absolute top-12 z-20 max-h-72 w-full overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-xl">
-                        {suggestions.map((item) => (
+                        {currentSuggestions.map((item) => (
                           <button
                             key={`${item.id}-${index}`}
                             type="button"
                             onClick={() => handleSetSlot(index, item)}
                             className="flex w-full items-center gap-2 border-b border-slate-100 px-3 py-2 text-left hover:bg-slate-50 last:border-b-0 sm:gap-3 sm:py-2.5"
                           >
-                            <Image src={item.image} alt={item.title} width={40} height={40} className="h-9 w-9 rounded object-cover sm:h-10 sm:w-10" />
-                            <span className="line-clamp-2 text-[11px] font-semibold text-slate-800 sm:text-xs">{item.title}</span>
+                            <Image src={item.thumbnail_image} alt={item.name} width={40} height={40} className="h-9 w-9 rounded object-cover sm:h-10 sm:w-10" />
+                            <span className="line-clamp-2 text-[11px] font-semibold text-slate-800 sm:text-xs">{item.name}</span>
                           </button>
                         ))}
                       </div>
@@ -305,7 +363,7 @@ export default function ComparePage() {
                           Remove
                         </button>
                         <Link
-                          href={`/products/${slot.id}`}
+                          href={`/products/${slot.slug}`}
                           className="inline-flex h-7 min-w-[100px] items-center justify-center rounded-full bg-[#2b7fe8] px-3 text-[11px] font-semibold text-white sm:h-8 sm:min-w-[130px] sm:px-5 sm:text-sm"
                         >
                           Shop Now
@@ -318,11 +376,11 @@ export default function ComparePage() {
             })}
           </div>
 
-          {commonKeys.map((key) => (
+          {universalKeys.map((key) => (
             <div key={key} className={`${compareGridClass} border-b border-slate-300 text-xs sm:text-sm lg:text-base`}>
               <div className="border-r border-slate-300 bg-[#efefef] px-3 py-3 font-semibold text-slate-900 sm:px-4 sm:py-4">{key}</div>
               {slots.map((slot, index) => {
-                const value = slot ? buildCompareAttributes(slot)[key] || "-" : "";
+                const value = slot ? (key === "Brand" ? slot.brand : key === "Category" ? slot.category : "-") : "";
                 const slotVisibilityClass = index === 0 ? "" : index === 1 ? "hidden lg:block" : "hidden 2xl:block";
                 return (
                   <div key={`${key}-${index}`} className={`border-r border-slate-300 px-3 py-3 text-slate-800 last:border-r-0 sm:px-4 sm:py-4 ${slotVisibilityClass}`}>
@@ -343,8 +401,7 @@ export default function ComparePage() {
                 <div key={`${category}-${key}`} className={`${compareGridClass} border-b border-slate-300 text-xs sm:text-sm lg:text-base`}>
                   <div className="border-r border-slate-300 bg-[#efefef] px-3 py-3 font-semibold text-slate-900 sm:px-4 sm:py-4">{key}</div>
                   {slots.map((slot, index) => {
-                    const attrs = slot ? buildCompareAttributes(slot) : null;
-                    const value = attrs && key in attrs ? attrs[key] : "";
+                    const value = slot ? (slot.specifications?.find(s => s.label === key)?.value || "-") : "";
                     const slotVisibilityClass = index === 0 ? "" : index === 1 ? "hidden lg:block" : "hidden 2xl:block";
                     return (
                       <div key={`${category}-${key}-${index}`} className={`border-r border-slate-300 px-3 py-3 text-slate-800 last:border-r-0 sm:px-4 sm:py-4 ${slotVisibilityClass}`}>

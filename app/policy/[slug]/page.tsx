@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getRouteMetadata } from "@/lib/metadata";
-import { getLegalPage, getLegalPageSlugs } from "@/lib/legalPages";
+import { fetchLegalPage, fetchLegalPageSlugs } from "@/lib/legalPages"; 
 
 type LegalPageProps = {
   params: Promise<{
@@ -10,12 +10,16 @@ type LegalPageProps = {
 };
 
 export async function generateStaticParams() {
-  return getLegalPageSlugs().map((slug) => ({ slug }));
+  const slugs = await fetchLegalPageSlugs();
+  if (!Array.isArray(slugs)) return [];
+  return slugs.map((slug) => ({
+    slug: slug,
+  }));
 }
 
 export async function generateMetadata({ params }: LegalPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const page = getLegalPage(slug);
+  const page = await fetchLegalPage(slug);
 
   if (!page) {
     return getRouteMetadata("root", {
@@ -25,14 +29,14 @@ export async function generateMetadata({ params }: LegalPageProps): Promise<Meta
   }
 
   return getRouteMetadata("root", {
-    title: `${page.title} | Electra International`,
-    description: page.description,
+    title: `${page.meta_title || page.title} | Electra International`,
+    description: page.meta_description || page.description,
   });
 }
 
 export default async function LegalPage({ params }: LegalPageProps) {
   const { slug } = await params;
-  const page = getLegalPage(slug);
+  const page = await fetchLegalPage(slug);
 
   if (!page) {
     notFound();

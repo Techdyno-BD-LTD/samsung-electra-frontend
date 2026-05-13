@@ -15,6 +15,14 @@ type ApiCategory = {
   icon: string | null;
   cover_image: string | null;
   number_of_products: number;
+  meta_title?: string;
+  meta_description?: string;
+  meta_img?: string;
+  filtering_attributes?: { 
+    id: number; 
+    name: string; 
+    values: { id: number; name: string; code?: string }[] 
+  }[];
 };
 
 type PageProps = {
@@ -22,10 +30,12 @@ type PageProps = {
 };
 
 async function getCategoryData(slug: string) {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const backendUrl = process.env.API_BASE_URL || 'http://localhost:5000';
+  const systemKey = process.env.API_SYSTEM_KEY || '';
   
   try {
-    const res = await fetch(`${siteUrl}/api/categories`, {
+    const res = await fetch(`${backendUrl}/api/v2/categories?limit=100`, {
+      headers: { 'x-system-key': systemKey },
       cache: 'no-store'
     });
     
@@ -34,14 +44,26 @@ async function getCategoryData(slug: string) {
     const payload = await res.json();
     const categories: ApiCategory[] = payload.data || [];
     
-    // Find the current category by slug
-    // We normalize the slug matching to be more resilient
     const currentCategory = categories.find(c => 
       c.slug === slug || 
       c.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") === slug
     );
     
     if (!currentCategory) return null;
+
+    let filteringAttributes = [];
+    try {
+      const infoRes = await fetch(`${backendUrl}/api/v2/category/info/${slug}`, {
+        headers: { 'x-system-key': systemKey },
+        cache: 'no-store'
+      });
+      if (infoRes.ok) {
+        const infoPayload = await infoRes.json();
+        filteringAttributes = infoPayload.data?.[0]?.filtering_attributes || [];
+      }
+    } catch (err) {
+      console.error("Error fetching filtering attributes:", err);
+    }
     
     // Find subcategories
     const subcategories = categories
@@ -54,7 +76,8 @@ async function getCategoryData(slug: string) {
       
     return {
       ...currentCategory,
-      subcategories
+      subcategories,
+      filtering_attributes: filteringAttributes
     };
   } catch (error) {
     console.error("Error fetching category data:", error);
@@ -67,14 +90,30 @@ export async function generateMetadata({ params }: PageProps) {
   
   if (!category) {
     return {
-      title: "Category not found | Electra",
+      title: "Category not found | Samsung Electra",
       description: "We can't locate the requested category.",
     };
   }
   
+  const siteTitle = "Samsung Electra";
+  const title = category.meta_title || category.name || "Category";
+  const description = category.meta_description || `Browse ${category.name} products at ${siteTitle}. Find ${category.subcategories.map((s) => s.name).join(", ")} and more.`;
+  const image = category.meta_img || category.cover_image || "/og-category.png";
+
   return {
-    title: `${category.name} | Samsung Electra`,
-    description: `Browse ${category.name} products at Samsung Electra. Find ${category.subcategories.map((s) => s.name).join(", ")} and more.`,
+    title: `${title} | ${siteTitle}`,
+    description: description,
+    openGraph: {
+      title: `${title} | ${siteTitle}`,
+      description: description,
+      images: [image],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${title} | ${siteTitle}`,
+      description: description,
+      images: [image],
+    },
   };
 }
 
@@ -90,7 +129,7 @@ export default async function CategoryPage({ params }: PageProps) {
   const shortName = breadcrumbParts[0]; // e.g., "TV" from "TV and Audio"
 
   return (
-    <div className="mt-4 lg:mt-16">
+    <div className="lg:mt-16">
       {/* ═══════════════ MOBILE NAVIGATION (Hidden on Desktop) ═══════════════ */}
       <div className="mb-4 lg:hidden">
         <Link
@@ -131,7 +170,7 @@ export default async function CategoryPage({ params }: PageProps) {
           <CategoryHeroBanner />
 
           {/* ═══════════════ MOBILE SUB-CATEGORIES (Hidden on Desktop) ═══════════════ */}
-          <div className="mt-5 flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide lg:hidden">
+          <div className="mt-5 flex items-center gap-2 overflow-x-auto px-1 pb-2 scrollbar-hide lg:hidden">
             <button className="whitespace-nowrap rounded-full bg-[#1A80FE] px-6 py-1 text-[12px] font-medium text-white shadow-sm">
               All
             </button>
@@ -151,12 +190,14 @@ export default async function CategoryPage({ params }: PageProps) {
       <div className="mt-2 lg:mt-6 flex gap-[1%]">
         {/* Desktop Filter panel — 24% width (Hidden on Mobile) */}
         <aside className="hidden w-[24%] shrink-0 lg:block">
-          <CategoryFilterPanel />
+          <CategoryFilterPanel 
+            filteringAttributes={category.filtering_attributes} 
+          />
         </aside>
 
         {/* Product grid — takes remaining space (~73% on desktop, full width on mobile) */}
         <div className="min-w-0 flex-1 lg:w-[73%]">
-          <CategoryProductGrid />
+          <CategoryProductGrid filteringAttributes={category.filtering_attributes} />
         </div>
       </div>
 

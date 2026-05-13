@@ -1,6 +1,5 @@
 import React from 'react';
 import Link from 'next/link';
-import aboutData from '@/database/about.json';
 import AboutHero from './AboutHero';
 import FounderSection from './FounderSection';
 import HistorySection from './HistorySection';
@@ -14,13 +13,44 @@ import SisterConcerns from './SisterConcerns';
 import InquirySection from './InquirySection';
 import ContactBanner from './ContactBanner';
 
-const About = () => {
-    const { title, founder, history, directors, missionVision, retails, distribution, brands, services, network, sisterConcerns, inquiry, contactBanner } = aboutData;
+export const dynamic = 'force-dynamic';
 
+async function getAboutData() {
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    try {
+        const res = await fetch(`${baseUrl}/api/pages/about`, { cache: 'no-store' });
+        if (!res.ok) return null;
+        const result = await res.json();
+        const page = result.data?.[0];
+        if (!page || !page.content) return null;
+        return JSON.parse(page.content);
+    } catch (e) {
+        console.error('Error fetching about data:', e);
+        return null;
+    }
+}
 
+const About = async () => {
+    const data = await getAboutData();
+
+    if (!data) {
+        return (
+            <div className="flex flex-col gap-6 pb-12 mt-20 px-4 max-w-7xl mx-auto text-center py-20">
+                <h1 className="text-2xl font-bold text-slate-800">Page Content Not Available</h1>
+                <p className="text-slate-500">Please check back later or contact support.</p>
+                <Link href="/" className="text-blue-600 hover:underline">Go back home</Link>
+            </div>
+        );
+    }
+
+    const { 
+        title, founder, history, directors, missionVision, 
+        retails, distribution, brands, services, 
+        network, sisterConcerns, inquiry, contactBanner 
+    } = data;
 
     return (
-        <div className="flex flex-col gap-6 pb-12 mt-20">
+        <div className="flex flex-col gap-6 pb-12 mt-20 px-4 max-w-[1400px] mx-auto">
             {/* ═══════════════ BREADCRUMB ═══════════════ */}
             <nav
                 aria-label="Breadcrumb"
@@ -34,97 +64,116 @@ const About = () => {
             </nav>
 
             {/* ═══════════════ MAIN TITLE (HERO) ═══════════════ */}
-            <AboutHero title={title} />
-
+            {title && <AboutHero title={title} />}
 
             {/* ═══════════════ FOUNDER SECTION ═══════════════ */}
-            <FounderSection
-                sectionTitle={founder.sectionTitle}
-                name={founder.name}
-                year={founder.year}
-                description={founder.description}
-            />
+            {founder && (
+                <FounderSection
+                    sectionTitle={founder.sectionTitle}
+                    name={founder.name}
+                    year={founder.year}
+                    description={founder.description}
+                    image={founder.image}
+                />
+            )}
 
             {/* ═══════════════ COMPANY HISTORY SECTION ═══════════════ */}
-            <HistorySection
-                sectionTitle={history.sectionTitle}
-                content={history.content}
-            />
+            {history && (
+                <HistorySection
+                    sectionTitle={history.sectionTitle}
+                    content={history.content}
+                />
+            )}
 
             {/* ═══════════════ DIRECTORS SECTION ═══════════════ */}
-            <DirectorsSection
-                sectionTitle={directors.sectionTitle}
-                list={directors.list}
-            />
+            {directors && directors.list && (
+                <DirectorsSection
+                    sectionTitle={directors.sectionTitle}
+                    list={directors.list}
+                />
+            )}
 
             {/* ═══════════════ MISSION / VISION / WHO WE ARE ═══════════════ */}
-            <MissionVisionSection items={missionVision.items} />
+            {missionVision && missionVision.items && (
+                <MissionVisionSection items={missionVision.items} />
+            )}
 
             {/* ═══════════════ RETAILS SECTION ═══════════════ */}
-            <ContentSection
-                title={retails.title}
-                paragraphs={retails.paragraphs}
-                image={retails.image}
-            />
+            {retails && (
+                <ContentSection
+                    title={retails.title}
+                    paragraphs={retails.paragraphs}
+                    image={retails.image}
+                />
+            )}
 
             {/* ═══════════════ DISTRIBUTION SECTION ═══════════════ */}
-            <ContentSection
-                title={distribution.title}
-                paragraphs={distribution.paragraphs}
-                image={distribution.image}
-                isReversed={true}
-            />
+            {distribution && (
+                <ContentSection
+                    title={distribution.title}
+                    paragraphs={distribution.paragraphs}
+                    image={distribution.image}
+                    isReversed={true}
+                />
+            )}
 
             {/* ═══════════════ BRANDS SECTION ═══════════════ */}
-            <BrandsSection
-                title={brands.title}
-                subtitle={brands.subtitle}
-                list={brands.list}
-            />
+            {brands && (
+                <BrandsSection
+                    title={brands.title}
+                    subtitle={brands.subtitle}
+                    list={brands.list}
+                />
+            )}
 
             {/* ═══════════════ SERVICES SECTION ═══════════════ */}
-            <ServicesSection
-                title={services.title}
-                subtitle={services.subtitle}
-                description={services.description}
-                images={services.images}
-            />
+            {services && (
+                <ServicesSection
+                    title={services.title}
+                    subtitle={services.subtitle}
+                    description={services.description}
+                    images={services.images}
+                />
+            )}
 
             {/* ═══════════════ NETWORK SECTION ═══════════════ */}
-            <NetworkSection
-                title={network.title}
-                stats={network.stats}
-                image={network.image}
-            />
+            {network && (
+                <NetworkSection
+                    title={network.title}
+                    stats={network.stats}
+                    image={network.image}
+                />
+            )}
 
             {/* ═══════════════ SISTER CONCERNS SECTION ═══════════════ */}
-            <SisterConcerns
-                title={sisterConcerns.title}
-                subtitle={sisterConcerns.subtitle}
-                list={sisterConcerns.list}
-            />
+            {sisterConcerns && (
+                <SisterConcerns
+                    title={sisterConcerns.title}
+                    subtitle={sisterConcerns.subtitle}
+                    list={sisterConcerns.list}
+                />
+            )}
 
             {/* ═══════════════ INQUIRY SECTION ═══════════════ */}
-            <InquirySection
-                title={inquiry.title}
-                subtitle={inquiry.subtitle}
-                btnText={inquiry.btnText}
-            />
+            {inquiry && (
+                <InquirySection
+                    title={inquiry.title}
+                    subtitle={inquiry.subtitle}
+                    btnText={inquiry.btnText}
+                />
+            )}
 
             {/* ═══════════════ CONTACT BANNER ═══════════════ */}
-            <ContactBanner
-                title={contactBanner.title}
-                description={contactBanner.description}
-                btnText={contactBanner.btnText}
-            />
-
+            {contactBanner && (
+                <ContactBanner
+                    title={contactBanner.title}
+                    description={contactBanner.description}
+                    btnText={contactBanner.btnText}
+                />
+            )}
         </div>
     );
 };
-
-
-
-
 
 export default About;
 

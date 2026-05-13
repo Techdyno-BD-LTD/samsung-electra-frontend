@@ -15,11 +15,11 @@ export default function VerifyOTP({ phoneNumber, onBack, onVerify }: VerifyOTPPr
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (code === "123456") {
+    if (code.length === 6) {
       setError("");
       onVerify(code);
     } else {
-      setError("Invalid OTP code. Please try again.");
+      setError("Please enter a 6-digit OTP code.");
     }
   };
 

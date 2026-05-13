@@ -1,45 +1,54 @@
-import Image from "next/image";
-import Link from "next/link";
-import offersData from "@/database/offers.json";
+"use client";
 
-type OfferItem = {
-  id: string;
+import React, { useEffect, useState } from "react";
+import CampaignOffers from "@/components/campaign/CampaignOffers";
+
+interface FlashDeal {
+  id: number;
   title: string;
-  image: string;
-  alt: string;
-};
+  slug: string;
+  banner: string;
+  end_date: number;
+}
 
 export default function OffersPage() {
-  const offers = offersData.offers as OfferItem[];
+  const [deals, setDeals] = useState<FlashDeal[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  return (
-    <main className="mt-20 pb-10 sm:mt-24 sm:pb-14 lg:mt-16">
-      <nav aria-label="Breadcrumb" className="mb-4 flex items-center gap-2 text-[12px] text-slate-500 sm:text-sm">
-        <Link href="/" className="transition hover:text-slate-700">
-          Home
-        </Link>
-        <span className="text-slate-400">›</span>
-        <span className="font-medium text-slate-700">Campaign</span>
-      </nav>
+  useEffect(() => {
+    async function fetchDeals() {
+      try {
+        const res = await fetch("/api/v2/flash-deals");
+        const json = await res.json();
+        if (json.success) {
+          setDeals(json.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch flash deals:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchDeals();
+  }, []);
 
-      <h1 className="mb-4 text-xl font-semibold text-slate-900 sm:mb-5 sm:text-2xl">{offersData.pageTitle}</h1>
+  if (loading) {
+    return (
+      <div className="flex min-h-[400px] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-300 border-t-blue-600"></div>
+      </div>
+    );
+  }
 
-      <section className="mx-auto grid w-full grid-cols-2 gap-2 sm:gap-3 lg:gap-4 2xl:max-w-[1824px]">
-        {offers.map((offer) => (
-          <article key={offer.id} className="w-full" aria-label={offer.title}>
-            <div className="relative aspect-[910/732] w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-              <Image
-                src={offer.image}
-                alt={offer.alt}
-                fill
-                priority={offer.id === offers[0]?.id}
-                sizes="(min-width: 1536px) 910px, (min-width: 1280px) calc((100vw - 5rem) / 2), (min-width: 640px) calc((100vw - 2.75rem) / 2), calc((100vw - 2.5rem) / 2)"
-                className="object-contain"
-              />
-            </div>
-          </article>
-        ))}
-      </section>
-    </main>
-  );
+  const mappedCampaigns = deals.map((deal) => ({
+    id: String(deal.id),
+    title: deal.title,
+    image: deal.banner,
+    alt: deal.title,
+    endAt: new Date(deal.end_date * 1000).toISOString(),
+    ctaText: "Explore More",
+    ctaHref: `/offers/details/${deal.slug}`,
+  }));
+
+  return <CampaignOffers pageTitle="Flash Deals" campaigns={mappedCampaigns} />;
 }

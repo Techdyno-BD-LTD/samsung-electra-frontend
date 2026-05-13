@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 
 import { logout } from "@/store/features/auth/authSlice";
 import { removeFromCart } from "@/store/features/cart/cartSlice";
+import { clearWishlist } from "@/store/features/wishlist/wishlistSlice";
 
 export default function MainBar() {
   const router = useRouter();
@@ -28,7 +29,7 @@ export default function MainBar() {
   const compareTotalCount = useAppSelector((state) => state.compare.slots.filter(Boolean).length);
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
   const [suggestions, setSuggestions] = useState<unknown[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
+  const [categories, setCategories] = useState<{ id: number; name: string; subcategories: { id: number; name: string }[] }[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<{ id: number; name: string } | null>(null);
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const [isCartDropdownOpen, setIsCartDropdownOpen] = useState(false);
@@ -66,10 +67,10 @@ export default function MainBar() {
         if (response.ok) {
           const payload = await response.json();
           const all = payload.data || [];
-          const tree = all.filter((c: any) => c.parent_id === 0).map((c: any) => ({
+          const tree = all.filter((c: { parent_id: number; id: number; name: string }) => c.parent_id === 0).map((c: { id: number; name: string }) => ({
             id: c.id,
             name: c.name,
-            subcategories: all.filter((s: any) => s.parent_id === c.id)
+            subcategories: all.filter((s: { parent_id: number }) => s.parent_id === c.id)
           }));
           setCategories(tree);
         }
@@ -100,7 +101,7 @@ export default function MainBar() {
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [searchQuery]);
+  }, [searchQuery, selectedCategory]);
 
   const handleSearch = () => {
     const query = searchQuery.trim();
@@ -115,6 +116,7 @@ export default function MainBar() {
 
   const handleLogout = () => {
     dispatch(logout());
+    dispatch(clearWishlist());
     router.push("/login");
   };
 
@@ -180,7 +182,7 @@ export default function MainBar() {
                           
                           {cat.subcategories?.length > 0 && (
                             <div className="bg-slate-50/50">
-                              {cat.subcategories.map((sub: any) => (
+                              {cat.subcategories.map((sub: { id: number; name: string }) => (
                                 <button
                                   key={sub.id}
                                   type="button"

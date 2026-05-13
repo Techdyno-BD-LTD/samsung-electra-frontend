@@ -1,12 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import AddToCartModal from "./AddToCartModal"; import { FaHeart, FaBalanceScale, FaShoppingCart, FaStar, FaEye, FaGavel } from "react-icons/fa";
+import AddToCartModal, { ProductData } from "./AddToCartModal";
+import { FaHeart, FaBalanceScale, FaShoppingCart, FaStar, FaEye, FaGavel } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { toggleWishlist } from "@/store/features/wishlist/wishlistSlice";
+import { addToWishlistAsync, removeFromWishlistAsync, WishlistItem } from "@/store/features/wishlist/wishlistSlice";
+import { showToast } from "@/store/features/toast/toastSlice";
 import { toggleCompare } from "@/store/features/compare/compareSlice";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { toProductSlug } from "@/lib/productSlug";
 
 interface ProductCardProps {
@@ -47,54 +50,7 @@ interface ProductCardProps {
   startingFrom?: string;
   bidButtonLabel?: string;
   dealImageHeight?: string;
-  productData?: {
-    id?: number | string;
-    slug?: string;
-    name?: string;
-    category_id?: number;
-    category?: {
-      name?: string;
-      slug?: string;
-    };
-    weight?: number;
-    model_number?: string;
-    connection_type?: string;
-    thumbnail_image?: string;
-    price_high_low?: string;
-    has_discount?: boolean;
-    discount?: string;
-    stroked_price?: string;
-    main_price?: string;
-    calculable_price?: number;
-    rating?: number;
-    rating_count?: number;
-    sales?: number;
-    current_stock?: number;
-    unit?: string;
-    emi_start?: string;
-    links?: {
-      details?: string;
-    };
-    brand?: {
-      id?: number;
-      slug?: string;
-      name?: string;
-      logo?: string;
-    };
-    variants?: Array<{
-      variant?: string;
-      price?: number;
-      sku?: string;
-      qty?: number;
-      image?: string | null;
-    }>;
-    other_features?: string;
-    tags?: string[];
-    badge_tag?: string;
-    badge_value?: string;
-    product_sold?: number;
-    [key: string]: unknown;
-  };
+  productData?: ProductData;
 }
 
 const ProductCard = ({
@@ -143,6 +99,9 @@ const ProductCard = ({
   const isWishlisted = useAppSelector((state) => state.wishlist.items.some((item) => item.id === wishlistItemId));
   const isCompared = useAppSelector((state) => state.compare.slots.some((slot) => slot?.id === wishlistItemId));
 
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
+  const router = useRouter();
+
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -152,15 +111,24 @@ const ProductCard = ({
   const handleToggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    dispatch(
-      toggleWishlist({
-        id: wishlistItemId,
+
+    if (!isAuthenticated) {
+      router.push(`/login?redirect=${window.location.pathname}`);
+      return;
+    }
+
+    if (isWishlisted) {
+      dispatch(removeFromWishlistAsync(productSlug));
+    } else {
+      const item: WishlistItem = {
+        id: productSlug,
+        productId: Number(productData?.id || 0),
         title,
         brand,
         image,
         price,
         originalPrice,
-        discountPercent,
+        discountLabel: discountPercent,
         saveAmount,
         color,
         type,
@@ -171,8 +139,21 @@ const ProductCard = ({
         emiPrice,
         emiPercent,
         tags,
-      })
-    );
+      };
+      dispatch(addToWishlistAsync(item)).then((result) => {
+        if (addToWishlistAsync.fulfilled.match(result)) {
+          dispatch(showToast({
+            message: "Added to Wishlist!",
+            type: 'success',
+            productName: title,
+            productImage: image,
+            productPrice: price,
+            actionLabel: "View Wishlist",
+            actionLink: "/dashboard/wishlist"
+          }));
+        }
+      });
+    }
   };
 
   const handleToggleCompare = (e: React.MouseEvent) => {
@@ -456,7 +437,7 @@ const ProductCard = ({
     const ratingValue = productData?.rating ?? rating;
     const ratingCountValue = productData?.rating_count ?? ratingCount;
     const categoryName = productData?.category?.name || type;
-    const weightValue = productData?.weight ? `${productData.weight}kg` : weight;
+    // const weightValue = productData?.weight ? `${productData.weight}kg` : weight;
     const variantLabel = productData?.variants?.[0]?.variant || "No Variant";
 
     return (
@@ -547,11 +528,11 @@ const ProductCard = ({
             </div>
           </div>
           <span className="text-[10px] font-semibold text-blue-600 sm:text-xs">
-            {weightValue} | {variantLabel}
+            {variantLabel}
           </span>
         </div>
 
-        <h3 className="line-clamp-2 min-h-[36px] px-2 pb-1 text-[12px] font-semibold leading-4 sm:min-h-[40px] sm:px-4 sm:text-[16px] sm:font-medium sm:leading-relaxed">
+        <h3 className="line-clamp-2 h-[32px] overflow-hidden px-2 text-[12px] font-semibold leading-4 sm:h-auto sm:min-h-[40px] sm:px-4 sm:pb-1 sm:text-[16px] sm:font-medium sm:leading-relaxed">
           <Link href={productHref}>{title}</Link>
         </h3>
 
@@ -708,8 +689,8 @@ const ProductCard = ({
       </div>
 
       {/* Title */}
-      <h3 className="line-clamp-2 min-h-[36px] px-2 pb-1 text-[12px] font-semibold leading-4 sm:min-h-[40px] sm:px-4 sm:text-[16px] sm:font-medium sm:leading-relaxed">
-        <Link href={productHref}>{productData?.name}</Link>
+      <h3 className="line-clamp-2 h-[32px] overflow-hidden px-2 text-[12px] font-semibold leading-4 sm:h-auto sm:min-h-[40px] sm:px-4 sm:pb-1 sm:text-[16px] sm:font-medium sm:leading-relaxed">
+        <Link href={productHref}>{productData?.name || title}</Link>
       </h3>
 
       {/* EMI Info */}
@@ -724,7 +705,7 @@ const ProductCard = ({
             className="object-contain"
           />
           <span className="line-clamp-2 leading-4 sm:line-clamp-1">
-            EMI From {productData?.emi_start} Tk/Month
+            EMI From {productData?.emi_start || emiPrice} Tk/Month
           </span>
         </span>
         <button className="shrink-0 text-[10px] font-semibold text-blue-600 hover:underline sm:text-xs">
@@ -734,31 +715,28 @@ const ProductCard = ({
 
       {/* Pricing */}
       <div className="flex flex-wrap items-center gap-1.5 px-2 pb-2 sm:gap-2 sm:px-4">
-        <span className="text-[20px] font-bold text-[#0081FF] sm:text-[17px]">
-          {productData?.main_price}
+        <span className="text-[14px] font-bold text-[#0081FF] sm:text-[17px]">
+          {productData?.main_price || price}
         </span>
         <span className="text-[11px] text-[#909090] line-through sm:text-[13px]">
-          {productData?.stroked_price}
+          {productData?.stroked_price || originalPrice}
         </span>
         <span className="text-[10px] font-semibold text-red-600 sm:text-xs">
-          {productData?.discount}
+          {productData?.discount || discountPercent}
         </span>
 
         <div>
           {(() => {
-            const parsePrice = (priceStr?: string) => {
-              if (!priceStr) return 0;
-              // Remove currency symbols, commas, and whitespace
-              // This regex keeps only digits and the decimal point
-              const normalized = priceStr.replace(/[^\d.]/g, '');
+            const parsePrice = (priceStr?: string | number) => {
+              if (priceStr === null || priceStr === undefined) return 0;
+              const normalized = String(priceStr).replace(/[^\d.]/g, '');
               return parseFloat(normalized) || 0;
             };
 
-            const original = parsePrice(productData?.stroked_price);
-            const current = parsePrice(productData?.main_price);
+            const original = parsePrice(productData?.stroked_price || originalPrice);
+            const current = parsePrice(productData?.main_price || price);
             const savings = original - current;
 
-            // Only show the badge if there is an actual saving
             if (savings <= 0) return null;
 
             return (
@@ -770,6 +748,7 @@ const ProductCard = ({
         </div>
       </div>
 
+
       {/* Savings Badge */}
       {/* {saveAmount && (
         <div className="px-4 pb-3">
@@ -780,12 +759,27 @@ const ProductCard = ({
       )} */}
 
       {/* Tags or Add to Cart on Hover */}
-      <div className="relative min-h-[52px] overflow-hidden px-2 pb-3 sm:px-4 sm:pb-4">
+      <div className="relative lg:min-h-[52px] overflow-hidden px-2 pb-3 sm:px-4 sm:pb-4">
         {/* Tags - fades out and slides up on hover */}
-        <div className="w-full transition-all duration-300 ease-in-out group-hover:pointer-events-none group-hover:-translate-y-4 group-hover:opacity-0">
+        <div className="w-full hidden lg:block transition-all duration-300 ease-in-out group-hover:pointer-events-none group-hover:-translate-y-4 group-hover:opacity-0">
           {(() => {
-            const displayTags = productData?.tags || tags || [];
-            if (displayTags.length === 0) return null;
+            interface TagObject {
+              value?: string;
+              label?: string;
+            }
+            let displayTags: string | (string | TagObject)[] = (productData?.tags as string[] | undefined) || tags || [];
+
+            // Handle string cases from API
+            if (typeof displayTags === 'string') {
+              try {
+                displayTags = JSON.parse(displayTags as string);
+              } catch {
+                // Fallback to comma separated or single tag
+                displayTags = (displayTags as string).split(',').map((t: string) => t.trim()).filter(Boolean);
+              }
+            }
+
+            if (!Array.isArray(displayTags) || displayTags.length === 0) return null;
 
             return (
               <div
@@ -796,20 +790,32 @@ const ProductCard = ({
               >
                 {displayTags.map((tag, index) => {
                   try {
-                    const cleanedTag = tag.replace(/^\[|\]$/g, "");
+                    // If tag is already an object, use it directly
+                    if (typeof tag === 'object' && tag !== null) {
+                      const tagObj = tag as TagObject;
+                      return (
+                        <span key={index} className="rounded-full bg-[#E7EEF6] py-1 text-center text-[9px] font-semibold text-[#0054A6] sm:text-[10px]">
+                          {tagObj.value || tagObj.label || JSON.stringify(tag)}
+                        </span>
+                      );
+                    }
+
+                    // Otherwise try to parse as JSON string
+                    const cleanedTag = String(tag).replace(/^\[|\]$/g, "");
                     const tagObj = JSON.parse(cleanedTag);
                     return (
                       <span
                         key={index}
                         className="rounded-full bg-[#E7EEF6] py-1 text-center text-[9px] font-semibold text-[#0054A6] sm:text-[10px]"
                       >
-                        {tagObj.value}
+                        {tagObj.value || tagObj.label || tagObj}
                       </span>
                     );
                   } catch {
+                    // Fallback to raw string
                     return (
                       <span key={index} className="rounded-full bg-[#E7EEF6] py-1 text-center text-[9px] font-semibold text-[#0054A6] sm:text-[10px]">
-                        {tag}
+                        {typeof tag === 'object' ? (tag as { value?: string, label?: string }).value || (tag as { value?: string, label?: string }).label || 'Tag' : String(tag)}
                       </span>
                     );
                   }
@@ -819,23 +825,39 @@ const ProductCard = ({
           })()}
         </div>
 
-        {/* Add to cart - slides up and fades in on hover */}
+        {/* Add to cart / See Details - slides up and fades in on hover */}
         <div className="absolute inset-x-2 bottom-3 flex opacity-0 translate-y-10 transition-all duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100 sm:inset-x-4 sm:bottom-4">
-          <button
-            onClick={handleAddToCart}
-            className="flex w-full items-center justify-center gap-2 rounded-full bg-[#0054A6] py-2 text-sm font-semibold text-white transition-all hover:bg-[#004487]"
-          >
-            <FaShoppingCart className="h-4 w-4" />
-            Add to cart
-          </button>
+          {productData?.higher_sale ? (
+            <Link
+              href={productHref}
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-[#0054A6] py-2 text-sm font-semibold text-white transition-all hover:bg-[#004487]"
+            >
+              <FaEye className="h-4 w-4" />
+              See Details
+            </Link>
+          ) : (
+            <button
+              onClick={handleAddToCart}
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-[#0054A6] py-2 text-sm font-semibold text-white transition-all hover:bg-[#004487]"
+            >
+              <FaShoppingCart className="h-4 w-4" />
+              Add to cart
+            </button>
+          )}
         </div>
       </div>
 
       {/* Mobile CTA */}
       <div className="px-2 pb-3 sm:hidden">
-        <button onClick={handleAddToCart} className="flex w-6/12 mx-auto items-center justify-center rounded-full bg-[#0054A6] py-1.5 text-[11px] font-semibold text-white transition-colors hover:bg-[#004487]">
-          Buy Now
-        </button>
+        {productData?.higher_sale ? (
+          <Link href={productHref} className="flex w-6/12 mx-auto items-center justify-center rounded-full bg-[#0054A6] py-1.5 text-[11px] font-semibold text-white transition-colors hover:bg-[#004487]">
+            See Details
+          </Link>
+        ) : (
+          <button onClick={handleAddToCart} className="flex w-6/12 mx-auto items-center justify-center rounded-full bg-[#0054A6] py-1.5 text-[11px] font-semibold text-white transition-colors hover:bg-[#004487]">
+            Buy Now
+          </button>
+        )}
       </div>
 
       {/* Add to Cart - show only on hover */}

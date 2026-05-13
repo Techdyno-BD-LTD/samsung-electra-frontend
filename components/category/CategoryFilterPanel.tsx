@@ -1,573 +1,327 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { HiChevronUp } from "react-icons/hi2";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
-/* ──────────────── Brands data ──────────────── */
-const brands = [
-  { name: "Samsung", count: 12 },
-  { name: "Whirlpool", count: 18 },
-  { name: "Electra", count: 10 },
-  { name: "Phillips", count: 6 },
-];
+interface FilterValue {
+  id: number;
+  name: string;
+  code?: string;
+}
 
-/* ──────────────── Product Type data ──────────────── */
-const productTypes = [
-  { name: "LED TV", count: 12 },
-  { name: "OLED TV", count: 18 },
-  { name: "QLED TV", count: 10 },
-  { name: "BASIC TV", count: 6 },
-];
+interface FilteringAttribute {
+  id: number;
+  name: string;
+  values: FilterValue[];
+}
 
-/* ──────────────── Display Size data ──────────────── */
-const displaySizes = [
-  { name: '43"', count: 18 },
-  { name: '55"', count: 3 },
-  { name: '45"', count: 9 },
-  { name: '60"', count: 10 },
-  { name: '19"', count: 3 },
-  { name: '26"', count: 4 },
-  { name: '36"', count: 10 },
-  { name: '32"', count: 12 },
-];
+interface Brand {
+  id: number;
+  name: string;
+  slug: string;
+}
 
-/* ──────────────── Bluetooth data ──────────────── */
-const bluetoothOptions = [
-  { name: "Bluetooth", count: 2 },
-];
+interface CategoryFilterPanelProps {
+  filteringAttributes?: FilteringAttribute[];
+}
 
-/* ──────────────── Color data ──────────────── */
-const colorOptions = [
-  { name: "White", count: 20 },
-  { name: "Black", count: 16 },
-];
+export default function CategoryFilterPanel({ filteringAttributes = [] }: CategoryFilterPanelProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-/* ──────────────── Power data ──────────────── */
-const powerOptions = [
-  { name: "26 W", count: 20 },
-];
-
-/* ──────────────── Campaign data ──────────────── */
-const campaignOptions = [
-  { name: "Best Seller", count: 18 },
-  { name: "Offers", count: 3 },
-];
-
-export default function CategoryFilterPanel() {
-  /* ---- Brands ---- */
+  /* ---- State for Filters ---- */
+  const [brands, setBrands] = useState<Brand[]>([]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(200000);
+  const [attributeFilters, setAttributeFilters] = useState<Record<string, string[]>>({});
+
+  /* ---- UI Open/Close States ---- */
+  const [priceOpen, setPriceOpen] = useState(true);
+  const [brandsOpen, setBrandsOpen] = useState(true);
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+
+  /* ---- Initialize from URL ---- */
+  useEffect(() => {
+    const brandsFromUrl = searchParams.get("brands")?.split(",") || [];
+    setSelectedBrands(brandsFromUrl.filter(Boolean));
+
+    const minP = Number(searchParams.get("minPrice")) || 0;
+    const maxP = Number(searchParams.get("maxPrice")) || 200000;
+    setMinPrice(minP);
+    setMaxPrice(maxP);
+
+    const attrs: Record<string, string[]> = {};
+    searchParams.forEach((value, key) => {
+      if (key.startsWith("attr_")) {
+        attrs[key] = value.split(/[|,]/).filter(Boolean);
+      }
+    });
+    setAttributeFilters(attrs);
+  }, [searchParams]);
+
+  /* ---- Fetch Brands ---- */
+  useEffect(() => {
+    async function fetchBrands() {
+      try {
+        const res = await fetch("/api/brands");
+        if (res.ok) {
+          const payload = await res.json();
+          setBrands(payload.data || []);
+        }
+      } catch (err) {
+        console.error("Error fetching brands:", err);
+      }
+    }
+    fetchBrands();
+  }, []);
+
+  /* ---- Update URL ---- */
+  const updateUrl = (updates: Record<string, string | null>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === null || value === "") {
+        params.delete(key);
+      } else {
+        params.set(key, value);
+      }
+    });
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
 
   const toggleBrand = (name: string) => {
-    setSelectedBrands((prev) =>
-      prev.includes(name) ? prev.filter((b) => b !== name) : [...prev, name]
-    );
+    const next = selectedBrands.includes(name)
+      ? selectedBrands.filter((b) => b !== name)
+      : [...selectedBrands, name];
+    setSelectedBrands(next);
+    updateUrl({ brands: next.join(",") });
   };
 
-  /* ---- Price Range ---- */
-  const [priceOpen, setPriceOpen] = useState(true);
-  const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(12000);
-
-  /* ---- Product Types ---- */
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
-
-  const toggleType = (name: string) => {
-    setSelectedTypes((prev) =>
-      prev.includes(name) ? prev.filter((t) => t !== name) : [...prev, name]
-    );
+  const toggleAttribute = (attrName: string, valueName: string) => {
+    const key = `attr_${attrName.toLowerCase()}`;
+    const current = attributeFilters[key] || [];
+    const next = current.includes(valueName)
+      ? current.filter((v) => v !== valueName)
+      : [...current, valueName];
+    
+    const nextFilters = { ...attributeFilters, [key]: next };
+    setAttributeFilters(nextFilters);
+    updateUrl({ [key]: next.join(",") });
   };
 
-  /* ---- Display Size ---- */
-  const [displaySizeOpen, setDisplaySizeOpen] = useState(true);
-  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
-  const toggleSize = (name: string) => {
-    setSelectedSizes((prev) =>
-      prev.includes(name) ? prev.filter((s) => s !== name) : [...prev, name]
-    );
+  const handlePriceChange = () => {
+    updateUrl({ minPrice: minPrice.toString(), maxPrice: maxPrice.toString() });
   };
 
-  /* ---- Bluetooth ---- */
-  const [bluetoothOpen, setBluetoothOpen] = useState(true);
-  const [selectedBluetooth, setSelectedBluetooth] = useState<string[]>([]);
-  const toggleBluetooth = (name: string) => {
-    setSelectedBluetooth((prev) =>
-      prev.includes(name) ? prev.filter((b) => b !== name) : [...prev, name]
-    );
-  };
-
-  /* ---- Color ---- */
-  const [colorOpen, setColorOpen] = useState(true);
-  const [selectedColors, setSelectedColors] = useState<string[]>([]);
-  const toggleColor = (name: string) => {
-    setSelectedColors((prev) =>
-      prev.includes(name) ? prev.filter((c) => c !== name) : [...prev, name]
-    );
-  };
-
-  /* ---- Power ---- */
-  const [powerOpen, setPowerOpen] = useState(true);
-  const [selectedPowers, setSelectedPowers] = useState<string[]>([]);
-  const togglePower = (name: string) => {
-    setSelectedPowers((prev) =>
-      prev.includes(name) ? prev.filter((p) => p !== name) : [...prev, name]
-    );
-  };
-
-  /* ---- Campaign ---- */
-  const [campaignOpen, setCampaignOpen] = useState(true);
-  const [selectedCampaigns, setSelectedCampaigns] = useState<string[]>([]);
-  const toggleCampaign = (name: string) => {
-    setSelectedCampaigns((prev) =>
-      prev.includes(name) ? prev.filter((c) => c !== name) : [...prev, name]
-    );
+  const resetAttribute = (attrName: string) => {
+    const key = `attr_${attrName.toLowerCase()}`;
+    setAttributeFilters(prev => ({ ...prev, [key]: [] }));
+    updateUrl({ [key]: null });
   };
 
   return (
     <div className="flex flex-col gap-5">
       {/* ═══════════════ BRANDS SECTION ═══════════════ */}
       <div className="rounded-md border border-slate-200 bg-white px-4 py-4">
-        {/* Header */}
-        <div className="mb-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-[24px] font-semibold text-slate-800">Brands</h3>
+        <div
+          onClick={() => setBrandsOpen(!brandsOpen)}
+          className="flex w-full cursor-pointer items-center justify-between"
+        >
+          <h3 className="text-[24px] font-semibold text-slate-800">Brands</h3>
+          <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={() => setSelectedBrands([])}
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedBrands([]);
+                updateUrl({ brands: null });
+              }}
               className="text-[12px] font-medium text-slate-400 transition hover:text-red-500"
             >
               Reset
             </button>
+            <HiChevronUp className={`h-4 w-4 text-slate-400 transition-transform ${brandsOpen ? "" : "rotate-180"}`} />
           </div>
-          {/* Blue partial underline */}
-          <div className="mt-2 h-[2.5px] w-[50%] rounded-full bg-gradient-to-r from-[#2B7FE8] via-[#2B7FE8]/60 to-transparent" />
         </div>
-
-        {/* Checkbox list */}
-        <ul className="flex flex-col gap-2.5">
-          {brands.map((brand) => {
-            const checked = selectedBrands.includes(brand.name);
-            return (
-              <li key={brand.name}>
-                <label className="flex cursor-pointer items-center justify-between">
-                  <span className="flex items-center gap-2.5">
-                    <span
-                      className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[3px] border transition-colors ${checked
-                        ? "border-slate-800 bg-slate-800"
-                        : "border-slate-300 bg-white"
-                        }`}
-                    >
+        <div className="mt-2 h-[2.5px] w-[50%] rounded-full bg-gradient-to-r from-[#2B7FE8] via-[#2B7FE8]/60 to-transparent" />
+        
+        <div className={`overflow-hidden transition-all duration-300 ${brandsOpen ? "mt-4 max-h-[400px] overflow-y-auto opacity-100 pr-2 custom-scrollbar" : "max-h-0 opacity-0"}`}>
+          <ul className="flex flex-col gap-2.5">
+            {brands.map((brand) => {
+              const checked = selectedBrands.includes(brand.name);
+              return (
+                <li key={brand.id}>
+                  <label className="flex cursor-pointer items-center gap-2.5">
+                    <span className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[3px] border transition-colors ${checked ? "border-slate-800 bg-slate-800" : "border-slate-300 bg-white"}`}>
                       {checked && (
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-3 w-3 text-white"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
                       )}
                     </span>
-                    <input
-                      type="checkbox"
-                      className="sr-only"
-                      checked={checked}
-                      onChange={() => toggleBrand(brand.name)}
-                    />
-                    <span className="text-[16px] text-slate-600">
-                      {brand.name}
-                    </span>
-                  </span>
-                  <span className="text-[12px] text-slate-400">
-                    {brand.count}
-                  </span>
-                </label>
-              </li>
-            );
-          })}
-        </ul>
+                    <input type="checkbox" className="sr-only" checked={checked} onChange={() => toggleBrand(brand.name)} />
+                    <span className="text-[16px] text-slate-600">{brand.name}</span>
+                  </label>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       </div>
 
       {/* ═══════════════ PRICE RANGE SECTION ═══════════════ */}
       <div className="rounded-md border border-slate-200 bg-white px-4 py-4">
-        {/* Header */}
-        <button
-          type="button"
-          onClick={() => setPriceOpen(!priceOpen)}
-          className="flex w-full items-center justify-between"
-        >
-          <h3 className="text-[24px] font-semibold text-slate-800">
-            Price Range
-          </h3>
-
-          <HiChevronUp
-            className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${priceOpen ? "" : "rotate-180"
-              }`}
-          />
-
-        </button>
-        <div className="mt-2 h-[2.5px] w-[50%] rounded-full bg-gradient-to-r from-[#2B7FE8] via-[#2B7FE8]/60 to-transparent" />
-        {/* Collapsible content */}
         <div
-          className={`overflow-hidden transition-all duration-300 ease-in-out ${priceOpen ? "mt-3 max-h-[200px] opacity-100" : "max-h-0 opacity-0"
-            }`}
+          onClick={() => setPriceOpen(!priceOpen)}
+          className="flex w-full cursor-pointer items-center justify-between"
         >
-          {/* Price labels */}
-          <div className="mb-3 flex items-center justify-between text-[24px] text-slate-700">
+          <h3 className="text-[24px] font-semibold text-slate-800">Price Range</h3>
+          <HiChevronUp className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${priceOpen ? "" : "rotate-180"}`} />
+        </div>
+        <div className="mt-2 h-[2.5px] w-[50%] rounded-full bg-gradient-to-r from-[#2B7FE8] via-[#2B7FE8]/60 to-transparent" />
+        
+        <div className={`overflow-hidden transition-all duration-300 ${priceOpen ? "mt-4 max-h-[250px] opacity-100" : "max-h-0 opacity-0"}`}>
+          <div className="mb-3 flex items-center justify-between text-[18px] text-slate-700">
             <span>৳{minPrice.toLocaleString()}</span>
             <span className="text-slate-400">—</span>
             <span>৳{maxPrice.toLocaleString()}</span>
           </div>
 
-          {/* Dual range slider (simplified single slider for max) */}
-          <div className="relative">
-            {/* Track background */}
-            <div className="h-[3px] w-full rounded-full bg-slate-200" />
-            {/* Active track */}
-            <div
-              className="absolute top-0 h-[3px] rounded-full bg-[#2B7FE8]"
-              style={{
-                left: `${(minPrice / 200000) * 100}%`,
-                right: `${100 - (maxPrice / 200000) * 100}%`,
-              }}
-            />
-            {/* Min thumb */}
+          <div className="relative mt-6 h-6">
             <input
               type="range"
               min={0}
               max={200000}
               step={1000}
               value={minPrice}
-              onChange={(e) => {
-                const val = Number(e.target.value);
-                if (val < maxPrice) setMinPrice(val);
-              }}
-              className="price-range-slider absolute top-[-6px] w-full"
+              onChange={(e) => setMinPrice(Number(e.target.value))}
+              onMouseUp={handlePriceChange}
+              onTouchEnd={handlePriceChange}
+              className="absolute pointer-events-none appearance-none z-20 h-1 w-full bg-transparent [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#2B7FE8] [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md"
             />
-            {/* Max thumb */}
             <input
               type="range"
               min={0}
               max={200000}
               step={1000}
               value={maxPrice}
-              onChange={(e) => {
-                const val = Number(e.target.value);
-                if (val > minPrice) setMaxPrice(val);
+              onChange={(e) => setMaxPrice(Number(e.target.value))}
+              onMouseUp={handlePriceChange}
+              onTouchEnd={handlePriceChange}
+              className="absolute pointer-events-none appearance-none z-20 h-1 w-full bg-transparent [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#2B7FE8] [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md"
+            />
+            <div className="absolute top-2 h-1 w-full bg-slate-200 rounded-full" />
+            <div 
+              className="absolute top-2 h-1 bg-[#2B7FE8] rounded-full" 
+              style={{
+                left: `${(minPrice / 200000) * 100}%`,
+                width: `${((maxPrice - minPrice) / 200000) * 100}%`
               }}
-              className="price-range-slider absolute top-[-6px] w-full"
             />
           </div>
 
-          {/* Input fields */}
           <div className="mt-4 flex items-center gap-2">
             <input
               type="number"
               value={minPrice}
               onChange={(e) => setMinPrice(Number(e.target.value))}
-              className="w-full rounded border border-slate-200 px-2 py-1.5 text-center text-[18px] text-slate-600 outline-none focus:border-blue-400"
+              onBlur={handlePriceChange}
+              className="w-full rounded border border-slate-200 px-2 py-1.5 text-center text-[16px] text-slate-600 outline-none focus:border-blue-400"
             />
             <input
               type="number"
               value={maxPrice}
               onChange={(e) => setMaxPrice(Number(e.target.value))}
-              className="w-full rounded border border-slate-200 px-2 py-1.5 text-center text-[18px] text-slate-600 outline-none focus:border-blue-400"
+              onBlur={handlePriceChange}
+              className="w-full rounded border border-slate-200 px-2 py-1.5 text-center text-[16px] text-slate-600 outline-none focus:border-blue-400"
             />
           </div>
         </div>
       </div>
 
-      {/* ═══════════════ PRODUCT TYPE SECTION ═══════════════ */}
-      <div className="rounded-md border border-slate-200 bg-white px-4 py-4">
-        {/* Header */}
-        <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-[24px] font-semibold text-slate-800">
-            Product Type
-          </h3>
-          <button
-            type="button"
-            onClick={() => setSelectedTypes([])}
-            className="text-[12px] font-medium text-slate-400 transition hover:text-red-500"
-          >
-            Reset
-          </button>
-        </div>
-        <div className="mt-2 mb-3 h-[2.5px] w-[50%] rounded-full bg-gradient-to-r from-[#2B7FE8] via-[#2B7FE8]/60 to-transparent" />
+      {/* ═══════════════ DYNAMIC ATTRIBUTE SECTIONS ═══════════════ */}
+      {filteringAttributes.map((attr) => {
+        const isOpen = openSections[attr.name] !== false; // Default open
+        const selectedValues = attributeFilters[`attr_${attr.name.toLowerCase()}`] || [];
+        const isColor = attr.name.toLowerCase() === 'color';
 
-        {/* Checkbox list */}
-        <ul className="flex flex-col gap-2.5">
-          {productTypes.map((pt) => {
-            const checked = selectedTypes.includes(pt.name);
-            return (
-              <li key={pt.name}>
-                <label className="flex cursor-pointer items-center justify-between">
-                  <span className="flex items-center gap-2.5">
-                    <span
-                      className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[3px] border transition-colors ${checked
-                        ? "border-slate-800 bg-slate-800"
-                        : "border-slate-300 bg-white"
-                        }`}
-                    >
-                      {checked && (
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-3 w-3 text-white"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      )}
-                    </span>
-                    <input
-                      type="checkbox"
-                      className="sr-only"
-                      checked={checked}
-                      onChange={() => toggleType(pt.name)}
-                    />
-                    <span className="text-[16px] text-slate-600">
-                      {pt.name}
-                    </span>
-                  </span>
-                  <span className="text-[12px] text-slate-400">{pt.count}</span>
-                </label>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
+        return (
+          <div key={attr.id} className="rounded-md border border-slate-200 bg-white px-4 py-4">
+            <div
+              onClick={() => setOpenSections(prev => ({ ...prev, [attr.name]: !isOpen }))}
+              className="flex w-full cursor-pointer items-center justify-between"
+            >
+              <h3 className="text-[24px] font-semibold text-slate-800">{attr.name}</h3>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    resetAttribute(attr.name);
+                  }}
+                  className="text-[12px] font-medium text-slate-400 transition hover:text-red-500"
+                >
+                  Reset
+                </button>
+                <HiChevronUp className={`h-4 w-4 text-slate-400 transition-transform ${isOpen ? "" : "rotate-180"}`} />
+              </div>
+            </div>
+            <div className="mt-2 h-[2.5px] w-[50%] rounded-full bg-gradient-to-r from-[#2B7FE8] via-[#2B7FE8]/60 to-transparent" />
 
-      {/* ═══════════════ DISPLAY SIZE SECTION ═══════════════ */}
-      <div className="rounded-md border border-slate-200 bg-white px-4 py-4">
-        <button
-          type="button"
-          onClick={() => setDisplaySizeOpen(!displaySizeOpen)}
-          className="flex w-full items-center justify-between"
-        >
-          <h3 className="text-[24px] font-semibold text-slate-800">Display Size</h3>
-          <HiChevronUp
-            className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${displaySizeOpen ? "" : "rotate-180"}`}
-          />
-        </button>
-        <div className="mt-2 h-[2.5px] w-[50%] rounded-full bg-gradient-to-r from-[#2B7FE8] via-[#2B7FE8]/60 to-transparent" />
-
-        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${displaySizeOpen ? "mt-3 max-h-[600px] opacity-100" : "max-h-0 opacity-0"}`}>
-          <ul className="flex flex-col gap-2.5">
-            {displaySizes.map((size) => {
-              const checked = selectedSizes.includes(size.name);
-              return (
-                <li key={size.name}>
-                  <label className="flex cursor-pointer items-center justify-between">
-                    <span className="flex items-center gap-2.5">
-                      <span
-                        className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[3px] border transition-colors ${checked
-                          ? "border-slate-800 bg-slate-800"
-                          : "border-slate-300 bg-white"}`}
+            <div className={`overflow-hidden transition-all duration-300 ${isOpen ? "mt-4 max-h-[300px] overflow-y-auto opacity-100 pr-2 custom-scrollbar" : "max-h-0 opacity-0"}`}>
+              {isColor ? (
+                <div className="grid grid-cols-5 gap-2 pb-2">
+                  {attr.values.map((val) => {
+                    const checked = selectedValues.includes(val.name);
+                    return (
+                      <button
+                        key={val.id}
+                        type="button"
+                        onClick={() => toggleAttribute(attr.name, val.name)}
+                        className={`group relative flex h-8 w-8 items-center justify-center rounded-full border transition-all ${checked ? "border-[#2B7FE8] scale-110 shadow-sm" : "border-slate-200 hover:border-slate-400"}`}
+                        title={val.name}
                       >
+                        <span 
+                          className="h-6 w-6 rounded-full border border-black/5" 
+                          style={{ backgroundColor: val.code || '#ddd' }}
+                        />
                         {checked && (
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
+                          <div className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-[#2B7FE8] text-[8px] text-white">
+                            ✓
+                          </div>
                         )}
-                      </span>
-                      <input type="checkbox" className="sr-only" checked={checked} onChange={() => toggleSize(size.name)} />
-                      <span className="text-[16px] text-slate-600">{size.name}</span>
-                    </span>
-                    <span className="text-[12px] text-slate-400">{String(size.count).padStart(2, '0')}</span>
-                  </label>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      </div>
-
-      {/* ═══════════════ BLUETOOTH SECTION ═══════════════ */}
-      <div className="rounded-md border border-slate-200 bg-white px-4 py-4">
-        <button
-          type="button"
-          onClick={() => setBluetoothOpen(!bluetoothOpen)}
-          className="flex w-full items-center justify-between"
-        >
-          <h3 className="text-[24px] font-semibold text-slate-800">Bluetooth</h3>
-          <HiChevronUp
-            className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${bluetoothOpen ? "" : "rotate-180"}`}
-          />
-        </button>
-        <div className="mt-2 h-[2.5px] w-[50%] rounded-full bg-gradient-to-r from-[#2B7FE8] via-[#2B7FE8]/60 to-transparent" />
-
-        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${bluetoothOpen ? "mt-3 max-h-[200px] opacity-100" : "max-h-0 opacity-0"}`}>
-          <ul className="flex flex-col gap-2.5">
-            {bluetoothOptions.map((bt) => {
-              const checked = selectedBluetooth.includes(bt.name);
-              return (
-                <li key={bt.name}>
-                  <label className="flex cursor-pointer items-center justify-between">
-                    <span className="flex items-center gap-2.5">
-                      <span
-                        className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[3px] border transition-colors ${checked
-                          ? "border-slate-800 bg-slate-800"
-                          : "border-slate-300 bg-white"}`}
-                      >
-                        {checked && (
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                        )}
-                      </span>
-                      <input type="checkbox" className="sr-only" checked={checked} onChange={() => toggleBluetooth(bt.name)} />
-                      <span className="text-[16px] text-slate-600">{bt.name}</span>
-                    </span>
-                    <span className="text-[12px] text-slate-400">{String(bt.count).padStart(2, '0')}</span>
-                  </label>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      </div>
-
-      {/* ═══════════════ COLOR SECTION ═══════════════ */}
-      <div className="rounded-md border border-slate-200 bg-white px-4 py-4">
-        <button
-          type="button"
-          onClick={() => setColorOpen(!colorOpen)}
-          className="flex w-full items-center justify-between"
-        >
-          <h3 className="text-[24px] font-semibold text-slate-800">Color</h3>
-          <HiChevronUp
-            className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${colorOpen ? "" : "rotate-180"}`}
-          />
-        </button>
-        <div className="mt-2 h-[2.5px] w-[50%] rounded-full bg-gradient-to-r from-[#2B7FE8] via-[#2B7FE8]/60 to-transparent" />
-
-        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${colorOpen ? "mt-3 max-h-[200px] opacity-100" : "max-h-0 opacity-0"}`}>
-          <ul className="flex flex-col gap-2.5">
-            {colorOptions.map((color) => {
-              const checked = selectedColors.includes(color.name);
-              return (
-                <li key={color.name}>
-                  <label className="flex cursor-pointer items-center justify-between">
-                    <span className="flex items-center gap-2.5">
-                      <span
-                        className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[3px] border transition-colors ${checked
-                          ? "border-slate-800 bg-slate-800"
-                          : "border-slate-300 bg-white"}`}
-                      >
-                        {checked && (
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                        )}
-                      </span>
-                      <input type="checkbox" className="sr-only" checked={checked} onChange={() => toggleColor(color.name)} />
-                      <span className="text-[16px] text-slate-600">{color.name}</span>
-                    </span>
-                    <span className="text-[12px] text-slate-400">{String(color.count).padStart(2, '0')}</span>
-                  </label>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      </div>
-
-      {/* ═══════════════ POWER SECTION ═══════════════ */}
-      <div className="rounded-md border border-slate-200 bg-white px-4 py-4">
-        <button
-          type="button"
-          onClick={() => setPowerOpen(!powerOpen)}
-          className="flex w-full items-center justify-between"
-        >
-          <h3 className="text-[24px] font-semibold text-slate-800">Power</h3>
-          <HiChevronUp
-            className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${powerOpen ? "" : "rotate-180"}`}
-          />
-        </button>
-        <div className="mt-2 h-[2.5px] w-[50%] rounded-full bg-gradient-to-r from-[#2B7FE8] via-[#2B7FE8]/60 to-transparent" />
-
-        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${powerOpen ? "mt-3 max-h-[200px] opacity-100" : "max-h-0 opacity-0"}`}>
-          <ul className="flex flex-col gap-2.5">
-            {powerOptions.map((pw) => {
-              const checked = selectedPowers.includes(pw.name);
-              return (
-                <li key={pw.name}>
-                  <label className="flex cursor-pointer items-center justify-between">
-                    <span className="flex items-center gap-2.5">
-                      <span
-                        className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[3px] border transition-colors ${checked
-                          ? "border-slate-800 bg-slate-800"
-                          : "border-slate-300 bg-white"}`}
-                      >
-                        {checked && (
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                        )}
-                      </span>
-                      <input type="checkbox" className="sr-only" checked={checked} onChange={() => togglePower(pw.name)} />
-                      <span className="text-[16px] text-slate-600">{pw.name}</span>
-                    </span>
-                    <span className="text-[12px] text-slate-400">{String(pw.count).padStart(2, '0')}</span>
-                  </label>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      </div>
-
-      {/* ═══════════════ CAMPAIGN SECTION ═══════════════ */}
-      <div className="rounded-md border border-slate-200 bg-white px-4 py-4">
-        <button
-          type="button"
-          onClick={() => setCampaignOpen(!campaignOpen)}
-          className="flex w-full items-center justify-between"
-        >
-          <h3 className="text-[24px] font-semibold text-slate-800">Campaign</h3>
-          <HiChevronUp
-            className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${campaignOpen ? "" : "rotate-180"}`}
-          />
-        </button>
-        <div className="mt-2 h-[2.5px] w-[50%] rounded-full bg-gradient-to-r from-[#2B7FE8] via-[#2B7FE8]/60 to-transparent" />
-
-        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${campaignOpen ? "mt-3 max-h-[200px] opacity-100" : "max-h-0 opacity-0"}`}>
-          <ul className="flex flex-col gap-2.5">
-            {campaignOptions.map((cp) => {
-              const checked = selectedCampaigns.includes(cp.name);
-              return (
-                <li key={cp.name}>
-                  <label className="flex cursor-pointer items-center justify-between">
-                    <span className="flex items-center gap-2.5">
-                      <span
-                        className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[3px] border transition-colors ${checked
-                          ? "border-slate-800 bg-slate-800"
-                          : "border-slate-300 bg-white"}`}
-                      >
-                        {checked && (
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                        )}
-                      </span>
-                      <input type="checkbox" className="sr-only" checked={checked} onChange={() => toggleCampaign(cp.name)} />
-                      <span className="text-[16px] text-slate-600">{cp.name}</span>
-                    </span>
-                    <span className="text-[12px] text-slate-400">{String(cp.count).padStart(2, '0')}</span>
-                  </label>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <ul className="flex flex-col gap-2.5">
+                  {attr.values.map((val) => {
+                    const checked = selectedValues.includes(val.name);
+                    return (
+                      <li key={val.id}>
+                        <label className="flex cursor-pointer items-center gap-2.5">
+                          <span className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[3px] border transition-colors ${checked ? "border-slate-800 bg-slate-800" : "border-slate-300 bg-white"}`}>
+                            {checked && (
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            )}
+                          </span>
+                          <input type="checkbox" className="sr-only" checked={checked} onChange={() => toggleAttribute(attr.name, val.name)} />
+                          <span className="text-[16px] text-slate-600">{val.name}</span>
+                        </label>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
