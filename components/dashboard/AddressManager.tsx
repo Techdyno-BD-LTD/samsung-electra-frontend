@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { FiEdit, FiTrash2, FiPlus, FiChevronDown } from "react-icons/fi";
 import { useAppSelector } from "@/store/hooks";
+import Skeleton from "@/components/common/Skeleton";
 
 interface Address {
   id: number;
@@ -13,11 +14,10 @@ interface Address {
   phone: string;
   postal_code: string;
   set_default: number;
-  city_id?: number;
-  state_id?: number;
-  area_id?: number;
-  area?: string;
   country_id?: number;
+  country_name?: string;
+  state_name?: string;
+  city_name?: string;
 }
 
 export default function AddressManager() {
@@ -43,6 +43,7 @@ export default function AddressManager() {
 
   const [districts, setDistricts] = useState<{ id: number; name: string }[]>([]);
   const [thanas, setThanas] = useState<{ id: number; name: string }[]>([]);
+  const [cities, setCities] = useState<{ id: number; name: string }[]>([]);
 
   const fetchAddresses = useCallback(async () => {
     if (!token) return;
@@ -73,14 +74,25 @@ export default function AddressManager() {
     }
   }, []);
 
-  const fetchThanas = async (districtId: string) => {
+  const fetchCities = async (districtId: string) => {
     if (!districtId) return;
     try {
-      const response = await fetch(`/api/v2/thanas-by-district/${districtId}`);
+      const response = await fetch(`/api/v2/cities-by-district/${districtId}`);
       const payload = await response.json();
       if (payload.success) setThanas(payload.data);
     } catch (error) {
-      console.error("Failed to fetch thanas", error);
+      console.error("Failed to fetch cities", error);
+    }
+  };
+
+  const fetchAreas = async (cityId: string) => {
+    if (!cityId) return;
+    try {
+      const response = await fetch(`/api/v2/areas-by-city/${cityId}`);
+      const payload = await response.json();
+      if (payload.success) setCities(payload.data);
+    } catch (error) {
+      console.error("Failed to fetch areas", error);
     }
   };
 
@@ -111,9 +123,11 @@ export default function AddressManager() {
       ? "/api/v2/user/shipping/update" 
       : "/api/v2/user/shipping/create";
     
-    const body = editingAddress 
+    const payload_body: any = editingAddress 
       ? { ...formData, id: editingAddress.id } 
       : formData;
+    
+    if (!payload_body.city_id) delete payload_body.city_id;
 
     try {
       const response = await fetch(endpoint, {
@@ -122,7 +136,7 @@ export default function AddressManager() {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify(body)
+        body: JSON.stringify(payload_body)
       });
       const payload = await response.json();
       if (payload.success) {
@@ -139,7 +153,6 @@ export default function AddressManager() {
           state_id: "",
           city_id: "",
           area_id: "",
-          area: "",
           set_default: 0 
         });
       }
@@ -160,14 +173,25 @@ export default function AddressManager() {
       state_id: address.state_id?.toString() || "",
       city_id: address.city_id?.toString() || "",
       area_id: address.area_id?.toString() || "",
-      area: address.area || "",
       set_default: address.set_default
     });
-    if (address.country_id) fetchThanas(address.country_id.toString());
+    if (address.country_id) fetchCities(address.country_id.toString());
+    if (address.state_id) fetchAreas(address.state_id.toString());
     setShowModal(true);
   };
 
-  if (loading) return <div className="p-8 text-center text-gray-500">Loading addresses...</div>;
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-20 w-full rounded-2xl" />
+        <div className="space-y-4">
+          {[1, 2].map((i) => (
+            <Skeleton key={i} className="h-32 w-full rounded-2xl" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -215,8 +239,8 @@ export default function AddressManager() {
                   </div>
                   <p className="text-sm text-slate-700 mb-1">{addr.phone}</p>
                   <p className="text-sm text-slate-700 mb-1">{addr.email || user?.email}</p>
-                  <p className="text-sm text-slate-600 leading-relaxed">
-                    {addr.address}, {addr.postal_code}
+                  <p className="text-gray-500 text-sm mt-1">
+                    {addr.address}, {addr.city_name ? `${addr.city_name}, ` : ''}{addr.state_name}, {addr.country_name}, {addr.postal_code}
                   </p>
                 </div>
                 
@@ -321,8 +345,8 @@ export default function AddressManager() {
                       value={formData.country_id}
                       onChange={(e) => {
                         const val = e.target.value;
-                        setFormData({ ...formData, country_id: val, state_id: "" });
-                        fetchThanas(val);
+                        setFormData({ ...formData, country_id: val, state_id: "", city_id: "" });
+                        fetchCities(val);
                       }}
                       className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 h-12 text-sm focus:ring-2 focus:ring-[#2b7fe8]/20 focus:border-[#2b7fe8] transition-all outline-none appearance-none"
                     >
@@ -335,19 +359,20 @@ export default function AddressManager() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-1.5">Thana / Upazilla</label>
+                  <label className="block text-sm font-bold text-gray-700 mb-1.5">City</label>
                   <div className="relative">
                     <select
                       required
                       value={formData.state_id}
                       onChange={(e) => {
                         const val = e.target.value;
-                        setFormData({ ...formData, state_id: val });
+                        setFormData({ ...formData, state_id: val, city_id: "" });
+                        fetchAreas(val);
                       }}
                       disabled={!formData.country_id}
                       className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 h-12 text-sm focus:ring-2 focus:ring-[#2b7fe8]/20 focus:border-[#2b7fe8] transition-all outline-none appearance-none disabled:bg-gray-100 disabled:cursor-not-allowed"
                     >
-                      <option value="">Select Thana</option>
+                      <option value="">Select City</option>
                       {thanas.map((t: { id: number; name: string }) => (
                         <option key={t.id} value={t.id}>{t.name}</option>
                       ))}
@@ -358,15 +383,21 @@ export default function AddressManager() {
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1.5">Area</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.area}
-                  onChange={(e) => setFormData({ ...formData, area: e.target.value })}
-                  placeholder="Enter area"
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 h-12 text-sm focus:ring-2 focus:ring-[#2b7fe8]/20 focus:border-[#2b7fe8] transition-all outline-none"
-                />
+                <label className="block text-sm font-bold text-gray-700 mb-1.5">Thana / Area (Optional)</label>
+                <div className="relative">
+                  <select
+                    value={formData.city_id}
+                    onChange={(e) => setFormData({ ...formData, city_id: e.target.value })}
+                    disabled={!formData.state_id}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 h-12 text-sm focus:ring-2 focus:ring-[#2b7fe8]/20 focus:border-[#2b7fe8] transition-all outline-none appearance-none disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  >
+                    <option value="">Select Thana / Area</option>
+                    {cities.map((c: { id: number; name: string }) => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                  </select>
+                  <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                </div>
               </div>
 
               <div className="flex items-center gap-2 pt-2">

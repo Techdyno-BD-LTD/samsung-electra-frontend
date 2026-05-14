@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { FiX, FiChevronDown } from "react-icons/fi";
 import Image from "next/image";
 import { formatCurrency } from "@/lib/currencyUtils";
+import Skeleton from "@/components/common/Skeleton";
 
 interface Order {
   id: number;
@@ -179,11 +180,7 @@ const CancellationModal = ({ isOpen, onClose, order, items, token, onSuccess }: 
                 onClick={handleSubmit}
                 className="bg-[#ff3131] text-white font-bold px-10 py-3.5 rounded-full hover:bg-red-600 transition-all shadow-lg shadow-red-100 disabled:opacity-50 disabled:grayscale disabled:shadow-none flex items-center justify-center gap-2"
             >
-                {submitting ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                ) : (
-                "Request Cancellation"
-                )}
+                {submitting ? <Skeleton className="w-4 h-4 rounded-full" /> : "Request Cancellation"}
             </button>
           </div>
         </div>

@@ -72,7 +72,7 @@ export default function RootLayout({
           <AuthInit />
           <GlobalToast />
           <Navbar />
-          <main className="mainwidth pb-20 pt-20 lg:pt-32 min-h-screen-safe overflow-x-hidden">
+          <main className="mainwidth pb-20 pt-2 lg:pt-32 min-h-screen-safe overflow-x-hidden">
             {children}
           </main>
           <div id="footer-breadcrumb-target" className="lg:hidden mx-auto mainwidthmore mb-4 px-4"></div>

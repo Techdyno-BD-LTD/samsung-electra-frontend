@@ -31,9 +31,25 @@ const ServiceRequestPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.full_name || !formData.mobile_number || !formData.email) {
-      dispatch(showToast({ message: "Please fill in all required fields.", type: "error" }));
-      return;
+    
+    const requiredFields = [
+      { key: 'full_name', label: 'Full Name' },
+      { key: 'mobile_number', label: 'Mobile Number' },
+      { key: 'email', label: 'E-mail Address' }
+    ];
+
+    for (const field of requiredFields) {
+      if (!formData[field.key as keyof typeof formData].trim()) {
+        const element = document.getElementsByName(field.key)[0] as HTMLElement;
+        if (element) {
+          element.focus();
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          element.classList.add('border-red-500');
+          setTimeout(() => element.classList.remove('border-red-500'), 3000);
+        }
+        dispatch(showToast({ message: `${field.label} is required.`, type: "error" }));
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -114,17 +130,16 @@ const ServiceRequestPage = () => {
         </div>
 
         <div className="p-6 lg:p-8">
-           <form onSubmit={handleSubmit} className="space-y-6">
+           <form onSubmit={handleSubmit} className="space-y-6" noValidate>
               {/* Row 1 */}
               <div className="space-y-1.5">
-                 <label className="text-[13px] font-semibold text-slate-700 ml-1">Full Name<span className="text-blue-400">*</span></label>
+                 <label className="text-[13px] font-semibold text-slate-700 ml-1">Full Name<span className="text-red-500">*</span></label>
                  <input 
                     type="text" 
                     name="full_name"
                     value={formData.full_name}
                     onChange={handleChange}
                     placeholder="Enter full name" 
-                    required
                     className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm font-medium focus:outline-none focus:border-[#2b7fe8] transition-colors" 
                  />
               </div>
@@ -132,26 +147,24 @@ const ServiceRequestPage = () => {
               {/* Row 2 */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                  <div className="space-y-1.5">
-                    <label className="text-[13px] font-semibold text-slate-700 ml-1">Mobile Number<span className="text-blue-400">*</span></label>
+                    <label className="text-[13px] font-semibold text-slate-700 ml-1">Mobile Number<span className="text-red-500">*</span></label>
                     <input 
                         type="text" 
                         name="mobile_number"
                         value={formData.mobile_number}
                         onChange={handleChange}
                         placeholder="Enter number" 
-                        required
                         className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm font-medium focus:outline-none focus:border-[#2b7fe8] transition-colors" 
                     />
                  </div>
                  <div className="space-y-1.5">
-                    <label className="text-[13px] font-semibold text-slate-700 ml-1">E-mail Address<span className="text-blue-400">*</span></label>
+                    <label className="text-[13px] font-semibold text-slate-700 ml-1">E-mail Address<span className="text-red-500">*</span></label>
                     <input 
                         type="email" 
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
                         placeholder="Enter email" 
-                        required
                         className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm font-medium focus:outline-none focus:border-[#2b7fe8] transition-colors" 
                     />
                  </div>

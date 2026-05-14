@@ -15,7 +15,7 @@ export async function GET(
   }
 
   try {
-    const response = await fetch(`${baseUrl}/api/v2/states-by-country/${districtId}`, {
+    const response = await fetch(`${baseUrl}/api/v2/cities-by-district/${districtId}`, {
       headers: { "x-system-key": systemKey },
     });
 

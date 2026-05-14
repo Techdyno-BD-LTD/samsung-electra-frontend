@@ -11,7 +11,7 @@ export async function GET() {
   }
 
   try {
-    const response = await fetch(`${baseUrl}/api/v2/countries`, {
+    const response = await fetch(`${baseUrl}/api/v2/districts`, {
       headers: { "x-system-key": systemKey },
     });
 

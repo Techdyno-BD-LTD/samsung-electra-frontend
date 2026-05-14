@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { FiMapPin, FiPhone, FiMail, FiArrowRight, FiLoader } from "react-icons/fi";
 import { useAppDispatch } from "@/store/hooks";
 import { showToast } from "@/store/features/toast/toastSlice";
+import Skeleton from "@/components/common/Skeleton";
 
 interface ContactContent {
     form_title: string;
@@ -60,9 +61,25 @@ export default function Page() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
-        if (!formData.name || !formData.phone || !formData.email || !formData.message) {
-            dispatch(showToast({ message: "Please fill in all required fields.", type: "error" }));
-            return;
+        const requiredFields = [
+            { key: 'name', label: 'Name' },
+            { key: 'phone', label: 'Phone Number' },
+            { key: 'email', label: 'E-mail' },
+            { key: 'message', label: 'Message' }
+        ];
+
+        for (const field of requiredFields) {
+            if (!formData[field.key as keyof typeof formData].trim()) {
+                const element = document.getElementsByName(field.key)[0] as HTMLElement;
+                if (element) {
+                    element.focus();
+                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    element.classList.add('border-red-500');
+                    setTimeout(() => element.classList.remove('border-red-500'), 3000);
+                }
+                dispatch(showToast({ message: `${field.label} is required.`, type: "error" }));
+                return;
+            }
         }
 
         setSubmitting(true);
@@ -91,8 +108,12 @@ export default function Page() {
 
     if (loading) {
         return (
-            <div className="w-full h-[60vh] flex items-center justify-center">
-                <FiLoader className="animate-spin text-4xl text-blue-500" />
+            <div className="mx-auto w-full px-4 lg:px-12 py-12 space-y-12 animate-in fade-in duration-500">
+                <Skeleton className="h-10 w-1/4 rounded-xl" />
+                <div className="grid lg:grid-cols-2 gap-8">
+                    <Skeleton className="h-[600px] w-full rounded-2xl" />
+                    <Skeleton className="h-[600px] w-full rounded-2xl" />
+                </div>
             </div>
         );
     }
@@ -121,51 +142,51 @@ export default function Page() {
                         </p>
                     </div>
 
-                    <form className="flex flex-col gap-4 md:gap-6" onSubmit={handleSubmit}>
+                    <form className="flex flex-col gap-4 md:gap-6" onSubmit={handleSubmit} noValidate>
                         <div className="flex flex-col gap-1.5">
-                            <label className="text-xs md:text-sm font-semibold text-slate-700">Name *</label>
+                            <label className="text-xs md:text-sm font-semibold text-slate-700">Name <span className="text-red-500">*</span></label>
                             <input
                                 type="text"
+                                name="name"
                                 value={formData.name}
                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                 className="w-full border border-slate-200 rounded-lg p-2.5 md:p-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all text-sm"
                                 placeholder="Your full name"
-                                required
                             />
                         </div>
 
                         <div className="flex flex-col gap-1.5">
-                            <label className="text-xs md:text-sm font-semibold text-slate-700">Phone Number *</label>
+                            <label className="text-xs md:text-sm font-semibold text-slate-700">Phone Number <span className="text-red-500">*</span></label>
                             <input
                                 type="text"
+                                name="phone"
                                 value={formData.phone}
                                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                                 className="w-full border border-slate-200 rounded-lg p-2.5 md:p-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all text-sm"
                                 placeholder="Phone number"
-                                required
                             />
                         </div>
 
                         <div className="flex flex-col gap-1.5">
-                            <label className="text-xs md:text-sm font-semibold text-slate-700">Your E-mail *</label>
+                            <label className="text-xs md:text-sm font-semibold text-slate-700">Your E-mail <span className="text-red-500">*</span></label>
                             <input
                                 type="email"
+                                name="email"
                                 value={formData.email}
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                 className="w-full border border-slate-200 rounded-lg p-2.5 md:p-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all text-sm"
                                 placeholder="Email address"
-                                required
                             />
                         </div>
 
                         <div className="flex flex-col gap-1.5">
-                            <label className="text-xs md:text-sm font-semibold text-slate-700">Your Message *</label>
+                            <label className="text-xs md:text-sm font-semibold text-slate-700">Your Message <span className="text-red-500">*</span></label>
                             <textarea
+                                name="message"
                                 value={formData.message}
                                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                                 className="w-full border border-slate-200 rounded-lg p-2.5 md:p-3 h-28 lg:h-40 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all resize-none text-sm"
                                 placeholder="How can we help you?"
-                                required
                             ></textarea>
                         </div>
 
@@ -174,7 +195,7 @@ export default function Page() {
                             disabled={submitting}
                             className="bg-[#1D80FE] text-white font-bold py-2.5 md:py-3 px-6 md:px-8 rounded-lg w-fit hover:bg-blue-600 transition-all shadow-md active:scale-95 text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                         >
-                            {submitting ? <FiLoader className="animate-spin" /> : null}
+                            {submitting ? <Skeleton className="w-4 h-4 rounded-full" /> : null}
                             {data.submit_button_text}
                         </button>
                     </form>

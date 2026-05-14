@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAppSelector } from "@/store/hooks";
 import ProductCard from "@/components/common/ProductCard";
+import Skeleton from "@/components/common/Skeleton";
 
 export default function WishlistPage() {
   const router = useRouter();
@@ -19,10 +20,12 @@ export default function WishlistPage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600 mb-4"></div>
-          <p className="text-slate-600">Redirecting to login...</p>
+      <div className="mx-auto max-w-[1440px] px-4 py-20 space-y-8 animate-in fade-in duration-500">
+        <Skeleton className="h-12 w-1/3 rounded-xl" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton key={i} className="aspect-[3/4] w-full rounded-2xl" />
+          ))}
         </div>
       </div>
     );

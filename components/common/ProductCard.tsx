@@ -11,6 +11,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toProductSlug } from "@/lib/productSlug";
+import BankEmiModal from "../productdetails/BankEmiModal";
 
 interface ProductCardProps {
   cardVariant?: "default" | "flashDeal" | "specialDeal";
@@ -93,6 +94,7 @@ const ProductCard = ({
 }: ProductCardProps) => {
   const dispatch = useAppDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEmiModalOpen, setIsEmiModalOpen] = useState(false);
 
   const productSlug = productData?.slug || slug || toProductSlug(title);
   const wishlistItemId = productSlug || title;
@@ -162,6 +164,7 @@ const ProductCard = ({
     dispatch(
       toggleCompare({
         id: wishlistItemId,
+        slug: productSlug,
         title,
         brand,
         brandLogo,
@@ -242,7 +245,7 @@ const ProductCard = ({
                 alt={brand || "Brand logo"}
                 width={130}
                 height={34}
-                className="h-6 w-auto object-contain"
+                className="h-5 w-auto object-contain"
               />
             ) : (
               <span className="text-sm font-bold uppercase tracking-wide text-slate-800">{brand}</span>
@@ -350,7 +353,7 @@ const ProductCard = ({
         <div className="pt-7">
           <div className="mb-3 flex justify-center">
             {brandLogo ? (
-              <Image src={brandLogo} alt={brand || "Brand logo"} width={130} height={34} className="h-6 w-auto object-contain" />
+              <Image src={brandLogo} alt={brand || "Brand logo"} width={130} height={34} className="h-5 w-auto object-contain" />
             ) : (
               <span className="text-sm font-bold uppercase tracking-wide text-slate-800">{brand}</span>
             )}
@@ -474,7 +477,7 @@ const ProductCard = ({
               alt={brandName || "Brand logo"}
               width={140}
               height={36}
-              className="h-5 w-auto object-contain sm:h-9"
+              className="h-4 w-auto object-contain sm:h-7"
             />
           ) : (
             <span className="text-sm font-bold uppercase tracking-wide text-foreground sm:text-lg">
@@ -628,7 +631,7 @@ const ProductCard = ({
             alt={productData?.brand?.name || brand || "Brand logo"}
             width={140}
             height={36}
-            className="h-5 w-auto object-contain sm:h-9"
+            className="h-4 w-auto object-contain sm:h-7"
           />
         ) : (
           <span className="text-sm font-bold tracking-wide text-foreground uppercase sm:text-lg">
@@ -708,7 +711,14 @@ const ProductCard = ({
             EMI From {productData?.emi_start || emiPrice} Tk/Month
           </span>
         </span>
-        <button className="shrink-0 text-[10px] font-semibold text-blue-600 hover:underline sm:text-xs">
+        <button 
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsEmiModalOpen(true);
+          }}
+          className="shrink-0 text-[10px] font-semibold text-blue-600 hover:underline sm:text-xs"
+        >
           EMI Details
         </button>
       </div>
@@ -868,6 +878,13 @@ const ProductCard = ({
         title={title} brand={brand} price={price} originalPrice={originalPrice}
         image={image} category={category} discountLabel={discountPercent}
         saveLabel={saveAmount} weight={weight} color={color} slug={slug}
+      />
+      <BankEmiModal
+        isOpen={isEmiModalOpen}
+        onClose={() => setIsEmiModalOpen(false)}
+        emiPlans={productData?.emi_plans || []}
+        productName={productData?.name || title}
+        productSlug={productSlug}
       />
     </div>
   );

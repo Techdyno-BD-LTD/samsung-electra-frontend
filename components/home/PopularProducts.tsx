@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import ProductCard from "@/components/common/ProductCard";
+import Skeleton from "@/components/common/Skeleton";
 import { Product } from "@/types/product";
 // import products from "@/database/popularproducts.json";
 
@@ -87,8 +88,8 @@ export default function PopularProducts() {
 
   if (loading) {
     return (
-      <div className="flex h-64 items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#2F73BD] border-t-transparent"></div>
+      <div className="flex w-full items-center justify-center py-20">
+        <Skeleton className="h-64 w-full rounded-2xl" />
       </div>
     );
   }

@@ -74,10 +74,24 @@ async function getCategoryData(slug: string) {
         slug: c.slug
       }));
       
+    // Find ancestors for breadcrumbs
+    const ancestors: { name: string; slug: string }[] = [];
+    let parentId = currentCategory.parent_id;
+    while (parentId && parentId !== 0) {
+      const parent = categories.find(c => c.id === parentId);
+      if (parent) {
+        ancestors.unshift({ name: parent.name, slug: parent.slug });
+        parentId = parent.parent_id;
+      } else {
+        break;
+      }
+    }
+      
     return {
       ...currentCategory,
       subcategories,
-      filtering_attributes: filteringAttributes
+      filtering_attributes: filteringAttributes,
+      ancestors
     };
   } catch (error) {
     console.error("Error fetching category data:", error);
@@ -146,13 +160,19 @@ export default async function CategoryPage({ params }: PageProps) {
         aria-label="Breadcrumb"
         className="mb-4 hidden items-center gap-2 text-[12px] leading-none text-slate-500 lg:flex lg:text-sm"
       >
-        <Link href="/" className="transition hover:text-slate-700">
+        <Link href="/" className="transition hover:text-blue-600">
           Home
         </Link>
+        {category.ancestors.map((ancestor: { name: string; slug: string }, idx: number) => (
+          <div key={idx} className="flex items-center gap-2">
+            <span className="text-slate-400">›</span>
+            <Link href={`/category/${ancestor.slug}`} className="transition hover:text-blue-600">
+              {ancestor.name}
+            </Link>
+          </div>
+        ))}
         <span className="text-slate-400">›</span>
-        <span>All {shortName}</span>
-        <span className="text-slate-400">›</span>
-        <span className="text-slate-700">{shortName}</span>
+        <span className="text-slate-700 font-medium">{category.name}</span>
       </nav>
 
       {/* ═══════════════ MAIN LAYOUT ═══════════════ */}

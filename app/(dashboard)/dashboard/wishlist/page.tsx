@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchWishlist, removeFromWishlistAsync } from "@/store/features/wishlist/wishlistSlice";
 import { showToast } from "@/store/features/toast/toastSlice";
 import { addToCart } from "@/store/features/cart/cartSlice";
+import Skeleton from "@/components/common/Skeleton";
 
 const WishlistPage = () => {
   const dispatch = useAppDispatch();
@@ -62,9 +63,13 @@ const WishlistPage = () => {
 
   if (loading && items.length === 0) {
     return (
-      <div className="bg-white rounded-2xl p-12 lg:p-20 shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-black/5 flex flex-col items-center justify-center text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600 mb-4"></div>
-        <p className="text-slate-600">Loading your wishlist...</p>
+      <div className="space-y-6">
+        <Skeleton className="h-20 w-full rounded-2xl" />
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-48 w-full rounded-2xl" />
+          ))}
+        </div>
       </div>
     );
   }

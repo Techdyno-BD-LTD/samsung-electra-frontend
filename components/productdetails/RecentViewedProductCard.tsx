@@ -111,6 +111,7 @@ export default function RecentViewedProductCard({ product }: RecentViewedProduct
     dispatch(
       toggleCompare({
         id: productSlug,
+        slug: productSlug,
         title: product.title ?? "Product",
         brand: product.brandLogo ? "Brand" : "",
         brandLogo: product.brandLogo,

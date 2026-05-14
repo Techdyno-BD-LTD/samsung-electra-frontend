@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { showToast } from "@/store/features/toast/toastSlice";
+import { useAppDispatch } from "@/store/hooks";
 
 interface VerifyOTPProps {
   phoneNumber: string;
@@ -10,8 +12,23 @@ interface VerifyOTPProps {
 }
 
 export default function VerifyOTP({ phoneNumber, onBack, onVerify }: VerifyOTPProps) {
+  const dispatch = useAppDispatch();
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
+  const [timer, setTimer] = useState(60);
+  const [canResend, setCanResend] = useState(false);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    } else {
+      setCanResend(true);
+    }
+    return () => clearInterval(interval);
+  }, [timer]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,6 +37,35 @@ export default function VerifyOTP({ phoneNumber, onBack, onVerify }: VerifyOTPPr
       onVerify(code);
     } else {
       setError("Please enter a 6-digit OTP code.");
+    }
+  };
+
+  const handleResend = async () => {
+    if (!canResend) return;
+
+    try {
+      const response = await fetch("/api/auth/send-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          emailOrPhone: phoneNumber,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.result) {
+        setTimer(60);
+        setCanResend(false);
+        dispatch(showToast({ message: "OTP has been resent successfully!", type: "success" }));
+      } else {
+        dispatch(showToast({ message: data.message || "Failed to resend OTP", type: "error" }));
+      }
+    } catch (err) {
+      console.error("Resend OTP error:", err);
+      dispatch(showToast({ message: "Something went wrong while resending OTP", type: "error" }));
     }
   };
 
@@ -72,12 +118,19 @@ export default function VerifyOTP({ phoneNumber, onBack, onVerify }: VerifyOTPPr
           <p className="text-[13px] text-gray-500 font-medium">
             Didn&apos;t Received OTP
           </p>
-          <button
-            type="button"
-            className="text-[13px] font-bold text-gray-800 hover:text-black"
-          >
-            Resend Code
-          </button>
+          {canResend ? (
+            <button
+              type="button"
+              onClick={handleResend}
+              className="text-[13px] font-bold text-[#0081FF] hover:text-blue-700"
+            >
+              Resend Code
+            </button>
+          ) : (
+            <p className="text-[13px] font-bold text-gray-400">
+              Resend in {Math.floor(timer / 60)}:{String(timer % 60).padStart(2, '0')}
+            </p>
+          )}
         </div>
 
         {/* Action Button */}

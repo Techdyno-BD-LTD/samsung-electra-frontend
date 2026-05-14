@@ -9,6 +9,7 @@ import { addToWishlistAsync, removeFromWishlistAsync, WishlistItem } from "@/sto
 import { showToast } from "@/store/features/toast/toastSlice";
 import { useRouter } from "next/navigation";
 import CartSuccessModal from "@/components/common/CartSuccessModal";
+import BankEmiModal from "../productdetails/BankEmiModal";
 import { toProductSlug } from "@/lib/productSlug";
 import { formatCurrency } from "@/lib/currencyUtils";
 
@@ -57,6 +58,18 @@ export interface ProductData {
   special_offer_title?: string;
   special_offers?: Array<{ text?: string; image?: string | null }>;
   featured_specs?: Array<{ title?: string; text?: string | null; icon?: string | null }>;
+  emi_plans?: Array<{
+    bank_id?: number;
+    bank_name?: string;
+    max_month?: number;
+    plans?: Array<{
+      months?: number;
+      interest_rate?: number;
+      product_price?: number;
+      effective_price?: number;
+      monthly_payable?: number;
+    }>;
+  }>;
   emi_facility?: { text?: string; link?: string | null; link_label?: string | null };
   warranty?: { text?: string; warranty_type?: string; link?: string | null; link_label?: string | null };
   exchange?: { text?: string; link?: string | null; link_label?: string | null };
@@ -125,6 +138,7 @@ export default function AddToCartModal({
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isHidingModal, setIsHidingModal] = useState(false);
+  const [isEmiModalOpen, setIsEmiModalOpen] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const thumbnailContainerRef = useRef<HTMLDivElement>(null);
 
@@ -610,7 +624,13 @@ export default function AddToCartModal({
                 <div className="flex items-center gap-3 border-y border-slate-100 py-2 text-sm text-slate-700">
                   <Image src="/images/EMI.png" alt="EMI" width={20} height={20} className="h-5 w-5 object-contain" />
                   <span>EMI Starts From <span className="font-bold">{emiText}</span></span>
-                  <button type="button" className="font-bold text-[#0C73DA] hover:underline">| {emiDetailsLabel}</button>
+                  <button 
+                    type="button" 
+                    className="font-bold text-[#0C73DA] hover:underline"
+                    onClick={() => setIsEmiModalOpen(true)}
+                  >
+                    | {emiDetailsLabel}
+                  </button>
                 </div>
 
                 {/* Attributes */}
@@ -778,7 +798,12 @@ export default function AddToCartModal({
                     <p className="flex items-center gap-3">
                       <Image src="/images/Vector.png" alt="EMI" width={20} height={20} className="h-5 w-5 opacity-70" />
                       <span>{emiFacilityInfo}</span>
-                      <button className="text-blue-600 font-bold hover:underline">{emiLinkLabel}</button>
+                      <button 
+                        className="text-blue-600 font-bold hover:underline"
+                        onClick={() => setIsEmiModalOpen(true)}
+                      >
+                        {emiLinkLabel}
+                      </button>
                     </p>
                   </div>
 
@@ -801,6 +826,13 @@ export default function AddToCartModal({
         productName={title}
         productImage={finalMainImage}
         productPrice={price}
+      />
+      <BankEmiModal
+        isOpen={isEmiModalOpen}
+        onClose={() => setIsEmiModalOpen(false)}
+        emiPlans={productData?.emi_plans || []}
+        productName={productData?.name || title}
+        productSlug={productSlug}
       />
     </>
   );

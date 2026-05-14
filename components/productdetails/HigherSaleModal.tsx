@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FaTimes, FaCloudUploadAlt, FaCheckCircle } from "react-icons/fa";
+import Skeleton from "@/components/common/Skeleton";
 
 interface HigherSaleModalProps {
   isOpen: boolean;
@@ -90,6 +91,49 @@ export default function HigherSaleModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    const requiredFields = [
+      { key: 'first_name', label: 'First Name' },
+      { key: 'last_name', label: 'Last Name' },
+      { key: 'mobile_number', label: 'Mobile Number' },
+      { key: 'email', label: 'E-mail Address' },
+      { key: 'age', label: 'Age' },
+      { key: 'gender', label: 'Gender' },
+      { key: 'marital_status', label: 'Marital Status' },
+      { key: 'head_of_household', label: 'Head of Household' },
+      { key: 'delivery_address', label: 'Delivery Address' },
+      { key: 'message', label: 'Message' }
+    ];
+
+    for (const field of requiredFields) {
+      if (!formData[field.key as keyof typeof formData]) {
+        const element = document.getElementsByName(field.key)[0] as HTMLElement;
+        if (element) {
+          element.focus();
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          element.classList.add('border-red-500');
+          setTimeout(() => element.classList.remove('border-red-500'), 3000);
+        }
+        setError(`${field.label} is required.`);
+        return;
+      }
+    }
+
+    // File validation
+    const requiredFiles = [
+      { key: 'nid_front', label: 'NID Front' },
+      { key: 'nid_back', label: 'NID Back' },
+      { key: 'passport_photos', label: 'Passport Photos' },
+      { key: 'guarantor_nid_photos', label: 'Guarantor NID Photos' }
+    ];
+
+    for (const fileField of requiredFiles) {
+      if (!files[fileField.key as keyof typeof files].id) {
+        setError(`${fileField.label} is required.`);
+        return;
+      }
+    }
+
     setLoading(true);
     setError(null);
 
@@ -354,7 +398,7 @@ export default function HigherSaleModal({
               <label className="cursor-pointer">
                 <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all">
                   {files.nid_front.uploading ? (
-                    <div className="animate-spin h-6 w-6 border-2 border-[#0081FF] border-t-transparent rounded-full"></div>
+                    <Skeleton className="h-6 w-6 rounded-full" />
                   ) : (
                     <FaCloudUploadAlt className="h-6 w-6 text-[#0081FF]" />
                   )}
@@ -373,7 +417,7 @@ export default function HigherSaleModal({
               <label className="cursor-pointer">
                 <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all">
                   {files.nid_back.uploading ? (
-                    <div className="animate-spin h-6 w-6 border-2 border-[#0081FF] border-t-transparent rounded-full"></div>
+                    <Skeleton className="h-6 w-6 rounded-full" />
                   ) : (
                     <FaCloudUploadAlt className="h-6 w-6 text-[#0081FF]" />
                   )}
@@ -392,7 +436,7 @@ export default function HigherSaleModal({
               <label className="cursor-pointer">
                 <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all">
                   {files.passport_photos.uploading ? (
-                    <div className="animate-spin h-6 w-6 border-2 border-[#0081FF] border-t-transparent rounded-full"></div>
+                    <Skeleton className="h-6 w-6 rounded-full" />
                   ) : (
                     <FaCloudUploadAlt className="h-6 w-6 text-[#0081FF]" />
                   )}
@@ -411,7 +455,7 @@ export default function HigherSaleModal({
               <label className="cursor-pointer">
                 <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all">
                   {files.guarantor_nid_photos.uploading ? (
-                    <div className="animate-spin h-6 w-6 border-2 border-[#0081FF] border-t-transparent rounded-full"></div>
+                    <Skeleton className="h-6 w-6 rounded-full" />
                   ) : (
                     <FaCloudUploadAlt className="h-6 w-6 text-[#0081FF]" />
                   )}
@@ -449,7 +493,7 @@ export default function HigherSaleModal({
             >
               {loading ? (
                 <>
-                  <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                  <Skeleton className="h-4 w-4 rounded-full" />
                   Submitting...
                 </>
               ) : (

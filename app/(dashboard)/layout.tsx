@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import DashboardSidebar from "./_components/DashboardSidebar";
 import { useAppSelector } from "@/store/hooks";
 import { useRouter } from "next/navigation";
+import Skeleton from "@/components/common/Skeleton";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -28,7 +29,18 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   }
 
   if (!isAuthenticated) {
-    return <div className="flex items-center justify-center min-h-[600px]">Redirecting to login...</div>;
+    return (
+      <div className="mx-auto max-w-[1440px] px-4 py-16 space-y-8 animate-in fade-in duration-500">
+        <Skeleton className="h-24 w-full rounded-2xl" />
+        <div className="grid grid-cols-1 lg:grid-cols-[25%_71%] gap-[2%]">
+          <Skeleton className="h-96 w-full rounded-2xl" />
+          <div className="space-y-6">
+            <Skeleton className="h-32 w-full rounded-2xl" />
+            <Skeleton className="h-[400px] w-full rounded-2xl" />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

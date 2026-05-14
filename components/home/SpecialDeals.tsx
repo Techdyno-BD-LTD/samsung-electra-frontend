@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import ProductCard from "@/components/common/ProductCard";
 import { formatCurrency } from "@/lib/currencyUtils";
+import Skeleton from "@/components/common/Skeleton";
 
 type FlashDealListItem = {
   id: number;
@@ -142,7 +143,11 @@ export default function SpecialDeals() {
   }, [flashDeal]);
 
   if (loading) {
-    return <div className="h-[400px] w-full animate-pulse bg-gray-100 rounded-xl"></div>;
+    return (
+      <section className="mx-auto w-full">
+        <Skeleton className="h-[400px] w-full rounded-3xl" />
+      </section>
+    );
   }
 
   if (!flashDeal) {

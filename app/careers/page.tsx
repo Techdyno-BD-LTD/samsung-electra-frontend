@@ -7,6 +7,7 @@ import JobCard from './_components/JobCard';
 import ApplyModal from './_components/ApplyModal';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { showToast } from '@/store/features/toast/toastSlice';
+import Skeleton from "@/components/common/Skeleton";
 
 interface Job {
   id: string;
@@ -62,8 +63,16 @@ export default function CareersPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="mx-auto px-4 lg:px-8 py-20 space-y-12 animate-in fade-in duration-500">
+        <div className="space-y-4">
+          <Skeleton className="h-10 w-1/4 rounded-xl" />
+        </div>
+        <Skeleton className="h-64 w-full rounded-[2.5rem]" />
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-32 w-full rounded-2xl" />
+          ))}
+        </div>
       </div>
     );
   }

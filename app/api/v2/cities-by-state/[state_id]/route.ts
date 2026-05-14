@@ -11,7 +11,7 @@ export async function GET(
         const apiBaseUrl = process.env.API_BASE_URL || "http://localhost:5000";
         const systemKey = process.env.API_SYSTEM_KEY || "";
         
-        const response = await fetch(`${apiBaseUrl}/api/v2/cities-by-state/${stateId}`, {
+        const response = await fetch(`${apiBaseUrl}/api/v2/areas-by-city/${stateId}`, {
             headers: {
                 "x-system-key": systemKey,
             },

@@ -1,4 +1,5 @@
 import React from "react";
+import Skeleton from "@/components/common/Skeleton";
 
 const DashboardPage = () => {
   return (
@@ -9,9 +10,9 @@ const DashboardPage = () => {
       </p>
       <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full px-4">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="p-6 border border-slate-100 rounded-xl bg-slate-50 animate-pulse">
-            <div className="h-4 bg-slate-200 rounded w-3/4 mb-4"></div>
-            <div className="h-4 bg-slate-200 rounded w-1/2"></div>
+          <div key={i} className="p-6 border border-slate-100 rounded-xl bg-slate-50">
+            <Skeleton className="h-4 w-3/4 mb-4 rounded" />
+            <Skeleton className="h-4 w-1/2 rounded" />
           </div>
         ))}
       </div>

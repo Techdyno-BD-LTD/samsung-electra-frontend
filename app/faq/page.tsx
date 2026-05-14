@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { FaPlus, FaMinus, FaWhatsapp } from "react-icons/fa";
+import Skeleton from "@/components/common/Skeleton";
 
 
 export const dynamic = 'force-dynamic';
@@ -53,8 +54,20 @@ export default function FaqPage() {
 
   if (loading && !data) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+      <div className="mx-auto w-full py-12 space-y-8 animate-in fade-in duration-500 px-4">
+        <Skeleton className="h-12 w-1/3 rounded-xl" />
+        <div className="flex flex-col lg:flex-row gap-8">
+          <div className="w-full lg:w-1/3 space-y-4">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="h-16 w-full rounded-xl" />
+            ))}
+          </div>
+          <div className="w-full lg:w-2/3 space-y-4">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <Skeleton key={i} className="h-14 w-full rounded-xl" />
+            ))}
+          </div>
+        </div>
       </div>
     );
   }

@@ -12,6 +12,7 @@ type MobileProductGalleryProps = {
   images?: string[];
   title?: string;
   warrantyBadgeImage?: string;
+  onImageClick?: (index: number) => void;
 };
 
 export default function MobileProductGallery({
@@ -19,6 +20,7 @@ export default function MobileProductGallery({
   images = [],
   title = "Product",
   warrantyBadgeImage = "/images/warrantybadge.png",
+  onImageClick,
 }: MobileProductGalleryProps) {
   const galleryImages = useMemo(
     () => {
@@ -86,8 +88,9 @@ export default function MobileProductGallery({
         alt={`${productTitle} image ${activeIndex + 1}`}
         width={520}
         height={520}
-        className="mx-auto h-[220px] w-full object-contain"
+        className="mx-auto h-[220px] w-full object-contain cursor-pointer"
         priority
+        onClick={() => onImageClick?.(activeIndex)}
       />
 
       {galleryImages.length > 1 && (

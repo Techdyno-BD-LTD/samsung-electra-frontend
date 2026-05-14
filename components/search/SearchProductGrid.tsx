@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { HiOutlineSquares2X2, HiOutlineBars3 } from "react-icons/hi2";
 import ProductCard from "@/components/common/ProductCard";
 import MobileFilterDrawer from "@/components/category/MobileFilterDrawer";
+import Skeleton from "@/components/common/Skeleton";
 
 type SearchProductGridProps = {
   query: string;
@@ -101,8 +102,24 @@ export default function SearchProductGrid({ query, categoryId, filteringAttribut
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="flex flex-col gap-6">
+        <div className="hidden lg:flex items-center justify-between rounded-md border border-slate-200 bg-[#f4f4f4] px-4 py-2.5">
+          <Skeleton className="h-5 w-48" />
+          <Skeleton className="h-9 w-40 rounded-md" />
+        </div>
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4">
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+            <div key={i} className="space-y-3 p-4 border border-slate-100 rounded-xl">
+              <Skeleton className="aspect-square w-full rounded-lg" />
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
+              <div className="flex justify-between pt-2">
+                <Skeleton className="h-5 w-20" />
+                <Skeleton className="h-5 w-12" />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

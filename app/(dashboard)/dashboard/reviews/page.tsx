@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FiStar, FiMessageCircle, FiMoreVertical, FiCheckCircle, FiLoader, FiSave, FiChevronDown } from "react-icons/fi";
 import { useAppSelector } from "@/store/hooks";
+import Skeleton from "@/components/common/Skeleton";
 
 interface Review {
   id: number;
@@ -138,9 +139,13 @@ const ReviewsPage = () => {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-2xl p-12 shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-black/5 flex flex-col items-center justify-center text-center">
-        <FiLoader className="text-4xl text-blue-500 animate-spin mb-4" />
-        <p className="text-slate-600 font-medium">Loading reviews...</p>
+      <div className="flex flex-col gap-6">
+        <Skeleton className="h-40 w-full rounded-2xl" />
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-32 w-full rounded-2xl" />
+          ))}
+        </div>
       </div>
     );
   }
@@ -365,7 +370,7 @@ const ReviewsPage = () => {
                 disabled={submitting}
                 className="w-full h-14 bg-[#2b7fe8] text-white rounded-2xl font-bold transition-all hover:bg-[#1a6ed9] hover:shadow-lg hover:shadow-blue-500/20 disabled:opacity-50 flex items-center justify-center gap-2 mt-4"
               >
-                {submitting ? <FiLoader className="animate-spin" /> : <FiSave />}
+                {submitting ? <Skeleton className="w-4 h-4 rounded-full" /> : <FiSave />}
                 Submit Review
               </button>
             </form>

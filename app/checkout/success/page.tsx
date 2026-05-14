@@ -6,6 +6,7 @@ import { useAppSelector } from '@/store/hooks';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { formatCurrency } from '@/lib/currencyUtils';
 import { LastOrder, OrderItem } from '@/store/features/order/orderSlice';
+import Skeleton from "@/components/common/Skeleton";
 
 const SuccessContent = () => {
     const router = useRouter();
@@ -63,8 +64,14 @@ const SuccessContent = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#1877f2]"></div>
+            <div className="max-w-7xl mx-auto px-4 py-20 space-y-8 animate-in fade-in duration-500">
+                <div className="flex flex-col items-center space-y-4">
+                    <Skeleton className="h-20 w-20 rounded-full" />
+                    <Skeleton className="h-8 w-1/2 rounded-xl" />
+                    <Skeleton className="h-4 w-1/3 rounded-lg" />
+                </div>
+                <Skeleton className="h-32 w-full rounded-2xl" />
+                <Skeleton className="h-96 w-full rounded-2xl" />
             </div>
         );
     }
@@ -210,8 +217,12 @@ const SuccessContent = () => {
 const Success = () => {
     return (
         <Suspense fallback={
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#1877f2]"></div>
+            <div className="max-w-7xl mx-auto px-4 py-20 space-y-8">
+                <div className="flex flex-col items-center space-y-4">
+                    <Skeleton className="h-20 w-20 rounded-full" />
+                    <Skeleton className="h-8 w-1/2 rounded-xl" />
+                </div>
+                <Skeleton className="h-32 w-full rounded-2xl" />
             </div>
         }>
             <SuccessContent />

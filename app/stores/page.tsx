@@ -13,6 +13,7 @@ import {
 } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa6";
 import Image from "next/image";
+import Skeleton from "@/components/common/Skeleton";
 
 type StoreHour = {
   day: string;
@@ -146,8 +147,17 @@ export default function StoresPage() {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#2b7fe8] border-t-transparent"></div>
+      <div className="space-y-12 animate-in fade-in duration-500">
+        <Skeleton className="h-40 w-full rounded-xl" />
+        <div className="grid lg:grid-cols-[0.95fr_1.05fr] gap-6">
+          <div className="space-y-4">
+            <Skeleton className="h-10 w-full rounded-lg" />
+            {[1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-40 w-full rounded-2xl" />
+            ))}
+          </div>
+          <Skeleton className="h-[600px] w-full rounded-2xl" />
+        </div>
       </div>
     );
   }

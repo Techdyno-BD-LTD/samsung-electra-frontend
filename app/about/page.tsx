@@ -12,8 +12,54 @@ import NetworkSection from './NetworkSection';
 import SisterConcerns from './SisterConcerns';
 import InquirySection from './InquirySection';
 import ContactBanner from './ContactBanner';
+import { Metadata } from 'next';
+import { getGlobalSettings } from '@/lib/metadata';
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata(): Promise<Metadata> {
+    const baseUrl = process.env.API_BASE_URL || 'http://localhost:5000';
+    const systemKey = process.env.API_SYSTEM_KEY || '';
+    
+    try {
+        const [pageRes, settings] = await Promise.all([
+            fetch(`${baseUrl}/api/v2/pages/about`, {
+                headers: { 'x-system-key': systemKey },
+                next: { revalidate: 3600 }
+            }),
+            getGlobalSettings()
+        ]);
+        const json = await pageRes.json();
+        const page = json.data?.[0];
+
+        const findSetting = (type: string) => settings.find((s: any) => s.type === type)?.value;
+        const globalMetaImage = findSetting("meta_image");
+        const siteTitle = findSetting("meta_title") || "Samsung Electra";
+
+        const title = page?.meta_title || "About Us";
+        const description = page?.meta_description || `Learn more about ${siteTitle} and our mission.`;
+        const image = page?.meta_image || globalMetaImage || "/og/default.png";
+        const fullTitle = `${title} | ${siteTitle}`;
+
+        return {
+            title: fullTitle,
+            description: description,
+            openGraph: {
+                title: fullTitle,
+                description: description,
+                images: [image],
+            },
+            twitter: {
+                card: "summary_large_image",
+                title: fullTitle,
+                description: description,
+                images: [image],
+            }
+        };
+    } catch (e) {
+        return { title: "About Us | Samsung Electra" };
+    }
+}
 
 async function getAboutData() {
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
@@ -176,5 +222,3 @@ const About = async () => {
 };
 
 export default About;
-
-

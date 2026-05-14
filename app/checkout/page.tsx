@@ -8,11 +8,14 @@ import { setLastOrder } from '@/store/features/order/orderSlice';
 import { formatCurrency, parseCurrency } from "@/lib/currencyUtils";
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import Skeleton from "@/components/common/Skeleton";
 
 interface Carrier {
     id: number;
     name: string;
     cost: number;
+    inside_dhaka_cost: number;
+    outside_dhaka_cost: number;
     transit_time: string;
     is_pickup?: boolean;
 }
@@ -37,7 +40,7 @@ const Checkout = () => {
     const router = useRouter();
     const cartItems = useAppSelector((state) => state.cart.items);
     const { user, token, isAuthenticated } = useAppSelector((state) => state.auth);
-    const [addresses, setAddresses] = useState<{ id: number; address: string; phone: string; postal_code: string; name: string; email: string }[]>([]);
+    const [addresses, setAddresses] = useState<{ id: number; address: string; phone: string; postal_code: string; name: string; email: string; country_id?: number; country_name?: string; state_name?: string; city_name?: string }[]>([]);
     const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
     const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
     const [addressForm, setAddressForm] = useState({
@@ -48,11 +51,12 @@ const Checkout = () => {
         postal_code: '',
         country_id: '',
         state_id: '',
-        area: '',
+        city_id: '',
     });
 
     const [districts, setDistricts] = useState<{ id: number; name: string }[]>([]);
     const [thanas, setThanas] = useState<{ id: number; name: string }[]>([]);
+    const [cities, setCities] = useState<{ id: number; name: string }[]>([]);
 
     const [paymentMethod, setPaymentMethod] = useState('');
     const [carriers, setCarriers] = useState<Carrier[]>([]);
@@ -111,14 +115,25 @@ const Checkout = () => {
         }
     }, []);
 
-    const fetchThanas = async (districtId: string) => {
+    const fetchCities = async (districtId: string) => {
         if (!districtId) return;
         try {
-            const response = await fetch(`/api/v2/thanas-by-district/${districtId}`);
+            const response = await fetch(`/api/v2/cities-by-district/${districtId}`);
             const payload = await response.json();
             if (payload.success) setThanas(payload.data);
         } catch (error) {
-            console.error("Failed to fetch thanas", error);
+            console.error("Failed to fetch cities", error);
+        }
+    };
+
+    const fetchAreas = async (cityId: string) => {
+        if (!cityId) return;
+        try {
+            const response = await fetch(`/api/v2/areas-by-city/${cityId}`);
+            const payload = await response.json();
+            if (payload.success) setCities(payload.data);
+        } catch (error) {
+            console.error("Failed to fetch areas", error);
         }
     };
 
@@ -242,6 +257,9 @@ const Checkout = () => {
 
     const handleAddAddress = async (e: React.FormEvent) => {
         e.preventDefault();
+        const payload_body: any = { ...addressForm };
+        if (!payload_body.city_id) delete payload_body.city_id;
+
         try {
             const response = await fetch("/api/v2/user/shipping/create", {
                 method: "POST",
@@ -249,7 +267,7 @@ const Checkout = () => {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`
                 },
-                body: JSON.stringify(addressForm)
+                body: JSON.stringify(payload_body)
             });
             const payload = await response.json();
             if (payload.success) {
@@ -266,6 +284,7 @@ const Checkout = () => {
                     postal_code: '',
                     country_id: '',
                     state_id: '',
+                    city_id: '',
                     area: '',
                 });
             }
@@ -275,7 +294,7 @@ const Checkout = () => {
     };
 
     const selectedAddress = useMemo(() =>
-        (addresses as { id: number; address: string; phone: string; postal_code: string; name: string; email: string }[]).find(a => a.id === selectedAddressId),
+        (addresses as { id: number; address: string; phone: string; postal_code: string; name: string; email: string; country_id?: number; country_name?: string; state_name?: string; city_name?: string }[]).find(a => a.id === selectedAddressId),
         [addresses, selectedAddressId]);
 
     const filteredPickupPoints = useMemo(() => {
@@ -370,7 +389,18 @@ const Checkout = () => {
         const tax = 0; // Assuming tax is free/0 as per UI
 
         const carrier = carriers.find(c => c.id === selectedCarrierId);
-        const delivery = carrier ? (carrier.cost || 0) : 0;
+        let delivery = 0;
+        if (carrier) {
+            // Logic for Inside/Outside Dhaka based on District ID 1
+            const isInsideDhaka = Number((selectedAddress as any)?.country_id) === 1;
+            
+            if (isInsideDhaka) {
+                delivery = carrier.inside_dhaka_cost > 0 ? carrier.inside_dhaka_cost : (carrier.cost || 0);
+            } else {
+                delivery = carrier.outside_dhaka_cost > 0 ? carrier.outside_dhaka_cost : (carrier.cost || 0);
+            }
+        }
+        
         const total = (subtotal + tax + delivery) - couponDiscount;
 
         return {
@@ -383,7 +413,7 @@ const Checkout = () => {
             couponDiscount,
             savePercent: originalSubtotal > 0 ? Math.round((savings / originalSubtotal) * 100) : 0
         };
-    }, [cartItems, carriers, selectedCarrierId, couponDiscount]);
+    }, [cartItems, carriers, selectedCarrierId, couponDiscount, selectedAddress]);
 
     const handlePlaceOrder = async () => {
         if (cartItems.length === 0) {
@@ -501,8 +531,17 @@ const Checkout = () => {
 
     if (!mounted) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#1877f2]"></div>
+            <div className="mx-auto w-full py-12 px-4 space-y-12 animate-in fade-in duration-500">
+                <Skeleton className="h-10 w-1/4 rounded-xl" />
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                    <div className="lg:col-span-3 space-y-8">
+                        <Skeleton className="h-40 w-full rounded-2xl" />
+                        <Skeleton className="h-64 w-full rounded-2xl" />
+                    </div>
+                    <div className="lg:col-span-2">
+                        <Skeleton className="h-96 w-full rounded-2xl" />
+                    </div>
+                </div>
             </div>
         );
     }
@@ -550,9 +589,11 @@ const Checkout = () => {
                                                 <div className="space-y-1 text-[12px] lg:text-[15px] text-gray-700 max-w-3xl leading-relaxed">
                                                     {selectedAddress ? (
                                                         <>
-                                                            <p>{(selectedAddress as { address: string }).address}, {(selectedAddress as { postal_code: string }).postal_code}</p>
-                                                            <p>Phone: {(selectedAddress as { phone: string }).phone}</p>
-                                                            <p>Email: {((selectedAddress as unknown) as { email?: string })?.email || user?.email}</p>
+                                                            <p>
+                                                                {(selectedAddress as any).address}, {(selectedAddress as any).city_name ? `${(selectedAddress as any).city_name}, ` : ''}{(selectedAddress as any).state_name}, {(selectedAddress as any).country_name}, {(selectedAddress as any).postal_code}
+                                                            </p>
+                                                            <p>Phone: {(selectedAddress as any).phone}</p>
+                                                            <p>Email: {(selectedAddress as any).email || user?.email}</p>
                                                         </>
                                                     ) : (
                                                         <p className="text-orange-500">Please select or add a shipping address</p>
@@ -609,7 +650,14 @@ const Checkout = () => {
                                                 <div className="flex justify-between items-center">
                                                     <span className="font-semibold text-[18px] lg:text-[22px] text-gray-800 group-hover:text-[#1877f2] transition-colors">{carrier.name}</span>
                                                     <span className={`px-4 py-1 rounded-full text-xs font-bold ${carrier.cost === 0 ? 'bg-[#1E5AA4] text-white' : 'text-gray-900'}`}>
-                                                        {carrier.cost === 0 ? 'Free' : `৳${carrier.cost}`}
+                                                        {(() => {
+                                                            if (carrier.cost === 0) return 'Free';
+                                                            const isInsideDhaka = Number((selectedAddress as any)?.country_id) === 1;
+                                                            const cost = isInsideDhaka 
+                                                                ? (carrier.inside_dhaka_cost > 0 ? carrier.inside_dhaka_cost : carrier.cost)
+                                                                : (carrier.outside_dhaka_cost > 0 ? carrier.outside_dhaka_cost : carrier.cost);
+                                                            return formatCurrency(cost);
+                                                        })()}
                                                     </span>
                                                 </div>
                                                 {!carrier.is_pickup && <p className="text-[12px] lg:text-[14px] text-gray-500 mt-1">Estimated delivery: {carrier.transit_time}</p>}
@@ -846,14 +894,6 @@ const Checkout = () => {
                                             {formatCurrency(totals.savings)}
                                         </span>
                                     </div>
-                                    {/* <div className="flex justify-between">
-                                        <span className="text-gray-600">Store Pickup</span>
-                                        <span className="font-bold text-gray-900">Free</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-600">TAX</span>
-                                        <span className="font-bold text-gray-900">Free</span>
-                                    </div> */}
                                     <div className="flex justify-between">
                                         <span className="text-gray-600">Delivery</span>
                                         <span className="font-bold text-gray-900">{totals.delivery > 0 ? formatCurrency(totals.delivery) : 'Free'}</span>
@@ -984,10 +1024,6 @@ const Checkout = () => {
                                         <span className="font-bold text-black">Free</span>
                                     </div>
                                     <div className="flex justify-between items-center">
-                                        <span>TAX</span>
-                                        <span className="font-bold text-black">Free</span>
-                                    </div>
-                                    <div className="flex justify-between items-center">
                                         <span>Delivery</span>
                                         <span className="font-bold text-black">{totals.delivery > 0 ? formatCurrency(totals.delivery) : 'Free'}</span>
                                     </div>
@@ -1089,8 +1125,8 @@ const Checkout = () => {
                                                     value={addressForm.country_id}
                                                     onChange={(e) => {
                                                         const val = e.target.value;
-                                                        setAddressForm({ ...addressForm, country_id: val, state_id: '' });
-                                                        fetchThanas(val);
+                                                        setAddressForm({ ...addressForm, country_id: val, state_id: '', city_id: '' });
+                                                        fetchCities(val);
                                                     }}
                                                     className="w-full bg-white border border-gray-200 rounded-xl px-4 h-12 text-sm focus:ring-2 focus:ring-[#1877f2]/20 focus:border-[#1877f2] transition-all outline-none appearance-none"
                                                 >
@@ -1103,19 +1139,20 @@ const Checkout = () => {
                                             </div>
                                         </div>
                                         <div>
-                                            <label className="block text-[13px] font-semibold text-gray-600 mb-1.5">Thana / Upazilla<span className="text-red-500">*</span></label>
+                                            <label className="block text-[13px] font-semibold text-gray-600 mb-1.5">City<span className="text-red-500">*</span></label>
                                             <div className="relative">
                                                 <select
                                                     required
                                                     value={addressForm.state_id}
                                                     onChange={(e) => {
                                                         const val = e.target.value;
-                                                        setAddressForm({ ...addressForm, state_id: val });
+                                                        setAddressForm({ ...addressForm, state_id: val, city_id: '' });
+                                                        fetchAreas(val);
                                                     }}
                                                     disabled={!addressForm.country_id}
                                                     className="w-full bg-white border border-gray-200 rounded-xl px-4 h-12 text-sm focus:ring-2 focus:ring-[#1877f2]/20 focus:border-[#1877f2] transition-all outline-none appearance-none disabled:bg-gray-50 disabled:cursor-not-allowed"
                                                 >
-                                                    <option value="">Select Thana</option>
+                                                    <option value="">Select City</option>
                                                     {thanas.map((t: { id: number; name: string }) => (
                                                         <option key={t.id} value={t.id}>{t.name}</option>
                                                     ))}
@@ -1125,16 +1162,20 @@ const Checkout = () => {
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-[13px] font-semibold text-gray-600 mb-1.5">Area<span className="text-red-500">*</span></label>
+                                        <label className="block text-[13px] font-semibold text-gray-600 mb-1.5">Thana / Area (Optional)</label>
                                         <div className="relative">
-                                            <input
-                                                type="text"
-                                                required
-                                                value={addressForm.area}
-                                                onChange={(e) => setAddressForm({ ...addressForm, area: e.target.value })}
-                                                placeholder="Enter area"
-                                                className="w-full bg-white border border-gray-200 rounded-xl px-4 h-12 text-sm focus:ring-2 focus:ring-[#1877f2]/20 focus:border-[#1877f2] transition-all outline-none"
-                                            />
+                                            <select
+                                                value={addressForm.city_id}
+                                                onChange={(e) => setAddressForm({ ...addressForm, city_id: e.target.value })}
+                                                disabled={!addressForm.state_id}
+                                                className="w-full bg-white border border-gray-200 rounded-xl px-4 h-12 text-sm focus:ring-2 focus:ring-[#1877f2]/20 focus:border-[#1877f2] transition-all outline-none appearance-none disabled:bg-gray-50 disabled:cursor-not-allowed"
+                                            >
+                                                <option value="">Select Thana / Area</option>
+                                                {cities.map((c: { id: number; name: string }) => (
+                                                    <option key={c.id} value={c.id}>{c.name}</option>
+                                                ))}
+                                            </select>
+                                            <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                                         </div>
                                     </div>
                                     <div>

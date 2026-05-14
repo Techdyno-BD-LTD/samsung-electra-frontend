@@ -19,6 +19,7 @@ import { formatCurrency } from "@/lib/currencyUtils";
 import { useAppSelector } from "@/store/hooks";
 import CancellationModal from "./components/CancellationModal";
 import { createPortal } from "react-dom";
+import Skeleton from "@/components/common/Skeleton";
 
 interface Order {
   id: number;
@@ -180,8 +181,13 @@ const OrdersPage = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="w-10 h-10 border-4 border-[#2b7fe8]/20 border-t-[#2b7fe8] rounded-full animate-spin"></div>
+      <div className="space-y-6">
+        <Skeleton className="h-20 w-full rounded-2xl" />
+        <div className="space-y-4">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <Skeleton key={i} className="h-24 w-full rounded-2xl" />
+          ))}
+        </div>
       </div>
     );
   }
@@ -377,7 +383,10 @@ const OrdersPage = () => {
                                     try {
                                       const addr = JSON.parse(order.shipping_address || '{}');
                                       if (typeof addr === 'object' && addr !== null) {
-                                        return `${addr.name || ''} ${addr.address || ''}, ${addr.city || ''}, ${addr.postal_code || ''} ${addr.phone || ''}`;
+                                        const cityPart = addr.city_name ? `${addr.city_name}, ` : '';
+                                        const statePart = addr.state_name || addr.city || '';
+                                        const countryPart = addr.country_name || addr.country || '';
+                                        return `${addr.name || ''} - ${addr.address || ''}, ${cityPart}${statePart}, ${countryPart}, ${addr.postal_code || ''} (${addr.phone || ''})`;
                                       }
                                       return order.shipping_address;
                                     } catch {
@@ -393,8 +402,9 @@ const OrdersPage = () => {
                             <h3 className="text-lg font-semibold text-slate-800 mb-6 border-b border-slate-100 pb-2">Product Details</h3>
 
                             {itemsLoading ? (
-                              <div className="flex justify-center py-8">
-                                <div className="w-8 h-8 border-3 border-blue-100 border-t-[#2b7fe8] rounded-full animate-spin"></div>
+                              <div className="space-y-4 py-4">
+                                <Skeleton className="h-20 w-full rounded-xl" />
+                                <Skeleton className="h-20 w-full rounded-xl" />
                               </div>
                             ) : (
                               <div className="space-y-8">

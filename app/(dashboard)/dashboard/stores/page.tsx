@@ -12,6 +12,7 @@ import {
   FiMapPin 
 } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa6";
+import Skeleton from "@/components/common/Skeleton";
 
 type StoreHour = {
   day: string;
@@ -135,8 +136,13 @@ const StoreLocationsPage = () => {
 
   if (loading) {
     return (
-      <div className="flex h-[400px] items-center justify-center bg-white rounded-2xl shadow-sm border border-black/5">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#2b7fe8] border-t-transparent"></div>
+      <div className="space-y-6">
+        <Skeleton className="h-20 w-full rounded-2xl" />
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-48 w-full rounded-2xl" />
+          ))}
+        </div>
       </div>
     );
   }
@@ -291,10 +297,7 @@ const StoreLocationsPage = () => {
 
            {/* More Loading Footer */}
            <div className="flex justify-center pt-4">
-              <button className="flex items-center gap-2 text-slate-500 text-sm font-semibold hover:text-slate-800 transition-colors">
-                 <div className="w-5 h-5 border-2 border-slate-300 border-t-slate-800 rounded-full animate-spin"></div>
-                 <span>More Loading</span>
-              </button>
+              <Skeleton className="h-10 w-40 rounded-full" />
            </div>
         </div>
       </div>

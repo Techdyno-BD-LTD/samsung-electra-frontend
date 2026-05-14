@@ -71,6 +71,32 @@ export default function ExchangeModal({ isOpen, onClose }: ExchangeModalProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    const requiredFields = [
+      { key: 'full_name', label: 'Full Name' },
+      { key: 'mobile_number', label: 'Mobile Number' },
+      { key: 'email_address', label: 'E-mail Address' },
+      { key: 'delivery_address', label: 'Delivery Address' },
+      { key: 'brands', label: 'Brands' },
+      { key: 'product_name', label: 'Product Name' },
+      { key: 'showroom_id', label: 'Showroom' },
+      { key: 'message', label: 'Message' }
+    ];
+
+    for (const field of requiredFields) {
+      if (!formData[field.key as keyof typeof formData]) {
+        const element = document.getElementsByName(field.key)[0] as HTMLElement;
+        if (element) {
+          element.focus();
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          element.classList.add('border-red-500');
+          setTimeout(() => element.classList.remove('border-red-500'), 3000);
+        }
+        alert(`${field.label} is required.`);
+        return;
+      }
+    }
+
     setLoading(true);
 
     try {
@@ -160,9 +186,9 @@ export default function ExchangeModal({ isOpen, onClose }: ExchangeModalProps) {
               <p className="text-sm text-slate-600">Our team will contact you shortly.</p>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-3">
+            <form onSubmit={handleSubmit} className="space-y-3" noValidate>
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-slate-700 uppercase tracking-wider ml-0.5">Full Name</label>
+                <label className="text-[10px] font-bold text-slate-700 uppercase tracking-wider ml-0.5">Full Name<span className="text-red-500">*</span></label>
                 <input
                   required
                   type="text"

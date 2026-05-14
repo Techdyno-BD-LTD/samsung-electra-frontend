@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import ProductCard from "@/components/common/ProductCard";
+import Skeleton from "@/components/common/Skeleton";
 import { Product } from "@/types/product";
 
 type ProductBadge = "New" | "Hot" | "Sold Out" | "Special" | "";
@@ -154,7 +155,7 @@ export default function CategoryWiseProducts({
 				>
 					{loading ? (
 						<div className="flex w-full items-center justify-center py-20">
-							<div className="h-10 w-10 animate-spin rounded-full border-4 border-[#0054A6] border-t-transparent" />
+							<Skeleton className="h-64 w-full rounded-2xl" />
 						</div>
 					) : featuredProducts.length === 0 ? (
 						<div className="flex w-full items-center justify-center py-20 text-slate-500">

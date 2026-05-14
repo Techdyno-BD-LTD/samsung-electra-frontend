@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import ProductCard from "@/components/common/ProductCard";
 import { Product } from "@/types/product";
+import Skeleton from "@/components/common/Skeleton";
 
 export default function BestSellingProducts() {
   const [dynamicProducts, setDynamicProducts] = useState<Product[]>([]);
@@ -117,8 +118,8 @@ export default function BestSellingProducts() {
           className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         >
           {loading ? (
-            <div className="flex w-full items-center justify-center py-20">
-              <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#0054A6] border-t-transparent" />
+            <div className="flex h-[300px] w-full items-center justify-center">
+              <Skeleton className="h-full w-full rounded-xl" />
             </div>
           ) : dynamicProducts.length === 0 ? (
             <div className="flex w-full items-center justify-center py-20 text-slate-500">

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
+import Skeleton from "@/components/common/Skeleton";
 
 type Category = {
   id: number;
@@ -60,8 +61,8 @@ export default function OurBrands() {
 
   if (loading) {
     return (
-      <div className="flex w-full items-center justify-center py-20">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#0054A6] border-t-transparent" />
+      <div className="flex w-full items-center justify-center py-10">
+        <Skeleton className="h-32 w-full rounded-xl" />
       </div>
     );
   }

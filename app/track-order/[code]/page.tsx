@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import OrderTimeline from '../_components/OrderTimeline';
 import OrderDetails from '../_components/OrderDetails';
 import Link from 'next/link';
+import Skeleton from "@/components/common/Skeleton";
 
 type TimelineStep = {
   label: string;
@@ -67,9 +68,13 @@ function OrderTrackDetailsContent({ params }: { params: { code: string } }) {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-40">
-        <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p className="text-slate-500 font-medium">Fetching order status...</p>
+      <div className="py-20 space-y-12">
+        <div className="space-y-4">
+          <Skeleton className="h-12 w-1/3 rounded-xl" />
+          <Skeleton className="h-6 w-1/4 rounded-lg" />
+        </div>
+        <Skeleton className="h-64 w-full rounded-[2.5rem]" />
+        <Skeleton className="h-[400px] w-full rounded-3xl" />
       </div>
     );
   }
@@ -120,8 +125,9 @@ function OrderTrackDetailsContent({ params }: { params: { code: string } }) {
 export default function OrderTrackDetailsPage({ params }: { params: { code: string } }) {
     return (
         <Suspense fallback={
-            <div className="flex flex-col items-center justify-center py-40">
-                <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+            <div className="py-20 space-y-12">
+                <Skeleton className="h-12 w-1/3 rounded-xl" />
+                <Skeleton className="h-64 w-full rounded-[2.5rem]" />
             </div>
         }>
             <OrderTrackDetailsContent params={params} />

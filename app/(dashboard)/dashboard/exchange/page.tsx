@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { FiShoppingBag, FiLoader, FiX } from "react-icons/fi";
+import Skeleton from "@/components/common/Skeleton";
 
 export const forceDynamic = "force-dynamic";
 
@@ -43,9 +44,10 @@ const ExchangeProductPage = () => {
           <h2 className="text-xl lg:text-xl font-semibold text-slate-800 mb-6">Select below what you want to exchange.</h2>
           
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-20 gap-4">
-              <FiLoader className="text-4xl text-blue-500 animate-spin" />
-              <p className="text-slate-400 font-medium">Loading products...</p>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+              {[1, 2, 3, 4].map((i) => (
+                <Skeleton key={i} className="aspect-square w-full rounded-2xl" />
+              ))}
             </div>
           ) : products.length > 0 ? (
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">

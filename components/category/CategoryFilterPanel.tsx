@@ -91,10 +91,10 @@ export default function CategoryFilterPanel({ filteringAttributes = [] }: Catego
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
-  const toggleBrand = (name: string) => {
-    const next = selectedBrands.includes(name)
-      ? selectedBrands.filter((b) => b !== name)
-      : [...selectedBrands, name];
+  const toggleBrand = (slug: string) => {
+    const next = selectedBrands.includes(slug)
+      ? selectedBrands.filter((s) => s !== slug)
+      : [...selectedBrands, slug];
     setSelectedBrands(next);
     updateUrl({ brands: next.join(",") });
   };
@@ -150,7 +150,7 @@ export default function CategoryFilterPanel({ filteringAttributes = [] }: Catego
         <div className={`overflow-hidden transition-all duration-300 ${brandsOpen ? "mt-4 max-h-[400px] overflow-y-auto opacity-100 pr-2 custom-scrollbar" : "max-h-0 opacity-0"}`}>
           <ul className="flex flex-col gap-2.5">
             {brands.map((brand) => {
-              const checked = selectedBrands.includes(brand.name);
+              const checked = selectedBrands.includes(brand.slug);
               return (
                 <li key={brand.id}>
                   <label className="flex cursor-pointer items-center gap-2.5">
@@ -161,7 +161,7 @@ export default function CategoryFilterPanel({ filteringAttributes = [] }: Catego
                         </svg>
                       )}
                     </span>
-                    <input type="checkbox" className="sr-only" checked={checked} onChange={() => toggleBrand(brand.name)} />
+                    <input type="checkbox" className="sr-only" checked={checked} onChange={() => toggleBrand(brand.slug)} />
                     <span className="text-[16px] text-slate-600">{brand.name}</span>
                   </label>
                 </li>

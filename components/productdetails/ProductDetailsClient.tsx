@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { FaHeart, FaMinus, FaPlus, FaRegShareSquare, FaStar, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useEffect, useState, useMemo, useRef } from "react";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 
 import ProductDetailsTabs from "@/components/productdetails/ProductDetailsTabs";
@@ -18,6 +19,10 @@ import CartSuccessModal from "@/components/common/CartSuccessModal";
 import { addToWishlistAsync, removeFromWishlistAsync, WishlistItem } from "@/store/features/wishlist/wishlistSlice";
 import { showToast } from "@/store/features/toast/toastSlice";
 import HigherSaleModal from "@/components/productdetails/HigherSaleModal";
+import BankEmiModal from "@/components/productdetails/BankEmiModal";
+import ProductImageZoomModal from "@/components/productdetails/ProductImageZoomModal";
+import Skeleton from "@/components/common/Skeleton";
+
 
 export interface ProductData {
   id?: number;
@@ -80,6 +85,18 @@ export interface ProductData {
       amount?: number;
     }>;
   };
+  emi_plans?: Array<{
+    bank_id?: number;
+    bank_name?: string;
+    max_month?: number;
+    plans?: Array<{
+      months?: number;
+      interest_rate?: number;
+      product_price?: number;
+      effective_price?: number;
+      monthly_payable?: number;
+    }>;
+  }>;
   reviews?: {
     total?: number;
     average?: number;
@@ -145,7 +162,10 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isHigherSaleModalOpen, setIsHigherSaleModalOpen] = useState(false);
+  const [isBankEmiModalOpen, setIsBankEmiModalOpen] = useState(false);
+  const [isZoomModalOpen, setIsZoomModalOpen] = useState(false);
   const [quantity, setQuantity] = useState(1);
+
   const thumbnailContainerRef = useRef<HTMLDivElement>(null);
 
   const isWishlisted = useAppSelector((state) => state.wishlist.items.some((item) => item.id === slug));
@@ -168,18 +188,15 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
   
   const parseHtmlFeatures = (htmlContent?: string): string[] => {
     if (!htmlContent) return [];
-    if (typeof document === 'undefined') return [];
-    const parser = new DOMParser();
-    try {
-      const doc = parser.parseFromString(htmlContent, 'text/html');
-      const paragraphs = Array.from(doc.querySelectorAll('p'));
-      return paragraphs
-        .map(p => p.textContent?.trim() || '')
+    // Simple regex to extract text between <p> tags, working on both server and client
+    const matches = htmlContent.match(/<p[^>]*>(.*?)<\/p>/g);
+    if (matches) {
+      return matches
+        .map(m => m.replace(/<[^>]*>/g, '').trim()) // Remove tags
         .map(text => text.replace(/^[•\s]+/, '').trim())
         .filter(Boolean);
-    } catch {
-      return [];
     }
+    return [];
   };
 
   useEffect(() => {
@@ -236,6 +253,9 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
   const brandName = productData?.brand?.name || "Brand";
   const brandLogo = productData?.brand?.logo || "/images/samsung.png";
   const ratingCount = productData?.rating_count?.toString() || "0";
+  const categoryName = productData?.category_info?.category_name || 
+                    (typeof productData?.category === 'object' ? productData.category?.name : productData?.category) || 
+                    "Category";
   const model = productData?.model_number || "Model";
   const sku = productData?.variants?.[0]?.sku || "SKU";
   const price = productData?.main_price || "Price";
@@ -264,14 +284,31 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
   const exchangeLinkLabel = productData?.exchange?.link_label ? productData.exchange.link_label : "Available Showrooms";
   const madeInText = productData?.made_in_text ? productData.made_in_text : "Product information";
 
-  const categoryName = productData?.category_info?.category_name || 
-                       (typeof productData?.category === 'object' ? productData.category?.name : productData?.category) || 
-                       "Category";
+  const breadcrumbs = useMemo(() => {
+    const items = [{ label: "Home", href: "/" }];
+    
+    // Parent Category
+    if (productData?.category_info?.parent_category_name) {
+      items.push({
+        label: productData.category_info.parent_category_name,
+        href: `/category/${productData.category_info.parent_category_slug || '#'}`
+      });
+    }
+    
+    const catSlug = productData?.category_info?.category_slug || 
+                    (typeof productData?.category === 'object' ? productData.category?.slug : null);
+                    
+    items.push({
+      label: categoryName,
+      href: catSlug ? `/category/${catSlug}` : '#'
+    });
+    
+    // Last item (Product name or just "Product details")
+    items.push({ label: "Product details", href: null });
+    
+    return items;
+  }, [productData]);
 
-  const breadcrumbCategory = categoryName
-    .split(" ")
-    .map((word) => (word.charAt(0) || "").toUpperCase() + word.slice(1))
-    .join(" ");
   const flatOfferPercent = (discountLabel || "0%").toString().match(/\d+%/)?.[0] ?? "0%";
 
   const attributesForUi = (productData?.attributes ?? []).filter((attribute) => {
@@ -441,10 +478,42 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-gray-600">Loading product details...</p>
+      <div className="mx-auto max-w-[1440px] px-4 py-8 space-y-8 animate-in fade-in duration-500">
+        <div className="flex gap-2">
+          <Skeleton className="h-4 w-16" />
+          <Skeleton className="h-4 w-4" />
+          <Skeleton className="h-4 w-24" />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="space-y-4">
+            <Skeleton className="aspect-square w-full rounded-xl" />
+            <div className="flex gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <Skeleton key={i} className="h-20 w-20 rounded-lg" />
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <Skeleton className="h-8 w-3/4" />
+            <div className="flex gap-2">
+              <Skeleton className="h-5 w-24 rounded-full" />
+              <Skeleton className="h-5 w-32 rounded-full" />
+            </div>
+            <div className="space-y-3 pt-4">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-2/3" />
+            </div>
+            <div className="flex gap-4 pt-6">
+              <Skeleton className="h-14 w-full rounded-lg" />
+              <Skeleton className="h-14 w-16 rounded-lg" />
+            </div>
+            <div className="pt-8 space-y-4">
+              <Skeleton className="h-48 w-full rounded-xl" />
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -471,11 +540,20 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
           aria-label="Breadcrumb"
           className="mb-3 hidden lg:flex items-center gap-2 lg:text-sm text-[12px] leading-none text-slate-500 px-4 md:px-0"
         >
-          <span>Home</span>
-          <span className="text-slate-400">›</span>
-          <span>{breadcrumbCategory}</span>
-          <span className="text-slate-400">›</span>
-          <span className="text-slate-700">Product details</span>
+          {breadcrumbs.map((item, index) => (
+            <div key={index} className="flex items-center gap-2">
+              {index > 0 && <span className="text-slate-400">›</span>}
+              {item.href ? (
+                <Link href={item.href} className="hover:text-blue-600 transition-colors">
+                  {item.label}
+                </Link>
+              ) : (
+                <span className={index === breadcrumbs.length - 1 ? "text-slate-700" : ""}>
+                  {item.label}
+                </span>
+              )}
+            </div>
+          ))}
         </nav>
 
         <div className="mx-auto mt-2 w-11/12">
@@ -484,19 +562,28 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
               <div className="relative rounded-2xl border border-slate-200 bg-white p-4">
                 <button
                   type="button"
-                  className="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-500"
+                  onClick={() => setIsZoomModalOpen(true)}
+                  className="absolute right-4 top-4 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-500 hover:bg-slate-50 transition-colors"
                 >
                   <FaPlus className="h-3 w-3" />
                 </button>
+
 
                 <div className="relative mx-auto min-h-[250px] max-w-[520px] sm:min-h-[320px] md:min-h-[700px]">
                   <MobileProductGallery
                     images={displayGallery}
                     title={title}
                     warrantyBadgeImage={warrantyBadgeImage}
+                    onImageClick={(index) => {
+                      setActiveImageIndex(index);
+                      setIsZoomModalOpen(true);
+                    }}
                   />
 
-                  <div className="hidden items-center justify-center md:flex md:min-h-[700px]">
+                  <div 
+                    className="hidden items-center justify-center md:flex md:min-h-[700px] cursor-zoom-in"
+                    onClick={() => setIsZoomModalOpen(true)}
+                  >
                     <Image
                       src={finalMainImage}
                       alt={title}
@@ -506,6 +593,7 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
                       priority
                     />
                   </div>
+
 
                   <Image
                     src={warrantyBadgeImage}
@@ -673,7 +761,11 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
               <div className="flex items-center  gap-2 border-b border-slate-200 pb-3 text-[12px] lg:text-[16px] text-slate-700">
                 <Image src="/images/EMI.png" alt="EMI" width={20} height={20} className="lg:h-5 h-4 w-4 lg:w-5 object-contain" />
                   EMI Starts From <span >{emiText}</span>
-                <button type="button" className="font-semibold text-[#0C73DA]">
+                <button 
+                  type="button" 
+                  className="font-semibold text-[#0C73DA]"
+                  onClick={() => setIsBankEmiModalOpen(true)}
+                >
                   | {emiDetailsLabel}
                 </button>
               </div>
@@ -1022,11 +1114,20 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
             aria-label="Breadcrumb"
             className="flex flex-wrap items-center gap-2 text-[12px] leading-none text-slate-500"
           >
-            <span>Home</span>
-            <span className="text-slate-400">›</span>
-            <span>{breadcrumbCategory}</span>
-            <span className="text-slate-400">›</span>
-            <span className="text-slate-700">Product details</span>
+            {breadcrumbs.map((item, index) => (
+              <div key={index} className="flex items-center gap-2">
+                {index > 0 && <span className="text-slate-400">›</span>}
+                {item.href ? (
+                  <Link href={item.href} className="hover:text-blue-600 transition-colors">
+                    {item.label}
+                  </Link>
+                ) : (
+                  <span className={index === breadcrumbs.length - 1 ? "text-slate-700" : ""}>
+                    {item.label}
+                  </span>
+                )}
+              </div>
+            ))}
           </nav>
         </div>
       </FooterBreadcrumbPortal>
@@ -1044,6 +1145,21 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
         onClose={() => setIsHigherSaleModalOpen(false)}
         productId={Number(productData?.id || 0)}
         productName={title || "Product"}
+      />
+      <BankEmiModal
+        isOpen={isBankEmiModalOpen}
+        onClose={() => setIsBankEmiModalOpen(false)}
+        emiPlans={productData?.emi_plans || []}
+        productName={title}
+        productSlug={productData?.slug}
+      />
+
+      <ProductImageZoomModal
+        isOpen={isZoomModalOpen}
+        onClose={() => setIsZoomModalOpen(false)}
+        images={displayGallery}
+        initialIndex={activeImageIndex}
+        altText={title}
       />
     </div>
   );

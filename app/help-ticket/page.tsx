@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAppSelector } from "@/store/hooks";
 import HelpTicketSuccessModal from "@/components/common/HelpTicketSuccessModal";
+import Skeleton from "@/components/common/Skeleton";
 
 export default function HelpTicketPage() {
   const { user, isAuthenticated, token } = useAppSelector((state) => state.auth);
@@ -51,6 +52,30 @@ export default function HelpTicketPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    const requiredFields = [
+      { key: 'full_name', label: 'Full Name' },
+      { key: 'mobile_number', label: 'Mobile Number' },
+      { key: 'email', label: 'E-mail Address' },
+      { key: 'order_id', label: 'Order ID' },
+      { key: 'topic', label: 'Topic' },
+      { key: 'message', label: 'Message' }
+    ];
+
+    for (const field of requiredFields) {
+      if (!formData[field.key as keyof typeof formData].trim()) {
+        const element = document.getElementsByName(field.key)[0] as HTMLElement;
+        if (element) {
+          element.focus();
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          element.classList.add('border-red-500');
+          setTimeout(() => element.classList.remove('border-red-500'), 3000);
+        }
+        setError(`${field.label} is required.`);
+        return;
+      }
+    }
+
     setLoading(true);
     setError(null);
 
@@ -89,6 +114,18 @@ export default function HelpTicketPage() {
 
   if (!mounted) return null;
 
+  if (loading) {
+      return (
+          <div className="mx-auto w-full px-4 lg:px-12 py-12 space-y-12 animate-in fade-in duration-500">
+              <Skeleton className="h-10 w-1/4 rounded-xl" />
+              <div className="grid lg:grid-cols-2 gap-8">
+                  <Skeleton className="h-[600px] w-full rounded-2xl" />
+                  <Skeleton className="h-[600px] w-full rounded-2xl" />
+              </div>
+          </div>
+      );
+  }
+
   return (
     <div className="bg-[#f8faff] min-h-screen py-8 px-4 lg:py-12">
       <div className="w-10/12 mx-auto">
@@ -115,17 +152,16 @@ export default function HelpTicketPage() {
         {/* Form Card */}
         <div className="   overflow-hidden">
           <div className="">
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6" noValidate>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Full Name */}
                 <div className="md:col-span-2 space-y-2">
                   <label className="text-sm font-bold text-slate-700 flex items-center">
-                    Full Name<span className="text-blue-500 ml-1">*</span>
+                    Full Name<span className="text-red-500 ml-1">*</span>
                   </label>
                   <input
                     type="text"
                     name="full_name"
-                    required
                     value={formData.full_name}
                     onChange={handleChange}
                     placeholder="Enter full name"
@@ -136,12 +172,11 @@ export default function HelpTicketPage() {
                 {/* Mobile Number */}
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-slate-700 flex items-center">
-                    Mobile Number<span className="text-blue-500 ml-1">*</span>
+                    Mobile Number<span className="text-red-500 ml-1">*</span>
                   </label>
                   <input
                     type="text"
                     name="mobile_number"
-                    required
                     value={formData.mobile_number}
                     onChange={handleChange}
                     placeholder="Enter number"
@@ -152,12 +187,11 @@ export default function HelpTicketPage() {
                 {/* E-mail Address */}
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-slate-700 flex items-center">
-                    E-mail Address<span className="text-blue-500 ml-1">*</span>
+                    E-mail Address<span className="text-red-500 ml-1">*</span>
                   </label>
                   <input
                     type="email"
                     name="email"
-                    required
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="Enter email"
@@ -168,12 +202,11 @@ export default function HelpTicketPage() {
                 {/* Order ID / Invoice number */}
                 <div className="md:col-span-2 space-y-2">
                   <label className="text-sm font-bold text-slate-700 flex items-center">
-                    Order id / Invoice number<span className="text-blue-500 ml-1">*</span>
+                    Order id / Invoice number<span className="text-red-500 ml-1">*</span>
                   </label>
                   <input
                     type="text"
                     name="order_id"
-                    required
                     value={formData.order_id}
                     onChange={handleChange}
                     placeholder="Enter order id"
@@ -184,12 +217,11 @@ export default function HelpTicketPage() {
                 {/* Topics */}
                 <div className="md:col-span-2 space-y-2">
                   <label className="text-sm font-bold text-slate-700 flex items-center">
-                    Topics<span className="text-blue-500 ml-1">*</span>
+                    Topics<span className="text-red-500 ml-1">*</span>
                   </label>
                   <input
                     type="text"
                     name="topic"
-                    required
                     value={formData.topic}
                     onChange={handleChange}
                     placeholder="Select topics"
@@ -200,11 +232,10 @@ export default function HelpTicketPage() {
                 {/* Message */}
                 <div className="md:col-span-2 space-y-2">
                   <label className="text-sm font-bold text-slate-700 flex items-center">
-                    Message<span className="text-blue-500 ml-1">*</span>
+                    Message<span className="text-red-500 ml-1">*</span>
                   </label>
                   <textarea
                     name="message"
-                    required
                     rows={6}
                     value={formData.message}
                     onChange={handleChange}
@@ -222,7 +253,7 @@ export default function HelpTicketPage() {
                   className="px-10 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-md shadow-lg shadow-blue-500/30 transition-all hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[160px]"
                 >
                   {loading ? (
-                    <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    <Skeleton className="w-6 h-6 rounded-full" />
                   ) : (
                     "Submit"
                   )}

@@ -188,7 +188,7 @@ export default function LoginForm() {
             {loginType === "phone" ? (
               <div className="space-y-4">
                 <label className="block text-[13px] font-semibold text-gray-600 ml-1">
-                  Phone Number<span className="text-[#0054A6] ml-0.5">*</span>
+                  Phone Number<span className="text-red-500 ml-0.5">*</span>
                 </label>
 
                 {/* Country Selector + Input */}
@@ -272,7 +272,7 @@ export default function LoginForm() {
             ) : (
               <div className="space-y-4">
                 <label className="block text-[13px] font-semibold text-gray-600 ml-1">
-                  Email Address<span className="text-[#0054A6] ml-0.5">*</span>
+                  Email Address<span className="text-red-500 ml-0.5">*</span>
                 </label>
                 <div className={`border rounded-md h-[50px] px-4 flex items-center transition-all duration-300 bg-gray-50 ${error ? "border-red-500" : "border-gray-200"}`}>
                   <input

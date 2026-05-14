@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FiShoppingBag, FiCalendar } from "react-icons/fi";
+import Skeleton from "@/components/common/Skeleton";
 
 interface CampingOffer {
   id: number;
@@ -63,8 +64,13 @@ const OffersPage = () => {
 
   if (loading) {
     return (
-      <div className="flex min-h-[400px] items-center justify-center bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-black/5">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-300 border-t-blue-600"></div>
+      <div className="space-y-6">
+        <Skeleton className="h-20 w-full rounded-2xl" />
+        <div className="space-y-4">
+          {[1, 2].map((i) => (
+            <Skeleton key={i} className="aspect-[3/1] lg:aspect-[4/1] w-full rounded-2xl" />
+          ))}
+        </div>
       </div>
     );
   }

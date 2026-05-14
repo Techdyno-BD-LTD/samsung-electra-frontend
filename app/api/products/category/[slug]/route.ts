@@ -6,7 +6,9 @@ export async function GET(request: Request, { params }: { params: { slug: string
   const { slug } = params;
   const backendUrl = process.env.API_BASE_URL || 'http://localhost:5000';
   try {
-    const response = await fetch(`${backendUrl}/api/v2/products/category/${slug}`, {
+    const { searchParams } = new URL(request.url);
+    const queryString = searchParams.toString();
+    const response = await fetch(`${backendUrl}/api/v2/products/category/${slug}${queryString ? `?${queryString}` : ''}`, {
       cache: 'no-store',
       headers: {
         'x-system-key': process.env.API_SYSTEM_KEY || '',

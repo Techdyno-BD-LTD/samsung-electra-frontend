@@ -5,6 +5,7 @@ import Link from "next/link";
 import { FaChevronRight } from "react-icons/fa";
 import BrandHero from "@/components/brand/BrandHero";
 import BrandCategorySection, { CategoryProduct } from "@/components/brand/BrandCategorySection";
+import Skeleton from "@/components/common/Skeleton";
 import brandsData from "@/database/brands.json";
 
 interface HigherSaleProduct {
@@ -119,8 +120,17 @@ export default function HigherSaleProductsPage() {
       {/* Dynamic Category Sections */}
       <div className="mt-8">
         {loading ? (
-          <div className="flex h-64 w-full items-center justify-center">
-            <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#215A9B] border-t-transparent"></div>
+          <div className="mx-auto w-full max-w-[1840px] px-8 py-12 space-y-12">
+            {[1, 2].map((i) => (
+              <div key={i} className="space-y-8">
+                <Skeleton className="h-10 w-1/4 rounded-xl" />
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+                  {[1, 2, 3, 4, 5].map((j) => (
+                    <Skeleton key={j} className="aspect-[3/4] w-full rounded-2xl" />
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         ) : products.length > 0 ? (
           categoryGroups.map((cat, index) => (

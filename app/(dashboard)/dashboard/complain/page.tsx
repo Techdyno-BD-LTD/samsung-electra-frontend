@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { FiImage, FiChevronDown, FiLoader } from "react-icons/fi";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { showToast } from "@/store/features/toast/toastSlice";
+import Skeleton from "@/components/common/Skeleton";
 
 interface DeliveredProduct {
   product_id: number;
@@ -141,12 +142,27 @@ const ComplainPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.category || !formData.description) {
-      dispatch(showToast({
-        message: "Please fill all required fields",
-        type: 'error'
-      }));
-      return;
+    const requiredFields = [
+      { key: 'full_name', label: 'Full Name' },
+      { key: 'mobile_number', label: 'Mobile Number' },
+      { key: 'email', label: 'E-mail Address' },
+      { key: 'product_id', label: 'Product' },
+      { key: 'category', label: 'Complain Category' },
+      { key: 'description', label: 'Detailed Description' }
+    ];
+
+    for (const field of requiredFields) {
+      if (!formData[field.key as keyof typeof formData]) {
+        const element = (document.getElementsByName(field.key)[0] || document.getElementById(field.key)) as HTMLElement;
+        if (element) {
+          element.focus();
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          element.classList.add('border-red-500');
+          setTimeout(() => element.classList.remove('border-red-500'), 3000);
+        }
+        dispatch(showToast({ message: `${field.label} is required.`, type: 'error' }));
+        return;
+      }
     }
 
     setSubmitting(true);
@@ -200,8 +216,16 @@ const ComplainPage = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <FiLoader className="w-8 h-8 animate-spin text-blue-500" />
+      <div className="space-y-6">
+        <Skeleton className="h-20 w-full rounded-2xl" />
+        <div className="space-y-6 bg-white rounded-2xl p-8 border border-black/5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Skeleton className="h-14 w-full rounded-lg" />
+            <Skeleton className="h-14 w-full rounded-lg" />
+          </div>
+          <Skeleton className="h-32 w-full rounded-xl" />
+          <Skeleton className="h-14 w-1/3 rounded-lg ml-auto" />
+        </div>
       </div>
     );
   }
@@ -214,42 +238,42 @@ const ComplainPage = () => {
         </div>
 
         <div className="p-6 lg:p-8">
-           <form className="space-y-6" onSubmit={handleSubmit}>
+           <form className="space-y-6" onSubmit={handleSubmit} noValidate>
               {/* Row 1 */}
               <div className="space-y-1.5">
-                 <label className="text-[13px] font-semibold text-slate-700 ml-1">Full Name<span className="text-blue-400">*</span></label>
+                 <label className="text-[13px] font-semibold text-slate-700 ml-1">Full Name<span className="text-red-500">*</span></label>
                  <input 
                   type="text" 
+                  name="full_name"
                   placeholder="Enter full name" 
                   value={formData.full_name}
                   onChange={e => setFormData({...formData, full_name: e.target.value})}
                   className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm font-medium focus:outline-none focus:border-[#2b7fe8] transition-colors shadow-sm" 
-                  required
                  />
               </div>
 
               {/* Row 2 */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                  <div className="space-y-1.5">
-                    <label className="text-[13px] font-semibold text-slate-700 ml-1">Mobile Number<span className="text-blue-400">*</span></label>
+                    <label className="text-[13px] font-semibold text-slate-700 ml-1">Mobile Number<span className="text-red-500">*</span></label>
                     <input 
                       type="text" 
+                      name="mobile_number"
                       placeholder="Enter number" 
                       value={formData.mobile_number}
                       onChange={e => setFormData({...formData, mobile_number: e.target.value})}
                       className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm font-medium focus:outline-none focus:border-[#2b7fe8] transition-colors shadow-sm" 
-                      required
                     />
                  </div>
                  <div className="space-y-1.5">
-                    <label className="text-[13px] font-semibold text-slate-700 ml-1">E-mail Address<span className="text-blue-400">*</span></label>
+                    <label className="text-[13px] font-semibold text-slate-700 ml-1">E-mail Address<span className="text-red-500">*</span></label>
                     <input 
                       type="email" 
+                      name="email"
                       placeholder="Enter email" 
                       value={formData.email}
                       onChange={e => setFormData({...formData, email: e.target.value})}
                       className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm font-medium focus:outline-none focus:border-[#2b7fe8] transition-colors shadow-sm" 
-                      required
                     />
                  </div>
               </div>
@@ -257,9 +281,11 @@ const ComplainPage = () => {
               {/* Row 3 */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                  <div className="space-y-1.5">
-                    <label className="text-[13px] font-semibold text-slate-700 ml-1">Product Name<span className="text-blue-400">*</span></label>
+                    <label className="text-[13px] font-semibold text-slate-700 ml-1">Product Name<span className="text-red-500">*</span></label>
                     <div className="relative">
                        <select 
+                        name="product_id"
+                        id="product_id"
                         value={formData.product_id}
                         onChange={handleProductChange}
                         className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm font-medium text-slate-700 appearance-none outline-none focus:border-[#2b7fe8] transition-colors shadow-sm"
@@ -276,7 +302,7 @@ const ComplainPage = () => {
                     </div>
                  </div>
                  <div className="space-y-1.5">
-                    <label className="text-[13px] font-semibold text-slate-700 ml-1">Order Code<span className="text-blue-400">*</span></label>
+                    <label className="text-[13px] font-semibold text-slate-700 ml-1">Order Code<span className="text-red-500">*</span></label>
                     <input 
                       type="text" 
                       placeholder="enter code" 
@@ -291,7 +317,7 @@ const ComplainPage = () => {
               {/* Row 4 */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                  <div className="space-y-1.5">
-                    <label className="text-[13px] font-semibold text-slate-700 ml-1">Date of purchase<span className="text-blue-400">*</span></label>
+                    <label className="text-[13px] font-semibold text-slate-700 ml-1">Date of purchase<span className="text-red-500">*</span></label>
                     <input 
                       type="date" 
                       value={formData.purchase_date}
@@ -301,9 +327,11 @@ const ComplainPage = () => {
                     />
                  </div>
                  <div className="space-y-1.5">
-                    <label className="text-[13px] font-semibold text-slate-700 ml-1">Complain Category<span className="text-blue-400">*</span></label>
+                    <label className="text-[13px] font-semibold text-slate-700 ml-1">Complain Category<span className="text-red-500">*</span></label>
                     <div className="relative">
                        <select 
+                        name="category"
+                        id="category"
                         value={formData.category}
                         onChange={e => setFormData({...formData, category: e.target.value})}
                         className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm font-medium text-slate-700 appearance-none outline-none focus:border-[#2b7fe8] transition-colors shadow-sm"
@@ -321,8 +349,9 @@ const ComplainPage = () => {
 
               {/* Row 5 */}
               <div className="space-y-1.5">
-                 <label className="text-[13px] font-semibold text-slate-700 ml-1">Detailed Description of the Complaint<span className="text-blue-400">*</span></label>
+                 <label className="text-[13px] font-semibold text-slate-700 ml-1">Detailed Description of the Complaint<span className="text-red-500">*</span></label>
                  <textarea 
+                  name="description"
                   rows={6} 
                   placeholder="write" 
                   value={formData.description}
@@ -339,7 +368,7 @@ const ComplainPage = () => {
                   onClick={() => fileInputRef.current?.click()}
                  >
                     <div className="w-12 h-12 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center text-slate-400 group-hover:text-[#2b7fe8] transition-colors">
-                       {uploadingDoc ? <FiLoader className="animate-spin text-xl" /> : <FiImage className="text-xl" />}
+                       {uploadingDoc ? <Skeleton className="w-5 h-5 rounded-full" /> : <FiImage className="text-xl" />}
                     </div>
                     <div>
                        <p className="text-[11px] text-slate-400 font-medium group-hover:text-slate-600">
@@ -378,7 +407,7 @@ const ComplainPage = () => {
                       disabled={submitting || uploadingDoc}
                       className="bg-[#2b7fe8] text-white px-12 py-3 rounded-lg text-sm font-semibold hover:bg-[#1a6ed9] transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                     >
-                      {submitting && <FiLoader className="animate-spin" />}
+                      {submitting && <Skeleton className="w-4 h-4 rounded-full" />}
                       {submitting ? "Submitting..." : "Submit"}
                     </button>
                  </div>

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { FiCamera, FiUser, FiMail, FiPhone, FiMapPin, FiSave, FiLoader } from "react-icons/fi";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { updateUser } from "@/store/features/auth/authSlice";
+import Skeleton from "@/components/common/Skeleton";
 
 export default function ProfilePage() {
   const dispatch = useAppDispatch();
@@ -155,8 +156,8 @@ export default function ProfilePage() {
                 <div className="relative group cursor-pointer" onClick={handleImageClick}>
                   <div className="w-32 h-32 lg:w-40 lg:h-40 rounded-2xl bg-white p-1 shadow-lg overflow-hidden border border-slate-100 relative">
                     {uploading ? (
-                      <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-10">
-                        <FiLoader className="animate-spin text-blue-600 text-2xl" />
+                      <div className="absolute inset-0 z-10">
+                        <Skeleton className="w-full h-full rounded-xl" />
                       </div>
                     ) : null}
                     <Image
@@ -266,7 +267,7 @@ export default function ProfilePage() {
                     className="bg-[#1877f2] text-white px-10 h-14 rounded-2xl font-bold hover:bg-blue-600 transition-all shadow-lg shadow-blue-500/20 flex items-center gap-2 disabled:opacity-50"
                   >
                     {loading ? (
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <Skeleton className="w-5 h-5 rounded-full" />
                     ) : (
                       <FiSave className="text-lg" />
                     )}

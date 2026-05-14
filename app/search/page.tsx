@@ -5,6 +5,16 @@ import CategoryFilterPanel from "@/components/category/CategoryFilterPanel";
 import SearchProductGrid from "@/components/search/SearchProductGrid";
 import CategoryFAQ from "@/components/category/CategoryFAQ";
 import { HiChevronLeft } from "react-icons/hi2";
+import { Metadata } from 'next';
+
+export async function generateMetadata({ searchParams }: { searchParams: { q?: string } }): Promise<Metadata> {
+    const query = searchParams.q || "";
+    const siteTitle = "Samsung Electra";
+    return {
+        title: query ? `Search results for "${query}" | ${siteTitle}` : `Search | ${siteTitle}`,
+        description: query ? `Search results for ${query} at Samsung Electra.` : "Search for Samsung products at Electra.",
+    };
+}
 
 export default async function SearchPage({ searchParams }: { searchParams: { q?: string; cat?: string } }) {
   const query = searchParams.q || "";

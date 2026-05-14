@@ -1,9 +1,10 @@
 "use client"
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { HiOutlineSquares2X2, HiOutlineBars3 } from "react-icons/hi2";
 import ProductCard from "@/components/common/ProductCard";
 import MobileFilterDrawer from "./MobileFilterDrawer";
+import Skeleton from "@/components/common/Skeleton";
 
 export default function CategoryProductGrid({ filteringAttributes }: { filteringAttributes?: { id: number; name: string; values: { id: number; name: string; code?: string }[] }[] }) {
   const params = useParams();
@@ -15,48 +16,66 @@ export default function CategoryProductGrid({ filteringAttributes }: { filtering
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [sourceProducts, setSourceProducts] = useState<{ id: number; name: string; slug: string; calculable_price: number; brand_name?: string; brand?: { name: string }; attributes?: { name: string; values: string[] }[]; color_name?: string }[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const [totalItemsCount, setTotalItemsCount] = useState(0);
 
   /* ---- Fetch Products ---- */
-  useEffect(() => {
+  const fetchProducts = useCallback(async (pageNum: number, isInitial: boolean = false) => {
     if (!categorySlug) return;
 
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(`/api/products/category/${categorySlug}`);
-        const data = await response.json();
-        if (data.success) {
+    try {
+      if (isInitial) setLoading(true);
+      else setLoadingMore(true);
+
+      const query = new URLSearchParams(searchParams.toString());
+      query.set("page", pageNum.toString());
+      query.set("limit", "12"); // Fetch 12 at a time
+
+      // Map frontend filter keys to backend filter keys
+      if (searchParams.has("minPrice")) query.set("min_price", searchParams.get("minPrice")!);
+      if (searchParams.has("maxPrice")) query.set("max_price", searchParams.get("maxPrice")!);
+      // brands is already "brands" in both
+
+      const response = await fetch(`/api/products/category/${categorySlug}?${query.toString()}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        if (isInitial) {
           setSourceProducts(data.data || []);
+        } else {
+          setSourceProducts(prev => [...prev, ...(data.data || [])]);
         }
-      } catch (error) {
-        console.error("Error fetching category products:", error);
-      } finally {
-        setLoading(false);
+        setTotalItemsCount(data.meta?.total || 0);
+        setHasMore(data.meta?.current_page < data.meta?.last_page);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching category products:", error);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  }, [categorySlug, searchParams]);
 
-    fetchProducts();
-  }, [categorySlug]);
+  // Reset and fetch when filters change
+  useEffect(() => {
+    setPage(1);
+    fetchProducts(1, true);
+  }, [categorySlug, searchParams, fetchProducts]);
 
-  /* ---- Client-Side Filtering ---- */
+  const loadMore = () => {
+    if (loadingMore || !hasMore) return;
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchProducts(nextPage);
+  };
+
+  /* ---- Client-Side Sorting & Remaining Filtering (Attributes) ---- */
   const filteredProducts = useMemo(() => {
     let filtered = [...sourceProducts];
 
-    // 1. Price Filtering
-    const minPrice = Number(searchParams.get("minPrice")) || 0;
-    const maxPrice = Number(searchParams.get("maxPrice")) || Infinity;
-    filtered = filtered.filter(p => {
-      const price = p.calculable_price || 0;
-      return price >= minPrice && price <= maxPrice;
-    });
-
-    // 2. Brand Filtering
-    const selectedBrands = searchParams.get("brands")?.split(",").filter(Boolean) || [];
-    if (selectedBrands.length > 0) {
-      filtered = filtered.filter(p => selectedBrands.includes(p.brand_name || p.brand?.name || ""));
-    }
-
-    // 3. Attribute Filtering
+    // Attribute Filtering (Remaining on client-side for now)
     searchParams.forEach((value, key) => {
       if (key.startsWith("attr_")) {
         const attrName = key.replace("attr_", "");
@@ -74,7 +93,7 @@ export default function CategoryProductGrid({ filteringAttributes }: { filtering
       }
     });
 
-    // 4. Sorting
+    // Sorting
     if (sortOption === "price-low") {
       filtered.sort((a, b) => (a.calculable_price || 0) - (b.calculable_price || 0));
     } else if (sortOption === "price-high") {
@@ -86,15 +105,13 @@ export default function CategoryProductGrid({ filteringAttributes }: { filtering
     return filtered;
   }, [sourceProducts, searchParams, sortOption]);
 
-  const totalItems = filteredProducts.length;
-
   return (
     <div className="flex flex-col gap-4">
       {/* ═══════════════ DESKTOP TOOLBAR (Hidden on Mobile) ═══════════════ */}
       <div className="hidden lg:flex items-center justify-between rounded-md border border-slate-200 bg-[#f4f4f4] px-4 py-2.5">
         <div className="flex items-center gap-4">
           <span className="text-[13px] font-medium text-slate-500">
-            <span className="font-semibold text-[#2B7FE8]">{totalItems}</span>{" "}
+            <span className="font-semibold text-[#2B7FE8]">{totalItemsCount}</span>{" "}
             Items Found
           </span>
 
@@ -179,14 +196,16 @@ export default function CategoryProductGrid({ filteringAttributes }: { filtering
       </div>
 
       <h2 className="text-[14px] font-semibold text-slate-800 -mt-1 mb-2 px-1">
-        {totalItems} Items Found
+        Showing {filteredProducts.length} of {totalItemsCount} Products
       </h2>
 
       {/* ═══════════════ PRODUCT GRID ═══════════════ */}
       <div className={viewMode === "grid" ? "grid grid-cols-2 gap-4 lg:grid-cols-3" : "flex flex-col gap-4"}>
         {loading ? (
-          <div className="flex w-full items-center justify-center py-20 col-span-full">
-            <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#0054A6] border-t-transparent" />
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 w-full col-span-full">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Skeleton key={i} className="aspect-[3/4] w-full rounded-2xl" />
+            ))}
           </div>
         ) : filteredProducts.length === 0 ? (
           <div className="flex w-full items-center justify-center py-20 text-slate-500 col-span-full">
@@ -198,6 +217,28 @@ export default function CategoryProductGrid({ filteringAttributes }: { filtering
           ))
         )}
       </div>
+
+      {/* ═══════════════ PAGINATION ═══════════════ */}
+      {hasMore && (
+        <div className="mt-8 flex justify-center pb-10">
+          <button
+            onClick={loadMore}
+            disabled={loadingMore}
+            className="group relative flex items-center gap-2 overflow-hidden rounded-full bg-white border border-slate-200 px-10 py-3 text-sm font-bold text-slate-800 transition-all hover:border-[#2b7fe8] hover:text-[#2b7fe8] disabled:opacity-50 shadow-sm"
+          >
+            {loadingMore ? (
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#2b7fe8] border-t-transparent"></div>
+            ) : (
+              <>
+                <span>Load More Products</span>
+                <span className="text-slate-400 group-hover:text-[#2b7fe8]">
+                   ({totalItemsCount - filteredProducts.length} Remaining)
+                </span>
+              </>
+            )}
+          </button>
+        </div>
+      )}
 
       <MobileFilterDrawer
         isOpen={isFilterOpen}
