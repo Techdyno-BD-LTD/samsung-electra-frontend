@@ -52,6 +52,7 @@ const Checkout = () => {
         country_id: '',
         state_id: '',
         city_id: '',
+        area: '',
     });
 
     const [districts, setDistricts] = useState<{ id: number; name: string }[]>([]);

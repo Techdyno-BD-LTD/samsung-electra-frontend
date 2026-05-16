@@ -35,6 +35,9 @@ export interface ProductData {
   };
   category_info?: {
     category_name?: string;
+    parent_category_name?: string;
+    parent_category_slug?: string;
+    category_slug?: string;
   };
   brand?: {
     name?: string;
@@ -304,7 +307,7 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
     });
     
     // Last item (Product name or just "Product details")
-    items.push({ label: "Product details", href: null });
+    items.push({ label: "Product details", href: "#" });
     
     return items;
   }, [productData]);

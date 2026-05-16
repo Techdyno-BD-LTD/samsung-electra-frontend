@@ -37,6 +37,10 @@ interface Order {
     phone: string;
   };
   shipping_address?: string;
+  created_at?: string;
+  cancel_request?: number;
+  cancel_request_at?: string;
+  cancel_reason?: string;
 }
 
 interface OrderItem {
@@ -525,8 +529,8 @@ const OrdersPage = () => {
             setCancellationModalOpen(false);
             setSelectedOrderForCancellation(null);
           }}
-          order={selectedOrderForCancellation}
-          items={orderItems}
+          order={selectedOrderForCancellation as any}
+          items={orderItems as any}
           token={token || ""}
           onSuccess={(msg) => {
             setSuccessMessage(msg);

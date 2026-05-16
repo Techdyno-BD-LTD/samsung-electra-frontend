@@ -1,8 +1,8 @@
-import { NextResponse, type NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const response = await fetch(`${process.env.API_BASE_URL}/api/v2/faqs`, {
       method: 'GET',

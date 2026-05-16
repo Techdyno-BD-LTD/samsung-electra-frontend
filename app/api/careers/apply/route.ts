@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
+    console.error('Submit application proxy error:', error);
     return NextResponse.json({ success: false, message: 'Failed to submit application' }, { status: 500 });
   }
 }

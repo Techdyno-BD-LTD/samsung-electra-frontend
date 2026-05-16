@@ -5,7 +5,7 @@ import Image from "next/image";
 import { FiShoppingBag, FiLoader, FiX } from "react-icons/fi";
 import Skeleton from "@/components/common/Skeleton";
 
-export const forceDynamic = "force-dynamic";
+export const dynamic = "force-dynamic";
 
 interface ExchangeProduct {
   id: number;

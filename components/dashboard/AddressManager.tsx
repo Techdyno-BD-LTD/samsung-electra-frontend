@@ -18,6 +18,9 @@ interface Address {
   country_name?: string;
   state_name?: string;
   city_name?: string;
+  state_id?: number | string;
+  city_id?: number | string;
+  area_id?: number | string;
 }
 
 export default function AddressManager() {
@@ -153,6 +156,7 @@ export default function AddressManager() {
           state_id: "",
           city_id: "",
           area_id: "",
+          area: "",
           set_default: 0 
         });
       }
@@ -173,6 +177,7 @@ export default function AddressManager() {
       state_id: address.state_id?.toString() || "",
       city_id: address.city_id?.toString() || "",
       area_id: address.area_id?.toString() || "",
+      area: "",
       set_default: address.set_default
     });
     if (address.country_id) fetchCities(address.country_id.toString());

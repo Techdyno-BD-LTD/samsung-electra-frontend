@@ -320,7 +320,7 @@ const ServiceRequestPage = () => {
                           {sc.address}
                        </p>
                        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-8">
-                          {sc.phones.map((p, i) => (
+                          {sc.phones.map((p: string, i: number) => (
                              <div key={i} className="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
                                 <div className="p-1 bg-slate-50 border border-slate-100 rounded-md">
                                    <FiPhone className="text-slate-400" />
