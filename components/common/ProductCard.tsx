@@ -312,7 +312,7 @@ const ProductCard = ({
               <button
                 type="button"
                 onClick={handleAddToCart}
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#1C5AA6] py-2.5 text-[18px] font-medium text-white transition-all hover:bg-[#15458a]"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#1C5AA6] py-2.5 text-[18px] font-medium text-white transition-all hover:bg-[#15458a]"
               >
                 <FaShoppingCart className="h-5 w-5" />
                 Add to cart
@@ -410,7 +410,7 @@ const ProductCard = ({
               <button
                 type="button"
                 onClick={handleAddToCart}
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#1C5AA6] py-2 text-[16px] font-medium text-white transition-all hover:bg-[#15458a]"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#1C5AA6] py-2 text-[16px] font-medium text-white transition-all hover:bg-[#15458a]"
               >
                 Buy Now
               </button>
@@ -566,7 +566,7 @@ const ProductCard = ({
           <div className="absolute inset-x-2 bottom-3 flex opacity-0 translate-y-10 transition-all duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100 sm:inset-x-4 sm:bottom-3">
             <button
               onClick={handleAddToCart}
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-[#0054A6] py-1.5 text-[12px] font-semibold text-white transition-all hover:bg-[#004487]"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0054A6] py-1.5 text-[12px] font-semibold text-white transition-all hover:bg-[#004487]"
             >
               <FaShoppingCart className="h-3.5 w-3.5" />
               Add to cart
@@ -575,7 +575,7 @@ const ProductCard = ({
         </div>
 
         <div className="px-2 pb-3 sm:hidden">
-          <button onClick={handleAddToCart} className="flex mx-auto w-6/12 items-center justify-center rounded-full bg-[#0054A6] py-1.5 text-[11px] font-semibold text-white transition-colors hover:bg-[#004487]">
+          <button onClick={handleAddToCart} className="flex mx-auto w-6/12 items-center justify-center rounded-xl bg-[#0054A6] py-1.5 text-[11px] font-semibold text-white transition-colors hover:bg-[#004487]">
             Buy Now
           </button>
         </div>
@@ -711,7 +711,7 @@ const ProductCard = ({
             EMI From {productData?.emi_start || emiPrice} Tk/Month
           </span>
         </span>
-        <button 
+        <button
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -840,7 +840,7 @@ const ProductCard = ({
           {productData?.higher_sale ? (
             <Link
               href={productHref}
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-[#0054A6] py-2 text-sm font-semibold text-white transition-all hover:bg-[#004487]"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0054A6] py-2 text-sm font-semibold text-white transition-all hover:bg-[#004487]"
             >
               <FaEye className="h-4 w-4" />
               See Details
@@ -848,7 +848,7 @@ const ProductCard = ({
           ) : (
             <button
               onClick={handleAddToCart}
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-[#0054A6] py-2 text-sm font-semibold text-white transition-all hover:bg-[#004487]"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0054A6] py-2 text-sm font-semibold text-white transition-all hover:bg-[#004487]"
             >
               <FaShoppingCart className="h-4 w-4" />
               Add to cart
@@ -860,11 +860,11 @@ const ProductCard = ({
       {/* Mobile CTA */}
       <div className="px-2 pb-3 sm:hidden">
         {productData?.higher_sale ? (
-          <Link href={productHref} className="flex w-6/12 mx-auto items-center justify-center rounded-full bg-[#0054A6] py-1.5 text-[11px] font-semibold text-white transition-colors hover:bg-[#004487]">
+          <Link href={productHref} className="flex w-6/12 mx-auto items-center justify-center rounded-xl bg-[#0054A6] py-1.5 text-[11px] font-semibold text-white transition-colors hover:bg-[#004487]">
             See Details
           </Link>
         ) : (
-          <button onClick={handleAddToCart} className="flex w-6/12 mx-auto items-center justify-center rounded-full bg-[#0054A6] py-1.5 text-[11px] font-semibold text-white transition-colors hover:bg-[#004487]">
+          <button onClick={handleAddToCart} className="flex w-6/12 mx-auto items-center justify-center rounded-xl bg-[#0054A6] py-1.5 text-[11px] font-semibold text-white transition-colors hover:bg-[#004487]">
             Buy Now
           </button>
         )}

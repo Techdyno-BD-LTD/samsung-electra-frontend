@@ -39,6 +39,7 @@ const Checkout = () => {
     const dispatch = useAppDispatch();
     const router = useRouter();
     const cartItems = useAppSelector((state) => state.cart.items);
+    const hasGiftVoucher = useMemo(() => cartItems.some((item) => item.type === "Gift Voucher"), [cartItems]);
     const { user, token, isAuthenticated } = useAppSelector((state) => state.auth);
     const [addresses, setAddresses] = useState<{ id: number; address: string; phone: string; postal_code: string; name: string; email: string; country_id?: number; country_name?: string; state_name?: string; city_name?: string }[]>([]);
     const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
@@ -60,6 +61,7 @@ const Checkout = () => {
     const [cities, setCities] = useState<{ id: number; name: string }[]>([]);
 
     const [paymentMethod, setPaymentMethod] = useState('');
+
     const [carriers, setCarriers] = useState<Carrier[]>([]);
     const [selectedCarrierId, setSelectedCarrierId] = useState<number | null>(null);
     const [selectedPickupPointId, setSelectedPickupPointId] = useState<number | null>(null);
@@ -74,6 +76,17 @@ const Checkout = () => {
         online: { id: number; name: string; thumbnail: string }[],
         offline: { id: number; heading: string; description: string }[]
     }>({ online: [], offline: [] });
+
+    useEffect(() => {
+        if (hasGiftVoucher) {
+            if (paymentMethod === 'Cash On Delivery' || !paymentMethod) {
+                if (paymentTypes.online && paymentTypes.online.length > 0) {
+                    setPaymentMethod(paymentTypes.online[0].name);
+                }
+            }
+        }
+    }, [hasGiftVoucher, paymentMethod, paymentTypes]);
+
     const [deliveryNote, setDeliveryNote] = useState('');
     const [agreedToTerms, setAgreedToTerms] = useState(true);
 
@@ -391,7 +404,7 @@ const Checkout = () => {
 
         const carrier = carriers.find(c => c.id === selectedCarrierId);
         let delivery = 0;
-        if (carrier) {
+        if (!hasGiftVoucher && carrier) {
             // Logic for Inside/Outside Dhaka based on District ID 1
             const isInsideDhaka = Number((selectedAddress as any)?.country_id) === 1;
             
@@ -414,7 +427,7 @@ const Checkout = () => {
             couponDiscount,
             savePercent: originalSubtotal > 0 ? Math.round((savings / originalSubtotal) * 100) : 0
         };
-    }, [cartItems, carriers, selectedCarrierId, couponDiscount, selectedAddress]);
+    }, [cartItems, carriers, selectedCarrierId, couponDiscount, selectedAddress, hasGiftVoucher]);
 
     const handlePlaceOrder = async () => {
         if (cartItems.length === 0) {
@@ -428,18 +441,18 @@ const Checkout = () => {
         }
 
         const selectedCarrier = carriers.find(c => c.id === selectedCarrierId);
-        if (!selectedCarrier) {
+        if (!hasGiftVoucher && !selectedCarrier) {
             alert("Please select a shipping method");
             return;
         }
 
-        const isPickup = selectedCarrier.is_pickup;
+        const isPickup = !hasGiftVoucher && selectedCarrier?.is_pickup;
         if (isPickup && !selectedPickupPointId) {
             alert("Please select a pickup store");
             return;
         }
 
-        if (!isPickup && !selectedAddressId) {
+        if (!hasGiftVoucher && !isPickup && !selectedAddressId) {
             alert("Please select a shipping address");
             return;
         }
@@ -454,10 +467,12 @@ const Checkout = () => {
                     tax: 0,
                     shipping_cost: 0
                 })),
-                shipping_address: selectedAddress,
-                shipping_type: isPickup ? "pickup" : "home_delivery",
+                shipping_address: hasGiftVoucher
+                    ? { name: user?.name || '', email: user?.email || '', phone: user?.phone || '', address: 'Digital Delivery' }
+                    : selectedAddress,
+                shipping_type: hasGiftVoucher ? "digital" : (isPickup ? "pickup" : "home_delivery"),
                 pickup_point_id: isPickup ? selectedPickupPointId : 0,
-                carrier_id: selectedCarrierId,
+                carrier_id: hasGiftVoucher ? 0 : selectedCarrierId,
                 shipping_cost: totals.delivery,
                 payment_type: paymentMethod === 'Cash On Delivery' ? 'cod' : (paymentMethod === 'sslcommerz' ? 'sslcommerz' : 'online'),
                 coupon_discount: couponDiscount,
@@ -563,150 +578,154 @@ const Checkout = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
                     {/* Left Column */}
                     <div className="lg:col-span-3 flex flex-col gap-6 lg:gap-10">
-                        <section>
-                            <h2 className="lg:text-[24px] text-[18px] font-semibold lg:mb-6 mb-2 text-gray-900 tracking-wide">Shipping Address</h2>
+                        {!hasGiftVoucher && (
+                            <section>
+                                <h2 className="lg:text-[24px] text-[18px] font-semibold lg:mb-6 mb-2 text-gray-900 tracking-wide">Shipping Address</h2>
 
-                            {!isAuthenticated ? (
-                                <div className="border border-gray-200 rounded-xl p-3 lg:p-4 flex flex-col lg:flex-row justify-between items-center gap-4 mb-6">
-                                    <span className="text-[#a1a1aa] font-medium text-[12px] lg:text-[14px] text-center lg:text-left">Add an address or login to use saved address</span>
-                                    <div className="flex space-x-3 w-full md:w-auto">
-                                        <button onClick={() => router.push('/login')} className="flex-1 md:flex-none border border-[#1877f2] text-[#1877f2] rounded-full lg:px-16 lg:py-1 py-1.5 font-medium hover:bg-blue-50 transition-colors text-[11px] lg:text-[15px]">Login</button>
-                                        <button onClick={() => router.push('/login')} className="flex-1 md:flex-none bg-[#1877f2] text-white rounded-full lg:px-10 py-1.5 font-medium hover:bg-blue-600 transition-colors w-max text-[11px] lg:text-[15px]">Add new address</button>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="border border-gray-200 rounded-xl p-2 lg:p-3">
-                                    {addresses.length > 0 ? (
-                                        <>
-                                            <div className="bg-[#f8f9fa] border border-gray-100 rounded-xl p-3 mb-4 lg:mb-6">
-                                                <div className="flex justify-between lg:items-start items-center mb-1">
-                                                    <h3 className="font-semibold text-gray-900 text-[15px] lg:text-[17px]">
-                                                        {((selectedAddress as unknown) as { name?: string })?.name || user?.name}
-                                                    </h3>
-                                                    <button onClick={() => setIsAddressModalOpen(true)} className="text-[#1877f2] flex items-center text-[12px] lg:text-[15px] font-semibold hover:underline">
-                                                        Change / Add <FiEdit className="ml-1.5 w-4 h-4" />
-                                                    </button>
-                                                </div>
-                                                <div className="space-y-1 text-[12px] lg:text-[15px] text-gray-700 max-w-3xl leading-relaxed">
-                                                    {selectedAddress ? (
-                                                        <>
-                                                            <p>
-                                                                {(selectedAddress as any).address}, {(selectedAddress as any).city_name ? `${(selectedAddress as any).city_name}, ` : ''}{(selectedAddress as any).state_name}, {(selectedAddress as any).country_name}, {(selectedAddress as any).postal_code}
-                                                            </p>
-                                                            <p>Phone: {(selectedAddress as any).phone}</p>
-                                                            <p>Email: {(selectedAddress as any).email || user?.email}</p>
-                                                        </>
-                                                    ) : (
-                                                        <p className="text-orange-500">Please select or add a shipping address</p>
-                                                    )}
-                                                </div>
-                                            </div>
-
-                                            {/* Address Selector */}
-                                            <div className="flex gap-3 overflow-x-auto pb-2 mb-4 no-scrollbar">
-                                                {(addresses as { id: number; address: string }[]).map(addr => (
-                                                    <button
-                                                        key={addr.id}
-                                                        onClick={() => setSelectedAddressId(addr.id)}
-                                                        className={`flex-shrink-0 px-4 py-2 rounded-lg border text-xs font-medium transition-all ${selectedAddressId === addr.id
-                                                            ? 'bg-blue-50 border-[#1877f2] text-[#1877f2]'
-                                                            : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'}`}
-                                                    >
-                                                        {addr.address.slice(0, 20)}...
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <div className="text-center py-6">
-                                            <p className="text-gray-500 mb-4 text-sm">No addresses found</p>
-                                            <button onClick={() => setIsAddressModalOpen(true)} className="bg-[#1877f2] text-white rounded-full px-8 py-2 font-medium hover:bg-blue-600 transition-colors text-sm">Add new address</button>
+                                {!isAuthenticated ? (
+                                    <div className="border border-gray-200 rounded-xl p-3 lg:p-4 flex flex-col lg:flex-row justify-between items-center gap-4 mb-6">
+                                        <span className="text-[#a1a1aa] font-medium text-[12px] lg:text-[14px] text-center lg:text-left">Add an address or login to use saved address</span>
+                                        <div className="flex space-x-3 w-full md:w-auto">
+                                            <button onClick={() => router.push('/login')} className="flex-1 md:flex-none border border-[#1877f2] text-[#1877f2] rounded-full lg:px-16 lg:py-1 py-1.5 font-medium hover:bg-blue-50 transition-colors text-[11px] lg:text-[15px]">Login</button>
+                                            <button onClick={() => router.push('/login')} className="flex-1 md:flex-none bg-[#1877f2] text-white rounded-full lg:px-10 py-1.5 font-medium hover:bg-blue-600 transition-colors w-max text-[11px] lg:text-[15px]">Add new address</button>
                                         </div>
-                                    )}
-
-                                    {/* Checkbox */}
-                                    <label className="inline-flex items-center space-x-3 cursor-pointer group mb-1">
-                                        <input type="checkbox" className="rounded border-gray-300 text-blue-500 focus:ring-blue-500 w-3.5 h-3.5 lg:w-5 lg:h-5 cursor-pointer" />
-                                        <span className="text-gray-700 text-[12px] lg:text-[15px] font-medium group-hover:text-gray-900 transition-colors">Use a different billing address</span>
-                                    </label>
-                                </div>
-                            )}
-
-                        </section>
-
-                        <section>
-                            <h2 className="lg:text-[24px] text-[18px] font-semibold mb-6 text-gray-900 tracking-wide">Shipping Method</h2>
-                            <div className="border border-gray-200 rounded-xl bg-white overflow-hidden mb-6">
-                                {carriers.map((carrier) => (
-                                    <div key={carrier.id} className="p-4 lg:p-6 border-b border-gray-100 last:border-0">
-                                        <label className="flex items-center space-x-3 cursor-pointer group">
-                                            <input
-                                                type="radio"
-                                                name="carrier"
-                                                checked={selectedCarrierId === carrier.id}
-                                                onChange={() => setSelectedCarrierId(carrier.id)}
-                                                className="w-4 h-4 lg:w-[22px] lg:h-[22px] text-[#1877f2] focus:ring-[#1877f2] cursor-pointer"
-                                            />
-                                            <div className="flex-1">
-                                                <div className="flex justify-between items-center">
-                                                    <span className="font-semibold text-[18px] lg:text-[22px] text-gray-800 group-hover:text-[#1877f2] transition-colors">{carrier.name}</span>
-                                                    <span className={`px-4 py-1 rounded-full text-xs font-bold ${carrier.cost === 0 ? 'bg-[#1E5AA4] text-white' : 'text-gray-900'}`}>
-                                                        {(() => {
-                                                            if (carrier.cost === 0) return 'Free';
-                                                            const isInsideDhaka = Number((selectedAddress as any)?.country_id) === 1;
-                                                            const cost = isInsideDhaka 
-                                                                ? (carrier.inside_dhaka_cost > 0 ? carrier.inside_dhaka_cost : carrier.cost)
-                                                                : (carrier.outside_dhaka_cost > 0 ? carrier.outside_dhaka_cost : carrier.cost);
-                                                            return formatCurrency(cost);
-                                                        })()}
-                                                    </span>
-                                                </div>
-                                                {!carrier.is_pickup && <p className="text-[12px] lg:text-[14px] text-gray-500 mt-1">Estimated delivery: {carrier.transit_time}</p>}
-                                            </div>
-                                        </label>
-
-                                        {carrier.is_pickup && selectedCarrierId === carrier.id && (
-                                            <div className="mt-4 ml-[28px] lg:ml-[34px]">
-                                                {/* <p className="text-gray-500 text-sm mb-4">This item not available in your area</p> */}
-                                                <div className="flex justify-between items-center mb-4">
-                                                    <span className="text-gray-600 font-medium">Pickup location</span>
-                                                    <button
-                                                        onClick={() => setIsPickupModalOpen(true)}
-                                                        className="text-[#1877f2] flex items-center gap-1 font-semibold hover:underline"
-                                                    >
-                                                        Select Store <FiChevronRight />
-                                                    </button>
+                                    </div>
+                                ) : (
+                                    <div className="border border-gray-200 rounded-xl p-2 lg:p-3">
+                                        {addresses.length > 0 ? (
+                                            <>
+                                                <div className="bg-[#f8f9fa] border border-gray-100 rounded-xl p-3 mb-4 lg:mb-6">
+                                                    <div className="flex justify-between lg:items-start items-center mb-1">
+                                                        <h3 className="font-semibold text-gray-900 text-[15px] lg:text-[17px]">
+                                                            {((selectedAddress as unknown) as { name?: string })?.name || user?.name}
+                                                        </h3>
+                                                        <button onClick={() => setIsAddressModalOpen(true)} className="text-[#1877f2] flex items-center text-[12px] lg:text-[15px] font-semibold hover:underline">
+                                                            Change / Add <FiEdit className="ml-1.5 w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                    <div className="space-y-1 text-[12px] lg:text-[15px] text-gray-700 max-w-3xl leading-relaxed">
+                                                        {selectedAddress ? (
+                                                            <>
+                                                                <p>
+                                                                    {(selectedAddress as any).address}, {(selectedAddress as any).city_name ? `${(selectedAddress as any).city_name}, ` : ''}{(selectedAddress as any).state_name}, {(selectedAddress as any).country_name}, {(selectedAddress as any).postal_code}
+                                                                </p>
+                                                                <p>Phone: {(selectedAddress as any).phone}</p>
+                                                                <p>Email: {(selectedAddress as any).email || user?.email}</p>
+                                                            </>
+                                                        ) : (
+                                                            <p className="text-orange-500">Please select or add a shipping address</p>
+                                                        )}
+                                                    </div>
                                                 </div>
 
-                                                {selectedPickupPointId ? (
-                                                    <div className="bg-gray-50 rounded-xl p-4 lg:p-6 border border-gray-100">
-                                                        <div className="flex justify-between items-start mb-2">
-                                                            <h3 className="font-bold text-gray-900">{pickupPoints.find(p => p.id === selectedPickupPointId)?.name}</h3>
-                                                            <button onClick={() => setIsPickupModalOpen(true)} className="text-[#1877f2] flex items-center gap-1 text-sm font-medium">
-                                                                Change <FiEdit className="w-4 h-4" />
-                                                            </button>
-                                                        </div>
-                                                        <p className="text-sm text-gray-600 leading-relaxed">
-                                                            {pickupPoints.find(p => p.id === selectedPickupPointId)?.address}
-                                                        </p>
-                                                        <p className="text-sm text-gray-900 font-semibold mt-2">
-                                                            Phone: {pickupPoints.find(p => p.id === selectedPickupPointId)?.phone}
-                                                        </p>
-                                                    </div>
-                                                ) : (
-                                                    <div className="bg-gray-50 rounded-xl p-6 border border-dashed border-gray-300 text-center">
-                                                        <p className="text-gray-500 text-sm italic">Please select a pickup store</p>
-                                                    </div>
-                                                )}
+                                                {/* Address Selector */}
+                                                <div className="flex gap-3 overflow-x-auto pb-2 mb-4 no-scrollbar">
+                                                    {(addresses as { id: number; address: string }[]).map(addr => (
+                                                        <button
+                                                            key={addr.id}
+                                                            onClick={() => setSelectedAddressId(addr.id)}
+                                                            className={`flex-shrink-0 px-4 py-2 rounded-lg border text-xs font-medium transition-all ${selectedAddressId === addr.id
+                                                                ? 'bg-blue-50 border-[#1877f2] text-[#1877f2]'
+                                                                : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'}`}
+                                                        >
+                                                            {addr.address.slice(0, 20)}...
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className="text-center py-6">
+                                                <p className="text-gray-500 mb-4 text-sm">No addresses found</p>
+                                                <button onClick={() => setIsAddressModalOpen(true)} className="bg-[#1877f2] text-white rounded-full px-8 py-2 font-medium hover:bg-blue-600 transition-colors text-sm">Add new address</button>
                                             </div>
                                         )}
+
+                                        {/* Checkbox */}
+                                        <label className="inline-flex items-center space-x-3 cursor-pointer group mb-1">
+                                            <input type="checkbox" className="rounded border-gray-300 text-blue-500 focus:ring-blue-500 w-3.5 h-3.5 lg:w-5 lg:h-5 cursor-pointer" />
+                                            <span className="text-gray-700 text-[12px] lg:text-[15px] font-medium group-hover:text-gray-900 transition-colors">Use a different billing address</span>
+                                        </label>
                                     </div>
-                                ))}
-                                {carriers.length === 0 && (
-                                    <p className="p-6 text-center text-gray-500 italic">No shipping methods available.</p>
                                 )}
-                            </div>
-                        </section>
+
+                            </section>
+                        )}
+
+                        {!hasGiftVoucher && (
+                            <section>
+                                <h2 className="lg:text-[24px] text-[18px] font-semibold mb-6 text-gray-900 tracking-wide">Shipping Method</h2>
+                                <div className="border border-gray-200 rounded-xl bg-white overflow-hidden mb-6">
+                                    {carriers.map((carrier) => (
+                                        <div key={carrier.id} className="p-4 lg:p-6 border-b border-gray-100 last:border-0">
+                                            <label className="flex items-center space-x-3 cursor-pointer group">
+                                                <input
+                                                    type="radio"
+                                                    name="carrier"
+                                                    checked={selectedCarrierId === carrier.id}
+                                                    onChange={() => setSelectedCarrierId(carrier.id)}
+                                                    className="w-4 h-4 lg:w-[22px] lg:h-[22px] text-[#1877f2] focus:ring-[#1877f2] cursor-pointer"
+                                                />
+                                                <div className="flex-1">
+                                                    <div className="flex justify-between items-center">
+                                                        <span className="font-semibold text-[18px] lg:text-[22px] text-gray-800 group-hover:text-[#1877f2] transition-colors">{carrier.name}</span>
+                                                        <span className={`px-4 py-1 rounded-full text-xs font-bold ${carrier.cost === 0 ? 'bg-[#1E5AA4] text-white' : 'text-gray-900'}`}>
+                                                            {(() => {
+                                                                if (carrier.cost === 0) return 'Free';
+                                                                const isInsideDhaka = Number((selectedAddress as any)?.country_id) === 1;
+                                                                const cost = isInsideDhaka 
+                                                                    ? (carrier.inside_dhaka_cost > 0 ? carrier.inside_dhaka_cost : carrier.cost)
+                                                                    : (carrier.outside_dhaka_cost > 0 ? carrier.outside_dhaka_cost : carrier.cost);
+                                                                return formatCurrency(cost);
+                                                            })()}
+                                                        </span>
+                                                    </div>
+                                                    {!carrier.is_pickup && <p className="text-[12px] lg:text-[14px] text-gray-500 mt-1">Estimated delivery: {carrier.transit_time}</p>}
+                                                </div>
+                                            </label>
+
+                                            {carrier.is_pickup && selectedCarrierId === carrier.id && (
+                                                <div className="mt-4 ml-[28px] lg:ml-[34px]">
+                                                    {/* <p className="text-gray-500 text-sm mb-4">This item not available in your area</p> */}
+                                                    <div className="flex justify-between items-center mb-4">
+                                                        <span className="text-gray-600 font-medium">Pickup location</span>
+                                                        <button
+                                                            onClick={() => setIsPickupModalOpen(true)}
+                                                            className="text-[#1877f2] flex items-center gap-1 font-semibold hover:underline"
+                                                        >
+                                                            Select Store <FiChevronRight />
+                                                        </button>
+                                                    </div>
+
+                                                    {selectedPickupPointId ? (
+                                                        <div className="bg-gray-50 rounded-xl p-4 lg:p-6 border border-gray-100">
+                                                            <div className="flex justify-between items-start mb-2">
+                                                                <h3 className="font-bold text-gray-900">{pickupPoints.find(p => p.id === selectedPickupPointId)?.name}</h3>
+                                                                <button onClick={() => setIsPickupModalOpen(true)} className="text-[#1877f2] flex items-center gap-1 text-sm font-medium">
+                                                                    Change <FiEdit className="w-4 h-4" />
+                                                                </button>
+                                                            </div>
+                                                            <p className="text-sm text-gray-600 leading-relaxed">
+                                                                {pickupPoints.find(p => p.id === selectedPickupPointId)?.address}
+                                                            </p>
+                                                            <p className="text-sm text-gray-900 font-semibold mt-2">
+                                                                Phone: {pickupPoints.find(p => p.id === selectedPickupPointId)?.phone}
+                                                            </p>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="bg-gray-50 rounded-xl p-6 border border-dashed border-gray-300 text-center">
+                                                            <p className="text-gray-500 text-sm italic">Please select a pickup store</p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                    {carriers.length === 0 && (
+                                        <p className="p-6 text-center text-gray-500 italic">No shipping methods available.</p>
+                                    )}
+                                </div>
+                            </section>
+                        )}
 
                         {/* Available Offers */}
                         <section className="mb-8">
@@ -793,13 +812,18 @@ const Checkout = () => {
                                 {/* Offline/Manual Payments (including COD) */}
                                 {(paymentTypes.offline as { id: number; heading: string; description: string }[]).map((method) => (
                                     <div key={method.id} className="p-4 lg:p-6 border-b border-gray-100 last:border-0">
-                                        <label className="flex items-center space-x-3 cursor-pointer group flex-wrap gap-y-2">
+                                        <label className={`flex items-center space-x-3 cursor-pointer group flex-wrap gap-y-2 ${hasGiftVoucher && method.heading === 'Cash On Delivery' ? 'opacity-40 cursor-not-allowed' : ''}`}>
                                             <input
                                                 type="radio"
                                                 name="payment"
+                                                disabled={hasGiftVoucher && method.heading === 'Cash On Delivery'}
                                                 checked={paymentMethod === method.heading}
-                                                onChange={() => setPaymentMethod(method.heading)}
-                                                className="w-4 h-4 lg:w-[22px] lg:h-[22px] text-[#1877f2] focus:ring-[#1877f2] cursor-pointer"
+                                                onChange={() => {
+                                                    if (!(hasGiftVoucher && method.heading === 'Cash On Delivery')) {
+                                                        setPaymentMethod(method.heading);
+                                                    }
+                                                }}
+                                                className="w-4 h-4 lg:w-[22px] lg:h-[22px] text-[#1877f2] focus:ring-[#1877f2] cursor-pointer disabled:cursor-not-allowed"
                                             />
                                             <span className="font-medium text-[16px] lg:text-[20px] text-gray-800 group-hover:text-[#1877f2] transition-colors">{method.heading}</span>
                                             {method.heading === 'Cash On Delivery' && (

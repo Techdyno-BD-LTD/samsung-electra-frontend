@@ -43,6 +43,7 @@ const DashboardSidebar = () => {
     { name: "Shipping Address", icon: <FiMapPin />, href: "/dashboard/address" },
     { name: "Wishlist", icon: <FiHeart />, href: "/dashboard/wishlist" },
     { name: "My Offers", icon: <FiGift />, href: "/dashboard/offers" },
+    { name: "Gift Vouchers", icon: <FiGift />, href: "/dashboard/gift-vouchers" },
     // { name: "Payment Method", icon: <FiCreditCard />, href: "/dashboard/payment" },
     { name: "Review", icon: <FiMessageSquare />, href: "/dashboard/reviews" },
     { name: "Store Location", icon: <FiHome />, href: "/dashboard/stores" },
