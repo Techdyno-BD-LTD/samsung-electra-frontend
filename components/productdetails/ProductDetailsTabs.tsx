@@ -155,22 +155,24 @@ export default function ProductDetailsTabs({
     { id: 'policy', label: 'Product Policy', ref: policyRef },
   ];
 
-  const recentViewedItems = (popularProducts as Array<{
-    title?: string;
-    image?: string;
-    brandLogo?: string;
-    type?: string;
-    rating?: number;
-    ratingCount?: string;
-    weight?: string;
-    color?: string;
-    emiPrice?: string;
-    price?: string;
-    originalPrice?: string;
-    discountPercent?: string;
-    saveAmount?: string;
-    tags?: string[];
-  }>).slice(0, 3);
+  const [recentViewedItems, setRecentViewedItems] = useState<any[]>(
+    (popularProducts as any[]).slice(0, 3)
+  );
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('recently_viewed_products');
+      if (stored) {
+        const list = JSON.parse(stored);
+        const filtered = list.filter((item: any) => item.id !== productId);
+        if (filtered.length > 0) {
+          setRecentViewedItems(filtered.slice(0, 3));
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load recently viewed products', err);
+    }
+  }, [productId]);
 
   const headingTitle = title ?? 'Samsung Front Loading Washing Machine- 8KG | WW80AGAS21AXLP';
   const reviewSummary = reviews ?? {};

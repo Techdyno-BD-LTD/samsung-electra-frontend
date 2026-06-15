@@ -102,6 +102,7 @@ export default function HeroSection() {
   const [hoveredCategory, setHoveredCategory] = useState<HeroCategory | null>(null);
   const [activeMenuCategory, setActiveMenuCategory] = useState<HeroCategory | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showAllCategories, setShowAllCategories] = useState(false);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleCategoryHover = (category: HeroCategory | null) => {
@@ -165,7 +166,6 @@ export default function HeroSection() {
         const topLevelCategories = allApiCategories.filter((item) => item.parent_id === 0);
 
         const categories: HeroCategory[] = topLevelCategories
-          .slice(0, 10)
           .map((item) => ({
             id: item.id,
             name: item.name,
@@ -284,7 +284,7 @@ export default function HeroSection() {
           className="space-y-2.5 lg:space-y-1.5 xl:space-y-1.5 2xl:space-y-3"
           onMouseLeave={() => handleCategoryHover(null)}
         >
-          {heroData.categories.map((category) => {
+          {(showAllCategories ? heroData.categories : heroData.categories.slice(0, 6)).map((category) => {
             const categoryUrl = `/category/${category.slug || category.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`;
             return (
               <Link
@@ -314,6 +314,37 @@ export default function HeroSection() {
               </Link>
             );
           })}
+
+          {heroData.categories.length > 6 && (
+            <button
+              type="button"
+              onClick={() => setShowAllCategories(!showAllCategories)}
+              onMouseEnter={() => handleCategoryHover(null)}
+              className="flex w-full items-center justify-between rounded-md border border-slate-100 bg-white px-2 py-3 text-left shadow-md transition hover:border-blue-300 hover:bg-blue-50/20 lg:px-2 lg:py-2 xl:px-2 xl:py-2 2xl:px-3 2xl:py-4"
+            >
+              <div className="flex items-center gap-2 lg:gap-1.5 xl:gap-1.5 2xl:gap-2">
+                <span className="flex h-6 w-6 items-center justify-center text-slate-400">
+                  {showAllCategories ? (
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 15l7-7 7 7" />
+                    </svg>
+                  ) : (
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  )}
+                </span>
+                <span className="text-[13px] font-semibold text-blue-600 lg:text-[12px] xl:text-[12px] 2xl:text-[13px]">
+                  {showAllCategories ? "See Less" : "See More"}
+                </span>
+              </div>
+              {!showAllCategories && (
+                <span className="inline-flex h-7 min-w-7 items-center justify-center rounded-full bg-slate-100 px-2 text-xs font-semibold text-slate-500">
+                  +{heroData.categories.length - 6}
+                </span>
+              )}
+            </button>
+          )}
         </div>
       </aside>
 

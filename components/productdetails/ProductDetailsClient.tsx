@@ -251,6 +251,48 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
     setSelectedColorName(productData.color_details?.[0]?.name ?? "");
   }, [productData]);
 
+  useEffect(() => {
+    if (!productData) return;
+
+    try {
+      const stored = localStorage.getItem('recently_viewed_products');
+      const list = stored ? JSON.parse(stored) : [];
+
+      let calculatedSaveAmount = "";
+      if (productData.stroked_price && productData.main_price) {
+        const orig = Number(productData.stroked_price.replace(/[^0-9.-]+/g, ""));
+        const curr = Number(productData.main_price.replace(/[^0-9.-]+/g, ""));
+        if (!isNaN(orig) && !isNaN(curr) && orig > curr) {
+          calculatedSaveAmount = `Save : ৳${(orig - curr).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+        }
+      }
+
+      const productInfo = {
+        id: productData.id,
+        title: productData.name,
+        image: productData.thumbnail_image,
+        brandLogo: productData.brand?.logo,
+        type: productData.category_info?.category_name || productData.category?.name,
+        rating: productData.rating,
+        ratingCount: productData.rating ? `(${Number(productData.rating).toFixed(1)})` : "(0.0)",
+        weight: productData.weight ? `${productData.weight}KG` : undefined,
+        color: productData.color_details?.[0]?.name || (productData.colors?.[0] ? String(productData.colors[0]) : undefined),
+        emiPrice: productData.emi_start ? `EMI From ${productData.emi_start}` : undefined,
+        price: productData.main_price,
+        originalPrice: productData.stroked_price,
+        discountPercent: productData.discount,
+        saveAmount: calculatedSaveAmount || undefined,
+        tags: productData.tags,
+      };
+
+      const filteredList = list.filter((item: any) => item.id !== productInfo.id);
+      filteredList.unshift(productInfo);
+      localStorage.setItem('recently_viewed_products', JSON.stringify(filteredList.slice(0, 3)));
+    } catch (err) {
+      console.error('Failed to update recently viewed products', err);
+    }
+  }, [productData]);
+
   const category = productData?.category_info?.category_name || productData?.category?.name || "Product Category";
   const title = productData?.name || "Product Title";
   const brandName = productData?.brand?.name || "Brand";

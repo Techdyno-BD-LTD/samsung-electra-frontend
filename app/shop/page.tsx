@@ -61,14 +61,33 @@ export default function BrandPage() {
 				const finalBrands = fetchedBrands.length > 0 ? fetchedBrands : (brandsData as BrandItem[]);
 				setBrands(finalBrands);
 
-				// 2. Fetch Category Products
-				const categories: ShopCategory[] = [
-					{ title: "Television", slug: "tv-audio" },
-					{ title: "Washing Machine", slug: "washing-machine" },
-					{ title: "Refrigerator", slug: "refrigerator" },
-					{ title: "Air Conditioner", slug: "air-conditionar" },
-					{ title: "Microwave", slug: "microwave" },
-				];
+				// 2. Fetch Category List
+				let categories: ShopCategory[] = [];
+				try {
+					const categoriesRes = await fetch("/api/categories");
+					const categoriesResult = await categoriesRes.json();
+					if (categoriesResult.success && Array.isArray(categoriesResult.data)) {
+						categories = categoriesResult.data
+							.filter((cat: any) => cat.parent_id === 0)
+							.map((cat: any) => ({
+								title: cat.name,
+								slug: cat.slug,
+							}));
+					}
+				} catch (err) {
+					console.error("Error fetching dynamic categories:", err);
+				}
+
+				// Fallback to static categories if fetching failed or returned empty
+				if (categories.length === 0) {
+					categories = [
+						{ title: "Television", slug: "tv-audio" },
+						{ title: "Washing Machine", slug: "washing-machine" },
+						{ title: "Refrigerator", slug: "refrigerator" },
+						{ title: "Air Conditioner", slug: "air-conditionar" },
+						{ title: "Microwave", slug: "microwave" },
+					];
+				}
 
 				const fetchPromises = categories.map(async (cat) => {
 					try {
