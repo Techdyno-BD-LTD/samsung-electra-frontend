@@ -8,6 +8,10 @@ const nextConfig = {
         port: '5000',
       },
       {
+        protocol: 'http',
+        hostname: '**',
+      },
+      {
         protocol: 'https',
         hostname: '**',
       },
