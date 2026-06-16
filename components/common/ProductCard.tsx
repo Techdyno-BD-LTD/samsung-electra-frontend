@@ -540,7 +540,7 @@ const ProductCard = ({
         </h3>
 
         <div className="flex items-end gap-2 px-2 pb-2 sm:px-4">
-          <span className="text-[17px] font-bold text-[#0AB15A]">{currentPrice}</span>
+          <span className="text-[14px] sm:text-[17px] font-bold text-[#0AB15A]">{currentPrice}</span>
           <span className="text-[12px] text-slate-400 line-through">{oldPrice}</span>
         </div>
 

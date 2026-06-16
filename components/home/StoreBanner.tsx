@@ -24,13 +24,13 @@ export default function StoreBanner() {
   if (!banner) return null;
 
   return (
-    <div className="w-full overflow-hidden rounded-xl">
+    <div className="w-full overflow-hidden ">
       <div className="relative aspect-[1840/130] w-full sm:aspect-[1840/141]">
         <Image
           src={banner}
           alt="Store Banner"
           fill
-          className="object-contain"
+          className="object-fill"
         />
       </div>
     </div>

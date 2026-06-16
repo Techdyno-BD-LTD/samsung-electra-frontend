@@ -27,7 +27,7 @@ export default function MobileBottomBar() {
     <nav className="lg:hidden w-full bg-white border-b border-slate-200 overflow-x-auto no-scrollbar">
       <div className="px-4">
         <ul className="flex items-center justify-around ">
-          {navLinks.map((link, index) => (
+          {navLinks.map((link) => (
             <li
               key={link.name}
               className="relative flex items-center group"
@@ -35,16 +35,16 @@ export default function MobileBottomBar() {
               onMouseLeave={() => setActiveDropdown(null)}
             >
               {/* Bullet Separator */}
-              {index !== 0 && (
+              {/* {index !== 0 && (
                 <span className="mr-3 text-[#2c4e72] font-bold text-[14px]">•</span>
-              )}
+              )} */}
 
               {/* Main Link */}
               <Link
                 href={link.href}
                 className={`text-[12px] flex items-center gap-1 transition-colors whitespace-nowrap py-1
                 ${link.active
-                    ? "text-[#0054A6] font-bold border-b-2 border-[#0054A6]" 
+                    ? "text-[#0054A6] font-bold border-b-2 border-[#0054A6]"
                     : "text-[#072F5B] hover:text-[#0081FF] font-medium"}
               `}
                 onClick={(e) => {

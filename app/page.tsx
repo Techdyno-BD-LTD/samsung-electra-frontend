@@ -102,7 +102,7 @@ export default async function Home() {
 
   return (
     <div className="space-y-16">
-      <section className=" mx-auto mt-0 lg:mt-8  py-6 ">
+      <section className=" mx-auto mt-16 lg:mt-8  py-6 ">
         <HeroSection />
         <div className="mt-5">
           <ServiceHighlights />

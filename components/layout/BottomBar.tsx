@@ -81,27 +81,25 @@ export default function BottomBar() {
               onMouseEnter={() => link.subLinks && link.subLinks.length > 0 && setActiveDropdown(link.name)}
               onMouseLeave={() => setActiveDropdown(null)}
             >
-              {index !== 0 && <span className="mr-2 lg:mr-4 text-[#2c4e72] font-bold text-[14px]">•</span>}
+              {/* {index !== 0 && <span className="mr-2 lg:mr-4 text-[#2c4e72] font-bold text-[14px]">•</span>} */}
 
               {link.href.startsWith("http") ? (
                 <a
                   href={link.href}
-                  className={`text-[14px] lg:text-[15px] flex items-center gap-1 transition-colors whitespace-nowrap py-1 ${
-                    link.active
+                  className={`text-[14px] lg:text-[15px] flex items-center gap-1 transition-colors whitespace-nowrap py-1 ${link.active
                       ? "text-[#0054A6] font-bold border-b-2 border-[#0054A6]"
                       : "text-[#072F5B] hover:text-[#0081FF] font-medium"
-                  }`}
+                    }`}
                 >
                   {link.name}
                 </a>
               ) : link.href ? (
                 <Link
                   href={link.href}
-                  className={`text-[14px] lg:text-[15px] flex items-center gap-1 transition-colors whitespace-nowrap py-1 ${
-                    link.active
+                  className={`text-[14px] lg:text-[15px] flex items-center gap-1 transition-colors whitespace-nowrap py-1 ${link.active
                       ? "text-[#0054A6] font-bold border-b-2 border-[#0054A6]"
                       : "text-[#072F5B] hover:text-[#0081FF] font-medium"
-                  }`}
+                    }`}
                 >
                   {link.name}
                   {link.subLinks && link.subLinks.length > 0 ? (

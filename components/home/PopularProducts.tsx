@@ -109,7 +109,7 @@ export default function PopularProducts() {
           onClick={() => scrollByOneCard(-1)}
           disabled={!canScrollLeft}
           aria-label="Show previous product"
-          className="absolute left-1 top-[120px] lg:left-5 sm:top-[220px] lg:top-[250px]  z-50 inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 bg-white text-[#1D3C61] shadow-md transition hover:border-[#2F73BD] hover:text-[#2F73BD] disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300 sm:left-0 sm:h-11 sm:w-11 sm:-translate-x-1/2 "
+          className="absolute left-1 top-[120px] lg:left-5 sm:top-[220px] lg:top-[250px]  z-10 inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 bg-white text-[#1D3C61] shadow-md transition hover:border-[#2F73BD] hover:text-[#2F73BD] disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300 sm:left-0 sm:h-11 sm:w-11 sm:-translate-x-1/2 "
         >
           <FaChevronLeft className="h-2 w-2 sm:h-4 sm:w-4" />
         </button>
@@ -119,7 +119,7 @@ export default function PopularProducts() {
           onClick={() => scrollByOneCard(1)}
           disabled={!canScrollRight}
           aria-label="Show next product"
-          className="absolute right-1 top-[120px] lg:right-7 sm:top-[220px] lg:top-[250px]  z-50 inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 bg-white text-[#1D3C61] shadow-md transition hover:border-[#2F73BD] hover:text-[#2F73BD] disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300 sm:right-0 sm:h-11 sm:w-11 sm:translate-x-1/2 "
+          className="absolute right-1 top-[120px] lg:right-7 sm:top-[220px] lg:top-[250px]  z-10 inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 bg-white text-[#1D3C61] shadow-md transition hover:border-[#2F73BD] hover:text-[#2F73BD] disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300 sm:right-0 sm:h-11 sm:w-11 sm:translate-x-1/2 "
         >
           <FaChevronRight className="h-2 w-2 sm:h-4 sm:w-4" />
         </button>

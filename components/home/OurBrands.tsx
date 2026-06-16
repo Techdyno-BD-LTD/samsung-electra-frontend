@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import Skeleton from "@/components/common/Skeleton";
 
 type Category = {
@@ -115,9 +116,10 @@ export default function OurBrands() {
 
       <div className="mt-0 grid grid-cols-2 gap-2 sm:grid-cols-2 sm:gap-3 xl:grid-cols-4">
         {activeSection.selected_categories.slice(0, 4).map((category) => (
-          <article
+          <Link
             key={`${activeSection.row_index}-${category.id}`}
-            className="border border-slate-200  px-4 pb-3 pt-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[#2F73BD]/30 hover:shadow-md"
+            href={`/category/${category.slug}?brands=${activeSection.brand.slug}`}
+            className="block border border-slate-200 bg-white px-4 pb-3 pt-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[#2F73BD]/30 hover:shadow-md"
           >
             <div className="relative mx-auto h-7 w-full max-w-[130px]">
               <Image
@@ -142,7 +144,7 @@ export default function OurBrands() {
             <h3 className="mt-5 text-center text-[12px] xl:text-base font-medium text-slate-900">
               {category.name}
             </h3>
-          </article>
+          </Link>
         ))}
       </div>
     </section>
