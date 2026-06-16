@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAppSelector } from "@/store/hooks";
 import {
   FaFacebookF,
   FaInstagram,
@@ -41,6 +43,8 @@ type FooterData = {
 };
 
 export default function Footer() {
+  const router = useRouter();
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
   const [mounted, setMounted] = useState(false);
   const [footerData, setFooterData] = useState<FooterData | null>(null);
   const currentYear = new Date().getFullYear();
@@ -56,6 +60,14 @@ export default function Footer() {
       })
       .catch((err) => console.error("Failed to fetch footer data:", err));
   }, []);
+
+  const handleServiceRequestClick = () => {
+    if (isAuthenticated) {
+      router.push("/dashboard/service");
+    } else {
+      router.push("/login?redirect=/dashboard/service");
+    }
+  };
 
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
 
@@ -254,7 +266,10 @@ export default function Footer() {
                   </li>
                 ))}
               </ul>
-              <button className="w-full bg-[#005faa] text-white py-1 rounded-md font-semibold text-[13px] hover:bg-[#004a80] transition-colors shadow-sm mt-4">
+              <button 
+                onClick={handleServiceRequestClick}
+                className="w-full bg-[#005faa] text-white py-1 rounded-md font-semibold text-[13px] hover:bg-[#004a80] transition-colors shadow-sm mt-4"
+              >
                 Service Request
               </button>
             </div>
@@ -355,7 +370,10 @@ export default function Footer() {
                     ))}
                   </ul>
                   {section.title === "After Sales Support" && (
-                    <button className="w-full bg-[#005faa] text-white py-2.5 rounded-md font-semibold text-[14px] hover:bg-[#004a80] transition-colors shadow-sm mt-4">
+                    <button 
+                      onClick={handleServiceRequestClick}
+                      className="w-full bg-[#005faa] text-white py-2.5 rounded-md font-semibold text-[14px] hover:bg-[#004a80] transition-colors shadow-sm mt-4"
+                    >
                       Service Request
                     </button>
                   )}
