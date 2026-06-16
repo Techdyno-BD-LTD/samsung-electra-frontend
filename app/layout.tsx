@@ -39,6 +39,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const siteIcon = findSetting("site_icon") || "/favicon.ico";
 
   return {
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
     title: siteTitle,
     description: siteDescription,
     icons: {

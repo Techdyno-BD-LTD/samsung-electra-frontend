@@ -5,7 +5,8 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: Request, { params }: { params: { slug: string } }) {
   try {
     const slug = params.slug;
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v2';
+    const baseUrl = process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    const backendUrl = baseUrl.includes('/api/v2') ? baseUrl : (baseUrl.endsWith('/') ? `${baseUrl}api/v2` : `${baseUrl}/api/v2`);
     const response = await fetch(`${backendUrl}/flash-deals/details/${slug}`, {
       method: 'GET',
       headers: {
