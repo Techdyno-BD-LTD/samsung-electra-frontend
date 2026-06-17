@@ -54,6 +54,36 @@ interface ProductCardProps {
   productData?: ProductData;
 }
 
+const hasDiscount = (
+  discountStr?: string | null,
+  mainPrice?: string | number | null,
+  strokedPrice?: string | number | null
+) => {
+  if (discountStr) {
+    const cleanDiscount = String(discountStr).replace(/[^\d.]/g, '');
+    if (parseFloat(cleanDiscount) === 0) {
+      return false;
+    }
+  }
+  if (mainPrice && strokedPrice) {
+    const parsePrice = (priceStr?: string | number | null) => {
+      if (priceStr === null || priceStr === undefined) return 0;
+      const normalized = String(priceStr).replace(/[^\d.]/g, '');
+      return parseFloat(normalized) || 0;
+    };
+    const main = parsePrice(mainPrice);
+    const stroked = parsePrice(strokedPrice);
+    if (stroked <= main) {
+      return false;
+    }
+    return true;
+  }
+  if (mainPrice && !strokedPrice) {
+    return false;
+  }
+  return !!discountStr;
+};
+
 const ProductCard = ({
   cardVariant = "default",
   category = "",
@@ -400,9 +430,13 @@ const ProductCard = ({
             {/* Prices - fades out and slides up on hover */}
             <div className="flex flex-wrap items-center gap-2 text-sm transition-all duration-300 ease-in-out group-hover:pointer-events-none group-hover:-translate-y-4 group-hover:opacity-0">
               <span className="text-lg font-bold text-slate-900">{price}</span>
-              {originalPrice && <span className="text-slate-400 line-through text-xs">{originalPrice}</span>}
-              {saveAmount && <span className="rounded bg-[#1B57A6] px-2 py-0.5 text-xs text-white">{saveAmount}</span>}
-              {discountPercent && <span className="text-xs text-red-500 font-medium">{discountPercent}</span>}
+              {hasDiscount(discountPercent, price, originalPrice) && (
+                <>
+                  {originalPrice && <span className="text-slate-400 line-through text-xs">{originalPrice}</span>}
+                  {saveAmount && <span className="rounded bg-[#1B57A6] px-2 py-0.5 text-xs text-white">{saveAmount}</span>}
+                  {discountPercent && <span className="text-xs text-red-500 font-medium">{discountPercent}</span>}
+                </>
+              )}
             </div>
 
             {/* Buy Now - slides up and fades in on hover */}
@@ -541,7 +575,9 @@ const ProductCard = ({
 
         <div className="flex items-end gap-2 px-2 pb-2 sm:px-4">
           <span className="text-[14px] sm:text-[17px] font-bold text-[#0AB15A]">{currentPrice}</span>
-          <span className="text-[12px] text-slate-400 line-through">{oldPrice}</span>
+          {hasDiscount(productData?.discount || discountPercent, currentPrice, oldPrice) && oldPrice && (
+            <span className="text-[12px] text-slate-400 line-through">{oldPrice}</span>
+          )}
         </div>
 
         <div className="px-2 pb-1 sm:px-4">
@@ -728,34 +764,42 @@ const ProductCard = ({
         <span className="text-[14px] font-bold text-[#0081FF] sm:text-[17px]">
           {productData?.main_price || price}
         </span>
-        <span className="text-[11px] text-[#909090] line-through sm:text-[13px]">
-          {productData?.stroked_price || originalPrice}
-        </span>
-        <span className="text-[10px] font-semibold text-red-600 sm:text-xs">
-          {productData?.discount || discountPercent}
-        </span>
-
-        <div>
-          {(() => {
-            const parsePrice = (priceStr?: string | number) => {
-              if (priceStr === null || priceStr === undefined) return 0;
-              const normalized = String(priceStr).replace(/[^\d.]/g, '');
-              return parseFloat(normalized) || 0;
-            };
-
-            const original = parsePrice(productData?.stroked_price || originalPrice);
-            const current = parsePrice(productData?.main_price || price);
-            const savings = original - current;
-
-            if (savings <= 0) return null;
-
-            return (
-              <span className="inline-block rounded-tl-2xl rounded-br-2xl bg-red-600 px-2 py-0.5 text-[9px] font-medium text-white uppercase sm:px-3 sm:py-1 sm:text-[10px]">
-                Save: {savings.toLocaleString('en-US', { minimumFractionDigits: 0 })}
+        {hasDiscount(productData?.discount || discountPercent, productData?.main_price || price, productData?.stroked_price || originalPrice) && (
+          <>
+            {(productData?.stroked_price || originalPrice) && (
+              <span className="text-[11px] text-[#909090] line-through sm:text-[13px]">
+                {productData?.stroked_price || originalPrice}
               </span>
-            );
-          })()}
-        </div>
+            )}
+            {(productData?.discount || discountPercent) && (
+              <span className="text-[10px] font-semibold text-red-600 sm:text-xs">
+                {productData?.discount || discountPercent}
+              </span>
+            )}
+
+            <div>
+              {(() => {
+                const parsePrice = (priceStr?: string | number) => {
+                  if (priceStr === null || priceStr === undefined) return 0;
+                  const normalized = String(priceStr).replace(/[^\d.]/g, '');
+                  return parseFloat(normalized) || 0;
+                };
+
+                const original = parsePrice(productData?.stroked_price || originalPrice);
+                const current = parsePrice(productData?.main_price || price);
+                const savings = original - current;
+
+                if (savings <= 0) return null;
+
+                return (
+                  <span className="inline-block rounded-tl-2xl rounded-br-2xl bg-red-600 px-2 py-0.5 text-[9px] font-medium text-white uppercase sm:px-3 sm:py-1 sm:text-[10px]">
+                    Save: {savings.toLocaleString('en-US', { minimumFractionDigits: 0 })}
+                  </span>
+                );
+              })()}
+            </div>
+          </>
+        )}
       </div>
 
 

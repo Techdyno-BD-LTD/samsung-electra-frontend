@@ -30,7 +30,7 @@ type MobileOfferDetailsProps = {
 
 function renderTextAfterColonBold(text?: string) {
   if (!text) return text;
-  
+
   const colonIndex = text.indexOf(":");
 
   if (colonIndex === -1) {
@@ -118,4 +118,4 @@ export default function MobileOfferDetails({
       </div>
     </div>
   );
-}
+}

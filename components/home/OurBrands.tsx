@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import Skeleton from "@/components/common/Skeleton";
 
 type Category = {
@@ -34,6 +35,35 @@ export default function OurBrands() {
   const [title, setTitle] = useState("Our Brands");
   const [activeRowIndex, setActiveRowIndex] = useState<number>(0);
 
+  const sliderRef = useRef<HTMLDivElement | null>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const updateScrollState = () => {
+    const slider = sliderRef.current;
+    if (!slider) return;
+    const tolerance = 2;
+    setCanScrollLeft(slider.scrollLeft > tolerance);
+    setCanScrollRight(slider.scrollLeft < slider.scrollWidth - slider.clientWidth - tolerance);
+  };
+
+  const scrollByOneCard = (direction: 1 | -1) => {
+    const slider = sliderRef.current;
+    if (!slider) return;
+
+    const firstCard = slider.querySelector("[data-brand-category-card]") as HTMLDivElement | null;
+    if (!firstCard) return;
+
+    const sliderStyles = window.getComputedStyle(slider);
+    const gap = parseFloat(sliderStyles.columnGap || sliderStyles.gap || "0") || 0;
+    const shift = firstCard.offsetWidth + gap;
+
+    slider.scrollBy({
+      left: shift * direction,
+      behavior: "smooth",
+    });
+  };
+
   useEffect(() => {
     async function fetchBrandSections() {
       try {
@@ -60,6 +90,24 @@ export default function OurBrands() {
     [activeRowIndex, brandSections]
   );
 
+  useEffect(() => {
+    const slider = sliderRef.current;
+    if (!slider) return;
+
+    const onScroll = () => updateScrollState();
+    const onResize = () => updateScrollState();
+
+    slider.scrollLeft = 0;
+    updateScrollState();
+    slider.addEventListener("scroll", onScroll);
+    window.addEventListener("resize", onResize);
+
+    return () => {
+      slider.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
+    };
+  }, [activeSection, activeSection?.selected_categories?.length]);
+
   if (loading) {
     return (
       <div className="flex w-full items-center justify-center py-10">
@@ -71,6 +119,8 @@ export default function OurBrands() {
   if (!activeSection) {
     return null;
   }
+
+  const hasMultipleCategories = activeSection.selected_categories.length > 2;
 
   return (
     <section className="mx-auto">
@@ -114,10 +164,11 @@ export default function OurBrands() {
         })}
       </div>
 
-      <div className="mt-0 grid grid-cols-2 gap-2 sm:grid-cols-2 sm:gap-3 xl:grid-cols-4">
+      {/* Desktop categories grid (exactly as it was) */}
+      <div className="mt-4 hidden sm:grid grid-cols-2 gap-3 xl:grid-cols-4">
         {activeSection.selected_categories.slice(0, 4).map((category) => (
           <Link
-            key={`${activeSection.row_index}-${category.id}`}
+            key={`${activeSection.row_index}-${category.id}-desktop`}
             href={`/category/${category.slug}?brands=${activeSection.brand.slug}`}
             className="block border border-slate-200 bg-white px-4 pb-3 pt-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[#2F73BD]/30 hover:shadow-md"
           >
@@ -147,6 +198,103 @@ export default function OurBrands() {
           </Link>
         ))}
       </div>
+
+      {/* Mobile view */}
+      {hasMultipleCategories ? (
+        <div className="relative mt-4 block sm:hidden">
+          <button
+            type="button"
+            onClick={() => scrollByOneCard(-1)}
+            disabled={!canScrollLeft}
+            aria-label="Previous categories"
+            className="absolute left-1 top-1/2 -translate-y-1/2 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white/95 text-[#1D3C61] shadow-md transition hover:border-[#2F73BD] hover:text-[#2F73BD] disabled:cursor-not-allowed disabled:border-slate-100 disabled:text-slate-300"
+          >
+            <FaChevronLeft className="h-3 w-3" />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => scrollByOneCard(1)}
+            disabled={!canScrollRight}
+            aria-label="Next categories"
+            className="absolute right-1 top-1/2 -translate-y-1/2 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white/95 text-[#1D3C61] shadow-md transition hover:border-[#2F73BD] hover:text-[#2F73BD] disabled:cursor-not-allowed disabled:border-slate-100 disabled:text-slate-300"
+          >
+            <FaChevronRight className="h-3 w-3" />
+          </button>
+
+          <div
+            ref={sliderRef}
+            className="flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          >
+            {activeSection.selected_categories.map((category) => (
+              <Link
+                key={`${activeSection.row_index}-${category.id}-slider`}
+                href={`/category/${category.slug}?brands=${activeSection.brand.slug}`}
+                data-brand-category-card
+                className="min-w-[70%] snap-start block border border-slate-200 bg-white px-4 pb-3 pt-6 shadow-sm transition-all duration-200 hover:border-[#2F73BD]/30 hover:shadow-md"
+              >
+                <div className="relative mx-auto h-6 w-full max-w-[100px]">
+                  <Image
+                    src={activeSection.brand.logo}
+                    alt={`${activeSection.brand.name} category logo`}
+                    fill
+                    sizes="100px"
+                    className="object-contain"
+                  />
+                </div>
+
+                <div className="relative mx-auto mt-4 h-[160px] w-full max-w-[240px]">
+                  <Image
+                    src={category.cover_image || "/assets/img/placeholder.jpg"}
+                    alt={category.name}
+                    fill
+                    sizes="180px"
+                    className="object-contain"
+                  />
+                </div>
+
+                <h3 className="mt-4 text-center text-[12px] font-medium text-slate-900">
+                  {category.name}
+                </h3>
+              </Link>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="mt-4 grid grid-cols-2 gap-2 block sm:hidden">
+          {activeSection.selected_categories.map((category) => (
+            <Link
+              key={`${activeSection.row_index}-${category.id}-grid-mobile`}
+              href={`/category/${category.slug}?brands=${activeSection.brand.slug}`}
+              className="block border border-slate-200 bg-white px-4 pb-3 pt-6 shadow-sm transition-all duration-200 hover:border-[#2F73BD]/30 hover:shadow-md"
+            >
+              <div className="relative mx-auto h-6 w-full max-w-[100px]">
+                <Image
+                  src={activeSection.brand.logo}
+                  alt={`${activeSection.brand.name} category logo`}
+                  fill
+                  sizes="100px"
+                  className="object-contain"
+                />
+              </div>
+
+              <div className="relative mx-auto mt-4 h-[160px] w-full max-w-[240px]">
+                <Image
+                  src={category.cover_image || "/assets/img/placeholder.jpg"}
+                  alt={category.name}
+                  fill
+                  sizes="180px"
+                  className="object-contain"
+                />
+              </div>
+
+              <h3 className="mt-4 text-center text-[12px] font-medium text-slate-900">
+                {category.name}
+              </h3>
+            </Link>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

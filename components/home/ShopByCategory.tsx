@@ -67,26 +67,26 @@ export default async function ShopByCategory() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 xl:gap-4">
+      <div className="grid grid-cols-3 gap-2 sm:gap-3 lg:grid-cols-4 xl:grid-cols-6 xl:gap-4">
         {dynamicCategories.map((category) => (
           <Link
             key={category.id}
             href={`/category/${category.slug}`}
-            className="group flex flex-col items-center rounded-2xl bg-white p-3  transition-all duration-300 hover:shadow-md lg:p-4 hover:-translate-y-0.5 border border-transparent hover:border-[#2F73BD]/30"
+            className="group flex flex-col items-center rounded-xl sm:rounded-2xl bg-white p-2 sm:p-3 transition-all duration-300 hover:shadow-md lg:p-4 hover:-translate-y-0.5 border border-transparent hover:border-[#2F73BD]/30"
           >
-            <div className="relative mb-3 aspect-square w-full overflow-hidden rounded-xl bg-slate-50 lg:mb-4">
+            <div className="relative mb-2 aspect-square w-full overflow-hidden rounded-lg sm:rounded-xl bg-slate-50 lg:mb-4">
               <Image
                 src={category.imageSrc}
                 alt={category.imageAlt}
                 fill
-                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
-                className="object-contain p-2 transition-transform duration-500 group-hover:scale-110 lg:p-4"
+                sizes="(max-width: 640px) 33vw, (max-width: 1024px) 33vw, 16vw"
+                className="object-contain p-1.5 sm:p-2 transition-transform duration-500 group-hover:scale-110 lg:p-4"
               />
             </div>
 
             <div className="text-center">
-              <h3 className="line-clamp-1 text-sm font-medium text-slate-800 lg:text-xl">{category.name}</h3>
-              <p className="mt-0.5 text-[10px] font-medium text-slate-500 lg:mt-1 lg:text-xs">{category.itemCount}</p>
+              <h3 className="line-clamp-1 text-[11px] font-medium text-slate-800 sm:text-sm lg:text-xl">{category.name}</h3>
+              <p className="mt-0.5 text-[9px] font-medium text-slate-500 sm:text-[10px] lg:mt-1 lg:text-xs">{category.itemCount}</p>
             </div>
           </Link>
         ))}

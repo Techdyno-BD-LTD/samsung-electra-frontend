@@ -142,6 +142,10 @@ export interface ProductData {
   higher_sale?: boolean;
   down_payment?: number;
   monthly_installment?: number;
+  show_free_delivery?: boolean;
+  show_free_installation?: boolean;
+  show_cash_on_delivery?: boolean;
+  show_after_sales_service?: boolean;
   [key: string]: unknown;
 }
 
@@ -188,7 +192,7 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
 
   const toComparable = (value?: string) => value?.trim().toLowerCase() ?? "";
   const isHexColor = (value?: string | null) => /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(value ?? "");
-  
+
   const parseHtmlFeatures = (htmlContent?: string): string[] => {
     if (!htmlContent) return [];
     // Simple regex to extract text between <p> tags, working on both server and client
@@ -209,15 +213,15 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
       try {
         setLoading(true);
         setError(null);
-        
+
         const response = await fetch(`/api/products/${slug}`);
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch product');
         }
 
         const data = await response.json();
-        
+
         if (data.success && data.data && data.data.length > 0) {
           setProductData(data.data[0]);
         } else {
@@ -269,6 +273,7 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
 
       const productInfo = {
         id: productData.id,
+        slug: productData.slug,
         title: productData.name,
         image: productData.thumbnail_image,
         brandLogo: productData.brand?.logo,
@@ -293,22 +298,51 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
     }
   }, [productData]);
 
+  const isDemoMode = process.env.NEXT_PUBLIC_APP_MODE === 'demo';
+
   const category = productData?.category_info?.category_name || productData?.category?.name || "Product Category";
   const title = productData?.name || "Product Title";
   const brandName = productData?.brand?.name || "Brand";
   const brandLogo = productData?.brand?.logo || "/images/samsung.png";
   const ratingCount = productData?.rating_count?.toString() || "0";
-  const categoryName = productData?.category_info?.category_name || 
-                    (typeof productData?.category === 'object' ? productData.category?.name : productData?.category) || 
-                    "Category";
-  const model = productData?.model_number || "Model";
-  const sku = productData?.variants?.[0]?.sku || "SKU";
+  const categoryName = productData?.category_info?.category_name ||
+    (typeof productData?.category === 'object' ? productData.category?.name : productData?.category) ||
+    "Category";
+  const model = productData?.model_number || (isDemoMode ? "Model" : "");
+  const sku = productData?.variants?.[0]?.sku || (isDemoMode ? "SKU" : "");
   const price = productData?.main_price || "Price";
   const originalPrice = productData?.stroked_price || "Price";
-  const discountLabel = productData?.discount || "0% Off";
-  const saveLabel = productData?.discount || "Save Amount";
+
+  const hasDisc = useMemo(() => {
+    if (isDemoMode) return true;
+    if (!productData?.discount || /^(0%|0%\s*off|0)$/i.test(productData.discount)) {
+      return false;
+    }
+    if (productData.main_price && productData.stroked_price) {
+      const main = Number(productData.main_price.replace(/[^0-9.-]+/g, ""));
+      const stroked = Number(productData.stroked_price.replace(/[^0-9.-]+/g, ""));
+      if (!isNaN(main) && !isNaN(stroked) && stroked <= main) {
+        return false;
+      }
+    }
+    return true;
+  }, [productData, isDemoMode]);
+
+  const saveAmountText = useMemo(() => {
+    if (productData?.stroked_price && productData?.main_price) {
+      const orig = Number(productData.stroked_price.replace(/[^0-9.-]+/g, ""));
+      const curr = Number(productData.main_price.replace(/[^0-9.-]+/g, ""));
+      if (!isNaN(orig) && !isNaN(curr) && orig > curr) {
+        return `SAVE : ৳ ${(orig - curr).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+      }
+    }
+    return isDemoMode ? "SAVE : ৳ 0" : "";
+  }, [productData, isDemoMode]);
+
+  const discountLabel = hasDisc ? (productData?.discount || (isDemoMode ? "0% Off" : "")) : "";
+  const saveLabel = hasDisc ? (saveAmountText || (isDemoMode ? "Save Amount" : "")) : "";
   const offersLabel = "View offers";
-  const emiText = productData?.emi_start || "EMI Available";
+  const emiText = productData?.emi_start || (isDemoMode ? "EMI Available" : "");
   const emiDetailsLabel = productData?.emi_facility?.link_label ? productData.emi_facility.link_label : "See details";
   const colorLabel = "Color";
   const features = productData?.tags || [];
@@ -316,22 +350,60 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
   const featuresList = parseHtmlFeatures(productData?.other_features) || productData?.tags || [];
   const mainImage = productData?.thumbnail_image || "/images/wm2.png";
   const warrantyBadgeImage = "/images/warrantybadge.png";
+  const specialOffers = useMemo(() => {
+    const raw = productData?.special_offers || [];
+    if (isDemoMode) return raw;
+    if (raw.length === 2 &&
+        raw[0]?.text === 'EBL Cashback 10%' &&
+        raw[1]?.text === 'Nagad Cashback 10%') {
+      return [];
+    }
+    return raw;
+  }, [productData?.special_offers, isDemoMode]);
+
+  const specialOfferTitle = useMemo(() => {
+    const title = productData?.special_offer_title || "";
+    if (isDemoMode) return title || "Special Offer";
+    if (title === 'Special Offer' && specialOffers.length === 0) {
+      return "";
+    }
+    return title;
+  }, [productData?.special_offer_title, specialOffers, isDemoMode]);
+
   const specialOfferLeft = "Special Offer";
   const specialOfferOne = "Offer 1";
   const specialOfferTwo = "Offer 2";
-  const showroomTitle = productData?.book_in_showroom_title ? productData.book_in_showroom_title : "Book in showroom Get 5% Off";
-  const shippingInfo = productData?.estimated_shipping_text ? productData.estimated_shipping_text : "Shipping information";
-  const warrantyInfo = productData?.warranty?.text ? productData.warranty.text : productData?.warranty?.warranty_type ? `Warranty: ${productData.warranty.warranty_type}` : "Warranty information";
+  const showroomTitle = productData?.book_in_showroom_title ? productData.book_in_showroom_title : (isDemoMode ? "Book in showroom Get 5% Off" : "");
+  const shippingInfo = productData?.estimated_shipping_text ? productData.estimated_shipping_text : (isDemoMode ? "Shipping information" : "");
+  const warrantyInfo = productData?.warranty?.text ? productData.warranty.text : productData?.warranty?.warranty_type ? `Warranty: ${productData.warranty.warranty_type}` : (isDemoMode ? "Warranty information" : "");
   const warrantyLinkLabel = productData?.warranty?.link_label ? productData.warranty.link_label : "View policy";
-  const emiFacilityInfo = productData?.emi_facility?.text ? productData.emi_facility.text : "EMI information";
+
+  const emiFacilityInfo = useMemo(() => {
+    const rawText = productData?.emi_facility?.text || "";
+    if (isDemoMode) return rawText || "EMI information";
+    if (/^0% emi facility for 6 months & available emi 36 month for this item$/i.test(rawText.trim())) {
+      return "";
+    }
+    return rawText;
+  }, [productData?.emi_facility?.text, isDemoMode]);
+
   const emiLinkLabel = productData?.emi_facility?.link_label ? productData.emi_facility.link_label : "See EMI Details";
-  const exchangeInfo = productData?.exchange?.text ? productData.exchange.text : "Exchange information";
+
+  const exchangeInfo = useMemo(() => {
+    const rawText = productData?.exchange?.text || "";
+    if (isDemoMode) return rawText || "Exchange information";
+    if (/^yes \/ no not available for this item \/ get exchange up to 4000 tk available from$/i.test(rawText.trim())) {
+      return "";
+    }
+    return rawText;
+  }, [productData?.exchange?.text, isDemoMode]);
+
   const exchangeLinkLabel = productData?.exchange?.link_label ? productData.exchange.link_label : "Available Showrooms";
-  const madeInText = productData?.made_in_text ? productData.made_in_text : "Product information";
+  const madeInText = productData?.made_in_text ? productData.made_in_text : (isDemoMode ? "Product information" : "");
 
   const breadcrumbs = useMemo(() => {
     const items = [{ label: "Home", href: "/" }];
-    
+
     // Parent Category
     if (productData?.category_info?.parent_category_name) {
       items.push({
@@ -339,18 +411,18 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
         href: `/category/${productData.category_info.parent_category_slug || '#'}`
       });
     }
-    
-    const catSlug = productData?.category_info?.category_slug || 
-                    (typeof productData?.category === 'object' ? productData.category?.slug : null);
-                    
+
+    const catSlug = productData?.category_info?.category_slug ||
+      (typeof productData?.category === 'object' ? productData.category?.slug : null);
+
     items.push({
       label: categoryName,
       href: catSlug ? `/category/${catSlug}` : '#'
     });
-    
+
     // Last item (Product name or just "Product details")
     items.push({ label: "Product details", href: "#" });
-    
+
     return items;
   }, [productData]);
 
@@ -409,21 +481,21 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
 
   const selectedSku = selectedVariant?.sku || sku;
   const selectedAvailability = (selectedVariant?.qty ?? productData?.current_stock ?? 0) > 0 ? "In Stock" : "Out of Stock";
-  
+
   const displayGallery = useMemo(() => {
     const images = new Set<string>();
     const thumb = productData?.thumbnail_image || mainImage || "/images/wm2.png";
     if (thumb) images.add(thumb as string);
-    
+
     productData?.photos?.forEach((p: { path?: string; photo?: string }) => {
       const img = p.path || p.photo;
       if (img) images.add(img);
     });
-    
+
     (productData?.variants ?? []).forEach((v: { image?: string }) => {
       if (v.image) images.add(v.image);
     });
-    
+
     return Array.from(images);
   }, [productData, mainImage]);
 
@@ -625,7 +697,7 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
                     }}
                   />
 
-                  <div 
+                  <div
                     className="hidden items-center justify-center md:flex md:min-h-[700px] cursor-zoom-in"
                     onClick={() => setIsZoomModalOpen(true)}
                   >
@@ -660,8 +732,8 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
                     <FaChevronLeft className="h-4 w-4 text-slate-600" />
                   </button>
                 )}
-                
-                <div 
+
+                <div
                   ref={thumbnailContainerRef}
                   className="flex gap-2 overflow-x-hidden scroll-smooth w-full px-1"
                   style={{ scrollbarWidth: 'none' }}
@@ -711,13 +783,21 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
                     <FaStar className="h-2.5 w-2.5 text-slate-300" />
                     <span className="ml-0.5 text-slate-500">{ratingCount}</span>
                   </div>
-                  <span>|</span>
-                  <span>Model : {model}</span>
+                  {model && (
+                    <>
+                      <span>|</span>
+                      <span>Model : {model}</span>
+                    </>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-2 whitespace-nowrap">
-                  <span>SKU : {selectedSku}</span>
-                  <span>|</span>
+                  {selectedSku && (
+                    <>
+                      <span>SKU : {selectedSku}</span>
+                      <span>|</span>
+                    </>
+                  )}
                   <span className="text-[#0A67C8]">{selectedAvailability}</span>
                 </div>
               </div>
@@ -732,10 +812,18 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
                   <FaStar className="h-3 w-3 text-slate-300" />
                   <span className="ml-1 text-slate-500">{ratingCount}</span>
                 </div>
-                <span>|</span>
-                <span>Model : {model}</span>
-                <span>|</span>
-                <span>SKU : {selectedSku}</span>
+                {model && (
+                  <>
+                    <span>|</span>
+                    <span>Model : {model}</span>
+                  </>
+                )}
+                {selectedSku && (
+                  <>
+                    <span>|</span>
+                    <span>SKU : {selectedSku}</span>
+                  </>
+                )}
                 <span>|</span>
                 <span className="text-[#0A67C8]">{selectedAvailability}</span>
               </div>
@@ -743,23 +831,29 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
               <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:hidden">
                 <p className="text-[22px] font-medium leading-none text-[#0C73DA]">{price}</p>
                 {productData?.higher_sale ? (
-                   <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
-                      <div className="flex flex-col">
-                        <span className="text-[8px] text-slate-500 font-bold uppercase">Down</span>
-                        <span className="text-xs font-bold text-[#0081FF]">৳{productData.down_payment?.toLocaleString()}</span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-[8px] text-slate-500 font-bold uppercase">Monthly</span>
-                        <span className="text-xs font-bold text-[#0081FF]">৳{productData.monthly_installment?.toLocaleString()}</span>
-                      </div>
-                   </div>
+                  <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
+                    <div className="flex flex-col">
+                      <span className="text-[8px] text-slate-500 font-bold uppercase">Down</span>
+                      <span className="text-xs font-bold text-[#0081FF]">৳{productData.down_payment?.toLocaleString()}</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[8px] text-slate-500 font-bold uppercase">Monthly</span>
+                      <span className="text-xs font-bold text-[#0081FF]">৳{productData.monthly_installment?.toLocaleString()}</span>
+                    </div>
+                  </div>
                 ) : (
                   <>
-                    <div className="flex flex-col items-center leading-none">
-                      <p className="text-[8px] font-semibold text-[#15A85B]">{discountLabel}</p>
-                      <p className="text-[10px] text-slate-400 line-through">{originalPrice}</p>
-                    </div>
-                    <span className="rounded-tl-3xl rounded-br-3xl bg-[#F13D36] px-3 py-1 text-[8px] font-semibold leading-none text-white">{saveLabel}</span>
+                    {hasDisc && (
+                      <>
+                        <div className="flex flex-col items-center leading-none">
+                          <p className="text-[8px] font-semibold text-[#15A85B]">{discountLabel}</p>
+                          <p className="text-[10px] text-slate-400 line-through">{originalPrice}</p>
+                        </div>
+                        {saveLabel && (
+                          <span className="rounded-tl-3xl rounded-br-3xl bg-[#F13D36] px-3 py-1 text-[8px] font-semibold leading-none text-white">{saveLabel}</span>
+                        )}
+                      </>
+                    )}
                     <button type="button" className="text-[8px] font-semibold leading-none text-[#0C73DA]">
                       {offersLabel}
                     </button>
@@ -769,7 +863,7 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
 
               <div className="hidden flex-wrap items-center gap-8 lg:flex">
                 <p className="text-4xl font-medium text-[#0C73DA]">{price}</p>
-                
+
                 {productData?.higher_sale ? (
                   <div className="flex items-center gap-6 border-l border-slate-200 pl-8">
                     <div className="flex flex-col">
@@ -787,14 +881,20 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
                   </div>
                 ) : (
                   <>
-                    <div className="flex flex-col items-center">
-                      <p className="text-base font-semibold text-[#15A85B]">{discountLabel}</p>
-                      <p className="text-md text-slate-400 line-through">{originalPrice}</p>
-                    </div>
+                    {hasDisc && (
+                      <>
+                        <div className="flex flex-col items-center">
+                          <p className="text-base font-semibold text-[#15A85B]">{discountLabel}</p>
+                          <p className="text-md text-slate-400 line-through">{originalPrice}</p>
+                        </div>
 
-                    <span className="rounded-tl-3xl rounded-br-3xl bg-[#F13D36] px-6 py-1 text-sm font-semibold text-white">
-                      SAVE : { (Number(originalPrice.replace(/[^0-9.-]+/g, "")) - Number(price.replace(/[^0-9.-]+/g, ""))).toFixed(2) }
-                    </span>
+                        {saveLabel && (
+                          <span className="rounded-tl-3xl rounded-br-3xl bg-[#F13D36] px-6 py-1 text-sm font-semibold text-white">
+                            {saveLabel}
+                          </span>
+                        )}
+                      </>
+                    )}
 
                     <button type="button" className="text-sm font-semibold text-[#0C73DA]">
                       {offersLabel}
@@ -803,17 +903,19 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
                 )}
               </div>
 
-              <div className="flex items-center  gap-2 border-b border-slate-200 pb-3 text-[12px] lg:text-[16px] text-slate-700">
-                <Image src="/images/EMI.png" alt="EMI" width={20} height={20} className="lg:h-5 h-4 w-4 lg:w-5 object-contain" />
+              {(isDemoMode || emiText) && (
+                <div className="flex items-center  gap-2 border-b border-slate-200 pb-3 text-[12px] lg:text-[16px] text-slate-700">
+                  <Image src="/images/EMI.png" alt="EMI" width={20} height={20} className="lg:h-5 h-4 w-4 lg:w-5 object-contain" />
                   EMI Starts From <span >{emiText}</span>
-                <button 
-                  type="button" 
-                  className="font-semibold text-[#0C73DA]"
-                  onClick={() => setIsBankEmiModalOpen(true)}
-                >
-                  | {emiDetailsLabel}
-                </button>
-              </div>
+                  <button
+                    type="button"
+                    className="font-semibold text-[#0C73DA]"
+                    onClick={() => setIsBankEmiModalOpen(true)}
+                  >
+                    | {emiDetailsLabel}
+                  </button>
+                </div>
+              )}
 
               <div className="space-y-2">
                 {attributesForUi.length > 0 ? (
@@ -842,56 +944,62 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
                     );
                   })
                 ) : (
+                  isDemoMode && (
+                    <div className="flex items-center gap-3 text-[12px] lg:text-sm">
+                      <span className="text-slate-700">Capacity :</span>
+                      <span className="text-slate-400">Not specified</span>
+                    </div>
+                  )
+                )}
+
+                {(colorOptions.length > 0 || isDemoMode) && (
                   <div className="flex items-center gap-3 text-[12px] lg:text-sm">
-                    <span className="text-slate-700">Capacity :</span>
-                    <span className="text-slate-400">Not specified</span>
+                    <span className="text-slate-700">{colorLabel} :</span>
+                    {colorOptions.length > 0 ? (
+                      colorOptions.map((color) => {
+                        const isSelected = toComparable(color.name) === toComparable(activeColorName);
+                        return (
+                          <button
+                            key={color.key}
+                            type="button"
+                            onClick={() => setSelectedColorName(color.name)}
+                            className={`rounded border p-1 ${isSelected ? "border-slate-600" : "border-slate-200"}`}
+                            title={color.name}
+                          >
+                            <span className="flex items-center gap-1.5">
+                              <Image src={color.image} alt={color.name} width={36} height={36} className="lg:h-9 lg:w-9 w-6 h-6 object-contain" />
+                              <span className="text-[10px] text-slate-700 lg:text-xs">{color.name}</span>
+                            </span>
+                          </button>
+                        );
+                      })
+                    ) : (
+                      <span className="text-slate-400">Not specified</span>
+                    )}
                   </div>
                 )}
+              </div>
 
-                <div className="flex items-center gap-3 text-[12px] lg:text-sm">
-                  <span className="text-slate-700">{colorLabel} :</span>
-                  {colorOptions.length > 0 ? (
-                    colorOptions.map((color) => {
-                      const isSelected = toComparable(color.name) === toComparable(activeColorName);
-                      return (
-                      <button
-                        key={color.key}
-                        type="button"
-                        onClick={() => setSelectedColorName(color.name)}
-                        className={`rounded border p-1 ${isSelected ? "border-slate-600" : "border-slate-200"}`}
-                        title={color.name}
-                      >
-                        <span className="flex items-center gap-1.5">
-                          <Image src={color.image} alt={color.name} width={36} height={36} className="lg:h-9 lg:w-9 w-6 h-6 object-contain" />
-                          <span className="text-[10px] text-slate-700 lg:text-xs">{color.name}</span>
-                        </span>
-                      </button>
-                      );
-                    })
+              {(featuresList.length > 0 || isDemoMode) && (
+                <div className="text-[14px] text-slate-700 hidden lg:block space-y-1">
+                  {featuresList && featuresList.length > 0 ? (
+                    <>
+                      {featuresList.slice(0, 4).map((feature, index) => (
+                        <p key={`${feature}-${index}`}>
+                          • {feature}
+                        </p>
+                      ))}
+                      {featuresList.length > 4 && (
+                        <button type="button" className="ml-3 text-[12px] font-semibold text-[#0C73DA] hover:underline">
+                          See More Features
+                        </button>
+                      )}
+                    </>
                   ) : (
-                    <span className="text-slate-400">Not specified</span>
+                    <p className="text-slate-400">No features available</p>
                   )}
                 </div>
-              </div>
-
-              <div className="text-[14px] text-slate-700 hidden lg:block space-y-1">
-                {featuresList && featuresList.length > 0 ? (
-                  <>
-                    {featuresList.slice(0, 4).map((feature, index) => (
-                      <p key={`${feature}-${index}`}>
-                        • {feature}
-                      </p>
-                    ))}
-                    {featuresList.length > 4 && (
-                      <button type="button" className="ml-3 text-[12px] font-semibold text-[#0C73DA] hover:underline">
-                        See More Features
-                      </button>
-                    )}
-                  </>
-                ) : (
-                  <p className="text-slate-400">No features available</p>
-                )}
-              </div>
+              )}
 
               <div className="flex items-start gap-2 lg:hidden">
                 <div className="relative h-[55px] w-[65px] overflow-hidden rounded-lg">
@@ -916,10 +1024,12 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
                 </div>
 
                 <div className="min-w-0 flex-1 space-y-1.5">
-                  <button type="button" className="inline-flex items-center gap-1.5 whitespace-nowrap text-[11px] font-medium tracking-wide text-[#0C73DA] leading-none">
-                    <Image src="/images/shop.png" alt="Showroom" width={12} height={12} className="h-3 w-3 object-contain" />
-                    {showroomTitle}
-                  </button>
+                  {showroomTitle && (
+                    <button type="button" className="inline-flex items-center gap-1.5 whitespace-nowrap text-[11px] font-medium tracking-wide text-[#0C73DA] leading-none">
+                      <Image src="/images/shop.png" alt="Showroom" width={12} height={12} className="h-3 w-3 object-contain" />
+                      {showroomTitle}
+                    </button>
+                  )}
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-3 rounded-md border border-slate-300 px-7 py-1">
                       <button type="button" onClick={handleDecrement} className="text-slate-600">
@@ -987,9 +1097,11 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
                     <button type="button" className="text-[16px] text-slate-600 leading-none">
                       Share
                     </button>
-                    <button type="button" className="whitespace-nowrap text-[16px] font-semibold text-[#0C73DA] leading-none">
-                      {showroomTitle}
-                    </button>
+                    {showroomTitle && (
+                      <button type="button" className="whitespace-nowrap text-[16px] font-semibold text-[#0C73DA] leading-none">
+                        {showroomTitle}
+                      </button>
+                    )}
                   </div>
 
                   <div className="sm:grid gap-3 sm:grid-cols-2 hidden ">
@@ -1030,98 +1142,133 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
                 </div>
               </div>
 
-              <MobileOfferDetails
-                specialOfferTitle={specialOfferLeft}
-                shippingInfo={shippingInfo}
-                warrantyInfo={warrantyInfo}
-                emiFacilityInfo={emiFacilityInfo}
-                exchangeInfo={exchangeInfo}
-              />
+              {(isDemoMode || (shippingInfo || warrantyInfo || emiFacilityInfo || exchangeInfo || showroomTitle || (specialOffers && specialOffers.length > 0))) && (
+                <MobileOfferDetails
+                  productData={{
+                    special_offers: specialOffers,
+                    special_offer_title: specialOfferTitle
+                  }}
+                  specialOfferTitle={specialOfferTitle || specialOfferLeft}
+                  shippingInfo={shippingInfo}
+                  warrantyInfo={warrantyInfo}
+                  emiFacilityInfo={emiFacilityInfo}
+                  exchangeInfo={exchangeInfo}
+                />
+              )}
 
-              <MobileMadeInFeatures madeInText={madeInText} features={features} />
+              {(isDemoMode || (madeInText || (features && features.length > 0))) && (
+                <MobileMadeInFeatures madeInText={madeInText} features={features} />
+              )}
 
-              <div className="hidden lg:flex lg:flex-wrap lg:items-center lg:gap-x-3 lg:gap-y-2 lg:py-1 lg:text-md lg:text-slate-600">
-                <p className="mr-0 flex shrink-0 items-center gap-1.5 border-r border-slate-300 pr-3 last:border-r-0 last:pr-0 lg:mr-4 lg:gap-2 lg:border-r-2 lg:pr-4">
-                  <Image src="/images/freedelivery.png" alt="Free delivery" width={20} height={20} className="h-5 w-5 object-contain" />
-                  Free Delivery
-                </p>
-                <p className="mr-0 flex shrink-0 items-center gap-1.5 border-r border-slate-300 pr-3 last:border-r-0 last:pr-0 lg:mr-4 lg:gap-2 lg:border-r-2 lg:pr-4">
-                  <Image src="/images/freeinstalation.png" alt="Free installation" width={20} height={20} className="h-5 w-5 object-contain" />
-                  Free Installation
-                </p>
-                <p className="mr-0 flex shrink-0 items-center gap-1.5 border-r border-slate-300 pr-3 last:border-r-0 last:pr-0 lg:mr-4 lg:gap-2 lg:border-r-2 lg:pr-4">
-                  <Image src="/images/cashondelivery.png" alt="Cash on delivery" width={20} height={20} className="h-5 w-5 object-contain" />
-                  Cash on delivery
-                </p>
-                <p className="mr-0 flex shrink-0 items-center gap-1.5 border-r border-slate-300 pr-3 last:border-r-0 last:pr-0 lg:mr-4 lg:gap-2 lg:border-r-2 lg:pr-4">
-                  <Image src="/images/salesservice.png" alt="After sales service" width={20} height={20} className="h-5 w-5 object-contain" />
-                  After sales service
-                </p>
-              </div>
-
-              {(productData?.special_offers?.length ?? 0) > 0 ? (
-                <div className="hidden lg:inline-flex lg:w-fit lg:max-w-full lg:flex-wrap lg:items-center lg:gap-2 lg:rounded-lg lg:border lg:border-[#2F7FE8] lg:px-3 lg:py-2 lg:text-sm lg:text-slate-900">
-                  <span className="whitespace-nowrap text-[15px] font-semibold text-[#0C73DA] md:text-sm">*{productData?.special_offer_title || specialOfferLeft} =</span>
-
-                  {productData?.special_offers?.map((offer, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      {index > 0 && <span className="h-6 w-px bg-slate-500/60" aria-hidden="true" />}
-                      <span className="flex items-center gap-2 whitespace-nowrap text-[15px] md:text-sm">
-                        {offer.image ? (
-                          <Image src={offer.image} alt={offer.text || `Offer ${index + 1}`} width={40} height={24} className="h-6 w-auto object-contain" />
-                        ) : null}
-                        {offer.text}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="hidden lg:inline-flex lg:w-fit lg:max-w-full lg:flex-wrap lg:items-center lg:gap-2 lg:rounded-lg lg:border lg:border-[#2F7FE8] lg:px-3 lg:py-2 lg:text-sm lg:text-slate-900">
-                  <span className="whitespace-nowrap text-[15px] font-semibold text-[#0C73DA] md:text-sm">*{specialOfferLeft} =</span>
-
-                  <span className="h-6 w-px bg-slate-500/60" aria-hidden="true" />
-
-                  <span className="flex items-center gap-2 whitespace-nowrap text-[15px] md:text-sm">
-                    <Image src="/images/ebl.png" alt="EBL" width={40} height={24} className="h-6 w-auto object-contain" />
-                    {specialOfferOne}
-                  </span>
-
-                  <span className="h-6 w-px bg-slate-500/60" aria-hidden="true" />
-
-                  <span className="flex items-center gap-2 whitespace-nowrap text-[15px] md:text-sm">
-                    <Image src="/images/nogod.png" alt="Nagad" width={40} height={24} className="h-6 w-auto object-contain" />
-                    {specialOfferTwo}
-                  </span>
+              {(productData?.show_free_delivery !== false ||
+                productData?.show_free_installation !== false ||
+                productData?.show_cash_on_delivery !== false ||
+                productData?.show_after_sales_service !== false) && (
+                <div className="hidden lg:flex lg:flex-wrap lg:items-center lg:gap-x-3 lg:gap-y-2 lg:py-1 lg:text-md lg:text-slate-600">
+                  {productData?.show_free_delivery !== false && (
+                    <p className="mr-0 flex shrink-0 items-center gap-1.5 border-r border-slate-300 pr-3 last:border-r-0 last:pr-0 lg:mr-4 lg:gap-2 lg:border-r-2 lg:pr-4">
+                      <Image src="/images/freedelivery.png" alt="Free delivery" width={20} height={20} className="h-5 w-5 object-contain" />
+                      Free Delivery
+                    </p>
+                  )}
+                  {productData?.show_free_installation !== false && (
+                    <p className="mr-0 flex shrink-0 items-center gap-1.5 border-r border-slate-300 pr-3 last:border-r-0 last:pr-0 lg:mr-4 lg:gap-2 lg:border-r-2 lg:pr-4">
+                      <Image src="/images/freeinstalation.png" alt="Free installation" width={20} height={20} className="h-5 w-5 object-contain" />
+                      Free Installation
+                    </p>
+                  )}
+                  {productData?.show_cash_on_delivery !== false && (
+                    <p className="mr-0 flex shrink-0 items-center gap-1.5 border-r border-slate-300 pr-3 last:border-r-0 last:pr-0 lg:mr-4 lg:gap-2 lg:border-r-2 lg:pr-4">
+                      <Image src="/images/cashondelivery.png" alt="Cash on delivery" width={20} height={20} className="h-5 w-5 object-contain" />
+                      Cash on delivery
+                    </p>
+                  )}
+                  {productData?.show_after_sales_service !== false && (
+                    <p className="mr-0 flex shrink-0 items-center gap-1.5 border-r border-slate-300 pr-3 last:border-r-0 last:pr-0 lg:mr-4 lg:gap-2 lg:border-r-2 lg:pr-4">
+                      <Image src="/images/salesservice.png" alt="After sales service" width={20} height={20} className="h-5 w-5 object-contain" />
+                      After sales service
+                    </p>
+                  )}
                 </div>
               )}
 
-              <div className="hidden lg:block lg:space-y-2 lg:border-b lg:border-slate-200 lg:pb-3 lg:text-xs lg:text-slate-600 lg:md:text-sm">
-                <p className="flex items-center gap-5">
-                  <Image src="/images/shippingtime.png" alt="Shipping time" width={24} height={24} unoptimized className="h-7 w-7 object-contain" />
-                  <span>Shipping Timeline:</span>{shippingInfo}
-                </p>
-                <p className="flex flex-wrap items-center gap-2">
-                  <span className="flex items-center gap-5">
-                    <Image src="/images/warranty.png" alt="Warranty" width={24} height={24} unoptimized className="h-7 w-7 object-contain" />
-                    {warrantyInfo}
-                  </span>
-                  <button type="button" className="whitespace-nowrap text-[#0C73DA] text-xs md:text-sm font-medium hover:underline">{warrantyLinkLabel}</button>
-                </p>
-                <p className="flex items-center gap-5">
-                  <Image src="/images/Vector.png" alt="EMI facility" width={24} height={24} unoptimized className="h-7 w-7 object-contain" />
-                  {emiFacilityInfo}
-                  <button type="button" className="whitespace-nowrap text-[#0C73DA] text-xs md:text-sm font-medium hover:underline">{emiLinkLabel}</button>
-                </p>
-                <p className="flex flex-wrap items-start gap-2">
-                  <Image src="/images/exchange.png" alt="Exchange" width={24} height={24} unoptimized className="h-7 w-7 object-contain flex-shrink-0" />
-                  <span className="flex-1 pt-0.5">{exchangeInfo}</span>
-                  <button type="button" className="whitespace-nowrap text-[#0C73DA] text-xs md:text-sm font-medium hover:underline flex-shrink-0">{exchangeLinkLabel}</button>
-                </p>
-              </div>
+              {((specialOffers?.length ?? 0) > 0 || isDemoMode) && (
+                (specialOffers?.length ?? 0) > 0 ? (
+                  <div className="hidden lg:inline-flex lg:w-fit lg:max-w-full lg:flex-wrap lg:items-center lg:gap-2 lg:rounded-lg lg:border lg:border-[#2F7FE8] lg:px-3 lg:py-2 lg:text-sm lg:text-slate-900">
+                    <span className="whitespace-nowrap text-[15px] font-semibold text-[#0C73DA] md:text-sm">*{specialOfferTitle || specialOfferLeft} =</span>
 
-              <p className="hidden rounded bg-slate-100 py-1 text-center text-lg font-medium text-[#0C73DA] lg:block">
-                {madeInText}
-              </p>
+                    {specialOffers?.map((offer, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        {index > 0 && <span className="h-6 w-px bg-slate-500/60" aria-hidden="true" />}
+                        <span className="flex items-center gap-2 whitespace-nowrap text-[15px] md:text-sm">
+                          {offer.image ? (
+                            <Image src={offer.image} alt={offer.text || `Offer ${index + 1}`} width={40} height={24} className="h-6 w-auto object-contain" />
+                          ) : null}
+                          {offer.text}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="hidden lg:inline-flex lg:w-fit lg:max-w-full lg:flex-wrap lg:items-center lg:gap-2 lg:rounded-lg lg:border lg:border-[#2F7FE8] lg:px-3 lg:py-2 lg:text-sm lg:text-slate-900">
+                    <span className="whitespace-nowrap text-[15px] font-semibold text-[#0C73DA] md:text-sm">*{specialOfferLeft} =</span>
+
+                    <span className="h-6 w-px bg-slate-500/60" aria-hidden="true" />
+
+                    <span className="flex items-center gap-2 whitespace-nowrap text-[15px] md:text-sm">
+                      <Image src="/images/ebl.png" alt="EBL" width={40} height={24} className="h-6 w-auto object-contain" />
+                      {specialOfferOne}
+                    </span>
+
+                    <span className="h-6 w-px bg-slate-500/60" aria-hidden="true" />
+
+                    <span className="flex items-center gap-2 whitespace-nowrap text-[15px] md:text-sm">
+                      <Image src="/images/nogod.png" alt="Nagad" width={40} height={24} className="h-6 w-auto object-contain" />
+                      {specialOfferTwo}
+                    </span>
+                  </div>
+                )
+              )}
+
+              {(isDemoMode || (shippingInfo || warrantyInfo || emiFacilityInfo || exchangeInfo)) && (
+                <div className="hidden lg:block lg:space-y-2 lg:border-b lg:border-slate-200 lg:pb-3 lg:text-xs lg:text-slate-600 lg:md:text-sm">
+                  {(isDemoMode || shippingInfo) && (
+                    <p className="flex items-center gap-5">
+                      <Image src="/images/shippingtime.png" alt="Shipping time" width={24} height={24} unoptimized className="h-7 w-7 object-contain" />
+                      <span>Shipping Timeline:</span>{shippingInfo}
+                    </p>
+                  )}
+                  {(isDemoMode || warrantyInfo) && (
+                    <p className="flex flex-wrap items-center gap-2">
+                      <span className="flex items-center gap-5">
+                        <Image src="/images/warranty.png" alt="Warranty" width={24} height={24} unoptimized className="h-7 w-7 object-contain" />
+                        {warrantyInfo}
+                      </span>
+                      <button type="button" className="whitespace-nowrap text-[#0C73DA] text-xs md:text-sm font-medium hover:underline">{warrantyLinkLabel}</button>
+                    </p>
+                  )}
+                  {(isDemoMode || emiFacilityInfo) && (
+                    <p className="flex items-center gap-5">
+                      <Image src="/images/Vector.png" alt="EMI facility" width={24} height={24} unoptimized className="h-7 w-7 object-contain" />
+                      {emiFacilityInfo}
+                      <button type="button" className="whitespace-nowrap text-[#0C73DA] text-xs md:text-sm font-medium hover:underline">{emiLinkLabel}</button>
+                    </p>
+                  )}
+                  {(isDemoMode || exchangeInfo) && (
+                    <p className="flex flex-wrap items-start gap-2">
+                      <Image src="/images/exchange.png" alt="Exchange" width={24} height={24} unoptimized className="h-7 w-7 object-contain flex-shrink-0" />
+                      <span className="flex-1 pt-0.5">{exchangeInfo}</span>
+                      <button type="button" className="whitespace-nowrap text-[#0C73DA] text-xs md:text-sm font-medium hover:underline flex-shrink-0">{exchangeLinkLabel}</button>
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {(isDemoMode || madeInText) && (
+                <p className="hidden rounded bg-slate-100 py-1 text-center text-lg font-medium text-[#0C73DA] lg:block">
+                  {madeInText}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -1137,7 +1284,7 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
         reviews={productData?.reviews as ProductData['reviews']}
       />
 
-      <MobileStickyPurchaseBar 
+      <MobileStickyPurchaseBar
         productData={productData || undefined}
         availability={selectedAvailability}
         price={price}

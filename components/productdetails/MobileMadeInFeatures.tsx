@@ -9,10 +9,10 @@ type MobileMadeInFeaturesProps = {
   features?: string[];
 };
 
-export default function MobileMadeInFeatures({ 
+export default function MobileMadeInFeatures({
   productData,
-  madeInText = productData?.brand?.name ? `Brand: ${productData.brand.name}` : "Product information", 
-  features = productData?.tags || [] 
+  madeInText = productData?.brand?.name ? `Brand: ${productData.brand.name}` : "Product information",
+  features = productData?.tags || []
 }: MobileMadeInFeaturesProps) {
   const mobileFeatures = features.slice(0, 4);
 
