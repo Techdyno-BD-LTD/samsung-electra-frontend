@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { BiChevronRight } from "react-icons/bi";
 import { FiHeart, FiTrash2, FiChevronDown } from "react-icons/fi";
-import { BsGearWideConnected } from "react-icons/bs";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { formatCurrency, parseCurrency } from "@/lib/currencyUtils";
 import { useRouter } from "next/navigation";
@@ -103,11 +102,6 @@ export default function CartPage() {
         <Link href="/products" className="hover:text-black transition-colors flex-shrink-0">Products</Link>
         <BiChevronRight className="text-[12px] lg:text-[13px] 2xl:text-[15px] mx-1 flex-shrink-0" />
         <span className="text-black font-semibold flex-shrink-0">Cart</span>
-      </div>
-
-      {/* EMI Banner */}
-      <div className="bg-gray-100 py-2.5 lg:py-3 2xl:py-4 px-4 rounded-[4px] flex items-center justify-center gap-2 text-[9px] sm:text-[13px] lg:text-[14px] 2xl:text-[16px] font-medium text-gray-800 text-center">
-        <span className="text-[14px] lg:text-[16px] 2xl:text-[18px]">🛍️</span> Enjoy 0% EMI on orders above ৳ 10,000! and get Up to 36 EMI Offer
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start mt-2">
@@ -223,24 +217,7 @@ export default function CartPage() {
             </>
           )}
 
-          {/* Motor Warranty Banner */}
-          {/* Mobile version - single inline row */}
-          <div className="sm:hidden mt-4 bg-[#f5f5f5] rounded-[4px] py-2.5 px-3 flex items-center gap-2 text-[11px] font-medium text-gray-700 border border-gray-200">
-            <BsGearWideConnected className="text-gray-600 text-[16px] flex-shrink-0" />
-            <span className="whitespace-nowrap">DIT Motor*-20 Years, Spare Parts &amp; After Sales Service - 1 Year</span>
-            <span className="text-gray-400 flex-shrink-0">|</span>
-            <span className="whitespace-nowrap flex-shrink-0">Cost=&nbsp;&nbsp;<span className="font-bold text-black">Free</span></span>
-          </div>
-          {/* Desktop/Tablet version - original layout */}
-          <div className="hidden sm:flex mt-4 lg:mt-5 bg-[#f5f5f5] rounded-[4px] py-3 lg:py-3.5 px-3 lg:px-4 flex-row items-center justify-between gap-3 text-left">
-            <div className="flex flex-row items-center gap-2 text-[11px] lg:text-[13px] 2xl:text-[15px] font-medium text-gray-700">
-              <BsGearWideConnected className="text-gray-600 text-[18px] lg:text-[20px] 2xl:text-[24px] flex-shrink-0" />
-              <span>DIT Motor*-20 Years, Spare Parts &amp; After Sales Service - 1 Year</span>
-            </div>
-            <div className="bg-[#0f55bd] text-white text-[10px] lg:text-[11px] 2xl:text-[13px] font-medium px-3 lg:px-4 py-1 lg:py-1.5 rounded-full flex-shrink-0">
-              Cost = Free
-            </div>
-          </div>
+
 
           <div className="mt-6 lg:hidden  lg:mt-24 2xl:mt-32 flex flex-col items-center justify-center gap-2 pb-16">
             <div className="flex flex-row items-center gap-3 sm:gap-4 text-center sm:text-left">

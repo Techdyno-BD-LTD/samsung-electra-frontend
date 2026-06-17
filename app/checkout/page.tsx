@@ -407,14 +407,14 @@ const Checkout = () => {
         if (!hasGiftVoucher && carrier) {
             // Logic for Inside/Outside Dhaka based on District ID 1
             const isInsideDhaka = Number((selectedAddress as any)?.country_id) === 1;
-            
+
             if (isInsideDhaka) {
                 delivery = carrier.inside_dhaka_cost > 0 ? carrier.inside_dhaka_cost : (carrier.cost || 0);
             } else {
                 delivery = carrier.outside_dhaka_cost > 0 ? carrier.outside_dhaka_cost : (carrier.cost || 0);
             }
         }
-        
+
         const total = (subtotal + tax + delivery) - couponDiscount;
 
         return {
@@ -564,46 +564,46 @@ const Checkout = () => {
 
     return (
         <>
-            <div className="px-2 mt-16 ">
+            <div className="px-2 mt-12">
                 {/* Breadcrumb */}
-                <nav className="text-sm text-gray-400 mb-2 flex items-center space-x-2">
+                <nav className="text-xs text-gray-400 mb-1 flex items-center space-x-1.5">
                     <span className="cursor-pointer hover:text-gray-900" onClick={() => router.push('/')}>Home</span>
-                    <FiChevronRight className="w-4 h-4" />
+                    <FiChevronRight className="w-3.5 h-3.5" />
                     <span className="text-gray-800 font-medium">Cart</span>
-                    <FiChevronRight className="w-4 h-4" />
+                    <FiChevronRight className="w-3.5 h-3.5" />
                     <span className="cursor-pointer hover:text-gray-900">Checkout</span>
 
                 </nav>
 
-                <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
                     {/* Left Column */}
-                    <div className="lg:col-span-3 flex flex-col gap-6 lg:gap-10">
+                    <div className="lg:col-span-3 flex flex-col gap-4 lg:gap-6">
                         {!hasGiftVoucher && (
                             <section>
-                                <h2 className="lg:text-[24px] text-[18px] font-semibold lg:mb-6 mb-2 text-gray-900 tracking-wide">Shipping Address</h2>
+                                <h2 className="lg:text-[18px] text-[15px] font-semibold lg:mb-3 mb-2 text-gray-900 tracking-wide">Shipping Address</h2>
 
                                 {!isAuthenticated ? (
-                                    <div className="border border-gray-200 rounded-xl p-3 lg:p-4 flex flex-col lg:flex-row justify-between items-center gap-4 mb-6">
-                                        <span className="text-[#a1a1aa] font-medium text-[12px] lg:text-[14px] text-center lg:text-left">Add an address or login to use saved address</span>
-                                        <div className="flex space-x-3 w-full md:w-auto">
-                                            <button onClick={() => router.push('/login')} className="flex-1 md:flex-none border border-[#1877f2] text-[#1877f2] rounded-full lg:px-16 lg:py-1 py-1.5 font-medium hover:bg-blue-50 transition-colors text-[11px] lg:text-[15px]">Login</button>
-                                            <button onClick={() => router.push('/login')} className="flex-1 md:flex-none bg-[#1877f2] text-white rounded-full lg:px-10 py-1.5 font-medium hover:bg-blue-600 transition-colors w-max text-[11px] lg:text-[15px]">Add new address</button>
+                                    <div className="border border-gray-200 rounded-xl p-2.5 lg:p-3 flex flex-col lg:flex-row justify-between items-center gap-3 mb-4">
+                                        <span className="text-[#a1a1aa] font-medium text-[11px] lg:text-[13px] text-center lg:text-left">Add an address or login to use saved address</span>
+                                        <div className="flex space-x-2.5 w-full md:w-auto">
+                                            <button onClick={() => router.push('/login')} className="flex-1 md:flex-none border border-[#1877f2] text-[#1877f2] rounded-full lg:px-10 lg:py-1 py-1 font-medium hover:bg-blue-50 transition-colors text-[10px] lg:text-[13px]">Login</button>
+                                            <button onClick={() => router.push('/login')} className="flex-1 md:flex-none bg-[#1877f2] text-white rounded-full lg:px-8 py-1 font-medium hover:bg-blue-600 transition-colors w-max text-[10px] lg:text-[13px]">Add new address</button>
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="border border-gray-200 rounded-xl p-2 lg:p-3">
+                                    <div className="border border-gray-200 rounded-xl p-1.5 lg:p-2">
                                         {addresses.length > 0 ? (
                                             <>
-                                                <div className="bg-[#f8f9fa] border border-gray-100 rounded-xl p-3 mb-4 lg:mb-6">
+                                                <div className="bg-[#f8f9fa] border border-gray-100 rounded-xl p-2.5 mb-3 lg:mb-4">
                                                     <div className="flex justify-between lg:items-start items-center mb-1">
-                                                        <h3 className="font-semibold text-gray-900 text-[15px] lg:text-[17px]">
+                                                        <h3 className="font-semibold text-gray-900 text-[13px] lg:text-[15px]">
                                                             {((selectedAddress as unknown) as { name?: string })?.name || user?.name}
                                                         </h3>
-                                                        <button onClick={() => setIsAddressModalOpen(true)} className="text-[#1877f2] flex items-center text-[12px] lg:text-[15px] font-semibold hover:underline">
-                                                            Change / Add <FiEdit className="ml-1.5 w-4 h-4" />
+                                                        <button onClick={() => setIsAddressModalOpen(true)} className="text-[#1877f2] flex items-center text-[11px] lg:text-[13px] font-semibold hover:underline">
+                                                            Change / Add <FiEdit className="ml-1 w-3.5 h-3.5" />
                                                         </button>
                                                     </div>
-                                                    <div className="space-y-1 text-[12px] lg:text-[15px] text-gray-700 max-w-3xl leading-relaxed">
+                                                    <div className="space-y-0.5 text-[11px] lg:text-[13px] text-gray-700 max-w-3xl leading-relaxed">
                                                         {selectedAddress ? (
                                                             <>
                                                                 <p>
@@ -619,31 +619,31 @@ const Checkout = () => {
                                                 </div>
 
                                                 {/* Address Selector */}
-                                                <div className="flex gap-3 overflow-x-auto pb-2 mb-4 no-scrollbar">
+                                                <div className="flex gap-2 overflow-x-auto pb-1.5 mb-3 no-scrollbar">
                                                     {(addresses as { id: number; address: string }[]).map(addr => (
                                                         <button
                                                             key={addr.id}
                                                             onClick={() => setSelectedAddressId(addr.id)}
-                                                            className={`flex-shrink-0 px-4 py-2 rounded-lg border text-xs font-medium transition-all ${selectedAddressId === addr.id
+                                                            className={`flex-shrink-0 px-3 py-1.5 rounded-lg border text-[11px] font-medium transition-all ${selectedAddressId === addr.id
                                                                 ? 'bg-blue-50 border-[#1877f2] text-[#1877f2]'
                                                                 : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'}`}
                                                         >
-                                                            {addr.address.slice(0, 20)}...
+                                                            {addr.address.slice(0, 18)}...
                                                         </button>
                                                     ))}
                                                 </div>
                                             </>
                                         ) : (
-                                            <div className="text-center py-6">
-                                                <p className="text-gray-500 mb-4 text-sm">No addresses found</p>
-                                                <button onClick={() => setIsAddressModalOpen(true)} className="bg-[#1877f2] text-white rounded-full px-8 py-2 font-medium hover:bg-blue-600 transition-colors text-sm">Add new address</button>
+                                            <div className="text-center py-4">
+                                                <p className="text-gray-500 mb-3 text-xs">No addresses found</p>
+                                                <button onClick={() => setIsAddressModalOpen(true)} className="bg-[#1877f2] text-white rounded-full px-6 py-1.5 font-medium hover:bg-blue-600 transition-colors text-xs">Add new address</button>
                                             </div>
                                         )}
 
                                         {/* Checkbox */}
-                                        <label className="inline-flex items-center space-x-3 cursor-pointer group mb-1">
-                                            <input type="checkbox" className="rounded border-gray-300 text-blue-500 focus:ring-blue-500 w-3.5 h-3.5 lg:w-5 lg:h-5 cursor-pointer" />
-                                            <span className="text-gray-700 text-[12px] lg:text-[15px] font-medium group-hover:text-gray-900 transition-colors">Use a different billing address</span>
+                                        <label className="inline-flex items-center space-x-2 cursor-pointer group">
+                                            <input type="checkbox" className="rounded border-gray-300 text-blue-500 focus:ring-blue-500 w-3 h-3 lg:w-4 lg:h-4 cursor-pointer" />
+                                            <span className="text-gray-700 text-[11px] lg:text-[13px] font-medium group-hover:text-gray-900 transition-colors">Use a different billing address</span>
                                         </label>
                                     </div>
                                 )}
@@ -653,67 +653,66 @@ const Checkout = () => {
 
                         {!hasGiftVoucher && (
                             <section>
-                                <h2 className="lg:text-[24px] text-[18px] font-semibold mb-6 text-gray-900 tracking-wide">Shipping Method</h2>
-                                <div className="border border-gray-200 rounded-xl bg-white overflow-hidden mb-6">
+                                <h2 className="lg:text-[18px] text-[15px] font-semibold mb-3 text-gray-900 tracking-wide">Shipping Method</h2>
+                                <div className="border border-gray-200 rounded-xl bg-white overflow-hidden mb-4">
                                     {carriers.map((carrier) => (
-                                        <div key={carrier.id} className="p-4 lg:p-6 border-b border-gray-100 last:border-0">
-                                            <label className="flex items-center space-x-3 cursor-pointer group">
+                                        <div key={carrier.id} className="p-3 lg:p-4 border-b border-gray-100 last:border-0">
+                                            <label className="flex items-center space-x-2.5 cursor-pointer group">
                                                 <input
                                                     type="radio"
                                                     name="carrier"
                                                     checked={selectedCarrierId === carrier.id}
                                                     onChange={() => setSelectedCarrierId(carrier.id)}
-                                                    className="w-4 h-4 lg:w-[22px] lg:h-[22px] text-[#1877f2] focus:ring-[#1877f2] cursor-pointer"
+                                                    className="w-3.5 h-3.5 lg:w-[18px] lg:h-[18px] text-[#1877f2] focus:ring-[#1877f2] cursor-pointer"
                                                 />
                                                 <div className="flex-1">
                                                     <div className="flex justify-between items-center">
-                                                        <span className="font-semibold text-[18px] lg:text-[22px] text-gray-800 group-hover:text-[#1877f2] transition-colors">{carrier.name}</span>
-                                                        <span className={`px-4 py-1 rounded-full text-xs font-bold ${carrier.cost === 0 ? 'bg-[#1E5AA4] text-white' : 'text-gray-900'}`}>
+                                                        <span className="font-semibold text-[14px] lg:text-[16px] text-gray-800 group-hover:text-[#1877f2] transition-colors">{carrier.name}</span>
+                                                        <span className={`px-3 py-0.5 rounded-full text-[10px] lg:text-[11px] font-bold ${carrier.cost === 0 ? 'bg-[#1E5AA4] text-white' : 'text-gray-900'}`}>
                                                             {(() => {
                                                                 if (carrier.cost === 0) return 'Free';
                                                                 const isInsideDhaka = Number((selectedAddress as any)?.country_id) === 1;
-                                                                const cost = isInsideDhaka 
+                                                                const cost = isInsideDhaka
                                                                     ? (carrier.inside_dhaka_cost > 0 ? carrier.inside_dhaka_cost : carrier.cost)
                                                                     : (carrier.outside_dhaka_cost > 0 ? carrier.outside_dhaka_cost : carrier.cost);
                                                                 return formatCurrency(cost);
                                                             })()}
                                                         </span>
                                                     </div>
-                                                    {!carrier.is_pickup && <p className="text-[12px] lg:text-[14px] text-gray-500 mt-1">Estimated delivery: {carrier.transit_time}</p>}
+                                                    {!carrier.is_pickup && <p className="text-[11px] lg:text-[12px] text-gray-500 mt-0.5">Estimated delivery: {carrier.transit_time}</p>}
                                                 </div>
                                             </label>
 
                                             {carrier.is_pickup && selectedCarrierId === carrier.id && (
-                                                <div className="mt-4 ml-[28px] lg:ml-[34px]">
-                                                    {/* <p className="text-gray-500 text-sm mb-4">This item not available in your area</p> */}
-                                                    <div className="flex justify-between items-center mb-4">
-                                                        <span className="text-gray-600 font-medium">Pickup location</span>
+                                                <div className="mt-3 ml-[24px] lg:ml-[28px]">
+                                                    <div className="flex justify-between items-center mb-2">
+                                                        <span className="text-gray-600 font-medium text-xs lg:text-sm">Pickup location</span>
                                                         <button
                                                             onClick={() => setIsPickupModalOpen(true)}
-                                                            className="text-[#1877f2] flex items-center gap-1 font-semibold hover:underline"
+                                                            className="text-[#1877f2] flex items-center gap-1 text-xs lg:text-sm font-semibold hover:underline"
                                                         >
                                                             Select Store <FiChevronRight />
                                                         </button>
                                                     </div>
 
                                                     {selectedPickupPointId ? (
-                                                        <div className="bg-gray-50 rounded-xl p-4 lg:p-6 border border-gray-100">
-                                                            <div className="flex justify-between items-start mb-2">
-                                                                <h3 className="font-bold text-gray-900">{pickupPoints.find(p => p.id === selectedPickupPointId)?.name}</h3>
-                                                                <button onClick={() => setIsPickupModalOpen(true)} className="text-[#1877f2] flex items-center gap-1 text-sm font-medium">
-                                                                    Change <FiEdit className="w-4 h-4" />
+                                                        <div className="bg-gray-50 rounded-xl p-3 lg:p-4 border border-gray-100">
+                                                            <div className="flex justify-between items-start mb-1.5">
+                                                                <h3 className="font-bold text-gray-900 text-xs lg:text-sm">{pickupPoints.find(p => p.id === selectedPickupPointId)?.name}</h3>
+                                                                <button onClick={() => setIsPickupModalOpen(true)} className="text-[#1877f2] flex items-center gap-1 text-[11px] lg:text-xs font-medium">
+                                                                    Change <FiEdit className="w-3.5 h-3.5" />
                                                                 </button>
                                                             </div>
-                                                            <p className="text-sm text-gray-600 leading-relaxed">
+                                                            <p className="text-xs text-gray-600 leading-relaxed">
                                                                 {pickupPoints.find(p => p.id === selectedPickupPointId)?.address}
                                                             </p>
-                                                            <p className="text-sm text-gray-900 font-semibold mt-2">
+                                                            <p className="text-xs text-gray-900 font-semibold mt-1.5">
                                                                 Phone: {pickupPoints.find(p => p.id === selectedPickupPointId)?.phone}
                                                             </p>
                                                         </div>
                                                     ) : (
-                                                        <div className="bg-gray-50 rounded-xl p-6 border border-dashed border-gray-300 text-center">
-                                                            <p className="text-gray-500 text-sm italic">Please select a pickup store</p>
+                                                        <div className="bg-gray-50 rounded-xl p-4 border border-dashed border-gray-300 text-center">
+                                                            <p className="text-gray-500 text-xs italic">Please select a pickup store</p>
                                                         </div>
                                                     )}
                                                 </div>
@@ -721,46 +720,46 @@ const Checkout = () => {
                                         </div>
                                     ))}
                                     {carriers.length === 0 && (
-                                        <p className="p-6 text-center text-gray-500 italic">No shipping methods available.</p>
+                                        <p className="p-4 text-center text-gray-500 italic text-xs">No shipping methods available.</p>
                                     )}
                                 </div>
                             </section>
                         )}
 
                         {/* Available Offers */}
-                        <section className="mb-8">
-                            <div className="flex justify-between items-center mb-6">
-                                <h2 className="lg:text-[24px] text-[18px] font-semibold text-gray-900 tracking-wide">Available Offers</h2>
+                        <section className="mb-4">
+                            <div className="flex justify-between items-center mb-3">
+                                <h2 className="lg:text-[18px] text-[15px] font-semibold text-gray-900 tracking-wide">Available Offers</h2>
                                 <button
                                     onClick={() => setIsCouponModalOpen(true)}
-                                    className="text-[#1877f2] font-semibold text-[14px] lg:text-[16px] hover:underline"
+                                    className="text-[#1877f2] font-semibold text-[12px] lg:text-[14px] hover:underline"
                                 >
                                     See All Coupon
                                 </button>
                             </div>
-                            <div className="border border-gray-200 rounded-xl bg-white p-4 lg:p-6 shadow-sm">
+                            <div className="border border-gray-200 rounded-xl bg-white p-3 lg:p-4 shadow-sm">
                                 {appliedCoupon && (
-                                    <div className="mb-4 flex items-center justify-between bg-blue-50 border border-blue-100 rounded-lg p-3">
+                                    <div className="mb-3 flex items-center justify-between bg-blue-50 border border-blue-100 rounded-lg p-2">
                                         <div className="flex items-center space-x-2">
-                                            <div className="bg-blue-600 rounded-full p-1.5 text-white">
-                                                <HiOutlineTicket className="w-4 h-4" />
+                                            <div className="bg-blue-600 rounded-full p-1 text-white">
+                                                <HiOutlineTicket className="w-3.5 h-3.5" />
                                             </div>
                                             <div>
-                                                <p className="text-[14px] font-bold text-blue-900">Coupon- {appliedCoupon.code}</p>
-                                                <p className="text-[12px] text-blue-700">Discount of {formatCurrency(couponDiscount)} applied</p>
+                                                <p className="text-[12px] font-bold text-blue-900">Coupon- {appliedCoupon.code}</p>
+                                                <p className="text-[11px] text-blue-700">Discount of {formatCurrency(couponDiscount)} applied</p>
                                             </div>
                                         </div>
                                         <button
                                             onClick={handleRemoveCoupon}
-                                            className="text-red-500 hover:text-red-700 transition-colors p-1"
+                                            className="text-red-500 hover:text-red-700 transition-colors p-0.5"
                                             title="Remove Coupon"
                                         >
-                                            <FiX className="w-5 h-5" />
+                                            <FiX className="w-4 h-4" />
                                         </button>
                                     </div>
                                 )}
 
-                                <div className="flex flex-col lg:flex-row gap-4">
+                                <div className="flex flex-col lg:flex-row gap-3">
                                     <div className="flex-1 relative">
                                         <input
                                             type="text"
@@ -768,15 +767,15 @@ const Checkout = () => {
                                             value={couponCode}
                                             onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                                             disabled={!!appliedCoupon}
-                                            className={`w-full h-[50px] lg:h-[56px] px-4 rounded-lg border ${couponError ? 'border-red-500' : 'border-gray-200'} focus:ring-2 focus:ring-[#1877f2] focus:border-transparent outline-none transition-all text-[15px] lg:text-[16px] disabled:bg-gray-50 disabled:cursor-not-allowed`}
+                                            className={`w-full h-[40px] lg:h-[44px] px-3.5 rounded-lg border ${couponError ? 'border-red-500' : 'border-gray-200'} focus:ring-2 focus:ring-[#1877f2] focus:border-transparent outline-none transition-all text-[13px] lg:text-[14px] disabled:bg-gray-50 disabled:cursor-not-allowed`}
                                         />
                                         {couponError && (
-                                            <p className="text-red-500 text-[12px] mt-1 absolute left-0 -bottom-5">{couponError}</p>
+                                            <p className="text-red-500 text-[10px] mt-0.5 absolute left-0 -bottom-4">{couponError}</p>
                                         )}
                                     </div>
                                     <button
                                         onClick={appliedCoupon ? handleRemoveCoupon : handleApplyCoupon}
-                                        className={`h-[50px] lg:h-[56px] px-8 rounded-lg font-bold text-[15px] lg:text-[16px] transition-all min-w-[200px] ${appliedCoupon ? 'bg-red-500 hover:bg-red-600 text-white' : 'bg-[#1877f2] hover:bg-[#1565c0] text-white shadow-lg shadow-blue-100'}`}
+                                        className={`h-[40px] lg:h-[44px] px-6 rounded-lg font-bold text-[13px] lg:text-[14px] transition-all min-w-[150px] ${appliedCoupon ? 'bg-red-500 hover:bg-red-600 text-white' : 'bg-[#1877f2] hover:bg-[#1565c0] text-white shadow-md shadow-blue-100'}`}
                                     >
                                         {appliedCoupon ? 'Remove Coupon' : 'Apply Coupon/Gift Code'}
                                     </button>
@@ -784,25 +783,25 @@ const Checkout = () => {
                             </div>
                         </section>
                         <section>
-                            <h2 className="lg:text-[24px] text-[18px] font-semibold lg:mb-6 mb-2 text-gray-900 tracking-wide">Payment Method</h2>
+                            <h2 className="lg:text-[18px] text-[15px] font-semibold lg:mb-3 mb-2 text-gray-900 tracking-wide">Payment Method</h2>
                             <div className="border border-gray-200 rounded-xl overflow-hidden bg-white">
                                 {/* Online Payments */}
                                 {(paymentTypes.online as { id: number; name: string; frontend_name?: string; image?: string }[]).map((method) => (
-                                    <div key={method.id} className="p-4 lg:p-6 border-b border-gray-100">
-                                        <div className="flex flex-col gap-2">
-                                            <label className="flex items-center space-x-3 cursor-pointer group">
+                                    <div key={method.id} className="p-3 lg:p-4 border-b border-gray-100">
+                                        <div className="flex flex-col gap-1.5">
+                                            <label className="flex items-center space-x-2.5 cursor-pointer group">
                                                 <input
                                                     type="radio"
                                                     name="payment"
                                                     checked={paymentMethod === method.name}
                                                     onChange={() => setPaymentMethod(method.name)}
-                                                    className="w-4 h-4 lg:w-[22px] lg:h-[22px] text-[#1877f2] focus:ring-[#1877f2] cursor-pointer"
+                                                    className="w-3.5 h-3.5 lg:w-[18px] lg:h-[18px] text-[#1877f2] focus:ring-[#1877f2] cursor-pointer"
                                                 />
-                                                <span className="font-medium text-[16px] lg:text-[20px] text-gray-800 group-hover:text-[#1877f2] transition-colors">{method.frontend_name || method.name}</span>
+                                                <span className="font-medium text-[13px] lg:text-[15px] text-gray-800 group-hover:text-[#1877f2] transition-colors">{method.frontend_name || method.name}</span>
                                             </label>
                                             {method.image && (
-                                                <div className="ml-[28px] lg:ml-[34px]">
-                                                    <Image src={method.image} alt={method.frontend_name || method.name} width={280} height={50} className="h-auto object-contain" />
+                                                <div className="ml-[24px] lg:ml-[28px]">
+                                                    <Image src={method.image} alt={method.frontend_name || method.name} width={220} height={40} className="h-auto object-contain" />
                                                 </div>
                                             )}
                                         </div>
@@ -811,8 +810,8 @@ const Checkout = () => {
 
                                 {/* Offline/Manual Payments (including COD) */}
                                 {(paymentTypes.offline as { id: number; heading: string; description: string }[]).map((method) => (
-                                    <div key={method.id} className="p-4 lg:p-6 border-b border-gray-100 last:border-0">
-                                        <label className={`flex items-center space-x-3 cursor-pointer group flex-wrap gap-y-2 ${hasGiftVoucher && method.heading === 'Cash On Delivery' ? 'opacity-40 cursor-not-allowed' : ''}`}>
+                                    <div key={method.id} className="p-3 lg:p-4 border-b border-gray-100 last:border-0">
+                                        <label className={`flex items-center space-x-2.5 cursor-pointer group flex-wrap gap-y-1 ${hasGiftVoucher && method.heading === 'Cash On Delivery' ? 'opacity-40 cursor-not-allowed' : ''}`}>
                                             <input
                                                 type="radio"
                                                 name="payment"
@@ -823,59 +822,59 @@ const Checkout = () => {
                                                         setPaymentMethod(method.heading);
                                                     }
                                                 }}
-                                                className="w-4 h-4 lg:w-[22px] lg:h-[22px] text-[#1877f2] focus:ring-[#1877f2] cursor-pointer disabled:cursor-not-allowed"
+                                                className="w-3.5 h-3.5 lg:w-[18px] lg:h-[18px] text-[#1877f2] focus:ring-[#1877f2] cursor-pointer disabled:cursor-not-allowed"
                                             />
-                                            <span className="font-medium text-[16px] lg:text-[20px] text-gray-800 group-hover:text-[#1877f2] transition-colors">{method.heading}</span>
+                                            <span className="font-medium text-[13px] lg:text-[15px] text-gray-800 group-hover:text-[#1877f2] transition-colors">{method.heading}</span>
                                             {method.heading === 'Cash On Delivery' && (
-                                                <span className="text-[#1877f2] text-[13px] lg:text-[15px] xl:ml-2 font-medium">(Advanced pay 10% For Order confirmation)</span>
+                                                <span className="text-[#1877f2] text-[11px] lg:text-[12px] xl:ml-2 font-medium">(Advanced pay 10% For Order confirmation)</span>
                                             )}
                                         </label>
-                                        <div className="ml-[28px] lg:ml-[34px] mt-2 text-[12px] lg:text-[14px] text-gray-500">
+                                        <div className="ml-[24px] lg:ml-[28px] mt-1.5 text-[11px] lg:text-[12px] text-gray-500">
                                             <div dangerouslySetInnerHTML={{ __html: method.description }}></div>
                                         </div>
                                     </div>
                                 ))}
 
                                 {paymentTypes.online.length === 0 && paymentTypes.offline.length === 0 && (
-                                    <p className="p-6 text-center text-gray-500 italic">No payment methods available.</p>
+                                    <p className="p-4 text-center text-gray-500 italic text-xs">No payment methods available.</p>
                                 )}
                             </div>
                         </section>
 
                         {/* Delivery Note */}
                         <section>
-                            <h2 className="lg:text-[24px] text-[18px] font-semibold lg:mb-6 mb-2 text-gray-900 tracking-wide">Delivery Note</h2>
+                            <h2 className="lg:text-[18px] text-[15px] font-semibold lg:mb-3 mb-2 text-gray-900 tracking-wide">Delivery Note</h2>
                             <textarea
                                 value={deliveryNote}
                                 onChange={(e) => setDeliveryNote(e.target.value)}
-                                className="w-full border border-gray-200 rounded-xl p-4 lg:p-5 text-[13px] lg:text-[15px] text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#1877f2] focus:border-[#1877f2] min-h-[120px] lg:min-h-[160px] resize-y bg-white"
+                                className="w-full border border-gray-200 rounded-xl p-3 lg:p-4 text-[12px] lg:text-[13px] text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#1877f2] focus:border-[#1877f2] min-h-[80px] lg:min-h-[100px] resize-y bg-white"
                                 placeholder="Enter your instruction message"
                             ></textarea>
                         </section>
                     </div>
 
                     {/* Right Column */}
-                    <div className="lg:col-span-2 sticky top-[230px] self-start hidden lg:block">
-                        <div className="bg-[#f8f9fa] rounded-2xl p-6 lg:p-7 shadow-sm">
-                            <div className="flex justify-between items-start mb-6">
-                                <h2 className="text-[18px] lg:text-[22px] font-bold flex items-center text-gray-900 tracking-tight cursor-pointer">
-                                    Order Total <FiChevronDown className="ml-2 w-5 h-5 lg:w-6 lg:h-6 text-gray-500" />
+                    <div className="lg:col-span-2 sticky top-[120px] self-start hidden lg:block">
+                        <div className="bg-[#f8f9fa] rounded-2xl p-4 lg:p-5 shadow-sm">
+                            <div className="flex justify-between items-start mb-4">
+                                <h2 className="text-[15px] lg:text-[17px] font-bold flex items-center text-gray-900 tracking-tight cursor-pointer">
+                                    Order Total <FiChevronDown className="ml-1.5 w-4 h-4 lg:w-5 lg:h-5 text-gray-500" />
                                 </h2>
                                 <div className="flex flex-col items-end">
-                                    <span className="text-[20px] lg:text-[26px] font-bold text-[#1877f2] tracking-tight">
+                                    <span className="text-[18px] lg:text-[22px] font-bold text-[#1877f2] tracking-tight">
                                         {mounted ? formatCurrency(totals.total) : "৳0"}
                                     </span>
                                     {mounted && totals.savePercent > 0 && (
-                                        <span className="bg-[#ff3b30] text-white text-[10px] lg:text-[12px] px-2 lg:px-2.5 py-0.5 lg:py-1 rounded mt-1 font-medium">Saving : {totals.savePercent}%</span>
+                                        <span className="bg-[#ff3b30] text-white text-[9px] lg:text-[11px] px-2 py-0.5 rounded mt-0.5 font-medium">Saving : {totals.savePercent}%</span>
                                     )}
                                 </div>
                             </div>
 
                             {/* Order Items */}
-                            <div className="space-y-4 mb-8">
+                            <div className="space-y-2 mb-4 max-h-[280px] overflow-y-auto pr-1 custom-scrollbar">
                                 {mounted && cartItems.map((item) => (
-                                    <div key={item.id} className="flex gap-4 p-4 bg-white border border-gray-200 rounded-xl items-start shadow-sm">
-                                        <div className="w-[72px] h-[72px] bg-gray-100 rounded-lg flex-shrink-0 relative overflow-hidden flex items-center justify-center border border-gray-100">
+                                    <div key={item.id} className="flex gap-3 p-2.5 bg-white border border-gray-200 rounded-xl items-start shadow-sm">
+                                        <div className="w-[56px] h-[56px] bg-gray-100 rounded-lg flex-shrink-0 relative overflow-hidden flex items-center justify-center border border-gray-100">
                                             <Image
                                                 key={item.image}
                                                 src={item.image}
@@ -885,34 +884,34 @@ const Checkout = () => {
                                             />
                                         </div>
                                         <div className="flex-1 flex justify-between">
-                                            <div className="pr-3">
-                                                <p className="text-[14px] text-gray-800 font-medium leading-[1.3]">
+                                            <div className="pr-2 min-w-0">
+                                                <p className="text-[12px] text-gray-800 font-medium leading-[1.3] truncate">
                                                     {item.title}
                                                 </p>
                                                 {item.type && (
-                                                    <p className="text-[12px] text-gray-500 mt-1">Category: {item.type}</p>
+                                                    <p className="text-[10px] text-gray-500 mt-0.5">Category: {item.type}</p>
                                                 )}
                                                 {(item.variant || item.color) && (
-                                                    <p className="text-[12px] text-gray-500 mt-0.5">Variant: {item.variant || item.color}</p>
+                                                    <p className="text-[10px] text-gray-500 mt-0.5">Variant: {item.variant || item.color}</p>
                                                 )}
-                                                <p className="text-[14px] text-gray-500 mt-2">QTY : {item.quantity}</p>
+                                                <p className="text-[11px] text-gray-500 mt-1">QTY : {item.quantity}</p>
                                             </div>
-                                            <div className="text-right flex flex-col items-end whitespace-nowrap">
-                                                <span className="text-[11px] lg:text-[13px] text-[#a1a1aa] line-through font-medium">{item.originalPrice}</span>
-                                                <span className="font-bold text-[15px] lg:text-[18px] mt-0.5 text-black">{item.price}</span>
+                                            <div className="text-right flex flex-col items-end whitespace-nowrap flex-shrink-0 pl-1">
+                                                <span className="text-[9px] lg:text-[11px] text-[#a1a1aa] line-through font-medium">{item.originalPrice}</span>
+                                                <span className="font-bold text-[13px] lg:text-[15px] mt-0.5 text-black">{item.price}</span>
                                             </div>
                                         </div>
                                     </div>
                                 ))}
                                 {mounted && cartItems.length === 0 && (
-                                    <p className="text-center text-gray-500 py-4 italic">Your cart is empty</p>
+                                    <p className="text-center text-gray-500 py-3 italic text-xs">Your cart is empty</p>
                                 )}
                             </div>
 
                             {/* Sub-Total */}
-                            <div className="pt-2">
-                                <h3 className="text-[17px] lg:text-[20px] font-bold mb-4 lg:mb-5 text-gray-900">Sub -Total</h3>
-                                <div className="space-y-3 lg:space-y-3.5 text-[14px] lg:text-[16px]">
+                            <div className="pt-1.5 border-t border-gray-200">
+                                <h3 className="text-[14px] lg:text-[16px] font-bold mb-2 lg:mb-3 text-gray-900">Sub -Total</h3>
+                                <div className="space-y-2 lg:space-y-2.5 text-[12px] lg:text-[14px]">
                                     <div className="flex justify-between">
                                         <span className="text-gray-600">Save</span>
                                         <span className="font-bold text-gray-900">
@@ -933,11 +932,11 @@ const Checkout = () => {
                             </div>
 
                             {/* Terms and Conditions Checkbox */}
-                            <div className="mt-8 mb-4 flex items-start space-x-3 cursor-pointer group" onClick={() => setAgreedToTerms(!agreedToTerms)}>
-                                <div className={`flex-shrink-0 w-5 h-5 rounded border flex items-center justify-center transition-all ${agreedToTerms ? 'bg-[#1877f2] border-[#1877f2]' : 'bg-white border-gray-300'}`}>
-                                    {agreedToTerms && <span className="text-white text-[10px]">✓</span>}
+                            <div className="mt-4 mb-3 flex items-start space-x-2.5 cursor-pointer group" onClick={() => setAgreedToTerms(!agreedToTerms)}>
+                                <div className={`flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center transition-all ${agreedToTerms ? 'bg-[#1877f2] border-[#1877f2]' : 'bg-white border-gray-300'}`}>
+                                    {agreedToTerms && <span className="text-white text-[8px]">✓</span>}
                                 </div>
-                                <p className="text-[12px] text-gray-600 leading-tight select-none">
+                                <p className="text-[11px] text-gray-600 leading-tight select-none">
                                     By proceeding, you acknowledge and accept Electra International&apos;s <span className="font-bold text-gray-700">Terms &amp; Conditions, Cancellation &amp; Refund Policy</span>, and <span className="font-bold text-gray-700">Privacy Policy</span>.
                                 </p>
                             </div>
@@ -945,7 +944,7 @@ const Checkout = () => {
                             <button
                                 onClick={handlePlaceOrder}
                                 disabled={cartItems.length === 0 || !agreedToTerms}
-                                className={`w-full bg-[#1877f2] hover:bg-blue-600 text-white font-semibold py-3 lg:py-4 rounded-xl shadow-sm transition-colors text-[15px] lg:text-[17px] ${(cartItems.length === 0 || !agreedToTerms) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                className={`w-full bg-[#1877f2] hover:bg-blue-600 text-white font-semibold py-2 lg:py-2.5 rounded-xl shadow-sm transition-colors text-[13px] lg:text-[14px] ${(cartItems.length === 0 || !agreedToTerms) ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
                                 Place Order
                             </button>
@@ -956,25 +955,25 @@ const Checkout = () => {
             {/* Mobile Fixed Bottom Bar / Bottom Sheet */}
             {mounted && cartItems.length > 0 && (
                 <div
-                    className={`lg:hidden fixed bottom-0 left-0 w-full bg-white z-[999] shadow-[0_-8px_30px_rgba(0,0,0,0.15)] transition-all duration-500 ease-in-out border-t border-gray-100 ${isExpanded ? 'h-[85vh] translate-y-0' : 'h-[85px] translate-y-0'
+                    className={`lg:hidden fixed bottom-0 left-0 w-full bg-white z-[999] shadow-[0_-8px_30px_rgba(0,0,0,0.15)] transition-all duration-500 ease-in-out border-t border-gray-100 ${isExpanded ? 'h-[80vh] translate-y-0' : 'h-[75px] translate-y-0'
                         }`}
                 >
                     {/* Arrow Icon Button */}
                     <button
                         onClick={() => setIsExpanded(!isExpanded)}
-                        className="absolute -top-4 left-1/2 -translate-x-1/2 w-9 h-9 bg-white border border-gray-100 rounded-full flex items-center justify-center shadow-lg cursor-pointer active:scale-90 transition-all duration-500 z-[1001]"
+                        className="absolute -top-3.5 left-1/2 -translate-x-1/2 w-8 h-8 bg-white border border-gray-100 rounded-full flex items-center justify-center shadow-md cursor-pointer active:scale-90 transition-all duration-500 z-[1001]"
                     >
-                        <FiChevronDown className={`text-gray-600 text-xl transition-transform duration-500 ${isExpanded ? 'rotate-180' : ''}`} />
+                        <FiChevronDown className={`text-gray-600 text-lg transition-transform duration-500 ${isExpanded ? 'rotate-180' : ''}`} />
                     </button>
 
                     {/* Wrapper to handle layout in both states */}
                     <div className="flex flex-col h-full overflow-hidden">
                         {/* Summary Top Part (Always at top of the expansion) */}
-                        <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-50 flex-shrink-0">
+                        <div className="flex items-center justify-between px-3 py-2 bg-white border-b border-gray-50 flex-shrink-0">
                             <div className="flex flex-col">
-                                <span className="text-[10px] text-gray-500 font-medium tracking-tight">Your Order total</span>
-                                <div className="flex items-center gap-2.5">
-                                    <span className="text-[18px] sm:text-[22px] font-semibold text-[#1877f2] leading-none tracking-tight">
+                                <span className="text-[9px] text-gray-500 font-medium tracking-tight">Your Order total</span>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-[16px] sm:text-[18px] font-semibold text-[#1877f2] leading-none tracking-tight">
                                         {formatCurrency(totals.total)}
                                     </span>
 
@@ -982,10 +981,10 @@ const Checkout = () => {
                                     <div className="flex flex-col justify-center leading-tight">
                                         {totals.savings > 0 && (
                                             <>
-                                                <span className="text-[9px] sm:text-[10px] text-[#0eb363] font-semibold whitespace-nowrap">
+                                                <span className="text-[8px] sm:text-[9px] text-[#0eb363] font-semibold whitespace-nowrap">
                                                     {totals.savePercent}% Off
                                                 </span>
-                                                <span className="text-[9px] sm:text-[10px] text-gray-400 line-through whitespace-nowrap">
+                                                <span className="text-[8px] sm:text-[9px] text-gray-400 line-through whitespace-nowrap">
                                                     {formatCurrency(totals.originalSubtotal)}
                                                 </span>
                                             </>
@@ -994,7 +993,7 @@ const Checkout = () => {
 
                                     {/* Red Save Badge to the Right */}
                                     {totals.savings > 0 && (
-                                        <div className="bg-[#ff3b30] text-white text-[8px] sm:text-[9px] px-2 py-0.5 rounded-tl-xl rounded-br-xl font-bold shadow-sm whitespace-nowrap">
+                                        <div className="bg-[#ff3b30] text-white text-[8px] sm:text-[9px] px-1.5 py-0.5 rounded-tl-lg rounded-br-lg font-bold shadow-sm whitespace-nowrap">
                                             Save : {formatCurrency(totals.savings)}
                                         </div>
                                     )}
@@ -1004,34 +1003,34 @@ const Checkout = () => {
                             <button
                                 onClick={handlePlaceOrder}
                                 disabled={!agreedToTerms}
-                                className={`bg-[#1877f2] text-white px-6 sm:px-10 py-2.5 rounded-full font-semibold text-[12px] sm:text-[15px] shadow-md active:scale-95 transition-all ${!agreedToTerms ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                className={`bg-[#1877f2] text-white px-5 sm:px-8 py-2 rounded-full font-semibold text-[11px] sm:text-[13px] shadow-md active:scale-95 transition-all ${!agreedToTerms ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
                                 Place Order
                             </button>
                         </div>
 
                         {/* Expanded Detailed Breakdown */}
-                        <div className={`flex-1 overflow-y-auto px-4 py-6 transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-                            <div className="bg-[#f8f9fa] rounded-xl border border-gray-200 p-5 shadow-sm space-y-6">
-                                <h3 className="text-center font-semibold text-[16px] text-gray-800 border-b border-gray-200 pb-3">Order Summary</h3>
+                        <div className={`flex-1 overflow-y-auto px-3 py-4 transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+                            <div className="bg-[#f8f9fa] rounded-xl border border-gray-200 p-4 shadow-sm space-y-4">
+                                <h3 className="text-center font-semibold text-[14px] text-gray-800 border-b border-gray-200 pb-2">Order Summary</h3>
 
                                 {/* Item List */}
-                                <div className="space-y-5">
+                                <div className="space-y-3">
                                     {cartItems.map(item => (
-                                        <div key={item.id} className="flex justify-between items-start text-[13px] sm:text-[14px]">
+                                        <div key={item.id} className="flex justify-between items-start text-[12px] sm:text-[13px]">
                                             <div className="flex flex-col gap-0.5 max-w-[60%]">
-                                                <span className="font-bold text-gray-700 leading-tight">{item.title}</span>
-                                                {item.type && <span className="text-[11px] text-gray-500">Category: {item.type}</span>}
-                                                {(item.variant || item.color) && <span className="text-[11px] text-gray-500">Variant: {item.variant || item.color}</span>}
-                                                <span className="text-[11px] text-gray-400 font-medium"> ( {item.quantity} pcs ) </span>
+                                                <span className="font-bold text-gray-700 leading-tight truncate">{item.title}</span>
+                                                {item.type && <span className="text-[10px] text-gray-500">Category: {item.type}</span>}
+                                                {(item.variant || item.color) && <span className="text-[10px] text-gray-500">Variant: {item.variant || item.color}</span>}
+                                                <span className="text-[10px] text-gray-400 font-medium"> ( {item.quantity} pcs ) </span>
                                             </div>
-                                            <div className="text-right flex flex-col items-end">
+                                            <div className="text-right flex flex-col items-end whitespace-nowrap">
                                                 {parseCurrency(item.originalPrice) > parseCurrency(item.price) && (
-                                                    <div className="text-[11px] text-gray-400 line-through font-medium">
+                                                    <div className="text-[10px] text-gray-400 line-through font-medium">
                                                         {formatCurrency(parseCurrency(item.originalPrice) * item.quantity)}
                                                     </div>
                                                 )}
-                                                <div className="font-bold text-gray-900 text-[15px]">
+                                                <div className="font-bold text-gray-900 text-[13px]">
                                                     {formatCurrency(parseCurrency(item.price) * item.quantity)}
                                                 </div>
                                             </div>
@@ -1039,10 +1038,10 @@ const Checkout = () => {
                                     ))}
                                 </div>
 
-                                <div className="space-y-4 text-[14px] font-medium text-gray-700 pt-2 border-t border-gray-100">
+                                <div className="space-y-2 text-[12px] font-medium text-gray-700 pt-2 border-t border-gray-100">
                                     <div className="flex justify-between items-center text-[#ff3b30]">
                                         <span>Save</span>
-                                        <span className="font-bold text-[16px]">{formatCurrency(totals.savings)}</span>
+                                        <span className="font-bold text-[14px]">{formatCurrency(totals.savings)}</span>
                                     </div>
                                     <div className="flex justify-between items-center">
                                         <span>Store Pickup</span>
@@ -1058,14 +1057,14 @@ const Checkout = () => {
                                     </div>
                                 </div>
 
-                                <div className="pt-5 border-t border-gray-300 flex justify-between items-center">
-                                    <span className="font-semibold text-[18px] text-gray-900">Your Total</span>
-                                    <span className="font-bold text-[22px] text-gray-900">{formatCurrency(totals.total)}</span>
+                                <div className="pt-3 border-t border-gray-300 flex justify-between items-center">
+                                    <span className="font-semibold text-[15px] text-gray-900">Your Total</span>
+                                    <span className="font-bold text-[18px] text-gray-900">{formatCurrency(totals.total)}</span>
                                 </div>
                             </div>
-                            <div className="mt-8 flex items-start space-x-3 cursor-pointer group px-4 pb-8" onClick={() => setAgreedToTerms(!agreedToTerms)}>
-                                <div className={`flex-shrink-0 w-5 h-5 rounded border flex items-center justify-center transition-all ${agreedToTerms ? 'bg-[#1877f2] border-[#1877f2]' : 'bg-white border-gray-300'}`}>
-                                    {agreedToTerms && <span className="text-white text-[10px]">✓</span>}
+                            <div className="mt-4 flex items-start space-x-2.5 cursor-pointer group px-2 pb-6" onClick={() => setAgreedToTerms(!agreedToTerms)}>
+                                <div className={`flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center transition-all ${agreedToTerms ? 'bg-[#1877f2] border-[#1877f2]' : 'bg-white border-gray-300'}`}>
+                                    {agreedToTerms && <span className="text-white text-[8px]">✓</span>}
                                 </div>
                                 <p className="text-[10px] text-gray-500 leading-relaxed select-none">
                                     By proceeding, you acknowledge and accept Electra International&apos;s <span className="underline">Terms &amp; Conditions</span>, <span className="underline">Cancellation &amp; Refund Policy</span>, and <span className="underline">Privacy Policy</span>.
