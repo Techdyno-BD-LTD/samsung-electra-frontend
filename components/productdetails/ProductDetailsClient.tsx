@@ -175,6 +175,7 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
   const [quantity, setQuantity] = useState(1);
 
   const thumbnailContainerRef = useRef<HTMLDivElement>(null);
+  const hasFiredViewItemRef = useRef<number | null>(null);
 
   const isWishlisted = useAppSelector((state) => state.wishlist.items.some((item) => item.id === slug));
 
@@ -536,27 +537,34 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
   };
 
   useEffect(() => {
-    if (!productData) return;
+    if (!productData || !productData.id) return;
+    if (hasFiredViewItemRef.current === Number(productData.id)) return;
 
     const variantName = selectedVariant?.variant || activeColorName || "";
     const parsedPrice = cleanPrice(price);
 
     pushToDataLayer({
+      pageType: "product-page",
+      productType: productData.variants && productData.variants.length > 0 ? "variable" : "simple",
       event: "view_item",
       ecommerce: {
         currency: "BDT",
         value: parsedPrice,
         items: [{
-          item_id: productData.slug || slug,
+          id: String(productData.id),
+          item_id: String(productData.id),
           item_name: productData.name || title,
+          currency: "BDT",
           price: parsedPrice,
           item_brand: productData.brand?.name || brandName,
-          item_category: category,
+          item_category: productData.category_info?.parent_category_name || category,
+          item_category2: productData.category_info?.parent_category_name ? category : undefined,
           item_variant: variantName,
           quantity: 1
         }]
       }
     });
+    hasFiredViewItemRef.current = Number(productData.id);
   }, [productData, slug, selectedVariant, activeColorName, price, title, brandName, category]);
 
   const handleAddToCart = () => {
@@ -572,11 +580,14 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
         currency: "BDT",
         value: parsedPrice * quantity,
         items: [{
-          item_id: cartPayload.slug,
+          id: String(cartPayload.productId),
+          item_id: String(cartPayload.productId),
           item_name: cartPayload.title,
+          currency: "BDT",
           price: parsedPrice,
           item_brand: cartPayload.brand,
-          item_category: cartPayload.type,
+          item_category: productData.category_info?.parent_category_name || cartPayload.type,
+          item_category2: productData.category_info?.parent_category_name ? cartPayload.type : undefined,
           item_variant: cartPayload.variant,
           quantity: cartPayload.quantity,
         }]
@@ -600,29 +611,14 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
         currency: "BDT",
         value: parsedPrice * quantity,
         items: [{
-          item_id: cartPayload.slug,
+          id: String(cartPayload.productId),
+          item_id: String(cartPayload.productId),
           item_name: cartPayload.title,
+          currency: "BDT",
           price: parsedPrice,
           item_brand: cartPayload.brand,
-          item_category: cartPayload.type,
-          item_variant: cartPayload.variant,
-          quantity: cartPayload.quantity,
-        }]
-      }
-    });
-
-    // Trigger begin_checkout
-    pushToDataLayer({
-      event: "begin_checkout",
-      ecommerce: {
-        currency: "BDT",
-        value: parsedPrice * quantity,
-        items: [{
-          item_id: cartPayload.slug,
-          item_name: cartPayload.title,
-          price: parsedPrice,
-          item_brand: cartPayload.brand,
-          item_category: cartPayload.type,
+          item_category: productData.category_info?.parent_category_name || cartPayload.type,
+          item_category2: productData.category_info?.parent_category_name ? cartPayload.type : undefined,
           item_variant: cartPayload.variant,
           quantity: cartPayload.quantity,
         }]

@@ -148,11 +148,14 @@ const ProductCard = ({
       ecommerce: {
         item_list_name: cardVariant === "flashDeal" ? "Flash Deals" : cardVariant === "specialDeal" ? "Special Deals" : "Standard Grid",
         items: [{
-          item_id: productSlug,
+          id: productData?.id ? String(productData.id) : productSlug,
+          item_id: productData?.id ? String(productData.id) : productSlug,
           item_name: productData?.name || title || "Product",
+          currency: "BDT",
           price: parsePriceNum(productData?.main_price || price),
           item_brand: productData?.brand?.name || brand || "Brand",
-          item_category: productData?.category?.name || type || "Category",
+          item_category: productData?.category_info?.parent_category_name || productData?.category?.name || type || "Category",
+          item_category2: productData?.category_info?.parent_category_name ? (productData?.category?.name || type || "Category") : undefined,
           item_variant: productData?.variants?.[0]?.variant || "",
           quantity: 1,
         }]
@@ -208,11 +211,14 @@ const ProductCard = ({
           currency: "BDT",
           value: mainPriceNum,
           items: [{
-            item_id: productSlug,
+            id: productData?.id ? String(productData.id) : productSlug,
+            item_id: productData?.id ? String(productData.id) : productSlug,
             item_name: productData?.name || title || "Product",
+            currency: "BDT",
             price: mainPriceNum,
             item_brand: productData?.brand?.name || brand || "Brand",
-            item_category: productData?.category?.name || type || "Category",
+            item_category: productData?.category_info?.parent_category_name || productData?.category?.name || type || "Category",
+            item_category2: productData?.category_info?.parent_category_name ? (productData?.category?.name || type || "Category") : undefined,
             item_variant: "",
             quantity: 1,
           }]

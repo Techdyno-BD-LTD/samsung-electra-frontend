@@ -34,6 +34,8 @@ interface PickupPoint {
     area?: string;
 }
 
+let lastBeginCheckoutTime = 0;
+
 const Checkout = () => {
     const [mounted, setMounted] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
@@ -106,6 +108,13 @@ const Checkout = () => {
 
     useEffect(() => {
         if (mounted && cartItems.length > 0 && !hasFiredBeginCheckout) {
+            const now = Date.now();
+            if (now - lastBeginCheckoutTime < 2000) {
+                setHasFiredBeginCheckout(true);
+                return;
+            }
+            lastBeginCheckoutTime = now;
+
             const subtotal = cartItems.reduce((acc, item) => acc + (parseCurrency(item.price) * item.quantity), 0);
             pushToDataLayer({
                 event: "begin_checkout",
@@ -114,8 +123,10 @@ const Checkout = () => {
                     value: subtotal,
                     coupon: appliedCoupon?.code || "",
                     items: cartItems.map(item => ({
-                        item_id: item.slug || String(item.id),
+                        id: String(item.productId),
+                        item_id: String(item.productId),
                         item_name: item.title,
+                        currency: "BDT",
                         price: parseCurrency(item.price),
                         item_brand: item.brand || "Samsung",
                         item_category: item.type || "Category",
@@ -470,8 +481,10 @@ const Checkout = () => {
                 value: totals.subtotal,
                 shipping_tier: carrier.name,
                 items: cartItems.map((item) => ({
-                    item_id: item.slug || String(item.id),
+                    id: String(item.productId),
+                    item_id: String(item.productId),
                     item_name: item.title,
+                    currency: "BDT",
                     price: parseCurrency(item.price),
                     item_brand: item.brand || "Samsung",
                     item_category: item.type || "Category",
@@ -492,8 +505,10 @@ const Checkout = () => {
                 value: totals.subtotal,
                 payment_type: methodName,
                 items: cartItems.map((item) => ({
-                    item_id: item.slug || String(item.id),
+                    id: String(item.productId),
+                    item_id: String(item.productId),
                     item_name: item.title,
+                    currency: "BDT",
                     price: parseCurrency(item.price),
                     item_brand: item.brand || "Samsung",
                     item_category: item.type || "Category",
@@ -605,8 +620,10 @@ const Checkout = () => {
                                 currency: "BDT",
                                 coupon: appliedCoupon?.code || "",
                                 items: cartItems.map(item => ({
-                                    item_id: item.slug || String(item.id),
+                                    id: String(item.productId),
+                                    item_id: String(item.productId),
                                     item_name: item.title,
+                                    currency: "BDT",
                                     price: parseCurrency(item.price),
                                     item_brand: item.brand || "Samsung",
                                     item_category: item.type || "Category",

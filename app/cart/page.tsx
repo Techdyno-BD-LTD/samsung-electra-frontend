@@ -90,8 +90,10 @@ export default function CartPage() {
           currency: "BDT",
           value: subTotal,
           items: cartItems.map((item) => ({
-            item_id: item.slug || String(item.id),
+            id: String(item.productId),
+            item_id: String(item.productId),
             item_name: item.title,
+            currency: "BDT",
             price: parseCurrency(item.price),
             item_brand: item.brand || "Samsung",
             item_category: item.type || "Category",
@@ -108,23 +110,6 @@ export default function CartPage() {
 
   const handleCheckout = () => {
     if (cartItems.length > 0) {
-      pushToDataLayer({
-        event: "begin_checkout",
-        ecommerce: {
-          currency: "BDT",
-          value: subTotal,
-          items: cartItems.map((item) => ({
-            item_id: item.slug || String(item.id),
-            item_name: item.title,
-            price: parseCurrency(item.price),
-            item_brand: item.brand || "Samsung",
-            item_category: item.type || "Category",
-            item_variant: item.variant || item.color || "",
-            quantity: item.quantity,
-          }))
-        }
-      });
-
       if (token) {
         router.push("/checkout");
       } else {

@@ -24,7 +24,12 @@ export interface ProductData {
   description?: string;
   category_id?: number;
   category?: { name?: string; slug?: string };
-  category_info?: { category_name?: string };
+  category_info?: {
+    category_name?: string;
+    parent_category_name?: string;
+    parent_category_slug?: string;
+    category_slug?: string;
+  };
   brand?: { id?: number; name?: string; slug?: string; logo?: string };
   thumbnail_image?: string;
   photos?: Array<{ photo?: string; path?: string; variant?: string }>;
@@ -440,11 +445,14 @@ export default function AddToCartModal({
         currency: "BDT",
         value: finalPriceNum * quantity,
         items: [{
-          item_id: cartPayload.slug,
+          id: String(cartPayload.productId),
+          item_id: String(cartPayload.productId),
           item_name: cartPayload.title,
+          currency: "BDT",
           price: finalPriceNum,
           item_brand: cartPayload.brand,
-          item_category: cartPayload.type,
+          item_category: productData?.category_info?.parent_category_name || cartPayload.type,
+          item_category2: productData?.category_info?.parent_category_name ? cartPayload.type : undefined,
           item_variant: cartPayload.variant,
           quantity: cartPayload.quantity,
         }]
@@ -468,11 +476,14 @@ export default function AddToCartModal({
         currency: "BDT",
         value: finalPriceNum * quantity,
         items: [{
-          item_id: cartPayload.slug,
+          id: String(cartPayload.productId),
+          item_id: String(cartPayload.productId),
           item_name: cartPayload.title,
+          currency: "BDT",
           price: finalPriceNum,
           item_brand: cartPayload.brand,
-          item_category: cartPayload.type,
+          item_category: productData?.category_info?.parent_category_name || cartPayload.type,
+          item_category2: productData?.category_info?.parent_category_name ? cartPayload.type : undefined,
           item_variant: cartPayload.variant,
           quantity: cartPayload.quantity,
         }]
