@@ -5,6 +5,7 @@ import { FaHeart, FaMinus, FaPlus, FaRegShareSquare, FaStar, FaChevronLeft, FaCh
 import { useEffect, useState, useMemo, useRef } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import { pushToDataLayer, cleanPrice } from "@/lib/gtm";
 
 import ProductDetailsTabs from "@/components/productdetails/ProductDetailsTabs";
 import MobileProductGallery from "@/components/productdetails/MobileProductGallery";
@@ -534,15 +535,100 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
     };
   };
 
+  useEffect(() => {
+    if (!productData) return;
+
+    const variantName = selectedVariant?.variant || activeColorName || "";
+    const parsedPrice = cleanPrice(price);
+
+    pushToDataLayer({
+      event: "view_item",
+      ecommerce: {
+        currency: "BDT",
+        value: parsedPrice,
+        items: [{
+          item_id: productData.slug || slug,
+          item_name: productData.name || title,
+          price: parsedPrice,
+          item_brand: productData.brand?.name || brandName,
+          item_category: category,
+          item_variant: variantName,
+          quantity: 1
+        }]
+      }
+    });
+  }, [productData, slug, selectedVariant, activeColorName, price, title, brandName, category]);
+
   const handleAddToCart = () => {
     if (!productData) return;
-    dispatch(addToCart(buildCartPayload()));
+    const cartPayload = buildCartPayload();
+    dispatch(addToCart(cartPayload));
+
+    const parsedPrice = cleanPrice(price);
+
+    pushToDataLayer({
+      event: "add_to_cart",
+      ecommerce: {
+        currency: "BDT",
+        value: parsedPrice * quantity,
+        items: [{
+          item_id: cartPayload.slug,
+          item_name: cartPayload.title,
+          price: parsedPrice,
+          item_brand: cartPayload.brand,
+          item_category: cartPayload.type,
+          item_variant: cartPayload.variant,
+          quantity: cartPayload.quantity,
+        }]
+      }
+    });
+
     setShowSuccessModal(true);
   };
 
   const handleBuyNow = () => {
     if (!productData) return;
-    dispatch(addToCart(buildCartPayload()));
+    const cartPayload = buildCartPayload();
+    dispatch(addToCart(cartPayload));
+
+    const parsedPrice = cleanPrice(price);
+
+    // Trigger add_to_cart
+    pushToDataLayer({
+      event: "add_to_cart",
+      ecommerce: {
+        currency: "BDT",
+        value: parsedPrice * quantity,
+        items: [{
+          item_id: cartPayload.slug,
+          item_name: cartPayload.title,
+          price: parsedPrice,
+          item_brand: cartPayload.brand,
+          item_category: cartPayload.type,
+          item_variant: cartPayload.variant,
+          quantity: cartPayload.quantity,
+        }]
+      }
+    });
+
+    // Trigger begin_checkout
+    pushToDataLayer({
+      event: "begin_checkout",
+      ecommerce: {
+        currency: "BDT",
+        value: parsedPrice * quantity,
+        items: [{
+          item_id: cartPayload.slug,
+          item_name: cartPayload.title,
+          price: parsedPrice,
+          item_brand: cartPayload.brand,
+          item_category: cartPayload.type,
+          item_variant: cartPayload.variant,
+          quantity: cartPayload.quantity,
+        }]
+      }
+    });
+
     if (!isAuthenticated) {
       router.push("/login?redirect=/checkout");
     } else {

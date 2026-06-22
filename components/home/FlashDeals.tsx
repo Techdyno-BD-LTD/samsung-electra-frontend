@@ -154,7 +154,7 @@ export default function FlashDeals() {
             <div
               key={`${activeDeal.id}-${product.id}`}
               data-flash-card
-              className="min-w-[65%] snap-start"
+              className="w-[65%] shrink-0 snap-start"
             >
               <ProductCard
                 cardVariant="flashDeal"
@@ -268,7 +268,7 @@ export default function FlashDeals() {
               <div
                 key={`${activeDeal.id}-${product.id}`}
                 data-flash-card
-                className="min-w-[48%] snap-start lg:min-w-[31.5%] xl:min-w-[24%] 2xl:min-w-[19%]"
+                className="w-[48%] lg:w-[31.5%] xl:w-[24%] 2xl:w-[19%] shrink-0 snap-start"
               >
                 <ProductCard
                   cardVariant="flashDeal"

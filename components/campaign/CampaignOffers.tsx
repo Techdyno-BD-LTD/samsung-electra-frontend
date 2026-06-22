@@ -103,32 +103,50 @@ export default function CampaignOffers({ pageTitle, campaigns }: CampaignOffersP
 
       <div className="space-y-4 sm:space-y-5">
         {campaigns.map((campaign) => (
-          <article key={campaign.id} className="mx-auto w-full max-w-[1840px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-            <div className="relative aspect-[1840/536] w-full bg-slate-100">
-              <Image
-                src={campaign.image}
-                alt={campaign.alt}
-                fill
-                priority={campaign.id === campaigns[0]?.id}
-                sizes="(max-width: 640px) 100vw, (max-width: 1920px) 95vw, 1840px"
-                className="object-contain"
-              />
+          <article key={campaign.id} className="mx-auto w-full max-w-[1840px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-shadow">
+            {campaign.ctaHref ? (
+              <Link href={campaign.ctaHref} className="relative block aspect-[1840/536] w-full bg-slate-100 group">
+                <Image
+                  src={campaign.image}
+                  alt={campaign.alt}
+                  fill
+                  priority={campaign.id === campaigns[0]?.id}
+                  sizes="(max-width: 640px) 100vw, (max-width: 1920px) 95vw, 1840px"
+                  className="object-contain transition-transform duration-500 group-hover:scale-[1.01]"
+                />
 
-              <div className="absolute inset-0 bg-gradient-to-r from-black/15 via-black/5 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/15 via-black/5 to-transparent" />
 
-              <div className="absolute left-1 bottom-1 origin-bottom-left scale-[0.72] sm:left-3 sm:bottom-3 sm:scale-100 md:left-5 md:bottom-5">
-                <CountdownBadge targetDate={campaign.endAt} />
+                <div className="absolute left-1 bottom-1 origin-bottom-left scale-[0.72] sm:left-3 sm:bottom-3 sm:scale-100 md:left-5 md:bottom-5">
+                  <CountdownBadge targetDate={campaign.endAt} />
+                </div>
+
+                {campaign.ctaText && (
+                  <span
+                    className="absolute right-3 top-3 rounded-md bg-[#0054A6] px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-white transition bg-[#0054A6] group-hover:bg-[#0A66C2] sm:right-5 sm:top-5 sm:px-4 sm:py-2 sm:text-sm"
+                  >
+                    {campaign.ctaText}
+                  </span>
+                )}
+              </Link>
+            ) : (
+              <div className="relative aspect-[1840/536] w-full bg-slate-100">
+                <Image
+                  src={campaign.image}
+                  alt={campaign.alt}
+                  fill
+                  priority={campaign.id === campaigns[0]?.id}
+                  sizes="(max-width: 640px) 100vw, (max-width: 1920px) 95vw, 1840px"
+                  className="object-contain"
+                />
+
+                <div className="absolute inset-0 bg-gradient-to-r from-black/15 via-black/5 to-transparent" />
+
+                <div className="absolute left-1 bottom-1 origin-bottom-left scale-[0.72] sm:left-3 sm:bottom-3 sm:scale-100 md:left-5 md:bottom-5">
+                  <CountdownBadge targetDate={campaign.endAt} />
+                </div>
               </div>
-
-              {campaign.ctaText && campaign.ctaHref && (
-                <Link
-                  href={campaign.ctaHref}
-                  className="absolute right-3 top-3 rounded-md bg-[#0054A6] px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-white transition hover:bg-[#0A66C2] sm:right-5 sm:top-5 sm:px-4 sm:py-2 sm:text-sm"
-                >
-                  {campaign.ctaText}
-                </Link>
-              )}
-            </div>
+            )}
           </article>
         ))}
       </div>

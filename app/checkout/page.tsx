@@ -9,6 +9,7 @@ import { formatCurrency, parseCurrency } from "@/lib/currencyUtils";
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Skeleton from "@/components/common/Skeleton";
+import { pushToDataLayer, hashSHA256, fetchClientIP } from "@/lib/gtm";
 
 interface Carrier {
     id: number;
@@ -97,9 +98,35 @@ const Checkout = () => {
     const [allCoupons, setAllCoupons] = useState<{ id: number; code: string; discount: number; type: string; discount_type: string; min_shopping?: number; max_discount?: number; end_date?: number }[]>([]);
     const [couponError, setCouponError] = useState<string | null>(null);
 
+    const [hasFiredBeginCheckout, setHasFiredBeginCheckout] = useState(false);
+
     useEffect(() => {
         setMounted(true);
     }, []);
+
+    useEffect(() => {
+        if (mounted && cartItems.length > 0 && !hasFiredBeginCheckout) {
+            const subtotal = cartItems.reduce((acc, item) => acc + (parseCurrency(item.price) * item.quantity), 0);
+            pushToDataLayer({
+                event: "begin_checkout",
+                ecommerce: {
+                    currency: "BDT",
+                    value: subtotal,
+                    coupon: appliedCoupon?.code || "",
+                    items: cartItems.map(item => ({
+                        item_id: item.slug || String(item.id),
+                        item_name: item.title,
+                        price: parseCurrency(item.price),
+                        item_brand: item.brand || "Samsung",
+                        item_category: item.type || "Category",
+                        item_variant: item.variant || item.color || "",
+                        quantity: item.quantity
+                    }))
+                }
+            });
+            setHasFiredBeginCheckout(true);
+        }
+    }, [mounted, cartItems, appliedCoupon, hasFiredBeginCheckout]);
 
     const fetchAddresses = useCallback(async () => {
         if (!token) return;
@@ -429,6 +456,54 @@ const Checkout = () => {
         };
     }, [cartItems, carriers, selectedCarrierId, couponDiscount, selectedAddress, hasGiftVoucher]);
 
+    const handleSelectCarrier = (carrier: Carrier) => {
+        setSelectedCarrierId(carrier.id);
+        const isInsideDhaka = Number((selectedAddress as any)?.country_id) === 1;
+        const cost = isInsideDhaka
+            ? (carrier.inside_dhaka_cost > 0 ? carrier.inside_dhaka_cost : carrier.cost)
+            : (carrier.outside_dhaka_cost > 0 ? carrier.outside_dhaka_cost : carrier.cost);
+
+        pushToDataLayer({
+            event: "add_shipping_info",
+            ecommerce: {
+                currency: "BDT",
+                value: totals.subtotal,
+                shipping_tier: carrier.name,
+                items: cartItems.map((item) => ({
+                    item_id: item.slug || String(item.id),
+                    item_name: item.title,
+                    price: parseCurrency(item.price),
+                    item_brand: item.brand || "Samsung",
+                    item_category: item.type || "Category",
+                    item_variant: item.variant || item.color || "",
+                    quantity: item.quantity,
+                }))
+            }
+        });
+    };
+
+    const handleSelectPaymentMethod = (methodName: string) => {
+        setPaymentMethod(methodName);
+
+        pushToDataLayer({
+            event: "add_payment_info",
+            ecommerce: {
+                currency: "BDT",
+                value: totals.subtotal,
+                payment_type: methodName,
+                items: cartItems.map((item) => ({
+                    item_id: item.slug || String(item.id),
+                    item_name: item.title,
+                    price: parseCurrency(item.price),
+                    item_brand: item.brand || "Samsung",
+                    item_category: item.type || "Category",
+                    item_variant: item.variant || item.color || "",
+                    quantity: item.quantity,
+                }))
+            }
+        });
+    };
+
     const handlePlaceOrder = async () => {
         if (cartItems.length === 0) {
             alert("Your cart is empty!");
@@ -508,6 +583,57 @@ const Checkout = () => {
                     couponDiscount: totals.couponDiscount,
                     total: totals.total
                 }));
+
+                // Trigger GTM Purchase Event asynchronously to avoid blocking user flow
+                (async () => {
+                    try {
+                        const ip = await fetchClientIP();
+                        const customerEmail = selectedAddress?.email || user?.email || "";
+                        const customerPhone = selectedAddress?.phone || user?.phone || "";
+                        
+                        // Generate SHA-256 hashed emails/phones for privacy-first Enhanced Conversions
+                        const hashedEmail = customerEmail ? await hashSHA256(customerEmail) : "";
+                        const hashedPhone = customerPhone ? await hashSHA256(customerPhone) : "";
+
+                        pushToDataLayer({
+                            event: "purchase",
+                            ecommerce: {
+                                transaction_id: orderId,
+                                value: totals.total,
+                                tax: totals.tax,
+                                shipping: totals.delivery,
+                                currency: "BDT",
+                                coupon: appliedCoupon?.code || "",
+                                items: cartItems.map(item => ({
+                                    item_id: item.slug || String(item.id),
+                                    item_name: item.title,
+                                    price: parseCurrency(item.price),
+                                    item_brand: item.brand || "Samsung",
+                                    item_category: item.type || "Category",
+                                    item_variant: item.variant || item.color || "",
+                                    quantity: item.quantity
+                                }))
+                            },
+                            // Enhanced Conversions Fields
+                            user_data: {
+                                sha256_email_address: hashedEmail,
+                                sha256_phone_number: hashedPhone,
+                                address: {
+                                    first_name: selectedAddress?.name?.split(" ")[0] || user?.name?.split(" ")[0] || "",
+                                    last_name: selectedAddress?.name?.split(" ").slice(1).join(" ") || user?.name?.split(" ").slice(1).join(" ") || "",
+                                    street: selectedAddress?.address || "",
+                                    city: selectedAddress?.city_name || "",
+                                    region: selectedAddress?.state_name || "",
+                                    postal_code: selectedAddress?.postal_code || "",
+                                    country: selectedAddress?.country_name || "Bangladesh"
+                                }
+                            },
+                            ip_address: ip
+                        });
+                    } catch (err) {
+                        console.error("GTM Purchase logging error:", err);
+                    }
+                })();
 
                 dispatch(clearCart());
 
@@ -662,7 +788,7 @@ const Checkout = () => {
                                                     type="radio"
                                                     name="carrier"
                                                     checked={selectedCarrierId === carrier.id}
-                                                    onChange={() => setSelectedCarrierId(carrier.id)}
+                                                    onChange={() => handleSelectCarrier(carrier)}
                                                     className="w-3.5 h-3.5 lg:w-[18px] lg:h-[18px] text-[#1877f2] focus:ring-[#1877f2] cursor-pointer"
                                                 />
                                                 <div className="flex-1">
@@ -794,7 +920,7 @@ const Checkout = () => {
                                                     type="radio"
                                                     name="payment"
                                                     checked={paymentMethod === method.name}
-                                                    onChange={() => setPaymentMethod(method.name)}
+                                                    onChange={() => handleSelectPaymentMethod(method.name)}
                                                     className="w-3.5 h-3.5 lg:w-[18px] lg:h-[18px] text-[#1877f2] focus:ring-[#1877f2] cursor-pointer"
                                                 />
                                                 <span className="font-medium text-[13px] lg:text-[15px] text-gray-800 group-hover:text-[#1877f2] transition-colors">{method.frontend_name || method.name}</span>
@@ -819,7 +945,7 @@ const Checkout = () => {
                                                 checked={paymentMethod === method.heading}
                                                 onChange={() => {
                                                     if (!(hasGiftVoucher && method.heading === 'Cash On Delivery')) {
-                                                        setPaymentMethod(method.heading);
+                                                        handleSelectPaymentMethod(method.heading);
                                                     }
                                                 }}
                                                 className="w-3.5 h-3.5 lg:w-[18px] lg:h-[18px] text-[#1877f2] focus:ring-[#1877f2] cursor-pointer disabled:cursor-not-allowed"

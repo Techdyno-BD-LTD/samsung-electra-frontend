@@ -267,7 +267,7 @@ export default function SpecialDeals() {
               <div
                 key={product.id}
                 data-special-card
-                className="min-w-[65%] snap-start sm:min-w-[48%] lg:min-w-[32%]"
+                className="w-[65%] sm:w-[48%] lg:w-[32%] shrink-0 snap-start"
               >
                 <ProductCard
                   cardVariant="specialDeal"

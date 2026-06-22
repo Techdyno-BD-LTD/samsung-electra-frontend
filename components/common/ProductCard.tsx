@@ -7,11 +7,13 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { addToWishlistAsync, removeFromWishlistAsync, WishlistItem } from "@/store/features/wishlist/wishlistSlice";
 import { showToast } from "@/store/features/toast/toastSlice";
 import { toggleCompare } from "@/store/features/compare/compareSlice";
+import { addToCart } from "@/store/features/cart/cartSlice";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toProductSlug } from "@/lib/productSlug";
 import BankEmiModal from "../productdetails/BankEmiModal";
+import { pushToDataLayer } from "@/lib/gtm";
 
 interface ProductCardProps {
   cardVariant?: "default" | "flashDeal" | "specialDeal";
@@ -84,6 +86,12 @@ const hasDiscount = (
   return !!discountStr;
 };
 
+const parsePriceNum = (priceStr?: string | number | null) => {
+  if (priceStr === null || priceStr === undefined) return 0;
+  const normalized = String(priceStr).replace(/[^\d.]/g, '');
+  return parseFloat(normalized) || 0;
+};
+
 const ProductCard = ({
   cardVariant = "default",
   category = "",
@@ -134,10 +142,85 @@ const ProductCard = ({
   const { isAuthenticated } = useAppSelector((state) => state.auth);
   const router = useRouter();
 
+  const handleSelectItem = () => {
+    pushToDataLayer({
+      event: "select_item",
+      ecommerce: {
+        item_list_name: cardVariant === "flashDeal" ? "Flash Deals" : cardVariant === "specialDeal" ? "Special Deals" : "Standard Grid",
+        items: [{
+          item_id: productSlug,
+          item_name: productData?.name || title || "Product",
+          price: parsePriceNum(productData?.main_price || price),
+          item_brand: productData?.brand?.name || brand || "Brand",
+          item_category: productData?.category?.name || type || "Category",
+          item_variant: productData?.variants?.[0]?.variant || "",
+          quantity: 1,
+        }]
+      }
+    });
+  };
+
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsModalOpen(true);
+
+    // Check if the product has variants
+    const hasVariants = !!(
+      productData?.variants &&
+      productData.variants.length > 0 &&
+      productData.variants.some((v) => {
+        const name = v.variant?.trim().toLowerCase();
+        return name && name !== "no variant" && name !== "";
+      })
+    );
+
+    if (hasVariants) {
+      setIsModalOpen(true);
+    } else {
+      const mainPriceNum = parsePriceNum(productData?.main_price || price);
+      const strokedPriceNum = parsePriceNum(productData?.stroked_price || originalPrice);
+      const savings = Math.max(0, strokedPriceNum - mainPriceNum);
+      const saveLabel = savings > 0 ? `Save : ৳ ${savings.toLocaleString('en-US')}` : "Save : ৳ 0";
+
+      const cartItem = {
+        id: productSlug,
+        slug: productSlug,
+        title: productData?.name || title || "Product",
+        brand: productData?.brand?.name || brand || "Brand",
+        image: productData?.thumbnail_image || image || "",
+        price: String(productData?.main_price || price).split('/')[0].trim(),
+        originalPrice: String(productData?.stroked_price || originalPrice || "").split('/')[0].trim(),
+        discountPercent: productData?.discount || discountPercent || "0%",
+        saveAmount: saveLabel,
+        color: color || "",
+        variant: "",
+        type: productData?.category?.name || type || "Category",
+        weight: (weight || productData?.weight) ? `${weight || productData?.weight}kg` : "N/A",
+        quantity: 1,
+        productId: Number(productData?.id || 0),
+      };
+
+      dispatch(addToCart(cartItem));
+
+      pushToDataLayer({
+        event: "add_to_cart",
+        ecommerce: {
+          currency: "BDT",
+          value: mainPriceNum,
+          items: [{
+            item_id: productSlug,
+            item_name: productData?.name || title || "Product",
+            price: mainPriceNum,
+            item_brand: productData?.brand?.name || brand || "Brand",
+            item_category: productData?.category?.name || type || "Category",
+            item_variant: "",
+            quantity: 1,
+          }]
+        }
+      });
+
+      router.push("/cart");
+    }
   };
 
   const handleToggleWishlist = (e: React.MouseEvent) => {
@@ -282,16 +365,16 @@ const ProductCard = ({
             )}
           </div>
 
-          <Link href={productHref} className="mb-2 flex items-center justify-center rounded-md" style={{ height: dealImageHeight }}>
+          <Link href={productHref} onClick={handleSelectItem} className="mb-2 flex items-center justify-center rounded-md" style={{ height: dealImageHeight }}>
             <Image src={image} alt={title} width={230} height={150} style={{ height: dealImageHeight }} className="w-auto object-contain" />
           </Link>
 
-          <Link href={productHref} className="mx-auto mb-4 block text-xs text-slate-500 underline">
+          <Link href={productHref} onClick={handleSelectItem} className="mx-auto mb-4 block text-xs text-slate-500 underline">
             {quickDetailsLabel}
           </Link>
 
           <h3 className="line-clamp-2 min-h-[56px] text-[18px] font-medium leading-7 text-slate-900">
-            <Link href={productHref}>{title}</Link>
+            <Link href={productHref} onClick={handleSelectItem}>{title}</Link>
           </h3>
 
           <div className=" grid grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] items-end gap-1 text-center text-[#1B57A6]">
@@ -389,11 +472,11 @@ const ProductCard = ({
             )}
           </div>
 
-          <Link href={productHref} className="mb-2 flex items-center justify-center rounded-md" style={{ height: dealImageHeight }}>
+          <Link href={productHref} onClick={handleSelectItem} className="mb-2 flex items-center justify-center rounded-md" style={{ height: dealImageHeight }}>
             <Image src={image} alt={title} width={380} height={260} style={{ height: dealImageHeight }} className="w-auto object-contain" />
           </Link>
 
-          <Link href={productHref} className="mx-auto mb-3 block text-xs text-slate-500 underline opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+          <Link href={productHref} onClick={handleSelectItem} className="mx-auto mb-3 block text-xs text-slate-500 underline opacity-0 transition-opacity duration-200 group-hover:opacity-100">
             {quickDetailsLabel}
           </Link>
 
@@ -422,7 +505,7 @@ const ProductCard = ({
           </div>
 
           <h3 className="mt-3 line-clamp-2 min-h-[56px] text-[18px] font-medium leading-7 text-slate-900">
-            <Link href={productHref}>{title}</Link>
+            <Link href={productHref} onClick={handleSelectItem}>{title}</Link>
           </h3>
 
           {/* Prices or Buy Now on Hover */}
@@ -521,7 +604,7 @@ const ProductCard = ({
         </div>
 
         <div className="relative mx-auto flex items-center justify-center overflow-hidden px-2 py-1.5 sm:px-3 sm:py-2">
-          <Link href={productHref}>
+          <Link href={productHref} onClick={handleSelectItem}>
             <Image
               src={image}
               alt={title}
@@ -547,7 +630,17 @@ const ProductCard = ({
         </div>
 
         <p className="hidden sm:block pb-2 text-center text-[9px] uppercase tracking-wide text-muted-foreground sm:pb-3 sm:text-[10px] sm:tracking-wider">
-          <Link href={productHref}>Quick Look</Link>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsModalOpen(true);
+            }}
+            className="hover:underline"
+          >
+            Quick Look
+          </button>
         </p>
 
         <div className="flex items-start justify-between px-2 pb-1.5 sm:items-center sm:px-4 sm:pb-2">
@@ -569,8 +662,8 @@ const ProductCard = ({
           </span>
         </div>
 
-        <h3 className="line-clamp-2 h-[32px] overflow-hidden px-2 text-[12px] font-semibold leading-4 sm:h-auto sm:min-h-[40px] sm:px-4 sm:pb-1 sm:text-[16px] sm:font-medium sm:leading-relaxed">
-          <Link href={productHref}>{title}</Link>
+        <h3 className="line-clamp-2 h-[32px] overflow-hidden px-2 text-[12px] font-semibold leading-4 sm:h-[48px] sm:leading-6 sm:px-4 sm:pb-1 sm:text-[16px] sm:font-medium">
+          <Link href={productHref} onClick={handleSelectItem}>{title}</Link>
         </h3>
 
         <div className="flex items-end gap-2 px-2 pb-2 sm:px-4">
@@ -678,7 +771,7 @@ const ProductCard = ({
 
       {/* Product Image */}
       <div className="relative mx-auto flex items-center justify-center overflow-hidden px-2 py-1.5 sm:px-3 sm:py-2">
-        <Link href={productHref}>
+        <Link href={productHref} onClick={handleSelectItem}>
           <Image
             src={productData?.thumbnail_image || image || ""}
             alt={title}
@@ -704,7 +797,17 @@ const ProductCard = ({
       </div>
 
       <p className="hidden sm:block pb-2 text-center text-[9px] uppercase tracking-wide text-muted-foreground sm:pb-3 sm:text-[10px] sm:tracking-wider">
-        <Link href={productHref}>Quick Look</Link>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsModalOpen(true);
+          }}
+          className="hover:underline"
+        >
+          Quick Look
+        </button>
       </p>
 
       {/* Type and Rating Section (Stars are now close to the type) */}
@@ -727,9 +830,8 @@ const ProductCard = ({
         </span>
       </div>
 
-      {/* Title */}
-      <h3 className="line-clamp-2 h-[32px] overflow-hidden px-2 text-[12px] font-semibold leading-4 sm:h-auto sm:min-h-[40px] sm:px-4 sm:pb-1 sm:text-[16px] sm:font-medium sm:leading-relaxed">
-        <Link href={productHref}>{productData?.name || title}</Link>
+      <h3 className="line-clamp-2 h-[32px] overflow-hidden px-2 text-[12px] font-semibold leading-4 sm:h-[48px] sm:leading-6 sm:px-4 sm:pb-1 sm:text-[16px] sm:font-medium">
+        <Link href={productHref} onClick={handleSelectItem}>{productData?.name || title}</Link>
       </h3>
 
       {/* EMI Info */}

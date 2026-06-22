@@ -132,7 +132,7 @@ export default function PopularProducts() {
             <div
               key={product.id}
               data-popular-card
-              className="min-w-[65%] snap-start sm:min-w-[48%] lg:min-w-[31.5%] xl:min-w-[24%] 2xl:min-w-[19%]"
+              className="w-[65%] sm:w-[48%] lg:w-[31.5%] xl:w-[24%] 2xl:w-[19%] shrink-0 snap-start"
             >
               <ProductCard
                 productData={product}

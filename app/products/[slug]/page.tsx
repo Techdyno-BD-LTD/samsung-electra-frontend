@@ -71,5 +71,58 @@ export default async function ProductPage({ params }: PageProps) {
     notFound();
   }
 
-  return <ProductDetailsClient initialData={product} slug={params.slug} />;
+  // Parse price safely
+  const rawPrice = product.main_price ? String(product.main_price).replace(/[^\d.]/g, '') : '0';
+  const numericPrice = parseFloat(rawPrice) || 0;
+
+  // Build images array
+  const images = [
+    product.thumbnail_image,
+    ...(product.photos || []).map(p => p.photo || p.path)
+  ].filter(Boolean) as string[];
+
+  // Construct structured data
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": product.name,
+    "image": images.length > 0 ? images : [product.thumbnail_image || "/og-image.png"],
+    "description": product.description ? product.description.replace(/<[^>]*>/g, '').substring(0, 300) : product.name,
+    "sku": product.model_number || product.variants?.[0]?.sku || String(product.id),
+    "mpn": product.model_number || String(product.id),
+    "brand": {
+      "@type": "Brand",
+      "name": product.brand?.name || "Samsung"
+    },
+    "offers": {
+      "@type": "Offer",
+      "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/products/${product.slug}`,
+      "priceCurrency": "BDT",
+      "price": numericPrice,
+      "priceValidUntil": new Date(new Date().getFullYear() + 1, 11, 31).toISOString().split('T')[0], // Dec 31 of next year
+      "itemCondition": "https://schema.org/NewCondition",
+      "availability": (product.current_stock && product.current_stock > 0)
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock"
+    },
+    ...(product.rating_count && product.rating_count > 0 ? {
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": product.rating || 5,
+        "reviewCount": product.rating_count,
+        "bestRating": "5",
+        "worstRating": "1"
+      }
+    } : {})
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <ProductDetailsClient initialData={product} slug={params.slug} />
+    </>
+  );
 }

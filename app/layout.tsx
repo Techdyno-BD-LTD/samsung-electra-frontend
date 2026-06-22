@@ -8,6 +8,7 @@ import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import StoreProvider from "@/store/StoreProvider";
 import AuthInit from "@/components/auth/AuthInit";
 import GlobalToast from "@/components/common/GlobalToast";
+import GoogleTagManager from "@/components/analytics/GoogleTagManager";
 
 const openSans = Open_Sans({
   variable: "--font-open-sans",
@@ -59,17 +60,35 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const baseUrl = process.env.API_BASE_URL;
+  const systemKey = process.env.API_SYSTEM_KEY;
+
+  let settings: { type: string; value: string }[] = [];
+  try {
+    const res = await fetch(`${baseUrl}/api/v2/business-settings`, {
+      headers: { "x-system-key": systemKey || "" },
+      next: { revalidate: 3600 },
+    });
+    const json = await res.json();
+    settings = json.data || [];
+  } catch (e) {
+    console.error("Failed to fetch settings in layout", e);
+  }
+
+  const gtmId = settings.find((s) => s.type === "google_tag_manager")?.value || "";
+
   return (
     <html lang="en" data-theme="light" suppressHydrationWarning>
       <body
         className={`${openSans.variable} antialiased`}
       >
         <StoreProvider>
+          <GoogleTagManager gtmId={gtmId} />
           <AuthInit />
           <GlobalToast />
           <Navbar />

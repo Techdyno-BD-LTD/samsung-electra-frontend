@@ -10,11 +10,13 @@ import { useRouter } from "next/navigation";
 import PeopleAlsoBought from "@/components/cart/PeopleAlsoBought";
 import { updateQuantity, removeFromCart, updateItemDetails } from "@/store/features/cart/cartSlice";
 import Image from "next/image";
+import { pushToDataLayer } from "@/lib/gtm";
 
 
 export default function CartPage() {
   const [mounted, setMounted] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [hasFiredViewCart, setHasFiredViewCart] = useState(false);
   const cartItems = useAppSelector(state => state.cart.items);
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -79,10 +81,50 @@ export default function CartPage() {
   const deliveryCharge = 0; // Configurable if needed
   const finalTotal = subTotal + deliveryCharge;
 
+  // Trigger GTM view_cart
+  useEffect(() => {
+    if (mounted && cartItems.length > 0 && !hasFiredViewCart) {
+      pushToDataLayer({
+        event: "view_cart",
+        ecommerce: {
+          currency: "BDT",
+          value: subTotal,
+          items: cartItems.map((item) => ({
+            item_id: item.slug || String(item.id),
+            item_name: item.title,
+            price: parseCurrency(item.price),
+            item_brand: item.brand || "Samsung",
+            item_category: item.type || "Category",
+            item_variant: item.variant || item.color || "",
+            quantity: item.quantity,
+          }))
+        }
+      });
+      setHasFiredViewCart(true);
+    }
+  }, [mounted, cartItems, subTotal, hasFiredViewCart]);
+
   const token = useAppSelector(state => state.auth.token);
 
   const handleCheckout = () => {
     if (cartItems.length > 0) {
+      pushToDataLayer({
+        event: "begin_checkout",
+        ecommerce: {
+          currency: "BDT",
+          value: subTotal,
+          items: cartItems.map((item) => ({
+            item_id: item.slug || String(item.id),
+            item_name: item.title,
+            price: parseCurrency(item.price),
+            item_brand: item.brand || "Samsung",
+            item_category: item.type || "Category",
+            item_variant: item.variant || item.color || "",
+            quantity: item.quantity,
+          }))
+        }
+      });
+
       if (token) {
         router.push("/checkout");
       } else {
@@ -224,9 +266,7 @@ export default function CartPage() {
               <h2 className="text-[10px] lg:text-[26px] 2xl:text-[32px] font-bold text-black tracking-tight">
                 Accept Payments Methods
               </h2>
-              <span className="text-[10px] lg:text-[11px] 2xl:text-[12px] text-[#1a83ff] font-semibold">
-                15% discount on pay with visa Master card
-              </span>
+
             </div>
 
             <div className="w-full max-w-5xl mx-auto px-4 flex justify-center">
@@ -314,9 +354,7 @@ export default function CartPage() {
           <h2 className="text-[22px] lg:text-[26px] 2xl:text-[32px] font-bold text-black tracking-tight">
             Accept Payments Methods
           </h2>
-          <span className="text-[10px] lg:text-[11px] 2xl:text-[12px] text-[#1a83ff] font-semibold">
-            15% discount on pay with visa Master card
-          </span>
+
         </div>
 
         <div className="w-full max-w-5xl mx-auto px-4 flex justify-center">

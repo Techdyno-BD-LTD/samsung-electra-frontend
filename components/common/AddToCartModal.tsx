@@ -12,6 +12,7 @@ import CartSuccessModal from "@/components/common/CartSuccessModal";
 import BankEmiModal from "../productdetails/BankEmiModal";
 import { toProductSlug } from "@/lib/productSlug";
 import { formatCurrency } from "@/lib/currencyUtils";
+import { pushToDataLayer } from "@/lib/gtm";
 
 const toComparable = (value?: string) => value?.trim().toLowerCase() ?? "";
 const isHexColor = (value?: string | null) => /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(value ?? "");
@@ -430,7 +431,26 @@ export default function AddToCartModal({
 
   const handleAddToCart = () => {
     if (!productData && !initialData) return;
-    dispatch(addToCart(buildCartPayload()));
+    const cartPayload = buildCartPayload();
+    dispatch(addToCart(cartPayload));
+
+    pushToDataLayer({
+      event: "add_to_cart",
+      ecommerce: {
+        currency: "BDT",
+        value: finalPriceNum * quantity,
+        items: [{
+          item_id: cartPayload.slug,
+          item_name: cartPayload.title,
+          price: finalPriceNum,
+          item_brand: cartPayload.brand,
+          item_category: cartPayload.type,
+          item_variant: cartPayload.variant,
+          quantity: cartPayload.quantity,
+        }]
+      }
+    });
+
     setIsHidingModal(true);
     setTimeout(() => {
       setShowSuccessModal(true);
@@ -439,7 +459,26 @@ export default function AddToCartModal({
 
   const handleBuyNow = () => {
     if (!productData && !initialData) return;
-    dispatch(addToCart(buildCartPayload()));
+    const cartPayload = buildCartPayload();
+    dispatch(addToCart(cartPayload));
+
+    pushToDataLayer({
+      event: "add_to_cart",
+      ecommerce: {
+        currency: "BDT",
+        value: finalPriceNum * quantity,
+        items: [{
+          item_id: cartPayload.slug,
+          item_name: cartPayload.title,
+          price: finalPriceNum,
+          item_brand: cartPayload.brand,
+          item_category: cartPayload.type,
+          item_variant: cartPayload.variant,
+          quantity: cartPayload.quantity,
+        }]
+      }
+    });
+
     if (!isAuthenticated) {
       router.push("/login?redirect=/checkout");
     } else {
