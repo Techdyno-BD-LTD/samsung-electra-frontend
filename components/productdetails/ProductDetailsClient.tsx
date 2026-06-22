@@ -543,9 +543,18 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
     const variantName = selectedVariant?.variant || activeColorName || "";
     const parsedPrice = cleanPrice(price);
 
+    const hasVariants = !!(
+      productData.variants &&
+      productData.variants.length > 0 &&
+      productData.variants.some((v) => {
+        const name = v.variant?.trim().toLowerCase();
+        return name && name !== "no variant" && name !== "";
+      })
+    );
+
     pushToDataLayer({
       pageType: "product-page",
-      productType: productData.variants && productData.variants.length > 0 ? "variable" : "simple",
+      productType: hasVariants ? "variable" : "simple",
       event: "view_item",
       ecommerce: {
         currency: "BDT",

@@ -194,7 +194,7 @@ export default function LoginForm() {
                 {/* Country Selector + Input */}
                 <div className="relative">
                   <div className={`flex items-center border rounded-md h-[50px] border-black px-4 transition-all duration-300 bg-gray-50 ${error ? "border-red-500" : "border-gray-200"}`}>
-                    <div 
+                    <div
                       className="flex items-center gap-2 pr-4 border-r border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors h-full"
                       onClick={() => setIsCountryDropdownOpen(!isCountryDropdownOpen)}
                     >
@@ -315,10 +315,10 @@ export default function LoginForm() {
               <button className="flex items-center justify-center w-12 h-12 border border-gray-100 rounded-2xl hover:bg-gray-50 hover:border-gray-200 transition-all duration-300 group">
                 <FcGoogle size={24} className="group-hover:scale-110 transition-transform" />
               </button>
-              <span className="text-[14px] font-medium text-gray-400 mx-1">or</span>
+              {/* <span className="text-[14px] font-medium text-gray-400 mx-1">or</span>
               <Link href="/signup" className="text-[14px] font-bold text-gray-900 hover:text-[#0054A6] transition-colors underline underline-offset-4 decoration-gray-200">
                 Sign Up
-              </Link>
+              </Link> */}
             </div>
           </div>
 
@@ -332,8 +332,8 @@ export default function LoginForm() {
           </div>
         </>
       ) : (
-        <VerifyOTP 
-          phoneNumber={loginType === "phone" ? fullPhoneNumber : email} 
+        <VerifyOTP
+          phoneNumber={loginType === "phone" ? fullPhoneNumber : email}
           onBack={() => setStep("login")}
           onVerify={handleVerify}
         />

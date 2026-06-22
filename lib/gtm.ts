@@ -39,10 +39,15 @@ export async function fetchClientIP(): Promise<string> {
   }
 }
 
+let uniqueEventIdCounter = 1;
+
 // Safely push to dataLayer
 export function pushToDataLayer(payload: Record<string, unknown>) {
   if (typeof window !== "undefined") {
     window.dataLayer = window.dataLayer || [];
+    if (!("gtm.uniqueEventId" in payload)) {
+      payload["gtm.uniqueEventId"] = uniqueEventIdCounter++;
+    }
     window.dataLayer.push(payload);
   }
 }
