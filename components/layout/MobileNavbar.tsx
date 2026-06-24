@@ -61,10 +61,20 @@ export default function MobileNavbar() {
 
     async function loadHeader() {
       try {
-        const response = await fetch("/api/header", { cache: "no-store" });
-        if (!response.ok) return;
+        const [headerRes, brandsRes] = await Promise.all([
+          fetch("/api/header", { cache: "no-store" }),
+          fetch("/api/brands")
+        ]);
 
-        const payload = (await response.json()) as HeaderResponse;
+        let fetchedBrands: Array<{ name: string; slug: string }> = [];
+        if (brandsRes.ok) {
+          const brandsJson = await brandsRes.json();
+          fetchedBrands = brandsJson.data || [];
+        }
+
+        if (!headerRes.ok) return;
+
+        const payload = (await headerRes.json()) as HeaderResponse;
         const header = payload.data;
 
         if (!header || !isMounted) return;
@@ -74,21 +84,34 @@ export default function MobileNavbar() {
         setUtilityLinks((header.topbar?.utility_links || []).filter((item) => item.title.trim() || item.link.trim() || Boolean(item.icon?.trim())));
 
         const items = (header.navigation ?? [])
-          .map((item) => ({
-            title: item.title?.trim() || "",
-            href: item.link?.trim() || "",
-            hasDropdown: (item.children?.length ?? 0) > 0,
-            items: (item.children ?? [])
-              .map((child) => ({
-                name: child.title?.trim() || "",
-                href: child.link?.trim() || "",
-              }))
-              .filter((child) => child.name || child.href),
-          }))
+          .map((item) => {
+            const title = item.title?.trim() || "";
+            const isOurBrands = title.toLowerCase() === "our brands";
+
+            const subItems = isOurBrands
+              ? fetchedBrands.map((b) => ({
+                  name: b.name,
+                  href: `/brand/${b.slug}`,
+                }))
+              : (item.children ?? [])
+                  .map((child) => ({
+                    name: child.title?.trim() || "",
+                    href: child.link?.trim() || "",
+                  }))
+                  .filter((child) => child.name || child.href);
+
+            return {
+              title,
+              href: item.link?.trim() || "",
+              hasDropdown: subItems.length > 0,
+              items: subItems,
+            };
+          })
           .filter((item) => item.title || item.href || item.hasDropdown);
 
         setNavItems(items);
-      } catch {
+      } catch (err) {
+        console.error("Failed to load mobile header/brands:", err);
         if (isMounted) {
           setLogoUrl(null);
           setSupportText(null);

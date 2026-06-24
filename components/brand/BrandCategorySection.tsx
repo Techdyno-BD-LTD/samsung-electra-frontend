@@ -151,7 +151,10 @@ export default function BrandCategorySection({
 								key={product.id}
 								className="w-[85%] flex-shrink-0 sm:w-[48%] md:w-[32%] lg:w-[calc((100%-3rem)/4)] 2xl:w-[calc((100%-4rem)/5)]"
 							>
-								<ProductCard {...product} />
+								<ProductCard 
+									{...product} 
+									brand={typeof product.brand === "string" ? product.brand : (product.brand as any)?.name || ""} 
+								/>
 							</div>
 						))
 					) : (

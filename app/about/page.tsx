@@ -17,10 +17,15 @@ import { getGlobalSettings } from '@/lib/metadata';
 
 export const dynamic = 'force-dynamic';
 
+interface GlobalSetting {
+    type: string;
+    value: string;
+}
+
 export async function generateMetadata(): Promise<Metadata> {
     const baseUrl = process.env.API_BASE_URL || 'http://localhost:5000';
     const systemKey = process.env.API_SYSTEM_KEY || '';
-    
+
     try {
         const [pageRes, settings] = await Promise.all([
             fetch(`${baseUrl}/api/v2/pages/about`, {
@@ -32,7 +37,7 @@ export async function generateMetadata(): Promise<Metadata> {
         const json = await pageRes.json();
         const page = json.data?.[0];
 
-        const findSetting = (type: string) => settings.find((s: any) => s.type === type)?.value;
+        const findSetting = (type: string) => (settings as GlobalSetting[]).find((s) => s.type === type)?.value;
         const globalMetaImage = findSetting("meta_image");
         const siteTitle = findSetting("meta_title") || "Samsung Electra";
 
@@ -89,14 +94,14 @@ const About = async () => {
         );
     }
 
-    const { 
-        title, founder, history, directors, missionVision, 
-        retails, distribution, brands, services, 
-        network, sisterConcerns, inquiry, contactBanner 
+    const {
+        title, founder, history, directors, missionVision,
+        retails, distribution, brands, services,
+        network, sisterConcerns, inquiry, contactBanner
     } = data;
 
     return (
-        <div className="flex flex-col gap-6 pb-12 mt-20 px-4 max-w-[1400px] mx-auto">
+        <div className="flex flex-col gap-6 pb-12 mt-20  mainwidth mx-auto">
             {/* ═══════════════ BREADCRUMB ═══════════════ */}
             <nav
                 aria-label="Breadcrumb"

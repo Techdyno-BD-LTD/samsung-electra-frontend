@@ -35,27 +35,50 @@ export default function BottomBar() {
 
     async function loadNavLinks() {
       try {
-        const response = await fetch("/api/header", { cache: "no-store" });
-        if (!response.ok) return;
+        const [headerRes, brandsRes] = await Promise.all([
+          fetch("/api/header", { cache: "no-store" }),
+          fetch("/api/brands")
+        ]);
 
-        const payload = (await response.json()) as HeaderNavResponse;
+        let fetchedBrands: Array<{ name: string; slug: string }> = [];
+        if (brandsRes.ok) {
+          const brandsJson = await brandsRes.json();
+          fetchedBrands = brandsJson.data || [];
+        }
+
+        if (!headerRes.ok) return;
+
+        const payload = (await headerRes.json()) as HeaderNavResponse;
         const items = (payload.data?.navigation ?? [])
-          .map((item) => ({
-            name: item.title?.trim() || "",
-            href: item.link?.trim() || "",
-            subLinks: (item.children ?? [])
-              .map((child) => ({
-                name: child.title?.trim() || "",
-                href: child.link?.trim() || "",
-              }))
-              .filter((child) => child.name || child.href),
-          }))
+          .map((item) => {
+            const name = item.title?.trim() || "";
+            const isOurBrands = name.toLowerCase() === "our brands";
+
+            const subLinks = isOurBrands
+              ? fetchedBrands.map((b) => ({
+                  name: b.name,
+                  href: `/brand/${b.slug}`,
+                }))
+              : (item.children ?? [])
+                  .map((child) => ({
+                    name: child.title?.trim() || "",
+                    href: child.link?.trim() || "",
+                  }))
+                  .filter((child) => child.name || child.href);
+
+            return {
+              name,
+              href: item.link?.trim() || "",
+              subLinks,
+            };
+          })
           .filter((item) => item.name || item.href || (item.subLinks?.length ?? 0) > 0);
 
         if (isMounted) {
           setNavLinks(items);
         }
-      } catch {
+      } catch (err) {
+        console.error("Failed to load nav links/brands:", err);
         if (isMounted) setNavLinks([]);
       }
     }

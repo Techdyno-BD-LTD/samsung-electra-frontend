@@ -13,7 +13,8 @@ import {
   FiChevronUp,
   FiSearch,
   FiX,
-  FiCheckCircle
+  FiCheckCircle,
+  FiDownload
 } from "react-icons/fi";
 import { formatCurrency } from "@/lib/currencyUtils";
 import { useAppSelector } from "@/store/hooks";
@@ -69,6 +70,35 @@ const OrdersPage = () => {
   const [cancellationModalOpen, setCancellationModalOpen] = useState(false);
   const [selectedOrderForCancellation, setSelectedOrderForCancellation] = useState<Order | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [downloadingOrderId, setDownloadingOrderId] = useState<number | null>(null);
+
+  const handleDownloadInvoice = async (orderId: number, orderCode: string) => {
+    if (!token) return;
+    setDownloadingOrderId(orderId);
+    try {
+      const response = await fetch(`/api/v2/order/invoice/download/${orderId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!response.ok) {
+        alert('Failed to download invoice');
+        return;
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `invoice-${orderCode}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Invoice download error:', err);
+      alert('An error occurred while downloading the invoice.');
+    } finally {
+      setDownloadingOrderId(null);
+    }
+  };
 
   const fetchOrders = useCallback(async (queryOverride?: string) => {
     if (!token) return;
@@ -507,6 +537,19 @@ const OrdersPage = () => {
                                 <div className="flex items-center gap-2 mt-2">
                                   <div className={`w-2 h-2 rounded-full ${order.payment_status === 'paid' ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse'}`}></div>
                                   <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Payment Status: {order.payment_status}</p>
+                                </div>
+
+                                <div className="mt-4 pt-4 border-t border-slate-100">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDownloadInvoice(order.id, order.code);
+                                    }}
+                                    disabled={downloadingOrderId === order.id}
+                                    className="w-full bg-[#2b7fe8] hover:bg-[#1a6ed9] text-white py-2.5 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-colors disabled:bg-slate-300 disabled:cursor-not-allowed"
+                                  >
+                                    <FiDownload /> {downloadingOrderId === order.id ? 'Downloading...' : 'Download Invoice'}
+                                  </button>
                                 </div>
                               </div>
                             </div>

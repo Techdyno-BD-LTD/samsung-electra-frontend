@@ -19,7 +19,7 @@ const FounderSection: React.FC<FounderSectionProps> = ({ sectionTitle, name, yea
                         <h3 className="2xl:text-4xl lg:text-3xl font-semibold text-slate-800 leading-tight">{name}</h3>
                         <p className="2xl:text-[16px] lg:text-[14px] text-slate-500 font-medium uppercase tracking-wide mt-1">{year}</p>
                     </div>
-                    <p className="text-slate-600 leading-relaxed 2xl:text-[20px] lg:text-[18px] w-10/12 ">
+                    <p className="text-slate-600 leading-relaxed 2xl:text-[18px] lg:text-[18px] w-10/12 ">
                         {description}
                     </p>
                 </div>
@@ -28,9 +28,9 @@ const FounderSection: React.FC<FounderSectionProps> = ({ sectionTitle, name, yea
                 <div className="w-full md:w-1/3 lg:w-[35%]">
                     <div className="relative aspect-[1/1] bg-[#F4F4F4] rounded-sm flex items-center justify-center overflow-hidden border border-slate-100/50">
                         {image ? (
-                            <img 
-                                src={image} 
-                                alt={name} 
+                            <img
+                                src={image}
+                                alt={name}
                                 className="w-full h-full object-cover"
                             />
                         ) : (

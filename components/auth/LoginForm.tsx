@@ -55,7 +55,13 @@ export default function LoginForm() {
 
     if (loginType === "phone") {
       const cleanNumber = phoneNumber.replace(/\s/g, "");
-      if (cleanNumber.length !== selectedCountry.length) {
+      let isValidLength = false;
+      if (selectedCountry.code === "BD") {
+        isValidLength = cleanNumber.length === 10 || cleanNumber.length === 11;
+      } else {
+        isValidLength = cleanNumber.length === selectedCountry.length;
+      }
+      if (!isValidLength) {
         setError(true);
         return;
       }
@@ -94,7 +100,8 @@ export default function LoginForm() {
 
   const handlePhoneNumberChange = (val: string) => {
     const numericValue = val.replace(/\D/g, "");
-    const limitedValue = numericValue.slice(0, selectedCountry.length);
+    const maxLength = selectedCountry.code === "BD" ? 11 : selectedCountry.length;
+    const limitedValue = numericValue.slice(0, maxLength);
     setPhoneNumber(limitedValue);
     if (error) setError(false);
   };

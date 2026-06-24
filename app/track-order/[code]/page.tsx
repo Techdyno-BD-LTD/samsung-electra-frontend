@@ -6,6 +6,8 @@ import OrderTimeline from '../_components/OrderTimeline';
 import OrderDetails from '../_components/OrderDetails';
 import Link from 'next/link';
 import Skeleton from "@/components/common/Skeleton";
+import { useAppSelector } from '@/store/hooks';
+import { FiDownload } from 'react-icons/fi';
 
 type TimelineStep = {
   label: string;
@@ -32,6 +34,7 @@ type OrderSummary = {
 };
 
 interface Order {
+  id: number;
   code: string;
   timeline: TimelineStep[];
   items: OrderItem[];
@@ -44,6 +47,43 @@ function OrderTrackDetailsContent({ params }: { params: { code: string } }) {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { token } = useAppSelector((state) => state.auth);
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownloadInvoice = async () => {
+    if (!token) {
+      alert('Please log in to download the invoice.');
+      return;
+    }
+    if (!order) return;
+    setDownloading(true);
+    try {
+      const response = await fetch(`/api/v2/order/invoice/download/${order.id}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!response.ok) {
+        alert('Failed to download invoice. Make sure you are logged in and own this order.');
+        return;
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `invoice-${order.code}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Invoice download error:', err);
+      alert('An error occurred while downloading the invoice.');
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -101,9 +141,19 @@ function OrderTrackDetailsContent({ params }: { params: { code: string } }) {
 
   return (
     <div className="py-10">
-      <header className="mb-10">
-        <h1 className="text-3xl font-bold text-slate-900 mb-2">Order Status</h1>
-        <p className="text-slate-500 font-medium">Order Id : <span className="text-slate-900">#{order.code}</span></p>
+      <header className="mb-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-100 pb-6">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Order Status</h1>
+          <p className="text-slate-500 font-medium">Order Id : <span className="text-slate-900">#{order.code}</span></p>
+        </div>
+        <button
+          onClick={handleDownloadInvoice}
+          disabled={downloading}
+          className="bg-[#007BFF] hover:bg-[#0056b3] text-white font-bold px-6 py-3 rounded-full text-sm flex items-center justify-center gap-2 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed w-fit"
+        >
+          <FiDownload className="w-4 h-4" />
+          {downloading ? 'Downloading...' : 'Download Invoice'}
+        </button>
       </header>
 
       <OrderTimeline timeline={order.timeline} />

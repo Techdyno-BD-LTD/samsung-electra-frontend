@@ -13,13 +13,30 @@ const SuccessContent = () => {
     const searchParams = useSearchParams();
     const orderCode = searchParams.get('order_code');
     const reduxLastOrder = useAppSelector((state) => state.order.lastOrder);
+    const { token } = useAppSelector((state) => state.auth);
     const [lastOrder, setLastOrder] = useState<LastOrder | null>(null);
+    const [orderDbId, setOrderDbId] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
+    const [downloading, setDownloading] = useState(false);
 
     useEffect(() => {
         if (reduxLastOrder) {
             setLastOrder(reduxLastOrder);
             setLoading(false);
+            
+            // Resolve the database numerical ID using the order code
+            const fetchOrderDbId = async () => {
+                try {
+                    const response = await fetch(`/api/v2/order/track?order_code=${reduxLastOrder.orderId}`);
+                    const payload = await response.json();
+                    if (payload.success && payload.data && payload.data.length > 0) {
+                        setOrderDbId(payload.data[0].id);
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch order ID", error);
+                }
+            };
+            fetchOrderDbId();
         } else if (orderCode) {
             // Fetch order details if not in Redux (e.g. after redirect)
             const fetchOrder = async () => {
@@ -28,6 +45,7 @@ const SuccessContent = () => {
                     const payload = await response.json();
                     if (payload.success && payload.data && payload.data.length > 0) {
                         const order = payload.data[0];
+                        setOrderDbId(order.id);
                         setLastOrder({
                             orderId: order.code,
                             paymentMethod: 'Online Payment',
@@ -61,6 +79,40 @@ const SuccessContent = () => {
             setLoading(false);
         }
     }, [reduxLastOrder, orderCode]);
+
+    const handleDownloadInvoice = async () => {
+        if (!orderDbId) {
+            alert('Invoice information is still loading. Please try again in a moment.');
+            return;
+        }
+        setDownloading(true);
+        try {
+            const response = await fetch(`/api/v2/order/invoice/download/${orderDbId}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (!response.ok) {
+                alert('Failed to download invoice. Please make sure you are logged in.');
+                return;
+            }
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `invoice-${lastOrder?.orderId || orderCode || 'order'}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error('Invoice download error:', err);
+            alert('An error occurred while downloading the invoice.');
+        } finally {
+            setDownloading(false);
+        }
+    };
 
     if (loading) {
         return (
@@ -133,8 +185,12 @@ const SuccessContent = () => {
                     >
                         Track your order
                     </button>
-                    <button className="bg-[#1877f2] text-white font-semibold px-4 py-2 rounded-lg text-[11px] hover:bg-blue-600 transition-colors uppercase tracking-wider shadow-sm whitespace-nowrap">
-                        Download Invoice
+                    <button 
+                        onClick={handleDownloadInvoice}
+                        disabled={downloading}
+                        className="bg-[#1877f2] text-white font-semibold px-4 py-2 rounded-lg text-[11px] hover:bg-blue-600 transition-colors uppercase tracking-wider shadow-sm whitespace-nowrap disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    >
+                        {downloading ? 'Downloading...' : 'Download Invoice'}
                     </button>
                 </div>
             </div>

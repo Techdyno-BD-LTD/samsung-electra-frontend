@@ -125,7 +125,7 @@ export default function BrandProductCarouselSection({
               data-brand-card
               className="w-[88%] flex-shrink-0 sm:w-[48%] md:w-[31.5%] lg:w-[24%] xl:w-[19.4%]"
             >
-              <ProductCard {...(product as ComponentProps<typeof ProductCard>)} />
+              <ProductCard productData={product as any} />
             </div>
           ))}
         </div>

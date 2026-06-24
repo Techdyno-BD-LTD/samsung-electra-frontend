@@ -1,0 +1,101 @@
+{
+  "title": "Product Installation",
+  "subtitle": "Proper and safe installation is ensured by our experienced and trained technician team, following the manufacturer’s guidelines and safety standards. We aim to provide a hassle-free installation experience so customers can start using their products with confidence. Installation services may be subject to availability, and terms, conditions, and service charges can vary depending on the type, size, and location of the product. Any applicable charges or requirements will be clearly communicated prior to installation.",
+  "categories": [
+    {
+      "name": "Air conditional",
+      "brands": [
+        {
+          "name": "electra",
+          "logo": "/images/brands/electra.png",
+          "instructions": [
+            "Electrical Power line should be there at the installation location along with required Circuit breaker according to AC Tonnage e.g. the electrical power line from Main Distribution Board of the Customer house to the AC Electrical power source (Indoor/Outdoor Unit).",
+            "The room size & location should be compatible according to AC Tonnage.",
+            "The limit of length of the Indoor & Outdoor Unit connecting copper tube is 10 feet to 40 feet according to Tonnage & Tube position (Horizontal / Vertical) (e.g. for 1 Ton the length limit is 10 feet to 25 feet and for 1.5 & 2 Ton the length limit is 10 feet to 40 feet).",
+            "For ODU(Outdoor Unit) installation including wall hanging by the Installer, the installation schedule will be given during daytime.",
+            "For high rise buildings, if the ODU needs to be hanged on a plain wall, then the Customer needs to cooperate by cutting the window grill or verandah grill for safe and proper installation.",
+            "For making water drain line from IDU(Indoor Unit) to ground floor which is excess of the given 15 feet flexible pipe, the Customer has to arrange by his/her own."
+          ]
+        },
+        {
+          "name": "SAMSUNG",
+          "logo": "/images/brands/samsung.png",
+          "instructions": [
+            "Proper power outlet must be present near the AC unit.",
+            "Standard installation includes 10 feet of copper pipe.",
+            "Outdoor unit brackets and extra pipe will be charged additionally.",
+            "Drainage pipe extension needs to be managed by the customer if beyond standard limits."
+          ]
+        },
+        {
+          "name": "Whirlpool",
+          "logo": "/images/brands/whirlpool.png",
+          "instructions": [
+            "Customer must ensure direct electrical connection line.",
+            "Warranty will not cover issues arising from improper voltage or third-party installation.",
+            "Standard wall mount bracket is included in the package."
+          ]
+        },
+        {
+          "name": "PHILIPS",
+          "logo": "/images/brands/philips.png",
+          "instructions": [
+            "Ensure standard electrical outlet and space criteria are met.",
+            "Refer to user manual for exact physical clearance required around the unit."
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Television",
+      "brands": [
+        {
+          "name": "electra",
+          "logo": "/images/brands/electra.png",
+          "instructions": [
+            "Wall mount bracket installation requires a solid brick or concrete wall.",
+            "Table top installation requires a flat, stable surface.",
+            "Power supply should have stable voltage and proper grounding."
+          ]
+        },
+        {
+          "name": "SAMSUNG",
+          "logo": "/images/brands/samsung.png",
+          "instructions": [
+            "Authorized technician will perform the unboxing and wall mount installation.",
+            "Do not unbox the TV yourself to preserve warranty eligibility.",
+            "Internet connection should be active for Smart TV demo."
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Washing Machine",
+      "brands": [
+        {
+          "name": "electra",
+          "logo": "/images/brands/electra.png",
+          "instructions": [
+            "Water inlet tap with adequate water pressure must be available within 1 meter.",
+            "Drainage outlet must be at floor level or low level.",
+            "Place the machine on a flat, even surface to avoid vibration."
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Dishwasher",
+      "brands": [
+        {
+          "name": "electra",
+          "logo": "/images/brands/electra.png",
+          "instructions": [
+            "Dedicated water line and drainage pipe must be prepared.",
+            "Standard installation includes connecting to existing plumbing.",
+            "Electrical line must have correct grounding."
+          ]
+        }
+      ]
+    }
+  ]
+}

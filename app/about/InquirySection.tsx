@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React from 'react';
 import { HiArrowRight } from "react-icons/hi2";
 
@@ -17,14 +18,14 @@ const InquirySection: React.FC<InquirySectionProps> = ({ title, subtitle, btnTex
                 {subtitle}
             </p>
 
-            <button className="flex items-center gap-4 bg-white border border-slate-100 px-8 py-2 rounded-full shadow-sm hover:shadow-md transition-all duration-300 group">
+            <Link href="/contact" className="flex items-center gap-4 bg-white border border-slate-100 px-8 py-2 rounded-full shadow-sm hover:shadow-md transition-all duration-300 group">
                 <div className="w-6 h-6 bg-[#1D81FF] rounded-full flex items-center justify-center text-white transition-transform duration-300 group-hover:translate-x-1">
                     <HiArrowRight className="w-4 h-4" />
                 </div>
                 <span className="text-lg font-semibold text-slate-800 pr-4">
                     {btnText}
                 </span>
-            </button>
+            </Link>
         </section>
     );
 };

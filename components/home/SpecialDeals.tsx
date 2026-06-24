@@ -28,6 +28,10 @@ type FlashDealProductDetails = {
     id: number;
     name: string;
   };
+  stroked_price?: string;
+  main_price?: string;
+  discount?: string;
+  discount_type?: string;
 };
 
 type FlashDealProduct = {
@@ -245,23 +249,14 @@ export default function SpecialDeals() {
             const product = pd.product;
             if (!product) return null;
 
-            const originalPrice = product.unit_price || 0;
-            const discountAmt = pd.discount || 0;
+            const originalPrice = product.stroked_price || "";
+            const price = product.main_price || "";
+            const discountPercent = product.discount || "";
 
-            let finalPrice = originalPrice;
-            let percentStr = "";
-            let saveStr = "";
-
-            if (pd.discount_type === "amount") {
-              finalPrice = originalPrice - discountAmt;
-              saveStr = formatCurrency(discountAmt);
-              percentStr = "-" + Math.round((discountAmt / originalPrice) * 100) + "% Off";
-            } else if (pd.discount_type === "percent") {
-              const calcDiscount = (originalPrice * discountAmt) / 100;
-              finalPrice = originalPrice - calcDiscount;
-              saveStr = formatCurrency(calcDiscount);
-              percentStr = "-" + discountAmt + "% Off";
-            }
+            const originalPriceNum = (product as any).stroked_price_raw || (product as any).unit_price || 0;
+            const finalPriceNum = (product as any).main_price_raw || 0;
+            const savings = Math.max(0, originalPriceNum - finalPriceNum);
+            const saveAmount = savings > 0 ? `Save : ${formatCurrency(savings)}` : "";
 
             return (
               <div
@@ -283,11 +278,12 @@ export default function SpecialDeals() {
                   dealHours={timeLeft.hours}
                   dealMinutes={timeLeft.minutes}
                   dealSeconds={timeLeft.seconds}
-                  price={formatCurrency(finalPrice)}
-                  originalPrice={formatCurrency(originalPrice)}
-                  saveAmount={saveStr ? `Save : ${saveStr}` : ""}
-                  discountPercent={percentStr}
+                  price={price}
+                  originalPrice={originalPrice}
+                  saveAmount={saveAmount}
+                  discountPercent={discountPercent}
                   dealImageHeight="260px"
+                  productData={product as any}
                 />
               </div>
             );
