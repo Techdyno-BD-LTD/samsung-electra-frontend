@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FaHeart, FaShoppingCart, FaStar } from "react-icons/fa";
-import { HiOutlineArrowsRightLeft } from "react-icons/hi2";
+// import { FaHeart, FaShoppingCart, FaStar } from "react-icons/fa";
+// import { HiOutlineArrowsRightLeft } from "react-icons/hi2";
 import { toProductSlug } from "@/lib/productSlug";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { addToWishlistAsync, removeFromWishlistAsync, WishlistItem } from "@/store/features/wishlist/wishlistSlice";
@@ -12,6 +12,7 @@ import { toggleCompare } from "@/store/features/compare/compareSlice";
 import { useRouter } from "next/navigation";
 import { showToast } from "@/store/features/toast/toastSlice";
 import AddToCartModal from "@/components/common/AddToCartModal";
+import { FaStar } from "react-icons/fa";
 
 type RecentViewedProduct = {
   title?: string;
@@ -75,11 +76,9 @@ export default function RecentViewedProductCard({ product }: RecentViewedProduct
   const productSlug = product.slug || toProductSlug(product.title ?? "product");
   const productHref = `/products/${productSlug}`;
   const isWishlisted = useAppSelector((state) => state.wishlist.items.some((item) => item.id === productSlug));
-  const isCompared = useAppSelector((state) => state.compare.slots.some((slot) => slot?.id === productSlug));
 
-  const handleAddToCart = () => {
-    setIsModalOpen(true);
-  };
+
+
 
   const handleToggleWishlist = () => {
     if (!isAuthenticated) {

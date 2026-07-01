@@ -208,7 +208,7 @@ export default function SpecialDeals() {
           </div>
 
           <Link
-            href={`/flash-deals/${flashDeal.slug}`}
+            href={`/offers`}
             className="inline-flex items-center gap-2 rounded-md border border-[#89a8d6] px-4 py-2 text-lg font-medium text-[#1B57A6] transition hover:bg-[#f4f8ff] sm:text-2xl"
           >
             All Deals

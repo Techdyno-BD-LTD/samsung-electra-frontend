@@ -61,7 +61,7 @@ export async function generateMetadata(): Promise<Metadata> {
                 images: [image],
             }
         };
-    } catch (e) {
+    } catch {
         return { title: "About Us | Samsung Electra" };
     }
 }

@@ -403,9 +403,12 @@ export default function MainBar() {
       <div className="group relative">
         <button className="flex items-center gap-2 rounded-full border-2 border-gray-100 p-0.5 hover:border-[#2b85ff] transition-all duration-300">
           <div className="h-10 w-10 overflow-hidden rounded-full border border-gray-50 bg-slate-50 flex items-center justify-center">
-            {user?.avatar && user.avatar !== "" ? (
+            {(typeof user?.avatar_original === 'string' && (user.avatar_original.startsWith('/') || user.avatar_original.startsWith('http'))) ||
+            (typeof user?.avatar === 'string' && (user.avatar.startsWith('/') || user.avatar.startsWith('http'))) ? (
               <Image
-                src={user.avatar}
+                src={(typeof user?.avatar_original === 'string' && (user.avatar_original.startsWith('/') || user.avatar_original.startsWith('http')))
+                  ? user.avatar_original
+                  : user?.avatar || ''}
                 alt="User"
                 width={40}
                 height={40}

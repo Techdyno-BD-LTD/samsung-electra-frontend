@@ -17,6 +17,7 @@ type CampaignItem = {
 type CampaignOffersProps = {
   pageTitle: string;
   campaigns: CampaignItem[];
+  breadcrumb?: string;
 };
 
 type CountdownParts = {
@@ -88,15 +89,15 @@ function CountdownBadge({ targetDate }: { targetDate: string }) {
   );
 }
 
-export default function CampaignOffers({ pageTitle, campaigns }: CampaignOffersProps) {
+export default function CampaignOffers({ pageTitle, campaigns, breadcrumb = "Campaign" }: CampaignOffersProps) {
   return (
-    <main className=" mt-10  sm:mt-24  lg:mt-16">
+    <main className=" mt-14  sm:mt-24  lg:mt-16">
       <nav aria-label="Breadcrumb" className="mb-4 flex items-center gap-2 text-[12px] text-slate-500 sm:text-sm">
         <Link href="/" className="transition hover:text-slate-700">
           Home
         </Link>
         <span className="text-slate-400">›</span>
-        <span className="font-medium text-slate-700">Campaign</span>
+        <span className="font-medium text-slate-700">{breadcrumb}</span>
       </nav>
 
       <h1 className="mb-4 text-xl font-semibold text-slate-900 sm:mb-5 sm:text-2xl">{pageTitle}</h1>
@@ -123,7 +124,7 @@ export default function CampaignOffers({ pageTitle, campaigns }: CampaignOffersP
 
                 {campaign.ctaText && (
                   <span
-                    className="absolute right-3 top-3 rounded-md bg-[#0054A6] px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-white transition bg-[#0054A6] group-hover:bg-[#0A66C2] sm:right-5 sm:top-5 sm:px-4 sm:py-2 sm:text-sm"
+                    className="absolute right-3 top-3 rounded-md  px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-white transition bg-[#0054A6] group-hover:bg-[#0A66C2] sm:right-5 sm:top-5 sm:px-4 sm:py-2 sm:text-sm"
                   >
                     {campaign.ctaText}
                   </span>

@@ -46,7 +46,7 @@ export async function generateMetadata(): Promise<Metadata> {
                 images: [image],
             }
         };
-    } catch (e) {
+    } catch {
         return {
             title: "B2B & Corporate Solutions | Samsung Electra",
             description: "Connect with Samsung Electra for B2B solutions, corporate partnerships, and institutional sales in Bangladesh. Custom retail experiences for your business.",

@@ -46,7 +46,7 @@ export async function generateMetadata(): Promise<Metadata> {
                 images: [image],
             }
         };
-    } catch (e) {
+    } catch {
         return {
             title: "FAQ | Samsung Electra",
             description: "Find answers to frequently asked questions about Samsung Electra products, services, and policies.",

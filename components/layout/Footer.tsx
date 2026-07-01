@@ -12,7 +12,8 @@ import {
   FaLinkedinIn,
   FaWhatsapp,
   FaChevronDown,
-  FaChevronUp
+  FaChevronUp,
+  FaTiktok
 } from "react-icons/fa";
 
 type FooterLink = {
@@ -39,6 +40,12 @@ type FooterData = {
   app_store_link: string;
   payment_title: string;
   payment_image: string;
+  facebook_link?: string;
+  instagram_link?: string;
+  youtube_link?: string;
+  linkedin_link?: string;
+  whatsapp_link?: string;
+  tiktok_link?: string;
   sections: FooterSection[];
 };
 
@@ -93,6 +100,19 @@ export default function Footer() {
   const afterSalesSection = getSection("After Sales Support");
   const popularSection = getSection("Popular");
   const customerServiceSection = getSection("Customer Service");
+
+  const getWhatsappHref = (raw: string | undefined) => {
+    if (!raw) return "";
+    const trimmed = raw.trim();
+    if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+      return trimmed;
+    }
+    let cleaned = trimmed.replace(/\D/g, "");
+    if (cleaned.length === 11 && cleaned.startsWith("0")) {
+      cleaned = "88" + cleaned;
+    }
+    return `https://wa.me/${cleaned}`;
+  };
 
   // Fallback for phones if multiple are comma-separated
   const phones = footerData?.phone ? footerData.phone.split(',').map(p => p.trim()) : ["+8809639023023", "+8801713353431"];
@@ -181,16 +201,43 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="space-y-3 pt-2">
-            <p className="text-[15px] font-semibold text-gray-700">Connect With us</p>
-            <div className="flex gap-4 text-blue-800">
-              <Link href="#" className="hover:text-blue-500 transition-colors"><FaFacebookF size={20} /></Link>
-              <Link href="#" className="hover:text-pink-600 transition-colors"><FaInstagram size={20} /></Link>
-              <Link href="#" className="hover:text-red-600 transition-colors"><FaYoutube size={20} /></Link>
-              <Link href="#" className="hover:text-blue-700 transition-colors"><FaLinkedinIn size={20} /></Link>
-              <Link href="#" className="hover:text-green-500 transition-colors"><FaWhatsapp size={20} /></Link>
+          {(footerData?.facebook_link || footerData?.instagram_link || footerData?.youtube_link || footerData?.linkedin_link || footerData?.whatsapp_link || footerData?.tiktok_link) && (
+            <div className="space-y-3 pt-2">
+              <p className="text-[15px] font-semibold text-gray-700">Connect With us</p>
+              <div className="flex gap-4 text-blue-800">
+                {footerData?.facebook_link && (
+                  <Link href={footerData.facebook_link} target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">
+                    <FaFacebookF size={20} />
+                  </Link>
+                )}
+                {footerData?.instagram_link && (
+                  <Link href={footerData.instagram_link} target="_blank" rel="noopener noreferrer" className="hover:text-pink-600 transition-colors">
+                    <FaInstagram size={20} />
+                  </Link>
+                )}
+                {footerData?.youtube_link && (
+                  <Link href={footerData.youtube_link} target="_blank" rel="noopener noreferrer" className="hover:text-red-600 transition-colors">
+                    <FaYoutube size={20} />
+                  </Link>
+                )}
+                {footerData?.linkedin_link && (
+                  <Link href={footerData.linkedin_link} target="_blank" rel="noopener noreferrer" className="hover:text-blue-700 transition-colors">
+                    <FaLinkedinIn size={20} />
+                  </Link>
+                )}
+                {footerData?.whatsapp_link && (
+                  <Link href={getWhatsappHref(footerData.whatsapp_link)} target="_blank" rel="noopener noreferrer" className="hover:text-green-500 transition-colors">
+                    <FaWhatsapp size={20} />
+                  </Link>
+                )}
+                {footerData?.tiktok_link && (
+                  <Link href={footerData.tiktok_link} target="_blank" rel="noopener noreferrer" className="hover:text-black transition-colors">
+                    <FaTiktok size={20} />
+                  </Link>
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Mobile Service Numbers */}
           <div className="flex flex-row gap-3 py-4 lg:hidden">

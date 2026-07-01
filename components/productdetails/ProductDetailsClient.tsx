@@ -356,8 +356,8 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
     const raw = productData?.special_offers || [];
     if (isDemoMode) return raw;
     if (raw.length === 2 &&
-        raw[0]?.text === 'EBL Cashback 10%' &&
-        raw[1]?.text === 'Nagad Cashback 10%') {
+      raw[0]?.text === 'EBL Cashback 10%' &&
+      raw[1]?.text === 'Nagad Cashback 10%') {
       return [];
     }
     return raw;
@@ -987,9 +987,9 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
                       </>
                     )}
 
-                    <button type="button" className="text-sm font-semibold text-[#0C73DA]">
+                    <Link href="/offers" type="button" className="text-sm font-semibold text-[#0C73DA]">
                       {offersLabel}
-                    </button>
+                    </Link>
                   </>
                 )}
               </div>
@@ -1255,33 +1255,33 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
                 productData?.show_free_installation !== false ||
                 productData?.show_cash_on_delivery !== false ||
                 productData?.show_after_sales_service !== false) && (
-                <div className="hidden lg:flex lg:flex-wrap lg:items-center lg:gap-x-3 lg:gap-y-2 lg:py-1 lg:text-md lg:text-slate-600">
-                  {productData?.show_free_delivery !== false && (
-                    <p className="mr-0 flex shrink-0 items-center gap-1.5 border-r border-slate-300 pr-3 last:border-r-0 last:pr-0 lg:mr-4 lg:gap-2 lg:border-r-2 lg:pr-4">
-                      <Image src="/images/freedelivery.png" alt="Free delivery" width={20} height={20} className="h-5 w-5 object-contain" />
-                      Free Delivery
-                    </p>
-                  )}
-                  {productData?.show_free_installation !== false && (
-                    <p className="mr-0 flex shrink-0 items-center gap-1.5 border-r border-slate-300 pr-3 last:border-r-0 last:pr-0 lg:mr-4 lg:gap-2 lg:border-r-2 lg:pr-4">
-                      <Image src="/images/freeinstalation.png" alt="Free installation" width={20} height={20} className="h-5 w-5 object-contain" />
-                      Free Installation
-                    </p>
-                  )}
-                  {productData?.show_cash_on_delivery !== false && (
-                    <p className="mr-0 flex shrink-0 items-center gap-1.5 border-r border-slate-300 pr-3 last:border-r-0 last:pr-0 lg:mr-4 lg:gap-2 lg:border-r-2 lg:pr-4">
-                      <Image src="/images/cashondelivery.png" alt="Cash on delivery" width={20} height={20} className="h-5 w-5 object-contain" />
-                      Cash on delivery
-                    </p>
-                  )}
-                  {productData?.show_after_sales_service !== false && (
-                    <p className="mr-0 flex shrink-0 items-center gap-1.5 border-r border-slate-300 pr-3 last:border-r-0 last:pr-0 lg:mr-4 lg:gap-2 lg:border-r-2 lg:pr-4">
-                      <Image src="/images/salesservice.png" alt="After sales service" width={20} height={20} className="h-5 w-5 object-contain" />
-                      After sales service
-                    </p>
-                  )}
-                </div>
-              )}
+                  <div className="hidden lg:flex lg:flex-wrap lg:items-center lg:gap-x-3 lg:gap-y-2 lg:py-1 lg:text-md lg:text-slate-600">
+                    {productData?.show_free_delivery !== false && (
+                      <p className="mr-0 flex shrink-0 items-center gap-1.5 border-r border-slate-300 pr-3 last:border-r-0 last:pr-0 lg:mr-4 lg:gap-2 lg:border-r-2 lg:pr-4">
+                        <Image src="/images/freedelivery.png" alt="Free delivery" width={20} height={20} className="h-5 w-5 object-contain" />
+                        Free Delivery
+                      </p>
+                    )}
+                    {productData?.show_free_installation !== false && (
+                      <p className="mr-0 flex shrink-0 items-center gap-1.5 border-r border-slate-300 pr-3 last:border-r-0 last:pr-0 lg:mr-4 lg:gap-2 lg:border-r-2 lg:pr-4">
+                        <Image src="/images/freeinstalation.png" alt="Free installation" width={20} height={20} className="h-5 w-5 object-contain" />
+                        Free Installation
+                      </p>
+                    )}
+                    {productData?.show_cash_on_delivery !== false && (
+                      <p className="mr-0 flex shrink-0 items-center gap-1.5 border-r border-slate-300 pr-3 last:border-r-0 last:pr-0 lg:mr-4 lg:gap-2 lg:border-r-2 lg:pr-4">
+                        <Image src="/images/cashondelivery.png" alt="Cash on delivery" width={20} height={20} className="h-5 w-5 object-contain" />
+                        Cash on delivery
+                      </p>
+                    )}
+                    {productData?.show_after_sales_service !== false && (
+                      <p className="mr-0 flex shrink-0 items-center gap-1.5 border-r border-slate-300 pr-3 last:border-r-0 last:pr-0 lg:mr-4 lg:gap-2 lg:border-r-2 lg:pr-4">
+                        <Image src="/images/salesservice.png" alt="After sales service" width={20} height={20} className="h-5 w-5 object-contain" />
+                        After sales service
+                      </p>
+                    )}
+                  </div>
+                )}
 
               {((specialOffers?.length ?? 0) > 0 || isDemoMode) && (
                 (specialOffers?.length ?? 0) > 0 ? (

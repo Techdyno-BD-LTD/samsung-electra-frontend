@@ -82,7 +82,9 @@ export default function VerifyOTP({ phoneNumber, onBack, onVerify }: VerifyOTPPr
       {/* Message */}
       <div className="text-center mb-8 px-4">
         <p className="text-xl leading-relaxed text-gray-700 font-medium">
-          OTP 6 digit code has been sent to your phone check the Phone inbox
+          {phoneNumber.includes("@")
+            ? "OTP 6 digit code has been sent to your email check the email inbox"
+            : "OTP 6 digit code has been sent to your phone check the Phone inbox"}
         </p>
       </div>
 
@@ -95,7 +97,7 @@ export default function VerifyOTP({ phoneNumber, onBack, onVerify }: VerifyOTPPr
           onClick={onBack}
           className="text-[13px] font-bold text-[#0081FF] hover:underline"
         >
-          Change Number
+          {phoneNumber.includes("@") ? "Change Email" : "Change Number"}
         </button>
       </div>
 

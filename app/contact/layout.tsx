@@ -46,7 +46,7 @@ export async function generateMetadata(): Promise<Metadata> {
                 images: [image],
             }
         };
-    } catch (e) {
+    } catch {
         return {
             title: "Contact Us | Samsung Electra",
             description: "Get in touch with Samsung Electra for support, inquiries, or feedback. We are here to help you with your connected retail needs.",

@@ -158,13 +158,14 @@ const OrdersPage = () => {
   // Click outside to close
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      if (cancellationModalOpen) return;
       if (ordersRef.current && !ordersRef.current.contains(event.target as Node)) {
         setExpandedOrderId(null);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [cancellationModalOpen]);
 
   useEffect(() => {
     if (successMessage) {

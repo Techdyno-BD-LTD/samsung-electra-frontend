@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { FaPhoneAlt, FaEnvelope, FaFacebook } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
@@ -42,6 +42,157 @@ export default function LoginForm() {
   const [step, setStep] = useState<LoginStep>("login");
   const [selectedCountry, setSelectedCountry] = useState<Country>(COUNTRIES[0]);
   const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
+
+  const [isSocialLoggingIn, setIsSocialLoggingIn] = useState(false);
+  const [settings, setSettings] = useState<{
+    email_login_enabled: boolean;
+    google_login_enabled: boolean;
+    facebook_login_enabled: boolean;
+    google_client_id?: string;
+    facebook_app_id?: string;
+  }>({
+    email_login_enabled: true,
+    google_login_enabled: true,
+    facebook_login_enabled: true,
+  });
+
+  useEffect(() => {
+    async function fetchSettings() {
+      try {
+        const res = await fetch("/api/settings/business");
+        const json = await res.json();
+        if (json && Array.isArray(json.data)) {
+          const emailEnabled = json.data.find((item: any) => item.type === "email_login_enabled")?.value === "1";
+          const googleEnabled = json.data.find((item: any) => item.type === "google_login_enabled")?.value === "1";
+          const facebookEnabled = json.data.find((item: any) => item.type === "facebook_login_enabled")?.value === "1";
+          const googleClientId = json.data.find((item: any) => item.type === "google_client_id")?.value || "";
+          const facebookAppId = json.data.find((item: any) => item.type === "facebook_app_id")?.value || "";
+          
+          setSettings({
+            email_login_enabled: emailEnabled,
+            google_login_enabled: googleEnabled,
+            facebook_login_enabled: facebookEnabled,
+            google_client_id: googleClientId,
+            facebook_app_id: facebookAppId,
+          });
+          
+          if (!emailEnabled) {
+            setLoginType("phone");
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load login method configurations:", err);
+      }
+    }
+    fetchSettings();
+  }, []);
+
+  useEffect(() => {
+    async function handleHashAuth() {
+      if (typeof window === "undefined") return;
+      const hash = window.location.hash;
+      if (!hash) return;
+
+      const params = new URLSearchParams(hash.replace("#", "?"));
+      const accessToken = params.get("access_token");
+      const state = params.get("state");
+
+      if (!accessToken || !state) return;
+
+      // Clear URL hash fragment
+      window.history.replaceState(null, "", window.location.pathname + window.location.search);
+      setIsSocialLoggingIn(true);
+
+      try {
+        let providerUserId = "";
+        let email = "";
+        let name = "";
+
+        if (state === "google") {
+          const userinfoRes = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          });
+          if (userinfoRes.ok) {
+            const userinfo = await userinfoRes.json();
+            providerUserId = userinfo.sub;
+            email = userinfo.email || "";
+            name = userinfo.name || "";
+          }
+        } else if (state === "facebook") {
+          const fbRes = await fetch(`https://graph.facebook.com/me?fields=id,name,email&access_token=${accessToken}`);
+          if (fbRes.ok) {
+            const fbInfo = await fbRes.json();
+            providerUserId = fbInfo.id;
+            email = fbInfo.email || "";
+            name = fbInfo.name || "";
+          }
+        }
+
+        if (!providerUserId) {
+          throw new Error("Failed to get profile information.");
+        }
+
+        const loginRes = await fetch("/api/auth/social-login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            provider: providerUserId,
+            social_provider: state,
+            access_token: accessToken,
+            email,
+            name,
+          }),
+        });
+
+        const data = await loginRes.json();
+        if (data.result) {
+          dispatch(
+            setCredentials({
+              user: data.user,
+              token: data.token,
+            })
+          );
+          router.push(redirect);
+        } else {
+          alert(data.message || "Social login failed");
+        }
+      } catch (err) {
+        console.error("Social auth callback error:", err);
+        alert("An error occurred during social login verification.");
+      } finally {
+        setIsSocialLoggingIn(false);
+      }
+    }
+    handleHashAuth();
+  }, [settings]);
+
+  const handleGoogleLogin = () => {
+    const clientId = settings.google_client_id;
+    if (!clientId) {
+      alert("Google login Client ID is not configured in the admin panel.");
+      return;
+    }
+    const redirectUri = encodeURIComponent(window.location.origin + "/login");
+    const scope = encodeURIComponent("openid email profile");
+    const state = "google";
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=token&scope=${scope}&state=${state}`;
+    window.location.href = authUrl;
+  };
+
+  const handleFacebookLogin = () => {
+    const appId = settings.facebook_app_id;
+    if (!appId) {
+      alert("Facebook App ID is not configured in the admin panel.");
+      return;
+    }
+    const redirectUri = encodeURIComponent(window.location.origin + "/login");
+    const scope = encodeURIComponent("email,public_profile");
+    const state = "facebook";
+    const authUrl = `https://www.facebook.com/v12.0/dialog/oauth?client_id=${appId}&redirect_uri=${redirectUri}&response_type=token&scope=${scope}&state=${state}`;
+    window.location.href = authUrl;
+  };
 
   // Toggle handlers
   const handleToggle = (type: LoginType) => {
@@ -143,7 +294,12 @@ export default function LoginForm() {
 
   return (
     <div className="w-full max-w-[420px] mx-auto bg-white p-8 md:p-10 mt-10 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-gray-100 min-h-[500px] flex flex-col justify-center">
-      {step === "login" ? (
+      {isSocialLoggingIn ? (
+        <div className="flex flex-col items-center justify-center space-y-4 py-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0054A6]"></div>
+          <p className="text-sm font-semibold text-gray-600">Signing in with social provider...</p>
+        </div>
+      ) : step === "login" ? (
         <>
           {/* Logo */}
           <div className="flex justify-center mb-1">
@@ -165,31 +321,33 @@ export default function LoginForm() {
           </div>
 
           {/* Login Type Switcher */}
-          <div className="flex items-center justify-center mb-5">
-            <div className="inline-flex items-center p-1  rounded-2xl ">
-              <button
-                onClick={() => handleToggle("phone")}
-                className={`flex items-center gap-2.5 px-8 py-2  text-[14px] font-semibold transition-all duration-300 ${loginType === "phone"
-                  ? "bg-[#0054A6] text-white shadow-lg shadow-blue-900/20"
-                  : "text-gray-400 hover:text-gray-600"
-                  }`}
-              >
-                <FaPhoneAlt size={14} />
-                Phone
-              </button>
-              <div className="w-[2px] h-6 bg-gray-900 mx-2"></div>
-              <button
-                onClick={() => handleToggle("mail")}
-                className={`flex items-center gap-2.5 px-8 py-3  text-sm font-semibold transition-all duration-300 ${loginType === "mail"
-                  ? "bg-[#0054A6] text-white shadow-lg shadow-blue-900/20"
-                  : "text-gray-400 hover:text-gray-600"
-                  }`}
-              >
-                <FaEnvelope size={14} />
-                Mail
-              </button>
+          {settings.email_login_enabled && (
+            <div className="flex items-center justify-center mb-5">
+              <div className="inline-flex items-center p-1  rounded-2xl ">
+                <button
+                  onClick={() => handleToggle("phone")}
+                  className={`flex items-center gap-2.5 px-8 py-2  text-[14px] font-semibold transition-all duration-300 ${loginType === "phone"
+                    ? "bg-[#0054A6] text-white shadow-lg shadow-blue-900/20"
+                    : "text-gray-400 hover:text-gray-600"
+                    }`}
+                >
+                  <FaPhoneAlt size={14} />
+                  Phone
+                </button>
+                <div className="w-[2px] h-6 bg-gray-900 mx-2"></div>
+                <button
+                  onClick={() => handleToggle("mail")}
+                  className={`flex items-center gap-2.5 px-8 py-3  text-sm font-semibold transition-all duration-300 ${loginType === "mail"
+                    ? "bg-[#0054A6] text-white shadow-lg shadow-blue-900/20"
+                    : "text-gray-400 hover:text-gray-600"
+                    }`}
+                >
+                  <FaEnvelope size={14} />
+                  Mail
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {loginType === "phone" ? (
@@ -308,26 +466,36 @@ export default function LoginForm() {
           </form>
 
           {/* Social Login */}
-          <div className="mt-4 text-center">
-            <div className="flex items-center gap-3 justify-center text-[14px] font-medium text-gray-400 mb-6">
-              <div className="h-[1px] w-12 bg-gray-100"></div>
-              <span>Login with</span>
-              <div className="h-[1px] w-12 bg-gray-100"></div>
-            </div>
+          {(settings.google_login_enabled || settings.facebook_login_enabled) && (
+            <div className="mt-4 text-center">
+              <div className="flex items-center gap-3 justify-center text-[14px] font-medium text-gray-400 mb-6">
+                <div className="h-[1px] w-12 bg-gray-100"></div>
+                <span>Login with</span>
+                <div className="h-[1px] w-12 bg-gray-100"></div>
+              </div>
 
-            <div className="flex items-center justify-center gap-4 mb-6">
-              <button className="flex items-center justify-center w-12 h-12 border border-gray-100 rounded-2xl hover:bg-gray-50 hover:border-gray-200 transition-all duration-300 group">
-                <FaFacebook size={24} className="text-[#1877F2] group-hover:scale-110 transition-transform" />
-              </button>
-              <button className="flex items-center justify-center w-12 h-12 border border-gray-100 rounded-2xl hover:bg-gray-50 hover:border-gray-200 transition-all duration-300 group">
-                <FcGoogle size={24} className="group-hover:scale-110 transition-transform" />
-              </button>
-              {/* <span className="text-[14px] font-medium text-gray-400 mx-1">or</span>
-              <Link href="/signup" className="text-[14px] font-bold text-gray-900 hover:text-[#0054A6] transition-colors underline underline-offset-4 decoration-gray-200">
-                Sign Up
-              </Link> */}
+              <div className="flex items-center justify-center gap-4 mb-6">
+                {settings.facebook_login_enabled && (
+                  <button
+                    type="button"
+                    onClick={handleFacebookLogin}
+                    className="flex items-center justify-center w-12 h-12 border border-gray-100 rounded-2xl hover:bg-gray-50 hover:border-gray-200 transition-all duration-300 group"
+                  >
+                    <FaFacebook size={24} className="text-[#1877F2] group-hover:scale-110 transition-transform" />
+                  </button>
+                )}
+                {settings.google_login_enabled && (
+                  <button
+                    type="button"
+                    onClick={handleGoogleLogin}
+                    className="flex items-center justify-center w-12 h-12 border border-gray-100 rounded-2xl hover:bg-gray-50 hover:border-gray-200 transition-all duration-300 group"
+                  >
+                    <FcGoogle size={24} className="group-hover:scale-110 transition-transform" />
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Footer Links */}
           <div className="mt-1 text-center">

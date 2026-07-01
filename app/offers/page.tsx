@@ -62,5 +62,5 @@ export default function OffersPage() {
     ctaHref: `/offers/details/${deal.slug}`,
   }));
 
-  return <CampaignOffers pageTitle="Flash Deals" campaigns={mappedCampaigns} />;
+  return <CampaignOffers pageTitle="Flash Deals" campaigns={mappedCampaigns} breadcrumb="Offers" />;
 }

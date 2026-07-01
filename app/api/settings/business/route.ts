@@ -14,11 +14,12 @@ export async function GET() {
   }
 
   try {
+    const isDev = process.env.NODE_ENV === "development";
     const response = await fetch(`${baseUrl}/api/v2/business-settings`, {
       headers: {
         "x-system-key": systemKey,
       },
-      next: { revalidate: 3600 }, // Cache for 1 hour
+      next: { revalidate: isDev ? 0 : 3600 }, // No cache in development
     });
 
     if (!response.ok) {
