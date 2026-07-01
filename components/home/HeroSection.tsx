@@ -301,9 +301,9 @@ export default function HeroSection() {
                     <Image
                       src={category.icon}
                       alt={category.name}
-                      width={24}
-                      height={24}
-                      className="h-6 w-6 object-contain"
+                      width={32}
+                      height={32}
+                      className="h-8 w-8 object-contain"
                     />
                   ) : null}
                   <span className="text-[13px] text-slate-700 lg:text-[12px] xl:text-[12px] 2xl:text-[13px]">{category.name}</span>

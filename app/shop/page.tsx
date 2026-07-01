@@ -150,7 +150,7 @@ export default function BrandPage() {
 	return (
 		<main className="min-h-screen bg-white">
 			{/* Breadcrumb Section */}
-			<div className="mx-auto w-full max-w-[1840px] px-4 py-6 md:px-8">
+			<div className="mx-auto w-full max-w-[1840px] px-4 py-6 md:px-8 mt-6">
 				<nav className="flex items-center gap-2 text-sm text-gray-500">
 					<Link href="/" className="hover:text-[#215A9B]">
 						Home
