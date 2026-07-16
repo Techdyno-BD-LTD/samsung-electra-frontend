@@ -189,7 +189,7 @@ export default function CategoryFilterPanel({ filteringAttributes = [] }: Catego
             <span>৳{maxPrice.toLocaleString()}</span>
           </div>
 
-          <div className="relative mt-6 h-6">
+          <div className="relative mt-6 h-4">
             <input
               type="range"
               min={0}
@@ -199,7 +199,7 @@ export default function CategoryFilterPanel({ filteringAttributes = [] }: Catego
               onChange={(e) => setMinPrice(Number(e.target.value))}
               onMouseUp={handlePriceChange}
               onTouchEnd={handlePriceChange}
-              className="absolute pointer-events-none appearance-none z-20 h-1 w-full bg-transparent [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#2B7FE8] [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md"
+              className="absolute top-0 left-0 pointer-events-none appearance-none z-20 h-4 w-full bg-transparent [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#2B7FE8] [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#2B7FE8] [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:shadow-md"
             />
             <input
               type="range"
@@ -210,11 +210,11 @@ export default function CategoryFilterPanel({ filteringAttributes = [] }: Catego
               onChange={(e) => setMaxPrice(Number(e.target.value))}
               onMouseUp={handlePriceChange}
               onTouchEnd={handlePriceChange}
-              className="absolute pointer-events-none appearance-none z-20 h-1 w-full bg-transparent [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#2B7FE8] [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md"
+              className="absolute top-0 left-0 pointer-events-none appearance-none z-20 h-4 w-full bg-transparent [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#2B7FE8] [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#2B7FE8] [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:shadow-md"
             />
-            <div className="absolute top-2 h-1 w-full bg-slate-200 rounded-full" />
+            <div className="absolute top-[6px] h-1 w-full bg-slate-200 rounded-full" />
             <div 
-              className="absolute top-2 h-1 bg-[#2B7FE8] rounded-full" 
+              className="absolute top-[6px] h-1 bg-[#2B7FE8] rounded-full" 
               style={{
                 left: `${(minPrice / 200000) * 100}%`,
                 width: `${((maxPrice - minPrice) / 200000) * 100}%`

@@ -3,10 +3,12 @@
 import { useState } from "react";
 import { HiChevronDown } from "react-icons/hi2";
 import { HiOutlineTv } from "react-icons/hi2";
+import Link from "next/link";
 
 type Subcategory = {
   name: string;
   count: number;
+  slug: string;
 };
 
 type CategorySidebarProps = {
@@ -50,8 +52,8 @@ export default function CategorySidebar({
         <ul>
           {subcategories.map((sub) => (
             <li key={sub.name}>
-              <button
-                type="button"
+              <Link
+                href={`/category/${sub.slug}`}
                 className="flex w-full items-center justify-between border-b border-slate-100 px-1 py-3.5 text-left text-[12px] text-slate-600 transition hover:text-blue-600"
               >
                 <span className="flex items-center gap-2">
@@ -59,7 +61,7 @@ export default function CategorySidebar({
                   <span>{sub.name} ({sub.count})</span>
                 </span>
                 <span className="inline-block h-2 w-2 rounded-full bg-[#2F7FE8]" />
-              </button>
+              </Link>
             </li>
           ))}
         </ul>
@@ -67,3 +69,4 @@ export default function CategorySidebar({
     </aside>
   );
 }
+

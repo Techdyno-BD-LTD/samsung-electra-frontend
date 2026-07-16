@@ -280,26 +280,74 @@ const ProductCard = ({
   const handleToggleCompare = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    const compareTitle = productData?.name || title;
+    const compareBrand = productData?.brand?.name || brand;
+    const compareBrandLogo = productData?.brand?.logo || brandLogo;
+    const compareImage = productData?.thumbnail_image || image;
+    const comparePrice = productData?.main_price || price;
+    const compareOriginalPrice = productData?.stroked_price || originalPrice;
+    const compareDiscountPercent = productData?.discount || discountPercent;
+    const compareCategory = productData?.category_info?.category_name || productData?.category?.name || category;
+    const compareType = productData?.category?.name || type;
+    const compareRating = productData?.rating ?? rating;
+    const compareRatingCount = productData?.rating_count?.toString() || ratingCount;
+
+    // Calculate savings
+    const parsePrice = (priceStr?: string | number | null) => {
+      if (priceStr === null || priceStr === undefined) return 0;
+      const normalized = String(priceStr).replace(/[^\d.]/g, '');
+      return parseFloat(normalized) || 0;
+    };
+    const main = parsePrice(comparePrice);
+    const stroked = parsePrice(compareOriginalPrice);
+    const savings = Math.max(0, stroked - main);
+    const compareSaveAmount = savings > 0 ? `Save : ৳ ${savings.toLocaleString('en-US')}` : saveAmount;
+
     dispatch(
       toggleCompare({
         id: wishlistItemId,
         slug: productSlug,
-        title,
-        brand,
-        brandLogo,
-        image,
-        price,
-        originalPrice,
-        discountPercent,
-        saveAmount,
-        category,
-        type,
-        weight,
-        color,
-        rating,
-        ratingCount,
+        title: compareTitle,
+        brand: compareBrand,
+        brandLogo: compareBrandLogo,
+        image: compareImage,
+        price: comparePrice,
+        originalPrice: compareOriginalPrice,
+        discountPercent: compareDiscountPercent,
+        saveAmount: compareSaveAmount,
+        category: compareCategory,
+        type: compareType,
+        weight: productData?.weight ? String(productData.weight) : weight,
+        color: color,
+        rating: compareRating,
+        ratingCount: compareRatingCount,
       })
     );
+
+    if (!isCompared) {
+      dispatch(
+        showToast({
+          message: "Added to Compare!",
+          type: "success",
+          productName: compareTitle,
+          productImage: compareImage,
+          productPrice: comparePrice,
+          actionLabel: "View Compare",
+          actionLink: "/compare",
+        })
+      );
+    } else {
+      dispatch(
+        showToast({
+          message: "Removed from Compare!",
+          type: "success",
+          productName: compareTitle,
+          productImage: compareImage,
+          productPrice: comparePrice,
+        })
+      );
+    }
   };
 
   const productHref = `/products/${productSlug}`;

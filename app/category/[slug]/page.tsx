@@ -191,16 +191,20 @@ export default async function CategoryPage({ params }: PageProps) {
 
           {/* ═══════════════ MOBILE SUB-CATEGORIES (Hidden on Desktop) ═══════════════ */}
           <div className="mt-5 flex items-center gap-2 overflow-x-auto px-1 pb-2 scrollbar-hide lg:hidden">
-            <button className="whitespace-nowrap rounded-full bg-[#1A80FE] px-6 py-1 text-[12px] font-medium text-white shadow-sm">
+            <Link
+              href={`/category/${category.slug}`}
+              className="whitespace-nowrap rounded-full bg-[#1A80FE] px-6 py-1 text-[12px] font-medium text-white shadow-sm"
+            >
               All
-            </button>
+            </Link>
             {category.subcategories.map((sub) => (
-              <button
+              <Link
                 key={sub.name}
+                href={`/category/${sub.slug}`}
                 className="whitespace-nowrap rounded-full bg-[#F3F4F6] px-6 py-1 text-[12px] font-medium text-[#374151] transition hover:bg-slate-200"
               >
                 {sub.name}
-              </button>
+              </Link>
             ))}
           </div>
         </div>

@@ -163,7 +163,7 @@ export default function HeroSection() {
         }));
 
         const allApiCategories = categoryPayload.data || [];
-        const topLevelCategories = allApiCategories.filter((item) => item.parent_id === 0);
+        const topLevelCategories = allApiCategories.filter((item) => item.parent_id === 0 && (item.number_of_products || 0) > 0);
 
         const categories: HeroCategory[] = topLevelCategories
           .map((item) => ({
@@ -175,7 +175,7 @@ export default function HeroSection() {
             slug: item.slug,
             parent_id: item.parent_id,
             subcategories: allApiCategories
-              .filter((sub) => sub.parent_id === item.id)
+              .filter((sub) => sub.parent_id === item.id && (sub.number_of_products || 0) > 0)
               .map((sub) => ({
                 id: sub.id,
                 name: sub.name,

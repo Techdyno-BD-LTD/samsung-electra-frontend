@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { FaChevronRight } from "react-icons/fa";
 import BrandHero from "@/components/brand/BrandHero";
-import BrandCategorySection from "@/components/brand/BrandCategorySection";
+import BrandCategorySection, { CategoryProduct } from "@/components/brand/BrandCategorySection";
 import Skeleton from "@/components/common/Skeleton";
 
 // Fallback Brand Tab Data
@@ -17,13 +17,40 @@ interface ShopCategory {
 
 interface CategoryData {
 	title: string;
-	products: any[];
+	products: CategoryProduct[];
 }
 
 interface BrandItem {
 	id: number;
 	name: string;
+	slug?: string;
 	tabLogo: string;
+}
+
+interface APIBrand {
+	id: number;
+	name: string;
+	slug?: string;
+	logo?: string;
+}
+
+interface APICategory {
+	parent_id: number;
+	number_of_products?: number;
+	name: string;
+	slug: string;
+}
+
+interface APIProduct {
+	id: number;
+	brand_id?: number;
+	brand_name?: string;
+	brand?: {
+		id?: number;
+		slug?: string;
+		name?: string;
+	};
+	[key: string]: unknown;
 }
 
 export default function BrandPage() {
@@ -47,7 +74,7 @@ export default function BrandPage() {
 							"philips": "/images/phillips.png",
 							"phillips": "/images/phillips.png",
 						};
-						fetchedBrands = brandsResult.data.map((b: any) => ({
+						fetchedBrands = (brandsResult.data as APIBrand[]).map((b) => ({
 							id: b.id,
 							name: b.name,
 							slug: b.slug,
@@ -67,9 +94,9 @@ export default function BrandPage() {
 					const categoriesRes = await fetch("/api/categories");
 					const categoriesResult = await categoriesRes.json();
 					if (categoriesResult.success && Array.isArray(categoriesResult.data)) {
-						categories = categoriesResult.data
-							.filter((cat: any) => cat.parent_id === 0)
-							.map((cat: any) => ({
+						categories = (categoriesResult.data as APICategory[])
+							.filter((cat) => cat.parent_id === 0 && (cat.number_of_products || 0) > 0)
+							.map((cat) => ({
 								title: cat.name,
 								slug: cat.slug,
 							}));
@@ -96,12 +123,12 @@ export default function BrandPage() {
 						if (result.success && Array.isArray(result.data)) {
 							return {
 								title: cat.title,
-								products: result.data.map((p: any) => {
+								products: (result.data as APIProduct[]).map((p) => {
 									// Match product brand with dynamic brands using ID/Slug to avoid typo issues
 									const brandId = p.brand_id || p.brand?.id;
 									const brandSlug = p.brand?.slug || "";
 									const matchedBrand = finalBrands.find(
-										(b: any) =>
+										(b) =>
 											(brandId && b.id === brandId) ||
 											(brandSlug && b.slug && b.slug.toLowerCase() === brandSlug.toLowerCase())
 									);
@@ -117,7 +144,7 @@ export default function BrandPage() {
 										} else if (rawName === "philips" || rawName === "phillips") {
 											brandName = "Phillips";
 										} else if (p.brand_name || p.brand?.name) {
-											brandName = p.brand_name || p.brand?.name;
+											brandName = p.brand_name || p.brand?.name || "Other";
 										}
 									}
 
@@ -125,7 +152,7 @@ export default function BrandPage() {
 										...p,
 										brand: brandName,
 										productData: p,
-									};
+									} as CategoryProduct;
 								}),
 							};
 						}
@@ -156,7 +183,7 @@ export default function BrandPage() {
 						Home
 					</Link>
 					<FaChevronRight className="h-3 w-3" />
-					<span className="font-medium text-[#215A9B]">Brand</span>
+					<span className="font-medium text-[#215A9B]">Shop</span>
 				</nav>
 			</div>
 

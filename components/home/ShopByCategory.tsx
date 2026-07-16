@@ -32,14 +32,17 @@ async function getCategories(): Promise<CategoryItem[]> {
     const data: ApiCategory[] = json.data || [];
 
     // Filter for parent categories, take first 6 and map to CategoryItem
-    return data.filter((c) => c.parent_id === 0).slice(0, 6).map((item) => ({
-      id: item.id,
-      name: item.name,
-      slug: item.slug,
-      itemCount: `${item.number_of_products || 0}+ Items`,
-      imageSrc: item.cover_image || item.icon || "/images/placeholder.png",
-      imageAlt: item.name,
-    }));
+    return data
+      .filter((c) => c.parent_id === 0 && (c.number_of_products || 0) > 0)
+      .slice(0, 6)
+      .map((item) => ({
+        id: item.id,
+        name: item.name,
+        slug: item.slug,
+        itemCount: `${item.number_of_products || 0}+ Items`,
+        imageSrc: item.cover_image || item.icon || "/images/placeholder.png",
+        imageAlt: item.name,
+      }));
   } catch (error) {
     console.error("Error loading categories for ShopByCategory:", error);
     return [];

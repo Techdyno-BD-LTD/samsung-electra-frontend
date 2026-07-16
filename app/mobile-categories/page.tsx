@@ -11,6 +11,7 @@ type Category = {
   icon: string | null;
   cover_image: string | null;
   parent_id: number;
+  number_of_products?: number;
 };
 
 type Brand = {
@@ -37,7 +38,7 @@ export default function MobileCategoriesPage() {
         const brandData = await brandRes.json();
 
         if (catData.success && Array.isArray(catData.data)) {
-          setCategories(catData.data.filter((c: Category) => c.parent_id === 0));
+          setCategories(catData.data.filter((c: Category) => c.parent_id === 0 && (c.number_of_products || 0) > 0));
         }
 
         if (brandData.success && Array.isArray(brandData.data)) {

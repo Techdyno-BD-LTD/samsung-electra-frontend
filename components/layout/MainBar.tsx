@@ -67,11 +67,13 @@ export default function MainBar() {
         if (response.ok) {
           const payload = await response.json();
           const all = payload.data || [];
-          const tree = all.filter((c: { parent_id: number; id: number; name: string }) => c.parent_id === 0).map((c: { id: number; name: string }) => ({
-            id: c.id,
-            name: c.name,
-            subcategories: all.filter((s: { parent_id: number }) => s.parent_id === c.id)
-          }));
+          const tree = all
+            .filter((c: { parent_id: number; id: number; name: string; number_of_products?: number }) => c.parent_id === 0 && (c.number_of_products || 0) > 0)
+            .map((c: { id: number; name: string }) => ({
+              id: c.id,
+              name: c.name,
+              subcategories: all.filter((s: { parent_id: number; number_of_products?: number }) => s.parent_id === c.id && (s.number_of_products || 0) > 0)
+            }));
           setCategories(tree);
         }
       } catch (error) {
