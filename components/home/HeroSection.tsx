@@ -284,36 +284,38 @@ export default function HeroSection() {
           className="space-y-2.5 lg:space-y-1.5 xl:space-y-1.5 2xl:space-y-3"
           onMouseLeave={() => handleCategoryHover(null)}
         >
-          {(showAllCategories ? heroData.categories : heroData.categories.slice(0, 6)).map((category) => {
-            const categoryUrl = `/category/${category.slug || category.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`;
-            return (
-              <Link
-                key={category.id}
-                href={categoryUrl}
-                onMouseEnter={() => handleCategoryHover(category)}
-                className={`flex w-full items-center justify-between rounded-md border px-2 py-3 text-left shadow-md transition lg:px-2 lg:py-2 xl:px-2 xl:py-2 2xl:px-3 2xl:py-4 ${hoveredCategory?.id === category.id
-                  ? "border-blue-400 bg-blue-50/50"
-                  : "border-slate-100 bg-white hover:border-blue-300 hover:bg-white"
-                  }`}
-              >
-                <div className="flex items-center gap-2 lg:gap-1.5 xl:gap-1.5 2xl:gap-2">
-                  {category.icon ? (
-                    <Image
-                      src={category.icon}
-                      alt={category.name}
-                      width={32}
-                      height={32}
-                      className="h-8 w-8 object-contain"
-                    />
-                  ) : null}
-                  <span className="text-[13px] text-slate-700 lg:text-[12px] xl:text-[12px] 2xl:text-[13px]">{category.name}</span>
-                </div>
-                <span className="inline-flex h-7 min-w-7 items-center justify-center rounded-full bg-blue-500 px-2 text-xs font-semibold text-white">
-                  {twoDigit(category.count)}
-                </span>
-              </Link>
-            );
-          })}
+          <div className={`w-full custom-scrollbar space-y-2.5 lg:space-y-1.5 xl:space-y-1.5 2xl:space-y-3 h-[392px] lg:h-[322px] xl:h-[322px] 2xl:h-[448px] ${showAllCategories ? "overflow-y-auto pr-1.5" : "overflow-hidden"}`}>
+            {(showAllCategories ? heroData.categories : heroData.categories.slice(0, 6)).map((category) => {
+              const categoryUrl = `/category/${category.slug || category.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`;
+              return (
+                <Link
+                  key={category.id}
+                  href={categoryUrl}
+                  onMouseEnter={() => handleCategoryHover(category)}
+                  className={`flex w-full items-center justify-between rounded-md border px-2 py-3 text-left shadow-md transition lg:px-2 lg:py-2 xl:px-2 xl:py-2 2xl:px-3 2xl:py-4 ${hoveredCategory?.id === category.id
+                    ? "border-blue-400 bg-blue-50/50"
+                    : "border-slate-100 bg-white hover:border-blue-300 hover:bg-white"
+                    }`}
+                >
+                  <div className="flex items-center gap-2 lg:gap-1.5 xl:gap-1.5 2xl:gap-2">
+                    {category.icon ? (
+                      <Image
+                        src={category.icon}
+                        alt={category.name}
+                        width={32}
+                        height={32}
+                        className="h-8 w-8 object-contain"
+                      />
+                    ) : null}
+                    <span className="text-[13px] text-slate-700 lg:text-[12px] xl:text-[12px] 2xl:text-[13px]">{category.name}</span>
+                  </div>
+                  <span className="inline-flex h-7 min-w-7 items-center justify-center rounded-full bg-blue-500 px-2 text-xs font-semibold text-white">
+                    {twoDigit(category.count)}
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
 
           {heroData.categories.length > 6 && (
             <button
