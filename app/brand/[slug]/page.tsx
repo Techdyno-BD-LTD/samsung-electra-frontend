@@ -149,19 +149,46 @@ export default async function BrandSlugPage({ params }: PageProps) {
   const categoryList = Array.from(categoryMap.values());
   const orderedTabs = categoryList.map((section) => section.tabLabel);
 
+  // 4. Fetch dynamic brand banner mapping page
+  let brandBanner: string | null = null;
+  try {
+    const pageRes = await fetch(`${baseUrl}/api/v2/pages/brands`, {
+      headers: {
+        'x-system-key': systemKey,
+      },
+      next: { revalidate: 60 },
+    });
+    if (pageRes.ok) {
+      const pagePayload = await pageRes.json();
+      if (pagePayload.success && pagePayload.data && pagePayload.data[0]) {
+        const contentObj = typeof pagePayload.data[0].content === "string"
+          ? JSON.parse(pagePayload.data[0].content)
+          : pagePayload.data[0].content;
+        
+        if (contentObj && contentObj.brand_banners && contentObj.brand_banners[brand.id]) {
+          brandBanner = contentObj.brand_banners[brand.id];
+        }
+      }
+    }
+  } catch (err) {
+    console.error("Error fetching brands page settings:", err);
+  }
+
   return (
     <main className=" mt-20">
-      <section className="mx-auto w-full max-w-[1840px] px-4 pt-4 md:px-8">
-        <div className="relative aspect-[1840/400] w-full overflow-hidden rounded-md">
-          <Image
-            src="/images/shoppage.png"
-            alt={`${brand.name} hero banner`}
-            fill
-            priority
-            className="object-cover"
-          />
-        </div>
-      </section>
+      {brandBanner && (
+        <section className="mx-auto w-full px-4 pt-4 md:px-0">
+          <div className="relative aspect-[1840/400] w-full overflow-hidden rounded-md">
+            <Image
+              src={brandBanner}
+              alt={`${brand.name} hero banner`}
+              fill
+              priority
+              className="object-cover"
+            />
+          </div>
+        </section>
+      )}
 
       <div className="mx-auto w-full max-w-[1840px] px-4 py-4 md:px-8">
         <nav className="flex items-center gap-2 text-xs text-gray-500">

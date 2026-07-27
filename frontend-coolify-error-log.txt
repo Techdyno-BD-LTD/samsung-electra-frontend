@@ -1,0 +1,1000 @@
+2026-Jul-20 07:56:07.809684 Docker 29.6.2 with BuildKit and Buildx detected on deployment server (localhost).
+2026-Jul-20 07:56:07.825155 Starting deployment of Techdyno-BD-LTD/samsung-electra-frontend:main to localhost.
+2026-Jul-20 07:56:08.251231 Preparing container with helper image: docker.io/coollabsio/coolify-helper:1.0.14
+2026-Jul-20 07:56:08.420378 [DEBUG] [CMD]: docker stop --time=30 qm5qo8etudcmzgk98tryw2cu
+2026-Jul-20 07:56:08.420378 [DEBUG] Flag --time has been deprecated, use --timeout instead
+2026-Jul-20 07:56:08.425308 [DEBUG] Error response from daemon: No such container: qm5qo8etudcmzgk98tryw2cu
+2026-Jul-20 07:56:08.642566 [DEBUG] [CMD]: docker run -d --network 'coolify' --name qm5qo8etudcmzgk98tryw2cu  --rm -v /root/.docker/buildx:/root/.docker/buildx -v /var/run/docker.sock:/var/run/docker.sock docker.io/coollabsio/coolify-helper:1.0.14
+2026-Jul-20 07:56:08.642566 [DEBUG] 2683541bf3b318f5d9ed6fec027cb2cd6a45986687dea39d6778e6ab444ae8fa
+2026-Jul-20 07:56:11.321626 [DEBUG] [CMD]: docker exec qm5qo8etudcmzgk98tryw2cu bash -c 'GIT_SSH_COMMAND="ssh -o ConnectTimeout=30 -p 22 -o Port=22 -o LogLevel=ERROR -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git ls-remote '\''https://x-access-token:<REDACTED>@github.com/Techdyno-BD-LTD/samsung-electra-frontend.git'\'' '\''refs/heads/main'\'''
+2026-Jul-20 07:56:11.321626 [DEBUG] 85d3059b6bbd495a996f41eefc2e29aff5c0ae92	refs/heads/main
+2026-Jul-20 07:56:11.499532 Image not found (qpje1byfnat5xbumpfyq1xls:85d3059b6bbd495a996f41eefc2e29aff5c0ae92). Building new image.
+2026-Jul-20 07:56:11.857875 ----------------------------------------
+2026-Jul-20 07:56:11.866176 Importing Techdyno-BD-LTD/samsung-electra-frontend:main (commit sha 85d3059b6bbd495a996f41eefc2e29aff5c0ae92) to /artifacts/qm5qo8etudcmzgk98tryw2cu.
+2026-Jul-20 07:56:12.107296 [DEBUG] [CMD]: docker exec qm5qo8etudcmzgk98tryw2cu bash -c 'git -c '\''url.https://x-access-token:<REDACTED>@github.com/.insteadOf=https://github.com/'\'' -c http.version=HTTP/1.1 clone --depth=1 --recurse-submodules --shallow-submodules -b '\''main'\'' '\''https:<REDACTED>@github.com/Techdyno-BD-LTD/samsung-electra-frontend.git'\'' '\''/artifacts/qm5qo8etudcmzgk98tryw2cu'\'' && cd '\''/artifacts/qm5qo8etudcmzgk98tryw2cu'\'' && GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git -c '\''url.https://x-access-token:<REDACTED>@github.com/.insteadOf=https://github.com/'\'' -c http.version=HTTP/1.1 fetch --depth=1 origin '\''85d3059b6bbd495a996f41eefc2e29aff5c0ae92'\'' && git -c '\''url.https:<REDACTED>@github.com/.insteadOf=https://github.com/'\'' -c http.version=HTTP/1.1 -c advice.detachedHead=false checkout '\''85d3059b6bbd495a996f41eefc2e29aff5c0ae92'\'' >/dev/null 2>&1 && cd '\''/artifacts/qm5qo8etudcmzgk98tryw2cu'\'' && if [ -f .gitmodules ]; then git -c '\''url.https:<REDACTED>@github.com/.insteadOf=https://github.com/'\'' -c http.version=HTTP/1.1 submodule sync && GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git -c '\''url.https:<REDACTED>@github.com/.insteadOf=https://github.com/'\'' -c http.version=HTTP/1.1 submodule update --init --recursive --depth=1; fi && cd '\''/artifacts/qm5qo8etudcmzgk98tryw2cu'\'' && GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git -c '\''url.https:<REDACTED>@github.com/.insteadOf=https://github.com/'\'' -c http.version=HTTP/1.1 lfs pull'
+2026-Jul-20 07:<REDACTED>@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de
+2026-Jul-20 07:56:21.928559 [DEBUG] #4 resolve ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de 0.0s done
+2026-Jul-20 07:56:21.928559 [DEBUG] #4 DONE 0.1s
+2026-Jul-20 07:56:21.928559 [DEBUG] 
+2026-Jul-20 07:56:21.928559 [DEBUG] #5 [internal] load build context
+2026-Jul-20 07:56:22.039515 [DEBUG] #5 ...
+2026-Jul-20 07:56:22.039515 [DEBUG] 
+2026-Jul-20 07:56:22.039515 [DEBUG] #4 [stage-0  1/11] FROM ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de
+2026-Jul-20 07:56:22.039515 [DEBUG] #4 DONE 0.2s
+2026-Jul-20 07:56:22.039515 [DEBUG] 
+2026-Jul-20 07:56:22.039515 [DEBUG] #5 [internal] load build context
+2026-Jul-20 07:56:22.394243 [DEBUG] #5 transferring context: 16.55MB 0.5s done
+2026-Jul-20 07:56:22.398686 [DEBUG] #5 DONE 0.5s
+2026-Jul-20 07:56:22.398686 [DEBUG] 
+2026-Jul-20 07:56:22.398686 [DEBUG] #4 [stage-0  1/11] FROM ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de
+2026-Jul-20 07:56:22.398686 [DEBUG] #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 0B / 75.95MB 0.3s
+2026-Jul-20 07:56:22.398686 [DEBUG] #4 sha256:866b26ac4e4722aa6bd512e1e0c5fa91657dc060ef3eebbbcbd6057625e8f518 0B / 335B 0.3s
+2026-Jul-20 07:56:22.398686 [DEBUG] #4 sha256:2726e237d1a374379e783053d93d0345c8a3bf3c57b5d35b099de1ad777486ee 0B / 29.72MB 0.2s
+2026-Jul-20 07:56:22.398686 [DEBUG] #4 sha256:7962e2b983fd33a26ed1c6cd3dc8130d909d793c6a76893ed532f122edf72913 0B / 33.30MB 0.2s
+2026-Jul-20 07:56:22.844695 [DEBUG] #4 sha256:866b26ac4e4722aa6bd512e1e0c5fa91657dc060ef3eebbbcbd6057625e8f518 335B / 335B 0.6s done
+2026-Jul-20 07:56:22.996827 [DEBUG] #4 sha256:7962e2b983fd33a26ed1c6cd3dc8130d909d793c6a76893ed532f122edf72913 4.19MB / 33.30MB 0.8s
+2026-Jul-20 07:56:23.144505 [DEBUG] #4 sha256:7962e2b983fd33a26ed1c6cd3dc8130d909d793c6a76893ed532f122edf72913 8.39MB / 33.30MB 0.9s
+2026-Jul-20 07:56:23.294379 [DEBUG] #4 sha256:7962e2b983fd33a26ed1c6cd3dc8130d909d793c6a76893ed532f122edf72913 10.49MB / 33.30MB 1.1s
+2026-Jul-20 07:56:23.444362 [DEBUG] #4 sha256:2726e237d1a374379e783053d93d0345c8a3bf3c57b5d35b099de1ad777486ee 3.15MB / 29.72MB 1.2s
+2026-Jul-20 07:56:23.594137 [DEBUG] #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 5.24MB / 75.95MB 1.5s
+2026-Jul-20 07:56:23.594137 [DEBUG] #4 sha256:7962e2b983fd33a26ed1c6cd3dc8130d909d793c6a76893ed532f122edf72913 12.58MB / 33.30MB 1.4s
+2026-Jul-20 07:56:23.750315 [DEBUG] #4 sha256:2726e237d1a374379e783053d93d0345c8a3bf3c57b5d35b099de1ad777486ee 6.29MB / 29.72MB 1.5s
+2026-Jul-20 07:56:23.894713 [DEBUG] #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 10.49MB / 75.95MB 1.8s
+2026-Jul-20 07:56:23.894713 [DEBUG] #4 sha256:2726e237d1a374379e783053d93d0345c8a3bf3c57b5d35b099de1ad777486ee 8.39MB / 29.72MB 1.7s
+2026-Jul-20 07:56:23.894713 [DEBUG] #4 sha256:7962e2b983fd33a26ed1c6cd3dc8130d909d793c6a76893ed532f122edf72913 15.73MB / 33.30MB 1.7s
+2026-Jul-20 07:56:24.043747 [DEBUG] #4 sha256:2726e237d1a374379e783053d93d0345c8a3bf3c57b5d35b099de1ad777486ee 10.49MB / 29.72MB 1.8s
+2026-Jul-20 07:56:24.043747 [DEBUG] #4 sha256:7962e2b983fd33a26ed1c6cd3dc8130d909d793c6a76893ed532f122edf72913 18.87MB / 33.30MB 1.8s
+2026-Jul-20 07:56:24.344412 [DEBUG] #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 16.78MB / 75.95MB 2.3s
+2026-Jul-20 07:56:24.344412 [DEBUG] #4 sha256:2726e237d1a374379e783053d93d0345c8a3bf3c57b5d35b099de1ad777486ee 14.68MB / 29.72MB 2.1s
+2026-Jul-20 07:56:24.344412 [DEBUG] #4 sha256:7962e2b983fd33a26ed1c6cd3dc8130d909d793c6a76893ed532f122edf72913 20.97MB / 33.30MB 2.1s
+2026-Jul-20 07:56:24.493803 [DEBUG] #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 20.97MB / 75.95MB 2.4s
+2026-Jul-20 07:56:24.493803 [DEBUG] #4 sha256:2726e237d1a374379e783053d93d0345c8a3bf3c57b5d35b099de1ad777486ee 16.78MB / 29.72MB 2.3s
+2026-Jul-20 07:56:24.644719 [DEBUG] #4 sha256:2726e237d1a374379e783053d93d0345c8a3bf3c57b5d35b099de1ad777486ee 18.87MB / 29.72MB 2.4s
+2026-Jul-20 07:56:24.644719 [DEBUG] #4 sha256:7962e2b983fd33a26ed1c6cd3dc8130d909d793c6a76893ed532f122edf72913 23.07MB / 33.30MB 2.4s
+2026-Jul-20 07:56:24.796095 [DEBUG] #4 sha256:2726e237d1a374379e783053d93d0345c8a3bf3c57b5d35b099de1ad777486ee 20.97MB / 29.72MB 2.6s
+2026-Jul-20 07:56:24.803137 [DEBUG] #4 sha256:7962e2b983fd33a26ed1c6cd3dc8130d909d793c6a76893ed532f122edf72913 25.17MB / 33.30MB 2.6s
+2026-Jul-20 07:56:25.095500 [DEBUG] #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 28.31MB / 75.95MB 3.0s
+2026-Jul-20 07:56:25.095500 [DEBUG] #4 sha256:2726e237d1a374379e783053d93d0345c8a3bf3c57b5d35b099de1ad777486ee 23.07MB / 29.72MB 2.9s
+2026-Jul-20 07:56:25.095500 [DEBUG] #4 sha256:7962e2b983fd33a26ed1c6cd3dc8130d909d793c6a76893ed532f122edf72913 30.41MB / 33.30MB 2.9s
+2026-Jul-20 07:56:25.383786 [DEBUG] #4 sha256:2726e237d1a374379e783053d93d0345c8a3bf3c57b5d35b099de1ad777486ee 26.21MB / 29.72MB 3.2s
+2026-Jul-20 07:56:25.383786 [DEBUG] #4 sha256:7962e2b983fd33a26ed1c6cd3dc8130d909d793c6a76893ed532f122edf72913 33.30MB / 33.30MB 3.3s done
+2026-Jul-20 07:56:25.499329 [DEBUG] #4 sha256:2726e237d1a374379e783053d93d0345c8a3bf3c57b5d35b099de1ad777486ee 29.72MB / 29.72MB 3.4s done
+2026-Jul-20 07:56:25.696685 [DEBUG] #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 32.51MB / 75.95MB 3.5s
+2026-Jul-20 07:56:25.696685 [DEBUG] #4 extracting sha256:2726e237d1a374379e783053d93d0345c8a3bf3c57b5d35b099de1ad777486ee
+2026-Jul-20 07:56:25.846297 [DEBUG] #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 36.70MB / 75.95MB 3.8s
+2026-Jul-20 07:56:26.445071 [DEBUG] #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 41.94MB / 75.95MB 4.4s
+2026-Jul-20 07:56:26.750482 [DEBUG] #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 47.19MB / 75.95MB 4.7s
+2026-Jul-20 07:56:26.901979 [DEBUG] #4 extracting sha256:2726e237d1a374379e783053d93d0345c8a3bf3c57b5d35b099de1ad777486ee 1.3s done
+2026-Jul-20 07:56:26.901979 [DEBUG] #4 extracting sha256:7962e2b983fd33a26ed1c6cd3dc8130d909d793c6a76893ed532f122edf72913
+2026-Jul-20 07:56:27.046540 [DEBUG] #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 52.43MB / 75.95MB 5.0s
+2026-Jul-20 07:56:27.500014 [DEBUG] #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 57.67MB / 75.95MB 5.4s
+2026-Jul-20 07:56:27.945890 [DEBUG] #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 61.87MB / 75.95MB 5.9s
+2026-Jul-20 07:56:28.547188 [DEBUG] #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 67.11MB / 75.95MB 6.5s
+2026-Jul-20 07:56:28.985485 [DEBUG] #4 extracting sha256:7962e2b983fd33a26ed1c6cd3dc8130d909d793c6a76893ed532f122edf72913 2.1s done
+2026-Jul-20 07:56:29.144110 [DEBUG] #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 73.40MB / 75.95MB 7.1s
+2026-Jul-20 07:56:29.409864 [DEBUG] #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 75.95MB / 75.95MB 7.3s done
+2026-Jul-20 07:56:29.570897 [DEBUG] #4 extracting sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06
+2026-Jul-20 07:56:31.723979 [DEBUG] #4 extracting sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 2.3s done
+2026-Jul-20 07:56:31.723979 [DEBUG] #4 DONE 9.8s
+2026-Jul-20 07:56:31.900323 [DEBUG] 
+2026-Jul-20 07:56:31.911871 [DEBUG] #4 [stage-0  1/11] FROM ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de
+2026-Jul-20 07:56:31.911871 [DEBUG] #4 extracting sha256:866b26ac4e4722aa6bd512e1e0c5fa91657dc060ef3eebbbcbd6057625e8f518 0.0s done
+2026-Jul-20 07:56:31.911871 [DEBUG] #4 DONE 9.8s
+2026-Jul-20 07:56:31.911871 [DEBUG] 
+2026-Jul-20 07:56:31.911871 [DEBUG] #6 [stage-0  2/11] WORKDIR /app/
+2026-Jul-20 07:56:31.929642 [DEBUG] #6 DONE 0.2s
+2026-Jul-20 07:56:32.132521 [DEBUG] 
+2026-Jul-20 07:56:32.142252 [DEBUG] #7 [stage-0  3/11] COPY .nixpacks/nixpkgs-ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.nix .nixpacks/nixpkgs-ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.nix
+2026-Jul-20 07:56:32.142252 [DEBUG] #7 DONE 0.0s
+2026-Jul-20 07:56:32.142252 [DEBUG] 
+2026-Jul-20 07:56:32.142252 [DEBUG] #8 [stage-0  4/11] RUN nix-env -if .nixpacks/nixpkgs-ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.nix && nix-collect-garbage -d
+2026-Jul-20 07:56:32.176420 [DEBUG] #8 0.196 unpacking 'https://github.com/NixOS/nixpkgs/archive/ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.tar.gz' into the Git cache...
+2026-Jul-20 07:<REDACTED>@3.0.2: Rimraf versions prior to v4 are no longer supported
+2026-Jul-20 07:58:38.906346 [DEBUG] #11 8.356 npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+2026-Jul-20 07:58:41.214995 [DEBUG] #11 10.66 npm warn deprecated @humanwhocodes/object-schema@2.0.3: Use @eslint/object-schema instead
+2026-Jul-20 07:58:41.452316 [DEBUG] #11 10.76 npm warn deprecated @humanwhocodes/config-array@0.13.0: Use @eslint/config-array instead
+2026-Jul-20 07:58:41.452316 [DEBUG] #11 10.90 npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+2026-Jul-20 07:58:46.094256 [DEBUG] #11 15.54 npm warn deprecated eslint@8.57.1: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+2026-Jul-20 07:<REDACTED>@0.1.0 build
+2026-Jul-20 07:59:20.763139 [DEBUG] #13 0.465 > next build
+2026-Jul-20 07:59:20.763139 [DEBUG] #13 0.465
+2026-Jul-20 07:59:21.900499 [DEBUG] #13 1.753 Attention: Next.js now collects completely anonymous telemetry regarding usage.
+2026-Jul-20 07:59:22.013331 [DEBUG] #13 1.756 This information is used to shape Next.js' roadmap and prioritize features.
+2026-Jul-20 07:59:22.029482 [DEBUG] #13 1.756 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+2026-Jul-20 07:59:22.029482 [DEBUG] #13 1.756 https://nextjs.org/telemetry
+2026-Jul-20 07:<REDACTED>@latest
+2026-Jul-20 08:00:29.192332 [DEBUG] #13 69.04   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+2026-Jul-20 08:<REDACTED>@typescript-eslint/no-unused-vars
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./app/(dashboard)/dashboard/exchange/page.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 5:25  Warning: 'FiLoader' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./app/(dashboard)/dashboard/orders/page.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 576:50  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 577:32  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./app/(dashboard)/dashboard/profile/page.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 5:63  Warning: 'FiLoader' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./app/(dashboard)/dashboard/reviews/page.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 6:66  Warning: 'FiLoader' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./app/(dashboard)/dashboard/service/page.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 99:56  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 108:27  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 109:24  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./app/about/FounderSection.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 31:29  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+2026-Jul-20 08:<REDACTED>@typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./app/api/v2/exchange-products/route.ts
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 3:27  Warning: 'req' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./app/api/v2/gift-vouchers/route.ts
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 5:27  Warning: 'request' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./app/b2b/page.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 67:10  Warning: 'loading' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./app/brand/[slug]/page.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 46:53  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 70:59  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 106:53  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./app/careers/_components/ApplyModal.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 113:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./app/category/[slug]/page.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 143:9  Warning: 'shortName' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./app/checkout/page.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 312:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 447:62  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 472:58  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 473:15  Warning: 'cost' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 753:90  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 753:126  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 753:166  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 753:211  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 753:250  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 753:291  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 755:96  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 756:96  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 817:114  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./app/compare/page.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 20:56  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 21:10  Warning: 'isLoading' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 82:60  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./app/contact/page.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 4:51  Warning: 'FiLoader' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./app/emi-bank-list/BankGrid.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 7:10  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./app/emi-bank-list/page.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 28:61  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 52:12  Warning: 'e' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./app/exchange-products/page.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 27:65  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 51:14  Warning: 'e' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./app/higher-sale/page.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 30:65  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 55:14  Warning: 'e' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./app/product-installation/page.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 25:62  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 42:12  Warning: 'e' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./app/service-charge/page.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 23:65  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 40:14  Warning: 'e' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./app/service-hours/page.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 25:65  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 42:14  Warning: 'e' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./app/service-payment/page.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 23:65  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 40:14  Warning: 'e' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./app/sitemap.ts
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 65:58  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./components/analytics/GoogleTagManager.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 9:16  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./components/auth/LoginForm.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 65:54  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 66:55  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 67:57  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 68:56  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 69:55  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 169:6  Warning: React Hook useEffect has missing dependencies: 'dispatch', 'redirect', and 'router'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./components/brand/BrandCategorySection.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 156:87  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./components/brand/BrandProductCarouselSection.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 3:44  Warning: 'ComponentProps' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 128:52  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./components/dashboard/AddressManager.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 129:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./components/home/SpecialDeals.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 256:50  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 256:88  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 257:47  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 286:43  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./components/productdetails/BankEmiModal.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 34:16  Warning: 'initialProductName' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 42:9  Warning: The 'emiPlans' conditional could make the dependencies of useMemo Hook (at line 68) change on every render. To fix this, wrap the initialization of 'emiPlans' in its own useMemo() Hook.  react-hooks/exhaustive-deps
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 42:9  Warning: The 'emiPlans' conditional could make the dependencies of useMemo Hook (at line 73) change on every render. To fix this, wrap the initialization of 'emiPlans' in its own useMemo() Hook.  react-hooks/exhaustive-deps
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./components/productdetails/ProductDetailsClient.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 295:47  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 429:6  Warning: React Hook useMemo has a missing dependency: 'categoryName'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./components/productdetails/ProductDetailsTabs.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 158:62  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 159:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 167:45  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./components/productdetails/ProductImageZoomModal.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 65:6  Warning: React Hook useEffect has missing dependencies: 'handleNext' and 'handlePrev'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./components/productdetails/RecentViewedProductCard.tsx
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 83:9  Warning: 'handleToggleWishlist' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 127:9  Warning: 'handleToggleCompare' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 ./lib/metadata.ts
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 96:14  Warning: 'e' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1
+2026-Jul-20 08:01:06.231810 [DEBUG] #13 106.1 info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules
+2026-Jul-20 08:<REDACTED>@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de
+2026-Jul-20 08:04:19.388340 #4 resolve ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de 0.0s done
+2026-Jul-20 08:04:19.388340 #4 DONE 0.1s
+2026-Jul-20 08:04:19.388340 
+2026-Jul-20 08:04:19.388340 #5 [internal] load build context
+2026-Jul-20 08:04:19.388340 #5 ...
+2026-Jul-20 08:04:19.388340 
+2026-Jul-20 08:04:19.388340 #4 [stage-0  1/11] FROM ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de
+2026-Jul-20 08:04:19.388340 #4 DONE 0.2s
+2026-Jul-20 08:04:19.388340 
+2026-Jul-20 08:04:19.388340 #5 [internal] load build context
+2026-Jul-20 08:04:19.388340 #5 transferring context: 16.55MB 0.5s done
+2026-Jul-20 08:04:19.388340 #5 DONE 0.5s
+2026-Jul-20 08:04:19.388340 
+2026-Jul-20 08:04:19.388340 #4 [stage-0  1/11] FROM ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de
+2026-Jul-20 08:04:19.388340 #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 0B / 75.95MB 0.3s
+2026-Jul-20 08:04:19.388340 #4 sha256:866b26ac4e4722aa6bd512e1e0c5fa91657dc060ef3eebbbcbd6057625e8f518 0B / 335B 0.3s
+2026-Jul-20 08:04:19.388340 #4 sha256:2726e237d1a374379e783053d93d0345c8a3bf3c57b5d35b099de1ad777486ee 0B / 29.72MB 0.2s
+2026-Jul-20 08:04:19.388340 #4 sha256:7962e2b983fd33a26ed1c6cd3dc8130d909d793c6a76893ed532f122edf72913 0B / 33.30MB 0.2s
+2026-Jul-20 08:04:19.388340 #4 sha256:866b26ac4e4722aa6bd512e1e0c5fa91657dc060ef3eebbbcbd6057625e8f518 335B / 335B 0.6s done
+2026-Jul-20 08:04:19.388340 #4 sha256:7962e2b983fd33a26ed1c6cd3dc8130d909d793c6a76893ed532f122edf72913 4.19MB / 33.30MB 0.8s
+2026-Jul-20 08:04:19.388340 #4 sha256:7962e2b983fd33a26ed1c6cd3dc8130d909d793c6a76893ed532f122edf72913 8.39MB / 33.30MB 0.9s
+2026-Jul-20 08:04:19.388340 #4 sha256:7962e2b983fd33a26ed1c6cd3dc8130d909d793c6a76893ed532f122edf72913 10.49MB / 33.30MB 1.1s
+2026-Jul-20 08:04:19.388340 #4 sha256:2726e237d1a374379e783053d93d0345c8a3bf3c57b5d35b099de1ad777486ee 3.15MB / 29.72MB 1.2s
+2026-Jul-20 08:04:19.388340 #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 5.24MB / 75.95MB 1.5s
+2026-Jul-20 08:04:19.388340 #4 sha256:7962e2b983fd33a26ed1c6cd3dc8130d909d793c6a76893ed532f122edf72913 12.58MB / 33.30MB 1.4s
+2026-Jul-20 08:04:19.388340 #4 sha256:2726e237d1a374379e783053d93d0345c8a3bf3c57b5d35b099de1ad777486ee 6.29MB / 29.72MB 1.5s
+2026-Jul-20 08:04:19.388340 #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 10.49MB / 75.95MB 1.8s
+2026-Jul-20 08:04:19.388340 #4 sha256:2726e237d1a374379e783053d93d0345c8a3bf3c57b5d35b099de1ad777486ee 8.39MB / 29.72MB 1.7s
+2026-Jul-20 08:04:19.388340 #4 sha256:7962e2b983fd33a26ed1c6cd3dc8130d909d793c6a76893ed532f122edf72913 15.73MB / 33.30MB 1.7s
+2026-Jul-20 08:04:19.388340 #4 sha256:2726e237d1a374379e783053d93d0345c8a3bf3c57b5d35b099de1ad777486ee 10.49MB / 29.72MB 1.8s
+2026-Jul-20 08:04:19.388340 #4 sha256:7962e2b983fd33a26ed1c6cd3dc8130d909d793c6a76893ed532f122edf72913 18.87MB / 33.30MB 1.8s
+2026-Jul-20 08:04:19.388340 #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 16.78MB / 75.95MB 2.3s
+2026-Jul-20 08:04:19.388340 #4 sha256:2726e237d1a374379e783053d93d0345c8a3bf3c57b5d35b099de1ad777486ee 14.68MB / 29.72MB 2.1s
+2026-Jul-20 08:04:19.388340 #4 sha256:7962e2b983fd33a26ed1c6cd3dc8130d909d793c6a76893ed532f122edf72913 20.97MB / 33.30MB 2.1s
+2026-Jul-20 08:04:19.388340 #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 20.97MB / 75.95MB 2.4s
+2026-Jul-20 08:04:19.388340 #4 sha256:2726e237d1a374379e783053d93d0345c8a3bf3c57b5d35b099de1ad777486ee 16.78MB / 29.72MB 2.3s
+2026-Jul-20 08:04:19.388340 #4 sha256:2726e237d1a374379e783053d93d0345c8a3bf3c57b5d35b099de1ad777486ee 18.87MB / 29.72MB 2.4s
+2026-Jul-20 08:04:19.388340 #4 sha256:7962e2b983fd33a26ed1c6cd3dc8130d909d793c6a76893ed532f122edf72913 23.07MB / 33.30MB 2.4s
+2026-Jul-20 08:04:19.388340 #4 sha256:2726e237d1a374379e783053d93d0345c8a3bf3c57b5d35b099de1ad777486ee 20.97MB / 29.72MB 2.6s
+2026-Jul-20 08:04:19.388340 #4 sha256:7962e2b983fd33a26ed1c6cd3dc8130d909d793c6a76893ed532f122edf72913 25.17MB / 33.30MB 2.6s
+2026-Jul-20 08:04:19.388340 #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 28.31MB / 75.95MB 3.0s
+2026-Jul-20 08:04:19.388340 #4 sha256:2726e237d1a374379e783053d93d0345c8a3bf3c57b5d35b099de1ad777486ee 23.07MB / 29.72MB 2.9s
+2026-Jul-20 08:04:19.388340 #4 sha256:7962e2b983fd33a26ed1c6cd3dc8130d909d793c6a76893ed532f122edf72913 30.41MB / 33.30MB 2.9s
+2026-Jul-20 08:04:19.388340 #4 sha256:2726e237d1a374379e783053d93d0345c8a3bf3c57b5d35b099de1ad777486ee 26.21MB / 29.72MB 3.2s
+2026-Jul-20 08:04:19.388340 #4 sha256:7962e2b983fd33a26ed1c6cd3dc8130d909d793c6a76893ed532f122edf72913 33.30MB / 33.30MB 3.3s done
+2026-Jul-20 08:04:19.388340 #4 sha256:2726e237d1a374379e783053d93d0345c8a3bf3c57b5d35b099de1ad777486ee 29.72MB / 29.72MB 3.4s done
+2026-Jul-20 08:04:19.388340 #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 32.51MB / 75.95MB 3.5s
+2026-Jul-20 08:04:19.388340 #4 extracting sha256:2726e237d1a374379e783053d93d0345c8a3bf3c57b5d35b099de1ad777486ee
+2026-Jul-20 08:04:19.388340 #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 36.70MB / 75.95MB 3.8s
+2026-Jul-20 08:04:19.388340 #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 41.94MB / 75.95MB 4.4s
+2026-Jul-20 08:04:19.388340 #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 47.19MB / 75.95MB 4.7s
+2026-Jul-20 08:04:19.388340 #4 extracting sha256:2726e237d1a374379e783053d93d0345c8a3bf3c57b5d35b099de1ad777486ee 1.3s done
+2026-Jul-20 08:04:19.388340 #4 extracting sha256:7962e2b983fd33a26ed1c6cd3dc8130d909d793c6a76893ed532f122edf72913
+2026-Jul-20 08:04:19.388340 #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 52.43MB / 75.95MB 5.0s
+2026-Jul-20 08:04:19.388340 #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 57.67MB / 75.95MB 5.4s
+2026-Jul-20 08:04:19.388340 #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 61.87MB / 75.95MB 5.9s
+2026-Jul-20 08:04:19.388340 #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 67.11MB / 75.95MB 6.5s
+2026-Jul-20 08:04:19.388340 #4 extracting sha256:7962e2b983fd33a26ed1c6cd3dc8130d909d793c6a76893ed532f122edf72913 2.1s done
+2026-Jul-20 08:04:19.388340 #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 73.40MB / 75.95MB 7.1s
+2026-Jul-20 08:04:19.388340 #4 sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 75.95MB / 75.95MB 7.3s done
+2026-Jul-20 08:04:19.388340 #4 extracting sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06
+2026-Jul-20 08:04:19.388340 #4 extracting sha256:b65af0a51d863b994ae8e73f3b739ad2c14c4ab0f3b8807c7baf25404b897c06 2.3s done
+2026-Jul-20 08:04:19.388340 #4 DONE 9.8s
+2026-Jul-20 08:04:19.388340 
+2026-Jul-20 08:04:19.388340 #4 [stage-0  1/11] FROM ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de
+2026-Jul-20 08:04:19.388340 #4 extracting sha256:866b26ac4e4722aa6bd512e1e0c5fa91657dc060ef3eebbbcbd6057625e8f518 0.0s done
+2026-Jul-20 08:04:19.388340 #4 DONE 9.8s
+2026-Jul-20 08:04:19.388340 
+2026-Jul-20 08:04:19.388340 #6 [stage-0  2/11] WORKDIR /app/
+2026-Jul-20 08:04:19.388340 #6 DONE 0.2s
+2026-Jul-20 08:04:19.388340 
+2026-Jul-20 08:04:19.388340 #7 [stage-0  3/11] COPY .nixpacks/nixpkgs-ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.nix .nixpacks/nixpkgs-ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.nix
+2026-Jul-20 08:04:19.388340 #7 DONE 0.0s
+2026-Jul-20 08:04:19.388340 
+2026-Jul-20 08:04:19.388340 #8 [stage-0  4/11] RUN nix-env -if .nixpacks/nixpkgs-ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.nix && nix-collect-garbage -d
+2026-Jul-20 08:04:19.388340 #8 0.196 unpacking 'https://github.com/NixOS/nixpkgs/archive/ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.tar.gz' into the Git cache...
+2026-Jul-20 08:<REDACTED>@3.0.2: Rimraf versions prior to v4 are no longer supported
+2026-Jul-20 08:04:19.388340 #11 8.356 npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+2026-Jul-20 08:04:19.388340 #11 10.66 npm warn deprecated @humanwhocodes/object-schema@2.0.3: Use @eslint/object-schema instead
+2026-Jul-20 08:04:19.388340 #11 10.76 npm warn deprecated @humanwhocodes/config-array@0.13.0: Use @eslint/config-array instead
+2026-Jul-20 08:04:19.388340 #11 10.90 npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+2026-Jul-20 08:04:19.388340 #11 15.54 npm warn deprecated eslint@8.57.1: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+2026-Jul-20 08:<REDACTED>@0.1.0 build
+2026-Jul-20 08:04:19.388340 #13 0.465 > next build
+2026-Jul-20 08:04:19.388340 #13 0.465
+2026-Jul-20 08:04:19.388340 #13 1.753 Attention: Next.js now collects completely anonymous telemetry regarding usage.
+2026-Jul-20 08:04:19.388340 #13 1.756 This information is used to shape Next.js' roadmap and prioritize features.
+2026-Jul-20 08:04:19.388340 #13 1.756 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+2026-Jul-20 08:04:19.388340 #13 1.756 https://nextjs.org/telemetry
+2026-Jul-20 08:<REDACTED>@latest
+2026-Jul-20 08:04:19.388340 #13 69.04   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+2026-Jul-20 08:<REDACTED>@typescript-eslint/no-unused-vars
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./app/(dashboard)/dashboard/exchange/page.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 5:25  Warning: 'FiLoader' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./app/(dashboard)/dashboard/orders/page.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 576:50  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 577:32  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./app/(dashboard)/dashboard/profile/page.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 5:63  Warning: 'FiLoader' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./app/(dashboard)/dashboard/reviews/page.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 6:66  Warning: 'FiLoader' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./app/(dashboard)/dashboard/service/page.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 99:56  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 108:27  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 109:24  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./app/about/FounderSection.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 31:29  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+2026-Jul-20 08:<REDACTED>@typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./app/api/v2/exchange-products/route.ts
+2026-Jul-20 08:04:19.388340 #13 106.1 3:27  Warning: 'req' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./app/api/v2/gift-vouchers/route.ts
+2026-Jul-20 08:04:19.388340 #13 106.1 5:27  Warning: 'request' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./app/b2b/page.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 67:10  Warning: 'loading' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./app/brand/[slug]/page.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 46:53  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 70:59  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 106:53  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./app/careers/_components/ApplyModal.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 113:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./app/category/[slug]/page.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 143:9  Warning: 'shortName' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./app/checkout/page.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 312:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 447:62  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 472:58  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 473:15  Warning: 'cost' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:04:19.388340 #13 106.1 753:90  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 753:126  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 753:166  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 753:211  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 753:250  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 753:291  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 755:96  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 756:96  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 817:114  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./app/compare/page.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 20:56  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 21:10  Warning: 'isLoading' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:04:19.388340 #13 106.1 82:60  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./app/contact/page.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 4:51  Warning: 'FiLoader' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./app/emi-bank-list/BankGrid.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 7:10  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./app/emi-bank-list/page.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 28:61  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 52:12  Warning: 'e' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./app/exchange-products/page.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 27:65  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 51:14  Warning: 'e' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./app/higher-sale/page.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 30:65  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 55:14  Warning: 'e' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./app/product-installation/page.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 25:62  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 42:12  Warning: 'e' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./app/service-charge/page.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 23:65  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 40:14  Warning: 'e' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./app/service-hours/page.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 25:65  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 42:14  Warning: 'e' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./app/service-payment/page.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 23:65  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 40:14  Warning: 'e' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./app/sitemap.ts
+2026-Jul-20 08:04:19.388340 #13 106.1 65:58  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./components/analytics/GoogleTagManager.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 9:16  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./components/auth/LoginForm.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 65:54  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 66:55  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 67:57  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 68:56  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 69:55  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 169:6  Warning: React Hook useEffect has missing dependencies: 'dispatch', 'redirect', and 'router'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./components/brand/BrandCategorySection.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 156:87  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./components/brand/BrandProductCarouselSection.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 3:44  Warning: 'ComponentProps' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:04:19.388340 #13 106.1 128:52  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./components/dashboard/AddressManager.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 129:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./components/home/SpecialDeals.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 256:50  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 256:88  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 257:47  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 286:43  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./components/productdetails/BankEmiModal.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 34:16  Warning: 'initialProductName' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:04:19.388340 #13 106.1 42:9  Warning: The 'emiPlans' conditional could make the dependencies of useMemo Hook (at line 68) change on every render. To fix this, wrap the initialization of 'emiPlans' in its own useMemo() Hook.  react-hooks/exhaustive-deps
+2026-Jul-20 08:04:19.388340 #13 106.1 42:9  Warning: The 'emiPlans' conditional could make the dependencies of useMemo Hook (at line 73) change on every render. To fix this, wrap the initialization of 'emiPlans' in its own useMemo() Hook.  react-hooks/exhaustive-deps
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./components/productdetails/ProductDetailsClient.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 295:47  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 429:6  Warning: React Hook useMemo has a missing dependency: 'categoryName'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./components/productdetails/ProductDetailsTabs.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 158:62  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 159:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1 167:45  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./components/productdetails/ProductImageZoomModal.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 65:6  Warning: React Hook useEffect has missing dependencies: 'handleNext' and 'handlePrev'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./components/productdetails/RecentViewedProductCard.tsx
+2026-Jul-20 08:04:19.388340 #13 106.1 83:9  Warning: 'handleToggleWishlist' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:04:19.388340 #13 106.1 127:9  Warning: 'handleToggleCompare' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 ./lib/metadata.ts
+2026-Jul-20 08:04:19.388340 #13 106.1 96:14  Warning: 'e' is defined but never used.  @typescript-eslint/no-unused-vars
+2026-Jul-20 08:04:19.388340 #13 106.1
+2026-Jul-20 08:04:19.388340 #13 106.1 info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules
+2026-Jul-20 08:04:19.388340 #13 125.6    Collecting page data ...
+2026-Jul-20 08:04:19.388340 #13 138.2 generateStaticParams error: TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 138.2     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 138.2     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-Jul-20 08:04:19.388340 #13 138.2     at async Object.u [as generateStaticParams] (/app/.next/server/app/brand/[slug]/page.js:1:4377)
+2026-Jul-20 08:04:19.388340 #13 138.2     at async buildParams (/app/node_modules/next/dist/build/utils.js:1026:40)
+2026-Jul-20 08:04:19.388340 #13 138.2     at async /app/node_modules/next/dist/build/utils.js:1043:33
+2026-Jul-20 08:04:19.388340 #13 138.2     at async /app/node_modules/next/dist/build/utils.js:1178:114
+2026-Jul-20 08:04:19.388340 #13 138.2     at async Span.traceAsyncFn (/app/node_modules/next/dist/trace/trace.js:154:20) {
+2026-Jul-20 08:04:19.388340 #13 138.2   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 138.2       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 138.2       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 138.2       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 138.2       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 138.2     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 138.2   }
+2026-Jul-20 08:04:19.388340 #13 138.2 }
+2026-Jul-20 08:04:19.388340 #13 148.8 Error fetching legal page slugs: TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 148.8     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 148.8     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-Jul-20 08:04:19.388340 #13 148.8     at async u (/app/.next/server/app/policy/[slug]/page.js:1:2377)
+2026-Jul-20 08:04:19.388340 #13 148.8     at async Object.c [as generateStaticParams] (/app/.next/server/app/policy/[slug]/page.js:1:2653)
+2026-Jul-20 08:04:19.388340 #13 148.8     at async buildParams (/app/node_modules/next/dist/build/utils.js:1026:40)
+2026-Jul-20 08:04:19.388340 #13 148.8     at async /app/node_modules/next/dist/build/utils.js:1043:33
+2026-Jul-20 08:04:19.388340 #13 148.8     at async /app/node_modules/next/dist/build/utils.js:1178:114
+2026-Jul-20 08:04:19.388340 #13 148.8     at async Span.traceAsyncFn (/app/node_modules/next/dist/trace/trace.js:154:20) {
+2026-Jul-20 08:04:19.388340 #13 148.8   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 148.8       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 148.8       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 148.8       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 148.8       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 148.8     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 148.8   }
+2026-Jul-20 08:04:19.388340 #13 148.8 }
+2026-Jul-20 08:04:19.388340 #13 151.7    Generating static pages (0/60) ...
+2026-Jul-20 08:04:19.388340 #13 153.0 Fetch careers proxy error: TypeError: Failed to parse URL from undefined/api/v2/careers
+2026-Jul-20 08:04:19.388340 #13 153.0     at new Request (node:internal/deps/undici/undici:9476:19)
+2026-Jul-20 08:04:19.388340 #13 153.0     at /app/.next/server/chunks/8948.js:2:2050
+2026-Jul-20 08:04:19.388340 #13 153.0     ... 6 lines matching cause stack trace ...
+2026-Jul-20 08:04:19.388340 #13 153.0     at async exportAppRoute (/app/node_modules/next/dist/export/routes/app-route.js:77:26)
+2026-Jul-20 08:04:19.388340 #13 153.0     at async exportPageImpl (/app/node_modules/next/dist/export/worker.js:175:20) {
+2026-Jul-20 08:04:19.388340 #13 153.0   [cause]: TypeError: Invalid URL
+2026-Jul-20 08:04:19.388340 #13 153.0       at new URL (node:internal/url:816:29)
+2026-Jul-20 08:04:19.388340 #13 153.0       at new Request (node:internal/deps/undici/undici:9474:25)
+2026-Jul-20 08:04:19.388340 #13 153.0       at /app/.next/server/chunks/8948.js:2:2050
+2026-Jul-20 08:04:19.388340 #13 153.0       at B (/app/.next/server/chunks/8948.js:2:8941)
+2026-Jul-20 08:04:19.388340 #13 153.0       at /app/.next/server/chunks/8948.js:2:11303
+2026-Jul-20 08:04:19.388340 #13 153.0       at async i (/app/.next/server/app/api/careers/route.js:1:521)
+2026-Jul-20 08:04:19.388340 #13 153.0       at async /app/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38411
+2026-Jul-20 08:04:19.388340 #13 153.0       at async e_.execute (/app/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:27880)
+2026-Jul-20 08:04:19.388340 #13 153.0       at async e_.handle (/app/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:39943)
+2026-Jul-20 08:04:19.388340 #13 153.0       at async exportAppRoute (/app/node_modules/next/dist/export/routes/app-route.js:77:26) {
+2026-Jul-20 08:04:19.388340 #13 153.0     code: 'ERR_INVALID_URL',
+2026-Jul-20 08:04:19.388340 #13 153.0     input: 'undefined/api/v2/careers'
+2026-Jul-20 08:04:19.388340 #13 153.0   }
+2026-Jul-20 08:04:19.388340 #13 153.0 }
+2026-Jul-20 08:04:19.388340 #13 153.4 Proxy error: B [Error]: Dynamic server usage: no-store fetch http://localhost:5000/api/v2/exchange-products /api/v2/exchange-products
+2026-Jul-20 08:04:19.388340 #13 153.4     at /app/.next/server/chunks/8948.js:2:10769
+2026-Jul-20 08:04:19.388340 #13 153.4     at /app/.next/server/chunks/8948.js:2:18390
+2026-Jul-20 08:04:19.388340 #13 153.4     at a.with (/app/.next/server/chunks/8948.js:1:8885)
+2026-Jul-20 08:04:19.388340 #13 153.4     at u.with (/app/.next/server/chunks/8948.js:1:3085)
+2026-Jul-20 08:04:19.388340 #13 153.4     at u.startActiveSpan (/app/.next/server/chunks/8948.js:1:18140)
+2026-Jul-20 08:04:19.388340 #13 153.4     at a.startActiveSpan (/app/.next/server/chunks/8948.js:1:18674)
+2026-Jul-20 08:04:19.388340 #13 153.4     at /app/.next/server/chunks/8948.js:2:17923
+2026-Jul-20 08:04:19.388340 #13 153.4     at a.with (/app/.next/server/chunks/8948.js:1:8885)
+2026-Jul-20 08:04:19.388340 #13 153.4     at u.with (/app/.next/server/chunks/8948.js:1:3085)
+2026-Jul-20 08:04:19.388340 #13 153.4     at b.trace (/app/.next/server/chunks/8948.js:2:17877) {
+2026-Jul-20 08:04:19.388340 #13 153.4   description: 'no-store fetch http://localhost:5000/api/v2/exchange-products /api/v2/exchange-products',
+2026-Jul-20 08:04:19.388340 #13 153.4   digest: 'DYNAMIC_SERVER_USAGE'
+2026-Jul-20 08:04:19.388340 #13 153.4 }
+2026-Jul-20 08:04:19.388340 #13 164.1 Failed to fetch settings in layout TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 164.1     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 164.1     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-Jul-20 08:04:19.388340 #13 164.1     at async v (/app/.next/server/chunks/2668.js:9:17650) {
+2026-Jul-20 08:04:19.388340 #13 164.1   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 164.1       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 164.1       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 164.1       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 164.1       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 164.1     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 164.1   }
+2026-Jul-20 08:04:19.388340 #13 164.1 }
+2026-Jul-20 08:04:19.388340 #13 164.1 Failed to fetch business settings for metadata TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 164.1     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 164.1     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-Jul-20 08:04:19.388340 #13 164.1     at async v (/app/.next/server/chunks/2668.js:9:17650) {
+2026-Jul-20 08:04:19.388340 #13 164.1   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 164.1       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 164.1       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 164.1       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 164.1       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 164.1     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 164.1   }
+2026-Jul-20 08:04:19.388340 #13 164.1 }
+2026-Jul-20 08:04:19.388340 #13 174.6 Failed to fetch settings in layout TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 174.6     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 174.6     at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+2026-Jul-20 08:04:19.388340 #13 174.6   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 174.6       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 174.6       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 174.6       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 174.6       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 174.6     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 174.6   }
+2026-Jul-20 08:04:19.388340 #13 174.6 }
+2026-Jul-20 08:04:19.388340 #13 174.6 Failed to fetch business settings for metadata TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 174.6     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 174.6     at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+2026-Jul-20 08:04:19.388340 #13 174.6   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 174.6       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 174.6       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 174.6       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 174.6       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 174.6     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 174.6   }
+2026-Jul-20 08:04:19.388340 #13 174.6 }
+2026-Jul-20 08:04:19.388340 #13 185.2 Sitemap generation error fetching /api/v2/products?limit=1000: TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 185.2     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 185.2     at processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-Jul-20 08:04:19.388340 #13 185.2     at runNextTicks (node:internal/process/task_queues:69:3)
+2026-Jul-20 08:04:19.388340 #13 185.2     at process.processImmediate (node:internal/timers:459:9)
+2026-Jul-20 08:04:19.388340 #13 185.2     at process.callbackTrampoline (node:internal/async_hooks:130:17)
+2026-Jul-20 08:04:19.388340 #13 185.2     at async s (/app/.next/server/app/sitemap.xml/route.js:1:1383)
+2026-Jul-20 08:04:19.388340 #13 185.2     at async Promise.all (index 0)
+2026-Jul-20 08:04:19.388340 #13 185.2     at async d (/app/.next/server/app/sitemap.xml/route.js:1:1625)
+2026-Jul-20 08:04:19.388340 #13 185.2     at async v (/app/.next/server/app/sitemap.xml/route.js:1:2994)
+2026-Jul-20 08:04:19.388340 #13 185.2     at async /app/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38411 {
+2026-Jul-20 08:04:19.388340 #13 185.2   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 185.2       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 185.2       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 185.2       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 185.2       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 185.2     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 185.2   }
+2026-Jul-20 08:04:19.388340 #13 185.2 }
+2026-Jul-20 08:04:19.388340 #13 185.2 Sitemap generation error fetching /api/v2/camping-offers: TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 185.2     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 185.2     at processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-Jul-20 08:04:19.388340 #13 185.2     at runNextTicks (node:internal/process/task_queues:69:3)
+2026-Jul-20 08:04:19.388340 #13 185.2     at process.processImmediate (node:internal/timers:459:9)
+2026-Jul-20 08:04:19.388340 #13 185.2     at process.callbackTrampoline (node:internal/async_hooks:130:17)
+2026-Jul-20 08:04:19.388340 #13 185.2     at async s (/app/.next/server/app/sitemap.xml/route.js:1:1383)
+2026-Jul-20 08:04:19.388340 #13 185.2     at async Promise.all (index 6)
+2026-Jul-20 08:04:19.388340 #13 185.2     at async d (/app/.next/server/app/sitemap.xml/route.js:1:1625)
+2026-Jul-20 08:04:19.388340 #13 185.2     at async v (/app/.next/server/app/sitemap.xml/route.js:1:2994)
+2026-Jul-20 08:04:19.388340 #13 185.2     at async /app/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38411 {
+2026-Jul-20 08:04:19.388340 #13 185.2   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 185.2       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 185.2       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 185.2       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 185.2       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 185.2     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 185.2   }
+2026-Jul-20 08:04:19.388340 #13 185.2 }
+2026-Jul-20 08:04:19.388340 #13 185.2 Sitemap generation error fetching /api/v2/blog-list: TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 185.2     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 185.2     at processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-Jul-20 08:04:19.388340 #13 185.2     at runNextTicks (node:internal/process/task_queues:69:3)
+2026-Jul-20 08:04:19.388340 #13 185.2     at process.processImmediate (node:internal/timers:459:9)
+2026-Jul-20 08:04:19.388340 #13 185.2     at process.callbackTrampoline (node:internal/async_hooks:130:17)
+2026-Jul-20 08:04:19.388340 #13 185.2     at async s (/app/.next/server/app/sitemap.xml/route.js:1:1383)
+2026-Jul-20 08:04:19.388340 #13 185.2     at async Promise.all (index 4)
+2026-Jul-20 08:04:19.388340 #13 185.2     at async d (/app/.next/server/app/sitemap.xml/route.js:1:1625)
+2026-Jul-20 08:04:19.388340 #13 185.2     at async v (/app/.next/server/app/sitemap.xml/route.js:1:2994)
+2026-Jul-20 08:04:19.388340 #13 185.2     at async /app/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38411 {
+2026-Jul-20 08:04:19.388340 #13 185.2   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 185.2       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 185.2       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 185.2       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 185.2       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 185.2     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 185.2   }
+2026-Jul-20 08:04:19.388340 #13 185.2 }
+2026-Jul-20 08:04:19.388340 #13 185.3 Sitemap generation error fetching /api/v2/flash-deals: TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 185.3     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 185.3     at processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-Jul-20 08:04:19.388340 #13 185.3     at runNextTicks (node:internal/process/task_queues:69:3)
+2026-Jul-20 08:04:19.388340 #13 185.3     at process.processImmediate (node:internal/timers:459:9)
+2026-Jul-20 08:04:19.388340 #13 185.3     at process.callbackTrampoline (node:internal/async_hooks:130:17)
+2026-Jul-20 08:04:19.388340 #13 185.3     at async s (/app/.next/server/app/sitemap.xml/route.js:1:1383)
+2026-Jul-20 08:04:19.388340 #13 185.3     at async Promise.all (index 5)
+2026-Jul-20 08:04:19.388340 #13 185.3     at async d (/app/.next/server/app/sitemap.xml/route.js:1:1625)
+2026-Jul-20 08:04:19.388340 #13 185.3     at async v (/app/.next/server/app/sitemap.xml/route.js:1:2994)
+2026-Jul-20 08:04:19.388340 #13 185.3     at async /app/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38411 {
+2026-Jul-20 08:04:19.388340 #13 185.3   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 185.3       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 185.3       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 185.3       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 185.3       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 185.3     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 185.3   }
+2026-Jul-20 08:04:19.388340 #13 185.3 }
+2026-Jul-20 08:04:19.388340 #13 185.3 Sitemap generation error fetching /api/v2/pages: TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 185.3     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 185.3     at processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-Jul-20 08:04:19.388340 #13 185.3     at runNextTicks (node:internal/process/task_queues:69:3)
+2026-Jul-20 08:04:19.388340 #13 185.3     at process.processImmediate (node:internal/timers:459:9)
+2026-Jul-20 08:04:19.388340 #13 185.3     at process.callbackTrampoline (node:internal/async_hooks:130:17)
+2026-Jul-20 08:04:19.388340 #13 185.3     at async s (/app/.next/server/app/sitemap.xml/route.js:1:1383)
+2026-Jul-20 08:04:19.388340 #13 185.3     at async Promise.all (index 3)
+2026-Jul-20 08:04:19.388340 #13 185.3     at async d (/app/.next/server/app/sitemap.xml/route.js:1:1625)
+2026-Jul-20 08:04:19.388340 #13 185.3     at async v (/app/.next/server/app/sitemap.xml/route.js:1:2994)
+2026-Jul-20 08:04:19.388340 #13 185.3     at async /app/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38411 {
+2026-Jul-20 08:04:19.388340 #13 185.3   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 185.3       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 185.3       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 185.3       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 185.3       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 185.3     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 185.3   }
+2026-Jul-20 08:04:19.388340 #13 185.3 }
+2026-Jul-20 08:04:19.388340 #13 185.3 Sitemap generation error fetching /api/v2/categories?limit=1000: TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 185.3     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 185.3     at processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-Jul-20 08:04:19.388340 #13 185.3     at runNextTicks (node:internal/process/task_queues:69:3)
+2026-Jul-20 08:04:19.388340 #13 185.3     at process.processImmediate (node:internal/timers:459:9)
+2026-Jul-20 08:04:19.388340 #13 185.3     at process.callbackTrampoline (node:internal/async_hooks:130:17)
+2026-Jul-20 08:04:19.388340 #13 185.3     at async s (/app/.next/server/app/sitemap.xml/route.js:1:1383)
+2026-Jul-20 08:04:19.388340 #13 185.3     at async Promise.all (index 1)
+2026-Jul-20 08:04:19.388340 #13 185.3     at async d (/app/.next/server/app/sitemap.xml/route.js:1:1625)
+2026-Jul-20 08:04:19.388340 #13 185.3     at async v (/app/.next/server/app/sitemap.xml/route.js:1:2994)
+2026-Jul-20 08:04:19.388340 #13 185.3     at async /app/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38411 {
+2026-Jul-20 08:04:19.388340 #13 185.3   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 185.3       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 185.3       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 185.3       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 185.3       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 185.3     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 185.3   }
+2026-Jul-20 08:04:19.388340 #13 185.3 }
+2026-Jul-20 08:04:19.388340 #13 185.3 Sitemap generation error fetching /api/v2/all-brands: TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 185.3     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 185.3     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-Jul-20 08:04:19.388340 #13 185.3     at async s (/app/.next/server/app/sitemap.xml/route.js:1:1383)
+2026-Jul-20 08:04:19.388340 #13 185.3     at async Promise.all (index 2)
+2026-Jul-20 08:04:19.388340 #13 185.3     at async d (/app/.next/server/app/sitemap.xml/route.js:1:1625)
+2026-Jul-20 08:04:19.388340 #13 185.3     at async v (/app/.next/server/app/sitemap.xml/route.js:1:2994)
+2026-Jul-20 08:04:19.388340 #13 185.3     at async /app/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38411
+2026-Jul-20 08:04:19.388340 #13 185.3     at async e_.execute (/app/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:27880)
+2026-Jul-20 08:04:19.388340 #13 185.3     at async e_.handle (/app/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:39943)
+2026-Jul-20 08:04:19.388340 #13 185.3     at async exportAppRoute (/app/node_modules/next/dist/export/routes/app-route.js:77:26) {
+2026-Jul-20 08:04:19.388340 #13 185.3   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 185.3       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 185.3       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 185.3       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 185.3       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 185.3     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 185.3   }
+2026-Jul-20 08:04:19.388340 #13 185.3 }
+2026-Jul-20 08:04:19.388340 #13 195.8 Failed to fetch settings in layout TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 195.8     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 195.8     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-Jul-20 08:04:19.388340 #13 195.8     at async v (/app/.next/server/chunks/2668.js:9:17650) {
+2026-Jul-20 08:04:19.388340 #13 195.8   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 195.8       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 195.8       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 195.8       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 195.8       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 195.8     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 195.8   }
+2026-Jul-20 08:04:19.388340 #13 195.8 }
+2026-Jul-20 08:04:19.388340 #13 195.8 Failed to fetch business settings for metadata TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 195.8     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 195.8     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-Jul-20 08:04:19.388340 #13 195.8     at async v (/app/.next/server/chunks/2668.js:9:17650) {
+2026-Jul-20 08:04:19.388340 #13 195.8   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 195.8       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 195.8       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 195.8       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 195.8       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 195.8     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 195.8   }
+2026-Jul-20 08:04:19.388340 #13 195.8 }
+2026-Jul-20 08:04:19.388340 #13 206.3 Failed to fetch settings in layout TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 206.3     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 206.3     at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+2026-Jul-20 08:04:19.388340 #13 206.3   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 206.3       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 206.3       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 206.3       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 206.3       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 206.3     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 206.3   }
+2026-Jul-20 08:04:19.388340 #13 206.3 }
+2026-Jul-20 08:04:19.388340 #13 206.3 Failed to fetch business settings for metadata TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 206.3     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 206.3     at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+2026-Jul-20 08:04:19.388340 #13 206.3   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 206.3       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 206.3       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 206.3       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 206.3       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 206.3     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 206.3   }
+2026-Jul-20 08:04:19.388340 #13 206.3 }
+2026-Jul-20 08:04:19.388340 #13 216.8 Failed to fetch settings in layout TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 216.8     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 216.8     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-Jul-20 08:04:19.388340 #13 216.8     at async v (/app/.next/server/chunks/2668.js:9:17650) {
+2026-Jul-20 08:04:19.388340 #13 216.8   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 216.8       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 216.8       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 216.8       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 216.8       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 216.8     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 216.8   }
+2026-Jul-20 08:04:19.388340 #13 216.8 }
+2026-Jul-20 08:04:19.388340 #13 216.8 Failed to fetch business settings for metadata TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 216.8     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 216.8     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-Jul-20 08:04:19.388340 #13 216.8     at async v (/app/.next/server/chunks/2668.js:9:17650) {
+2026-Jul-20 08:04:19.388340 #13 216.8   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 216.8       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 216.8       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 216.8       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 216.8       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 216.8     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 216.8   }
+2026-Jul-20 08:04:19.388340 #13 216.8 }
+2026-Jul-20 08:04:19.388340 #13 227.3 Failed to fetch settings in layout TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 227.3     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 227.3     at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+2026-Jul-20 08:04:19.388340 #13 227.3   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 227.3       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 227.3       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 227.3       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 227.3       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 227.3     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 227.3   }
+2026-Jul-20 08:04:19.388340 #13 227.3 }
+2026-Jul-20 08:04:19.388340 #13 227.3 Failed to fetch business settings for metadata TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 227.3     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 227.3     at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+2026-Jul-20 08:04:19.388340 #13 227.3   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 227.3       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 227.3       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 227.3       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 227.3       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 227.3     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 227.3   }
+2026-Jul-20 08:04:19.388340 #13 227.3 }
+2026-Jul-20 08:04:19.388340 #13 227.4    Generating static pages (15/60)
+2026-Jul-20 08:04:19.388340 #13 237.9 Failed to fetch settings in layout TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 237.9     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 237.9     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-Jul-20 08:04:19.388340 #13 237.9     at async v (/app/.next/server/chunks/2668.js:9:17650) {
+2026-Jul-20 08:04:19.388340 #13 237.9   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 237.9       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 237.9       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 237.9       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 237.9       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 237.9     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 237.9   }
+2026-Jul-20 08:04:19.388340 #13 237.9 }
+2026-Jul-20 08:04:19.388340 #13 237.9 Failed to fetch business settings for metadata TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 237.9     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 237.9     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-Jul-20 08:04:19.388340 #13 237.9     at async v (/app/.next/server/chunks/2668.js:9:17650) {
+2026-Jul-20 08:04:19.388340 #13 237.9   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 237.9       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 237.9       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 237.9       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 237.9       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 237.9     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 237.9   }
+2026-Jul-20 08:04:19.388340 #13 237.9 }
+2026-Jul-20 08:04:19.388340 #13 248.4 Failed to fetch settings in layout TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 248.4     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 248.4     at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+2026-Jul-20 08:04:19.388340 #13 248.4   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 248.4       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 248.4       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 248.4       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 248.4       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 248.4     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 248.4   }
+2026-Jul-20 08:04:19.388340 #13 248.4 }
+2026-Jul-20 08:04:19.388340 #13 248.4 Failed to fetch business settings for metadata TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 248.4     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 248.4     at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+2026-Jul-20 08:04:19.388340 #13 248.4   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 248.4       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 248.4       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 248.4       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 248.4       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 248.4     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 248.4   }
+2026-Jul-20 08:04:19.388340 #13 248.4 }
+2026-Jul-20 08:04:19.388340 #13 258.9 Failed to fetch settings in layout TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 258.9     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 258.9     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-Jul-20 08:04:19.388340 #13 258.9     at async v (/app/.next/server/chunks/2668.js:9:17650) {
+2026-Jul-20 08:04:19.388340 #13 258.9   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 258.9       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 258.9       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 258.9       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 258.9       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 258.9     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 258.9   }
+2026-Jul-20 08:04:19.388340 #13 258.9 }
+2026-Jul-20 08:04:19.388340 #13 258.9 Failed to fetch business settings for metadata TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 258.9     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 258.9     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-Jul-20 08:04:19.388340 #13 258.9     at async v (/app/.next/server/chunks/2668.js:9:17650) {
+2026-Jul-20 08:04:19.388340 #13 258.9   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 258.9       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 258.9       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 258.9       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 258.9       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 258.9     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 258.9   }
+2026-Jul-20 08:04:19.388340 #13 258.9 }
+2026-Jul-20 08:04:19.388340 #13 269.4 Failed to fetch settings in layout TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 269.4     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 269.4     at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+2026-Jul-20 08:04:19.388340 #13 269.4   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 269.4       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 269.4       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 269.4       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 269.4       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 269.4     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 269.4   }
+2026-Jul-20 08:04:19.388340 #13 269.4 }
+2026-Jul-20 08:04:19.388340 #13 269.4 Failed to fetch business settings for metadata TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 269.4     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 269.4     at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+2026-Jul-20 08:04:19.388340 #13 269.4   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 269.4       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 269.4       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 269.4       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 269.4       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 269.4     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 269.4   }
+2026-Jul-20 08:04:19.388340 #13 269.4 }
+2026-Jul-20 08:04:19.388340 #13 280.0 Failed to fetch settings in layout TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 280.0     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 280.0     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-Jul-20 08:04:19.388340 #13 280.0     at async v (/app/.next/server/chunks/2668.js:9:17650) {
+2026-Jul-20 08:04:19.388340 #13 280.0   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 280.0       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 280.0       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 280.0       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 280.0       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 280.0     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 280.0   }
+2026-Jul-20 08:04:19.388340 #13 280.0 }
+2026-Jul-20 08:04:19.388340 #13 280.0 Failed to fetch business settings for metadata TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 280.0     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 280.0     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-Jul-20 08:04:19.388340 #13 280.0     at async v (/app/.next/server/chunks/2668.js:9:17650) {
+2026-Jul-20 08:04:19.388340 #13 280.0   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 280.0       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 280.0       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 280.0       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 280.0       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 280.0     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 280.0   }
+2026-Jul-20 08:04:19.388340 #13 280.0 }
+2026-Jul-20 08:04:19.388340 #13 290.5 Failed to fetch settings in layout TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 290.5     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 290.5     at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+2026-Jul-20 08:04:19.388340 #13 290.5   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 290.5       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 290.5       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 290.5       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 290.5       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 290.5     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 290.5   }
+2026-Jul-20 08:04:19.388340 #13 290.5 }
+2026-Jul-20 08:04:19.388340 #13 290.5 Failed to fetch business settings for metadata TypeError: fetch failed
+2026-Jul-20 08:04:19.388340 #13 290.5     at node:internal/deps/undici/undici:13392:13
+2026-Jul-20 08:04:19.388340 #13 290.5     at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+2026-Jul-20 08:04:19.388340 #13 290.5   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted address: admin.electrabd.com:443, timeout: 10000ms)
+2026-Jul-20 08:04:19.388340 #13 290.5       at onConnectTimeout (node:internal/deps/undici/undici:2599:28)
+2026-Jul-20 08:04:19.388340 #13 290.5       at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2026-Jul-20 08:04:19.388340 #13 290.5       at process.processImmediate (node:internal/timers:491:21)
+2026-Jul-20 08:04:19.388340 #13 290.5       at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+2026-Jul-20 08:04:19.388340 #13 290.5     code: 'UND_ERR_CONNECT_TIMEOUT'
+2026-Jul-20 08:04:19.388340 #13 290.5   }
+2026-Jul-20 08:04:19.388340 #13 290.5 }
+2026-Jul-20 08:04:19.388340 #13 290.5    Generating static pages (18/60)
+2026-Jul-20 08:04:19.407306 [DEBUG] Error type: App\Exceptions\DeploymentException
+2026-Jul-20 08:04:19.427437 [DEBUG] Error code: 0
+2026-Jul-20 08:04:19.446200 [DEBUG] Location: /var/www/html/app/Traits/ExecuteRemoteCommand.php:242
+2026-Jul-20 08:04:19.463588 [DEBUG] Stack trace (first 5 lines):
+2026-Jul-20 08:04:19.481309 [DEBUG] #0 /var/www/html/app/Traits/ExecuteRemoteCommand.php(106): App\Jobs\ApplicationDeploymentJob->executeCommandWithProcess()
+2026-Jul-20 08:04:19.498278 [DEBUG] #1 /var/www/html/vendor/laravel/framework/src/Illuminate/Collections/Traits/EnumeratesValues.php(275): App\Jobs\ApplicationDeploymentJob->{closure:App\Traits\ExecuteRemoteCommand::execute_remote_command():72}()
+2026-Jul-20 08:04:19.514423 [DEBUG] #2 /var/www/html/app/Traits/ExecuteRemoteCommand.php(72): Illuminate\Support\Collection->each()
+2026-Jul-20 08:04:19.530554 [DEBUG] #3 /var/www/html/app/Jobs/ApplicationDeploymentJob.php(3778): App\Jobs\ApplicationDeploymentJob->execute_remote_command()
+2026-Jul-20 08:04:19.547480 [DEBUG] #4 /var/www/html/app/Jobs/ApplicationDeploymentJob.php(946): App\Jobs\ApplicationDeploymentJob->build_image()
+2026-Jul-20 08:04:19.566753 ========================================
+2026-Jul-20 08:04:19.587271 Deployment failed. Removing the new version of your application.
+2026-Jul-20 08:04:20.584198 Gracefully shutting down build container: qm5qo8etudcmzgk98tryw2cu
+2026-Jul-20 08:04:20.750968 [DEBUG] [CMD]: docker stop --time=30 qm5qo8etudcmzgk98tryw2cu
+2026-Jul-20 08:04:20.750968 [DEBUG] Flag --time has been deprecated, use --timeout instead
+2026-Jul-20 08:04:21.043433 [DEBUG] qm5qo8etudcmzgk98tryw2cu

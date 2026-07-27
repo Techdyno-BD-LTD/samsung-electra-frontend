@@ -57,10 +57,30 @@ export default function BrandPage() {
 	const [brands, setBrands] = useState<BrandItem[]>([]);
 	const [categoryList, setCategoryList] = useState<CategoryData[]>([]);
 	const [loading, setLoading] = useState(true);
+	const [shopBanner, setShopBanner] = useState<string | null>(null);
+	const [bannerLoading, setBannerLoading] = useState(true);
 
 	useEffect(() => {
 		async function fetchShopData() {
 			try {
+				// Fetch dynamic shop page banner
+				try {
+					const pageRes = await fetch("/api/pages/shop");
+					const pageResult = await pageRes.json();
+					if (pageResult.success && pageResult.data && pageResult.data[0]) {
+						const contentObj = typeof pageResult.data[0].content === "string" 
+							? JSON.parse(pageResult.data[0].content) 
+							: pageResult.data[0].content;
+						if (contentObj && contentObj.hero && contentObj.hero.image) {
+							setShopBanner(contentObj.hero.image);
+						}
+					}
+				} catch (err) {
+					console.error("Error fetching shop page settings:", err);
+				} finally {
+					setBannerLoading(false);
+				}
+
 				// 1. Fetch Dynamic Brands from API first
 				let fetchedBrands: BrandItem[] = [];
 				try {
@@ -188,10 +208,16 @@ export default function BrandPage() {
 			</div>
 
 			{/* Hero Banner Section */}
-			<BrandHero
-				bannerImage="/images/shoppage.png"
-				altText="Our Premium Brand Collections"
-			/>
+			{bannerLoading ? (
+				<div className="mx-auto w-full max-w-[1840px] px-4 md:px-8">
+					<Skeleton className="w-full aspect-[1840/400] rounded-xl" />
+				</div>
+			) : shopBanner ? (
+				<BrandHero
+					bannerImage={shopBanner}
+					altText="Our Premium Brand Collections"
+				/>
+			) : null}
 
 			{/* Dynamic Category Sections */}
 			<div className="mt-8">
