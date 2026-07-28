@@ -215,7 +215,7 @@ export default function MobileNavbar() {
           <div className="px-2 flex items-center justify-center">
             <div className="bg-white shadow-md mb-1 gap-2 px-2 py-2 flex items-center rounded-md">
               <p className="text-[10px] text-gray-700">Log In To Unlock A Personalized Experience And Special Savings.</p>
-              <button className="flex-shrink-0 bg-[#0081FF] text-white text-[13px] py-0.5 px-4 rounded-md hover:bg-blue-700 transition-colors">Login</button>
+              <Link href="/login" onClick={() => setIsOpen(false)} className="flex-shrink-0 bg-[#0081FF] text-white text-[13px] py-0.5 px-4 rounded-md hover:bg-blue-700 transition-colors">Login</Link>
             </div>
           </div>
 
