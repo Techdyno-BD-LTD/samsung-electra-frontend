@@ -19,7 +19,7 @@ const SisterConcerns: React.FC<SisterConcernsProps> = ({ title, subtitle, list }
         <section className="flex flex-col items-center gap-8 mt-4 px-4 md:px-0">
             {/* Header */}
             <div className="text-center space-y-2">
-                <h2 className="2xl:text-4xl lg:text-3xl text-2xl font-semibold text-[#005B9E]">
+                <h2 className="2xl:text-3xl lg:text-3xl text-2xl font-semibold text-[#005B9E]">
                     {title}
                 </h2>
                 <p className="text-[14px] md:text-[15px] text-gray-500 font-medium">
@@ -46,10 +46,12 @@ const SisterConcerns: React.FC<SisterConcernsProps> = ({ title, subtitle, list }
                         </div>
                         {/* Button Area */}
                         <Link
-                            href="#"
+                            href={concern.btnText || "#"}
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className="w-full bg-[#E8F1F9] text-[#005B9E] font-medium py-3 rounded-md text-center hover:bg-[#D9EAF7] transition-colors duration-300"
                         >
-                            {concern.btnText}
+                            Read More
                         </Link>
                     </div>
                 ))}

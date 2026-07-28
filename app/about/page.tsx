@@ -101,7 +101,7 @@ const About = async () => {
     } = data;
 
     return (
-        <div className="flex flex-col gap-6 pb-12 mt-20  mainwidth mx-auto">
+        <div className="flex flex-col gap-6 pb-12 mt-20   mx-auto">
             {/* ═══════════════ BREADCRUMB ═══════════════ */}
             <nav
                 aria-label="Breadcrumb"

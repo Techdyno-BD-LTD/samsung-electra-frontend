@@ -13,7 +13,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({ title, subtitle, desc
         <section className="flex flex-col items-center gap-8 mt-14 px-4 md:px-0">
             {/* Header */}
             <div className="text-center space-y-2">
-                <h2 className="2xl:text-4xl lg:text-3xl text-2xl font-semibold text-[#005B9E]">
+                <h2 className="lg:text-3xl text-2xl font-semibold text-[#005B9E]">
                     {title}
                 </h2>
                 <p className="text-[14px] md:text-[15px] text-gray-500 font-medium">
@@ -23,7 +23,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({ title, subtitle, desc
 
             {/* Description Paragraph */}
             <div className=" text-center px-6">
-                <p className="text-[16px] lg:text-[18px] 2xl:text-[24px] lg:w-9/12 mx-auto font-normal leading-snug text-slate-800">
+                <p className="text-[16px] lg:text-[18px] 2xl:text-[20px] lg:w-9/12 mx-auto font-normal leading-snug text-slate-800">
                     {description}
                 </p>
             </div>
@@ -34,7 +34,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({ title, subtitle, desc
                 {images.map((image, index) => (
                     <div
                         key={index}
-                        className="relative aspect-[16/10] rounded-2xl overflow-hidden shadow-lg border border-slate-100"
+                        className="relative aspect-[16/8] rounded-2xl overflow-hidden shadow-lg border border-slate-100"
                     >
                         <Image
                             src={image}

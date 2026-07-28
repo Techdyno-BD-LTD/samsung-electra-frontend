@@ -10,7 +10,7 @@ interface ContactBannerProps {
 const ContactBanner: React.FC<ContactBannerProps> = ({ title, description, btnText }) => {
     return (
         <section className="w-full bg-[#1A80FE] rounded-lg mt-8 
-        px-4 sm:px-6 md:px-10 lg:px-20 xl:px-32 
+        px-4 sm:px-6 md:px-10 lg:px-20  
         py-6 md:py-8 
         flex flex-col md:flex-row justify-between items-center gap-6 md:gap-8 shadow-lg">
 

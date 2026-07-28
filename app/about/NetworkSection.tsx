@@ -19,11 +19,11 @@ const NetworkSection: React.FC<NetworkSectionProps> = ({ title, stats, image }) 
 
                 {/* Left Side: Stats */}
                 <div className="flex flex-col justify-start gap-6 ">
-                    <h2 className="text-3xl 2xl:text-[45px] font-semibold text-slate-800 tracking-tight leading-[1.1]">
+                    <h2 className="text-3xl 2xl:text-[40px] font-semibold text-slate-800 tracking-tight leading-[1.1]">
                         {title}
                     </h2>
 
-                    <div className="flex flex-col gap-4 max-w-sm w-full">
+                    <div className="flex flex-col gap-4 max-w-sm w-full justify-center">
                         {stats.map((stat, index) => (
                             <div
                                 key={index}
@@ -41,12 +41,12 @@ const NetworkSection: React.FC<NetworkSectionProps> = ({ title, stats, image }) 
                 </div>
 
                 {/* Right Side: Map Image */}
-                <div className="relative w-full aspect-[838/962] flex items-center justify-center overflow-hidden rounded-2xl">
+                <div className="relative w-full aspect-[838/700] flex items-center justify-center overflow-hidden rounded-2xl">
                     <Image
                         src={image}
                         alt="Electra Network Map"
                         fill
-                        className="object-cover"
+                        className="object-contain"
                         sizes="(max-width: 768px) 100vw, 50vw"
                         priority
                     />

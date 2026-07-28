@@ -14,10 +14,10 @@ interface DirectorsSectionProps {
 
 const DirectorsSection: React.FC<DirectorsSectionProps> = ({ sectionTitle, list }) => {
     return (
-        <section className="mt-12 bg-[#F8F9FA] p-6 md:p-12 rounded-sm border border-slate-100">
+        <section className="mt-12 bg-[#f1f1f1] p-6 md:p-12 rounded-sm border border-slate-100">
             {/* Header Card */}
             <div className="w-full bg-white py-6 rounded-sm shadow-sm mb-12 flex justify-center items-center border border-slate-100/50">
-                <h2 className="text-xl 2xl:text-4xl font-semibold text-[#005B9E]">
+                <h2 className="text-xl 2xl:text-3xl font-semibold text-[#005B9E]">
                     {sectionTitle}
                 </h2>
             </div>

@@ -3,7 +3,18 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { FaTimes, FaBars } from "react-icons/fa";
+import { 
+  FaTimes, 
+  FaBars, 
+  FaRegUser, 
+  FaRegHeart, 
+  FaExchangeAlt, 
+  FaFacebookF, 
+  FaInstagram, 
+  FaYoutube, 
+  FaLinkedinIn, 
+  FaWhatsapp 
+} from "react-icons/fa";
 import { useAppSelector } from "@/store/hooks";
 import { usePathname } from "next/navigation";
 
@@ -44,6 +55,13 @@ export default function MobileNavbar() {
   const [supportText, setSupportText] = useState<string | null>(null);
   const [utilityLinks, setUtilityLinks] = useState<Array<{ id: number; title: string; link: string; external_link: string | null; icon: string | null }>>([]);
   const [navItems, setNavItems] = useState<NavItem[]>([]);
+  const [socialLinks, setSocialLinks] = useState<{
+    facebook?: string | null;
+    instagram?: string | null;
+    youtube?: string | null;
+    linkedin?: string | null;
+    whatsapp?: string | null;
+  }>({});
   const cartTotalCount = useAppSelector((state) =>
     state.cart.items.reduce((total, item) => total + item.quantity, 0)
   );
@@ -61,10 +79,23 @@ export default function MobileNavbar() {
 
     async function loadHeader() {
       try {
-        const [headerRes, brandsRes] = await Promise.all([
+        const [headerRes, brandsRes, footerRes] = await Promise.all([
           fetch("/api/header", { cache: "no-store" }),
-          fetch("/api/brands")
+          fetch("/api/brands"),
+          fetch("/api/footer-settings").catch(() => null)
         ]);
+
+        if (footerRes && footerRes.ok) {
+          const footerJson = await footerRes.json();
+          const fd = footerJson.data;
+          setSocialLinks({
+            facebook: fd?.facebook_link,
+            instagram: fd?.instagram_link,
+            youtube: fd?.youtube_link,
+            linkedin: fd?.linkedin_link,
+            whatsapp: fd?.whatsapp_link,
+          });
+        }
 
         let fetchedBrands: Array<{ name: string; slug: string }> = [];
         if (brandsRes.ok) {
@@ -162,7 +193,7 @@ export default function MobileNavbar() {
         </div>
       </div>
 
-      <div className={`fixed inset-y-0 left-0 z-50 w-full bg-white shadow-2xl transform transition-transform duration-300 ease-in-out lg:hidden ${isOpen ? "translate-x-0" : "-translate-x-full"}`}>
+      <div className={`fixed inset-y-0 right-0 z-[1000] w-full bg-white shadow-2xl transform transition-transform duration-300 ease-in-out lg:hidden ${isOpen ? "translate-x-0" : "translate-x-full"}`}>
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between p-4 border-b border-slate-200">
             {logoUrl ? (
@@ -290,6 +321,92 @@ export default function MobileNavbar() {
                 </div>
               ))}
             </div>
+
+            {/* Replicated Footer and Account Section for Mobile Sidebar */}
+            <div className="border-t border-gray-200 my-4" />
+
+            <div className="space-y-2 mb-6">
+              <Link
+                href="/dashboard"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-4 px-4 py-3 bg-[#F8F9FA] hover:bg-[#F1F3F5] rounded-[4px] text-[#072F5B] transition-colors"
+              >
+                <FaRegUser className="w-[18px] h-[18px] text-[#072F5B]" />
+                <span className="text-[14px] font-medium">My Account</span>
+              </Link>
+              <Link
+                href="/wishlist"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-4 px-4 py-3 bg-[#F8F9FA] hover:bg-[#F1F3F5] rounded-[4px] text-[#072F5B] transition-colors"
+              >
+                <FaRegHeart className="w-[18px] h-[18px] text-[#072F5B]" />
+                <span className="text-[14px] font-medium">Wishlist</span>
+              </Link>
+              <Link
+                href="/compare"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-4 px-4 py-3 bg-[#F8F9FA] hover:bg-[#F1F3F5] rounded-[4px] text-[#072F5B] transition-colors"
+              >
+                <FaExchangeAlt className="w-[18px] h-[18px] text-[#072F5B]" />
+                <span className="text-[14px] font-medium">Product Compare</span>
+              </Link>
+            </div>
+
+            {Boolean(
+              socialLinks.facebook ||
+              socialLinks.instagram ||
+              socialLinks.youtube ||
+              socialLinks.linkedin ||
+              socialLinks.whatsapp
+            ) && (
+              <div className="space-y-3 px-1 pb-6">
+                <p className="text-[14px] font-semibold text-gray-700">Connect With us</p>
+                <div className="flex gap-4 text-[#005B9E]">
+                  {socialLinks.facebook && (
+                    <Link href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">
+                      <FaFacebookF size={18} />
+                    </Link>
+                  )}
+                  {socialLinks.instagram && (
+                    <Link href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="hover:text-pink-600 transition-colors">
+                      <FaInstagram size={18} />
+                    </Link>
+                  )}
+                  {socialLinks.youtube && (
+                    <Link href={socialLinks.youtube} target="_blank" rel="noopener noreferrer" className="hover:text-red-600 transition-colors">
+                      <FaYoutube size={18} />
+                    </Link>
+                  )}
+                  {socialLinks.linkedin && (
+                    <Link href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-blue-700 transition-colors">
+                      <FaLinkedinIn size={18} />
+                    </Link>
+                  )}
+                  {socialLinks.whatsapp && (
+                    <Link 
+                      href={(() => {
+                        const raw = socialLinks.whatsapp;
+                        if (!raw) return "";
+                        const trimmed = raw.trim();
+                        if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+                          return trimmed;
+                        }
+                        let cleaned = trimmed.replace(/\D/g, "");
+                        if (cleaned.length === 11 && cleaned.startsWith("0")) {
+                          cleaned = "88" + cleaned;
+                        }
+                        return `https://wa.me/${cleaned}`;
+                      })()} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="hover:text-green-500 transition-colors"
+                    >
+                      <FaWhatsapp size={18} />
+                    </Link>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

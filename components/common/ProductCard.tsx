@@ -558,7 +558,7 @@ const ProductCard = ({
             </div>
           </div>
 
-          <h3 className="mt-3 line-clamp-2 min-h-[56px] text-[18px] font-medium leading-7 text-slate-900">
+          <h3 className="mt-3 line-clamp-2 min-h-[56px] text-[14px] lg:text-[18px] font-medium leading-7 text-slate-900">
             <Link href={productHref} onClick={handleSelectItem}>{title}</Link>
           </h3>
 

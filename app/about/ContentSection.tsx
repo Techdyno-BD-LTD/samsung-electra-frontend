@@ -18,7 +18,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({ title, paragraphs, imag
                 </h2>
                 <div className="space-y-6">
                     {paragraphs.map((paragraph, index) => (
-                        <p key={index} className="2xl:text-[24px] lg:text-[16px] text-gray-800 leading-relaxed text-justify">
+                        <p key={index} className="2xl:text-[20px] lg:text-[16px] text-gray-800 leading-relaxed text-justify">
                             {paragraph}
                         </p>
                     ))}
@@ -27,12 +27,12 @@ const ContentSection: React.FC<ContentSectionProps> = ({ title, paragraphs, imag
 
             {/* Image Container */}
             <div className="w-full md:w-1/2 lg:w-[48%]">
-                <div className="relative aspect-[16/10]  rounded-2xl overflow-hidden ">
+                <div className="relative aspect-[16/9]  rounded-2xl overflow-hidden ">
                     <Image
                         src={image}
                         alt={title}
                         fill
-                        className="object-fit"
+                        className="object-contain"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 40vw"
                     />
                 </div>

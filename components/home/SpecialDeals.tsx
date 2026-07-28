@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import ProductCard from "@/components/common/ProductCard";
+import { ProductData } from "@/components/common/AddToCartModal";
 import { formatCurrency } from "@/lib/currencyUtils";
 import Skeleton from "@/components/common/Skeleton";
 
@@ -30,6 +31,8 @@ type FlashDealProductDetails = {
   };
   stroked_price?: string;
   main_price?: string;
+  stroked_price_raw?: number;
+  main_price_raw?: number;
   discount?: string;
   discount_type?: string;
 };
@@ -253,8 +256,8 @@ export default function SpecialDeals() {
             const price = product.main_price || "";
             const discountPercent = product.discount || "";
 
-            const originalPriceNum = (product as any).stroked_price_raw || (product as any).unit_price || 0;
-            const finalPriceNum = (product as any).main_price_raw || 0;
+            const originalPriceNum = product.stroked_price_raw || product.unit_price || 0;
+            const finalPriceNum = product.main_price_raw || 0;
             const savings = Math.max(0, originalPriceNum - finalPriceNum);
             const saveAmount = savings > 0 ? `Save : ${formatCurrency(savings)}` : "";
 
@@ -283,7 +286,7 @@ export default function SpecialDeals() {
                   saveAmount={saveAmount}
                   discountPercent={discountPercent}
                   dealImageHeight="260px"
-                  productData={product as any}
+                  productData={product as unknown as ProductData}
                 />
               </div>
             );
