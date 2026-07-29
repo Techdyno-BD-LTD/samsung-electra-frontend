@@ -172,6 +172,8 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
   const [isHigherSaleModalOpen, setIsHigherSaleModalOpen] = useState(false);
   const [isBankEmiModalOpen, setIsBankEmiModalOpen] = useState(false);
   const [isZoomModalOpen, setIsZoomModalOpen] = useState(false);
+  const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
   const [quantity, setQuantity] = useState(1);
 
   const thumbnailContainerRef = useRef<HTMLDivElement>(null);
@@ -191,6 +193,13 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
 
   const handleIncrement = () => setQuantity((prev) => prev + 1);
   const handleDecrement = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - left) / width) * 100;
+    const y = ((e.clientY - top) / height) * 100;
+    setZoomPosition({ x, y });
+  };
 
   const toComparable = (value?: string) => value?.trim().toLowerCase() ?? "";
   const isHexColor = (value?: string | null) => /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(value ?? "");
@@ -771,7 +780,7 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
                 <button
                   type="button"
                   onClick={() => setIsZoomModalOpen(true)}
-                  className="absolute right-4 top-4 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-500 hover:bg-slate-50 transition-colors"
+                  className="absolute right-4 top-4 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-500 hover:bg-slate-50 transition-colors md:hidden"
                 >
                   <FaPlus className="h-3 w-3" />
                 </button>
@@ -789,15 +798,21 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
                   />
 
                   <div
-                    className="hidden items-center justify-center md:flex md:min-h-[700px] cursor-zoom-in"
-                    onClick={() => setIsZoomModalOpen(true)}
+                    className="hidden items-center justify-center md:flex md:min-h-[700px] overflow-hidden relative cursor-zoom-in"
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                    onMouseMove={handleMouseMove}
                   >
                     <Image
                       src={finalMainImage}
                       alt={title}
                       width={520}
                       height={520}
-                      className="h-auto w-full object-contain"
+                      className="h-auto w-full object-contain transition-transform duration-150 ease-out"
+                      style={{
+                        transform: isHovered ? 'scale(2.2)' : 'scale(1)',
+                        transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`
+                      }}
                       priority
                     />
                   </div>
