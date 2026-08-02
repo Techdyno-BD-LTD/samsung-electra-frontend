@@ -172,7 +172,9 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
   const [isHigherSaleModalOpen, setIsHigherSaleModalOpen] = useState(false);
   const [isBankEmiModalOpen, setIsBankEmiModalOpen] = useState(false);
   const [isZoomModalOpen, setIsZoomModalOpen] = useState(false);
-  const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
+  const [lensPosition, setLensPosition] = useState({ x: 0, y: 0 });
+  const [zoomBackgroundPos, setZoomBackgroundPos] = useState("0% 0%");
+  const [containerSize, setContainerSize] = useState({ width: 520, height: 700 });
   const [isHovered, setIsHovered] = useState(false);
   const [quantity, setQuantity] = useState(1);
 
@@ -196,9 +198,30 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - left) / width) * 100;
-    const y = ((e.clientY - top) / height) * 100;
-    setZoomPosition({ x, y });
+    const mouseX = e.clientX - left;
+    const mouseY = e.clientY - top;
+
+    // Lens dimensions: 30% of container width, 22% of container height
+    const lensWidth = width * 0.3;
+    const lensHeight = height * 0.22;
+
+    // Center lens on cursor
+    let x = mouseX - lensWidth / 2;
+    let y = mouseY - lensHeight / 2;
+
+    // Constrain lens inside boundaries
+    if (x < 0) x = 0;
+    if (x > width - lensWidth) x = width - lensWidth;
+    if (y < 0) y = 0;
+    if (y > height - lensHeight) y = height - lensHeight;
+
+    // Calculate background position percentages
+    const bgX = (x / (width - lensWidth)) * 100;
+    const bgY = (y / (height - lensHeight)) * 100;
+
+    setLensPosition({ x, y });
+    setZoomBackgroundPos(`${bgX}% ${bgY}%`);
+    setContainerSize({ width, height });
   };
 
   const toComparable = (value?: string) => value?.trim().toLowerCase() ?? "";
@@ -776,7 +799,23 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
         <div className="mx-auto mt-2 w-11/12">
           <div className="flex flex-col gap-2 lg:gap-6 lg:flex-row">
             <div className="w-full space-y-3 lg:w-[53%]">
-              <div className="relative rounded-2xl border border-slate-200 bg-white p-4">
+              <div
+                className="relative rounded-2xl border border-slate-200 bg-white p-4"
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                onMouseMove={handleMouseMove}
+              >
+                {isHovered && (
+                  <div
+                    className="absolute border border-slate-500 bg-black/10 pointer-events-none z-20"
+                    style={{
+                      left: `${lensPosition.x}px`,
+                      top: `${lensPosition.y}px`,
+                      width: '30%',
+                      height: '22%',
+                    }}
+                  />
+                )}
                 <button
                   type="button"
                   onClick={() => setIsZoomModalOpen(true)}
@@ -799,20 +838,13 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
 
                   <div
                     className="hidden items-center justify-center md:flex md:min-h-[700px] overflow-hidden relative cursor-zoom-in"
-                    onMouseEnter={() => setIsHovered(true)}
-                    onMouseLeave={() => setIsHovered(false)}
-                    onMouseMove={handleMouseMove}
                   >
                     <Image
                       src={finalMainImage}
                       alt={title}
                       width={520}
                       height={520}
-                      className="h-auto w-full object-contain transition-transform duration-150 ease-out"
-                      style={{
-                        transform: isHovered ? 'scale(2.2)' : 'scale(1)',
-                        transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`
-                      }}
+                      className="h-auto w-full object-contain"
                       priority
                     />
                   </div>
@@ -823,7 +855,7 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
                     alt="Official warranty"
                     width={120}
                     height={120}
-                    className="absolute bottom-2 left-2 hidden h-28 w-28 object-contain md:block"
+                    className="absolute bottom-2 left-2 hidden h-28 w-28 object-contain md:block pointer-events-none"
                   />
                 </div>
               </div>
@@ -874,7 +906,44 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
               </div>
             </div>
 
-            <div className="w-full lg:space-y-3 space-y-2  lg:w-[47%]">
+            <div className="w-full lg:space-y-3 space-y-2  lg:w-[47%] relative">
+              {/* Zoom Preview Panel (overlaps right-side details) */}
+              {isHovered && (
+                <div
+                  className="hidden md:block absolute top-0 left-0 w-[400px] h-[400px] border border-black rounded-2xl bg-white shadow-2xl z-[99] overflow-hidden pointer-events-none"
+                >
+                  <div
+                    className="relative origin-top-left border border-slate-200 bg-white p-4"
+                    style={{
+                      width: `${containerSize.width}px`,
+                      height: `${containerSize.height}px`,
+                      transform: `scale(${400 / (containerSize.width * 0.3)}) translate(${-lensPosition.x}px, ${-lensPosition.y}px)`,
+                    }}
+                  >
+                    <div className="relative mx-auto min-h-[250px] max-w-[520px] sm:min-h-[320px] md:min-h-[700px]">
+                      <div
+                        className="hidden items-center justify-center md:flex md:min-h-[700px] overflow-hidden relative"
+                      >
+                        <Image
+                          src={finalMainImage}
+                          alt={title}
+                          width={520}
+                          height={520}
+                          className="h-auto w-full object-contain"
+                          priority
+                        />
+                      </div>
+                      <Image
+                        src={warrantyBadgeImage}
+                        alt="Official warranty"
+                        width={120}
+                        height={120}
+                        className="absolute bottom-2 left-2 hidden h-28 w-28 object-contain md:block"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
               <p className="text-[12px] lg:text-[18px]  text-slate-600">{categoryName}</p>
               <h1 className="text-[16px] lg:text-3xl font-semibold leading-tight text-slate-900">{title}</h1>
 
