@@ -166,8 +166,8 @@ export default function StoresPage() {
     <main className="mt-20 pb-10 sm:mt-24 sm:pb-14 lg:mt-16">
       <section className="relative overflow-hidden rounded-lg border border-slate-200 bg-[#1E5AA4]">
         {banner ? (
-          <div className="relative aspect-[1840/400] w-full">
-            <Image src={banner} alt="Store Banner" fill className="object-cover" />
+          <div className="relative aspect-[1810/393] w-full">
+            <Image src={banner} alt="Store Banner" fill className="object-contain" />
           </div>
         ) : (
           <div className="flex aspect-[1840/400] w-full items-center justify-center">

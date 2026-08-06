@@ -1,8 +1,11 @@
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v2/careers`, {
+    const response = await fetch(`${process.env.API_BASE_URL}/api/v2/careers`, {
+      cache: 'no-store',
       headers: {
         'x-system-key': process.env.API_SYSTEM_KEY || '',
       },

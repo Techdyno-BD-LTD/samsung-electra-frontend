@@ -22,6 +22,10 @@ export default async function SearchPage({ searchParams }: { searchParams: { q?:
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
   let filteringAttributes = [];
+  let searchBannerUrl = null;
+  const backendUrl = process.env.API_BASE_URL || 'http://localhost:5000';
+  const systemKey = process.env.API_SYSTEM_KEY || '';
+
   try {
     const attrRes = await fetch(`${siteUrl}/api/filtering-attributes`, {
       cache: 'no-store'
@@ -32,6 +36,19 @@ export default async function SearchPage({ searchParams }: { searchParams: { q?:
     }
   } catch (err) {
     console.error("Error fetching search filtering attributes:", err);
+  }
+
+  try {
+    const bannerRes = await fetch(`${backendUrl}/api/v2/search-banner`, {
+      headers: { 'x-system-key': systemKey },
+      cache: 'no-store'
+    });
+    if (bannerRes.ok) {
+      const bannerPayload = await bannerRes.json();
+      searchBannerUrl = bannerPayload.data?.banner || null;
+    }
+  } catch (err) {
+    console.error("Error fetching search page banner:", err);
   }
 
   return (
@@ -73,7 +90,7 @@ export default async function SearchPage({ searchParams }: { searchParams: { q?:
           </div>
 
           <div className="min-w-0">
-            <CategoryHeroBanner />
+            <CategoryHeroBanner banner={searchBannerUrl} />
           </div>
         </div>
 

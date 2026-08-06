@@ -118,7 +118,7 @@ export default function CareersPage() {
       {/* Job Listings */}
       <div className=" mx-auto px-4 lg:px-8 pb-24">
         <div className="space-y-4">
-          {data?.jobs.length ? (
+          {data?.jobs?.length ? (
             data.jobs.map((job) => (
               <JobCard
                 key={job.id}

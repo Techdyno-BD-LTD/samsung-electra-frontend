@@ -14,6 +14,7 @@ type ApiCategory = {
   parent_id: number;
   icon: string | null;
   cover_image: string | null;
+  banner: string | null;
   number_of_products: number;
   meta_title?: string;
   meta_description?: string;
@@ -187,7 +188,7 @@ export default async function CategoryPage({ params }: PageProps) {
 
         {/* Hero banner (Shared, but might need different margins on mobile) */}
         <div className="min-w-0">
-          <CategoryHeroBanner />
+          <CategoryHeroBanner banner={category.banner} />
 
           {/* ═══════════════ MOBILE SUB-CATEGORIES (Hidden on Desktop) ═══════════════ */}
           <div className="mt-5 flex items-center gap-2 overflow-x-auto px-1 pb-2 scrollbar-hide lg:hidden">
