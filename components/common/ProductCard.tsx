@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import AddToCartModal, { ProductData } from "./AddToCartModal";
+import CartSuccessModal from "@/components/common/CartSuccessModal";
 import { FaHeart, FaBalanceScale, FaShoppingCart, FaStar, FaEye, FaGavel } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { addToWishlistAsync, removeFromWishlistAsync, WishlistItem } from "@/store/features/wishlist/wishlistSlice";
@@ -133,6 +134,13 @@ const ProductCard = ({
   const dispatch = useAppDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEmiModalOpen, setIsEmiModalOpen] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [addedItemDetails, setAddedItemDetails] = useState<{
+    title: string;
+    image: string;
+    price: string;
+    originalPrice?: string;
+  } | null>(null);
 
   const productSlug = productData?.slug || slug || toProductSlug(title);
   const wishlistItemId = productSlug || title;
@@ -225,7 +233,13 @@ const ProductCard = ({
         }
       });
 
-      router.push("/cart");
+      setAddedItemDetails({
+        title: cartItem.title,
+        image: cartItem.image,
+        price: cartItem.price,
+        originalPrice: cartItem.originalPrice,
+      });
+      setShowSuccessModal(true);
     }
   };
 
@@ -496,6 +510,14 @@ const ProductCard = ({
           image={image} category={category} discountLabel={discountPercent}
           saveLabel={saveAmount} weight={weight} color={color} slug={slug}
         />
+        <CartSuccessModal
+          isOpen={showSuccessModal}
+          onClose={() => setShowSuccessModal(false)}
+          productName={addedItemDetails?.title || title}
+          productImage={addedItemDetails?.image || image}
+          productPrice={addedItemDetails?.price || price}
+          productOriginalPrice={addedItemDetails?.originalPrice || originalPrice}
+        />
       </article>
     );
   }
@@ -596,6 +618,14 @@ const ProductCard = ({
           title={title} brand={brand} price={price} originalPrice={originalPrice}
           image={image} category={category} discountLabel={discountPercent}
           saveLabel={saveAmount} weight={weight} color={color} slug={slug}
+        />
+        <CartSuccessModal
+          isOpen={showSuccessModal}
+          onClose={() => setShowSuccessModal(false)}
+          productName={addedItemDetails?.title || title}
+          productImage={addedItemDetails?.image || image}
+          productPrice={addedItemDetails?.price || price}
+          productOriginalPrice={addedItemDetails?.originalPrice || originalPrice}
         />
       </article>
     );
@@ -716,11 +746,11 @@ const ProductCard = ({
           </span>
         </div>
 
-        <h3 className="line-clamp-2 h-[32px] overflow-hidden px-2 text-[12px] font-semibold leading-4 sm:h-[48px] sm:leading-6 sm:px-4 sm:pb-1 sm:text-[16px] sm:font-medium">
+        <h3 className="line-clamp-2 h-[32px] mb-2 overflow-hidden px-2 text-[12px] font-semibold leading-4 sm:h-[48px] sm:leading-6 sm:px-4 sm:pb-1 sm:text-[16px] sm:font-medium">
           <Link href={productHref} onClick={handleSelectItem}>{title}</Link>
         </h3>
 
-        <div className="flex items-end gap-2 px-2 pb-2 sm:px-4">
+        <div className="flex items-end gap-2 px-2 pb-3 sm:px-4">
           <span className="text-[14px] sm:text-[17px] font-bold text-[#0AB15A]">{currentPrice}</span>
           {hasDiscount(productData?.discount || discountPercent, currentPrice, oldPrice) && oldPrice && (
             <span className="text-[12px] text-slate-400 line-through">{oldPrice}</span>
@@ -771,12 +801,20 @@ const ProductCard = ({
           image={image} category={category} discountLabel={discountPercent}
           saveLabel={saveAmount} weight={weight} color={color} slug={slug}
         />
+        <CartSuccessModal
+          isOpen={showSuccessModal}
+          onClose={() => setShowSuccessModal(false)}
+          productName={addedItemDetails?.title || title}
+          productImage={addedItemDetails?.image || image}
+          productPrice={addedItemDetails?.price || price}
+          productOriginalPrice={addedItemDetails?.originalPrice || originalPrice}
+        />
       </article>
     );
   }
 
   return (
-    <div className="group relative w-full max-w-full overflow-hidden rounded-t-2xl border border-border bg-card shadow-sm transition-shadow duration-300 hover:shadow-lg">
+    <div className="group relative w-full max-w-full overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-shadow duration-300 hover:shadow-lg">
       {/* EMI Badge */}
       {displayBadgeLabel && (
         <div
@@ -884,114 +922,130 @@ const ProductCard = ({
         </span>
       </div>
 
-      <h3 className="line-clamp-2 h-[32px] overflow-hidden px-2 text-[12px] font-semibold leading-4 sm:h-[48px] sm:leading-6 sm:px-4 sm:pb-1 sm:text-[16px] sm:font-medium">
+      <h3 className="line-clamp-2 h-[32px] overflow-hidden px-2 text-[12px] mb-2 font-semibold leading-4 sm:h-[48px] sm:leading-6 sm:px-4 sm:pb-1 sm:text-[16px] sm:font-medium">
         <Link href={productHref} onClick={handleSelectItem}>{productData?.name || title}</Link>
       </h3>
 
-      {/* EMI Info */}
-      <div className="flex items-start justify-between gap-1 px-2 pb-1 sm:items-center sm:px-4">
-        <span className="flex min-w-0 items-center gap-1 text-[10px] text-muted-foreground sm:text-xs">
-          {/* Icon Image Tag */}
-          <Image
-            src="/images/EMI.png" // Tomar icon er file path ekhane hobe
-            alt="EMI Icon"
-            width={12}  // Size tulo-namulok bhabe choto rakha hoyeche text er sathe milate
-            height={12}
-            className="object-contain"
-          />
-          <span className="line-clamp-2 leading-4 sm:line-clamp-1">
-            EMI From {productData?.emi_start || emiPrice} Tk/Month
-          </span>
-        </span>
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setIsEmiModalOpen(true);
-          }}
-          className="shrink-0 text-[10px] font-semibold text-blue-600 hover:underline sm:text-xs"
-        >
-          EMI Details
-        </button>
-      </div>
-
-      {/* Pricing */}
-      <div className="flex flex-wrap items-center gap-1.5 px-2 pb-2 sm:gap-2 sm:px-4">
-        <span className="text-[14px] font-bold text-[#0081FF] sm:text-[17px]">
-          {productData?.main_price || price}
-        </span>
-        {hasDiscount(productData?.discount || discountPercent, productData?.main_price || price, productData?.stroked_price || originalPrice) && (
-          <>
-            {(productData?.stroked_price || originalPrice) && (
-              <span className="text-[11px] text-[#909090] line-through sm:text-[13px]">
-                {productData?.stroked_price || originalPrice}
+      {/* EMI and Pricing with Hover Add to Cart */}
+      <div className="relative min-h-[70px] overflow-hidden">
+        {/* EMI & Pricing Info - fades out on hover */}
+        <div className="w-full transition-all duration-300 ease-in-out group-hover:pointer-events-none group-hover:opacity-0 group-hover:-translate-y-2">
+          {/* EMI Info */}
+          <div className="flex items-start justify-between gap-1 px-2 pb-2 sm:items-center sm:px-4">
+            <span className="flex min-w-0 items-center gap-1 text-[10px] text-muted-foreground sm:text-xs">
+              {/* Icon Image Tag */}
+              <Image
+                src="/images/EMI.png" // Tomar icon er file path ekhane hobe
+                alt="EMI Icon"
+                width={12}  // Size tulo-namulok bhabe choto rakha hoyeche text er sathe milate
+                height={12}
+                className="object-contain"
+              />
+              <span className="line-clamp-2 leading-4 sm:line-clamp-1">
+                EMI From {productData?.emi_start || emiPrice} Tk/Month
               </span>
-            )}
-            {(productData?.discount || discountPercent) && (
-              <span className="text-[10px] font-semibold text-red-600 sm:text-xs">
-                {productData?.discount || discountPercent}
-              </span>
-            )}
+            </span>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsEmiModalOpen(true);
+              }}
+              className="shrink-0 text-[10px] font-semibold text-blue-600 hover:underline sm:text-xs"
+            >
+              EMI Details
+            </button>
+          </div>
 
-            <div>
-              {(() => {
-                const parsePrice = (priceStr?: string | number) => {
-                  if (priceStr === null || priceStr === undefined) return 0;
-                  const normalized = String(priceStr).replace(/[^\d.]/g, '');
-                  return parseFloat(normalized) || 0;
-                };
-
-                const original = parsePrice(productData?.stroked_price || originalPrice);
-                const current = parsePrice(productData?.main_price || price);
-                const savings = original - current;
-
-                if (savings <= 0) return null;
-
-                return (
-                  <span className="inline-block rounded-tl-2xl rounded-br-2xl bg-red-600 px-2 py-0.5 text-[9px] font-medium text-white uppercase sm:px-3 sm:py-1 sm:text-[10px]">
-                    Save: {savings.toLocaleString('en-US', { minimumFractionDigits: 0 })}
+          {/* Pricing */}
+          <div className="flex flex-wrap items-center gap-1.5 px-2 pb-2 sm:gap-2 sm:px-4">
+            <span className="text-[14px] font-bold text-[#0081FF] sm:text-[17px]">
+              {productData?.main_price || price}
+            </span>
+            {hasDiscount(productData?.discount || discountPercent, productData?.main_price || price, productData?.stroked_price || originalPrice) && (
+              <>
+                {(productData?.stroked_price || originalPrice) && (
+                  <span className="text-[11px] text-[#909090] line-through sm:text-[13px]">
+                    {productData?.stroked_price || originalPrice}
                   </span>
-                );
-              })()}
-            </div>
-          </>
-        )}
+                )}
+                {(productData?.discount || discountPercent) && (
+                  <span className="text-[10px] font-semibold text-red-600 sm:text-xs">
+                    {productData?.discount || discountPercent}
+                  </span>
+                )}
+
+                <div>
+                  {(() => {
+                    const parsePrice = (priceStr?: string | number) => {
+                      if (priceStr === null || priceStr === undefined) return 0;
+                      const normalized = String(priceStr).replace(/[^\d.]/g, '');
+                      return parseFloat(normalized) || 0;
+                    };
+
+                    const original = parsePrice(productData?.stroked_price || originalPrice);
+                    const current = parsePrice(productData?.main_price || price);
+                    const savings = original - current;
+
+                    if (savings <= 0) return null;
+
+                    return (
+                      <span className="inline-block rounded-tl-2xl rounded-br-2xl bg-red-600 px-2 py-0.5 text-[9px] font-medium text-white uppercase sm:px-3 sm:py-1 sm:text-[10px]">
+                        Save: {savings.toLocaleString('en-US', { minimumFractionDigits: 0 })}
+                      </span>
+                    );
+                  })()}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Add to cart / See Details - slides up and fades in on hover */}
+        <div className="absolute inset-0 flex items-center opacity-0 translate-y-10 transition-all duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100 px-2 sm:px-4">
+          {productData?.higher_sale ? (
+            <Link
+              href={productHref}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0054A6] py-2 text-sm font-semibold text-white transition-all hover:bg-[#004487]"
+            >
+              <FaEye className="h-4 w-4" />
+              See Details
+            </Link>
+          ) : (
+            <button
+              onClick={handleAddToCart}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0054A6] py-2 text-sm font-semibold text-white transition-all hover:bg-[#004487]"
+            >
+              <FaShoppingCart className="h-4 w-4" />
+              Add to cart
+            </button>
+          )}
+        </div>
       </div>
 
+      {/* Tags Section */}
+      {(() => {
+        interface TagObject {
+          value?: string;
+          label?: string;
+        }
+        let displayTags: string | (string | TagObject)[] = (productData?.tags as string[] | undefined) || tags || [];
 
-      {/* Savings Badge */}
-      {/* {saveAmount && (
-        <div className="px-4 pb-3">
-          <span className="inline-block rounded-full bg-red-600 px-3 py-1 text-[10px] font-bold text-white uppercase">
-         {saveAmount}
-          </span>
-        </div>
-      )} */}
+        // Handle string cases from API
+        if (typeof displayTags === 'string') {
+          try {
+            displayTags = JSON.parse(displayTags as string);
+          } catch {
+            // Fallback to comma separated or single tag
+            displayTags = (displayTags as string).split(',').map((t: string) => t.trim()).filter(Boolean);
+          }
+        }
 
-      {/* Tags or Add to Cart on Hover */}
-      <div className="relative lg:min-h-[52px] overflow-hidden px-2 pb-3 sm:px-4 sm:pb-4">
-        {/* Tags - fades out and slides up on hover */}
-        <div className="w-full hidden lg:block transition-all duration-300 ease-in-out group-hover:pointer-events-none group-hover:-translate-y-4 group-hover:opacity-0">
-          {(() => {
-            interface TagObject {
-              value?: string;
-              label?: string;
-            }
-            let displayTags: string | (string | TagObject)[] = (productData?.tags as string[] | undefined) || tags || [];
+        if (!Array.isArray(displayTags) || displayTags.length === 0) return null;
 
-            // Handle string cases from API
-            if (typeof displayTags === 'string') {
-              try {
-                displayTags = JSON.parse(displayTags as string);
-              } catch {
-                // Fallback to comma separated or single tag
-                displayTags = (displayTags as string).split(',').map((t: string) => t.trim()).filter(Boolean);
-              }
-            }
-
-            if (!Array.isArray(displayTags) || displayTags.length === 0) return null;
-
-            return (
+        return (
+          <div className="hidden lg:block px-2 pb-3 sm:px-4 sm:pb-4">
+            <div className="w-full">
               <div
                 className="grid gap-1.5"
                 style={{
@@ -1031,31 +1085,10 @@ const ProductCard = ({
                   }
                 })}
               </div>
-            );
-          })()}
-        </div>
-
-        {/* Add to cart / See Details - slides up and fades in on hover */}
-        <div className="absolute inset-x-2 bottom-3 flex opacity-0 translate-y-10 transition-all duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100 sm:inset-x-4 sm:bottom-4">
-          {productData?.higher_sale ? (
-            <Link
-              href={productHref}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0054A6] py-2 text-sm font-semibold text-white transition-all hover:bg-[#004487]"
-            >
-              <FaEye className="h-4 w-4" />
-              See Details
-            </Link>
-          ) : (
-            <button
-              onClick={handleAddToCart}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0054A6] py-2 text-sm font-semibold text-white transition-all hover:bg-[#004487]"
-            >
-              <FaShoppingCart className="h-4 w-4" />
-              Add to cart
-            </button>
-          )}
-        </div>
-      </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Mobile CTA */}
       <div className="px-2 pb-3 sm:hidden">
@@ -1078,6 +1111,14 @@ const ProductCard = ({
         title={title} brand={brand} price={price} originalPrice={originalPrice}
         image={image} category={category} discountLabel={discountPercent}
         saveLabel={saveAmount} weight={weight} color={color} slug={slug}
+      />
+      <CartSuccessModal
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        productName={addedItemDetails?.title || title}
+        productImage={addedItemDetails?.image || image}
+        productPrice={addedItemDetails?.price || price}
+        productOriginalPrice={addedItemDetails?.originalPrice || originalPrice}
       />
       <BankEmiModal
         isOpen={isEmiModalOpen}

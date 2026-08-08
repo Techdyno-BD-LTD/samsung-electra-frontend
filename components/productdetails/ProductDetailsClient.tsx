@@ -1505,6 +1505,7 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
         productName={title || "Product"}
         productImage={finalMainImage}
         productPrice={price}
+        productOriginalPrice={originalPrice}
       />
 
       <HigherSaleModal

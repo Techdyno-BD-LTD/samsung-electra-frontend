@@ -175,7 +175,7 @@ export default function CartPage() {
                         {item.title}
                       </div>
                       <div className="text-gray-500 mt-0.5 sm:mt-1 lg:mt-1.5 text-[8px] sm:text-[10px] lg:text-[11px] 2xl:text-[13px]">
-                        {item.type && <span>Category: {item.type} | </span>}
+                        {item.type && <span>Category: {item.type} </span>}
                         {item.variant ? <span>Variant: {item.variant}</span> : item.color ? <span>Color: {item.color}</span> : null}
                       </div>
                       <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 mt-1 sm:mt-2 font-medium flex-wrap">
@@ -203,17 +203,18 @@ export default function CartPage() {
                       />
                       <div className="flex flex-col w-[16px] sm:w-[20px] lg:w-[22px] 2xl:w-[24px] flex-shrink-0 bg-transparent">
                         <button
-                          onClick={() => dispatch(updateQuantity({ id: item.id, newQuantity: item.quantity - 1 }))}
-                          className="h-1/2 flex items-center justify-center border-b border-gray-400 text-gray-600 hover:bg-gray-100 leading-none text-[10px] sm:text-[12px] 2xl:text-[14px] bg-white"
-                        >
-                          -
-                        </button>
-                        <button
                           onClick={() => dispatch(updateQuantity({ id: item.id, newQuantity: item.quantity + 1 }))}
-                          className="h-1/2 flex items-center justify-center text-gray-600 hover:bg-gray-100 leading-none text-[10px] sm:text-[12px] 2xl:text-[14px] bg-white"
+                          className="h-1/2 flex items-center justify-center border-b border-gray-400 text-gray-600 hover:bg-gray-100 leading-none text-[10px] sm:text-[12px] 2xl:text-[14px] bg-white"
                         >
                           +
                         </button>
+                        <button
+                          onClick={() => dispatch(updateQuantity({ id: item.id, newQuantity: item.quantity - 1 }))}
+                          className="h-1/2 flex items-center justify-center  text-gray-600 hover:bg-gray-100 leading-none text-[10px] sm:text-[12px] 2xl:text-[14px] bg-white"
+                        >
+                          -
+                        </button>
+                        
                       </div>
                     </div>
                   </div>
@@ -228,12 +229,12 @@ export default function CartPage() {
                         {formatCurrency(parseCurrency(item.originalPrice) * item.quantity)}
                       </div>
                     )}
-                    {item.discountPercent && (
+                    {item.discountPercent && item.originalPrice && parseCurrency(item.originalPrice) > parseCurrency(item.price) && (
                       <div className="text-[#0eb363] font-bold text-[8px] sm:text-[10px] 2xl:text-[12px]">
                         {item.discountPercent}
                       </div>
                     )}
-                    {item.saveAmount && (
+                    {item.saveAmount && item.originalPrice && parseCurrency(item.originalPrice) > parseCurrency(item.price) && (
                       <div className="bg-[#f04848] text-white text-[7px] sm:text-[9px] lg:text-[10px] 2xl:text-[12px] px-1.5 sm:px-2 2xl:px-2.5 py-[2px] 2xl:py-[3px] rounded-tl-2xl rounded-br-2xl font-medium mt-[2px] leading-tight shadow-sm tracking-wide">
                         {item.saveAmount}
                       </div>
@@ -277,7 +278,9 @@ export default function CartPage() {
           {mounted && cartItems.length > 0 ? (
             cartItems.map(item => {
               const itemTotal = formatCurrency(parseCurrency(item.price) * item.quantity);
-              const itemOriginalTotal = item.originalPrice ? formatCurrency(parseCurrency(item.originalPrice) * item.quantity) : '';
+              const itemOriginalTotal = item.originalPrice && parseCurrency(item.originalPrice) > parseCurrency(item.price)
+                ? formatCurrency(parseCurrency(item.originalPrice) * item.quantity)
+                : '';
               return (
                 <div key={item.id} className="flex justify-between items-start mb-4 lg:mb-5 text-[12px] lg:text-[13px] 2xl:text-[14px]">
                   <div className="text-gray-600 w-[50%] lg:w-[55%] leading-relaxed font-medium line-clamp-2">
@@ -297,16 +300,16 @@ export default function CartPage() {
             <div className="text-[12px] text-gray-500 mb-4">{mounted ? "No items to compute." : "Loading..."}</div>
           )}
 
-          <div className="space-y-3 lg:space-y-4 text-[13px] lg:text-[14px] 2xl:text-[15px] font-medium text-gray-700 mt-6 lg:mt-8">
-            <div className="flex justify-between items-center">
-              <span>Save</span>
-              <span className="font-bold text-[#f04848] lg:text-black text-[14px] lg:text-[15px] 2xl:text-[16px]">
-                {mounted ? formatCurrency(totalSavings) : "৳0"}
-              </span>
+          {mounted && totalSavings > 0 && (
+            <div className="space-y-3 lg:space-y-4 text-[13px] lg:text-[14px] 2xl:text-[15px] font-medium text-gray-700 mt-6 lg:mt-8">
+              <div className="flex justify-between items-center">
+                <span>Save</span>
+                <span className="font-bold text-[#f04848] lg:text-black text-[14px] lg:text-[15px] 2xl:text-[16px]">
+                  {formatCurrency(totalSavings)}
+                </span>
+              </div>
             </div>
-
-
-          </div>
+          )}
 
           <hr className="border-gray-200 my-4 lg:my-5" />
 
@@ -425,7 +428,7 @@ export default function CartPage() {
                         <span className="text-[11px] text-gray-400 font-medium"> ( {item.quantity} pcs ) </span>
                       </div>
                       <div className="text-right flex flex-col items-end">
-                        {item.originalPrice && (
+                        {item.originalPrice && parseCurrency(item.originalPrice) > parseCurrency(item.price) && (
                           <div className="text-[11px] text-gray-400 line-through font-medium">
                             {formatCurrency(parseCurrency(item.originalPrice) * item.quantity)}
                           </div>
@@ -439,10 +442,12 @@ export default function CartPage() {
                 </div>
 
                 <div className="space-y-4 text-[14px] font-medium text-gray-700 pt-2 border-t border-gray-100">
-                  <div className="flex justify-between items-center text-[#f04848]">
-                    <span>Save</span>
-                    <span className="font-bold text-[16px]">{formatCurrency(totalSavings)}</span>
-                  </div>
+                  {totalSavings > 0 && (
+                    <div className="flex justify-between items-center text-[#f04848]">
+                      <span>Save</span>
+                      <span className="font-bold text-[16px]">{formatCurrency(totalSavings)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between items-center">
                     <span>Store Pickup</span>
                     <span className="font-bold text-black">Free</span>

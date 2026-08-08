@@ -10,6 +10,7 @@ interface CartSuccessModalProps {
   productName: string;
   productImage: string;
   productPrice: string | number;
+  productOriginalPrice?: string | number;
 }
 
 export default function CartSuccessModal({
@@ -18,6 +19,7 @@ export default function CartSuccessModal({
   productName,
   productImage,
   productPrice,
+  productOriginalPrice,
 }: CartSuccessModalProps) {
   const router = useRouter();
 
@@ -53,8 +55,13 @@ export default function CartSuccessModal({
             <h3 className="text-[15px] font-bold text-slate-800 leading-snug mb-3">
               {productName}
             </h3>
-            <p className="text-[13px] text-slate-500 flex items-center">
+            <p className="text-[13px] text-slate-500 flex items-center flex-wrap">
               Price: <span className="ml-4 font-bold text-[#1a56db] text-base">{productPrice}</span>
+              {productOriginalPrice && String(productOriginalPrice).trim() !== "" && (
+                <span className="ml-2 text-xs text-slate-400 line-through">
+                  {productOriginalPrice}
+                </span>
+              )}
             </p>
           </div>
         </div>

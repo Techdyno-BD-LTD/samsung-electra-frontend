@@ -876,6 +876,7 @@ export default function AddToCartModal({
         productName={title}
         productImage={finalMainImage}
         productPrice={price}
+        productOriginalPrice={originalPrice}
       />
       <BankEmiModal
         isOpen={isEmiModalOpen}
