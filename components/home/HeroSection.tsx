@@ -449,29 +449,27 @@ export default function HeroSection() {
             >
               {loopedSlides.map((slide, index) => (
                 <div key={`${slide.id}-${index}`} className="relative h-full min-w-full">
-                  <Image
-                    src={slide.imageUrl}
-                    alt={slide.title}
-                    fill
-                    sizes="(max-width: 1024px) 100vw, (max-width: 1280px) 72vw, 74vw"
-                    className="object-contain object-center"
-                    priority={index === 0}
-                  />
-                  {/* <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/45 to-black/15" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/15" /> */}
-
-                  {/* <div className="relative z-20 flex h-full items-end p-6 sm:p-8">
-                    <div className="max-w-[520px] text-white">
-                      <h2 className="text-3xl font-bold leading-tight drop-shadow-md sm:text-5xl">{slide.title}</h2>
-                      <p className="mt-3 text-lg text-white/90 sm:text-3xl">{slide.subtitle}</p>
-                      <Link
-                        href={slide.ctaHref}
-                        className="mt-5 inline-flex items-center rounded-full bg-white/90 px-5 py-2 text-sm font-semibold text-slate-900 transition hover:bg-white"
-                      >
-                        {slide.ctaLabel}
-                      </Link>
-                    </div>
-                  </div> */}
+                  {slide.ctaHref && slide.ctaHref !== "#" ? (
+                    <Link href={slide.ctaHref} className="block relative w-full h-full">
+                      <Image
+                        src={slide.imageUrl}
+                        alt={slide.title}
+                        fill
+                        sizes="(max-width: 1024px) 100vw, (max-width: 1280px) 72vw, 74vw"
+                        className="object-contain object-center cursor-pointer"
+                        priority={index === 0}
+                      />
+                    </Link>
+                  ) : (
+                    <Image
+                      src={slide.imageUrl}
+                      alt={slide.title}
+                      fill
+                      sizes="(max-width: 1024px) 100vw, (max-width: 1280px) 72vw, 74vw"
+                      className="object-contain object-center"
+                      priority={index === 0}
+                    />
+                  )}
                 </div>
               ))}
             </div>
