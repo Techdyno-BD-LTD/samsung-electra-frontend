@@ -19,6 +19,7 @@ import {
   FiChevronRight,
   FiCamera
 } from "react-icons/fi";
+import { FaGavel } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { logout } from "@/store/features/auth/authSlice";
 import { clearWishlist } from "@/store/features/wishlist/wishlistSlice";
@@ -42,6 +43,7 @@ const DashboardSidebar = () => {
     { name: "Profile", icon: <FiUserCheck />, href: "/dashboard/profile" },
     { name: "Shipping Address", icon: <FiMapPin />, href: "/dashboard/address" },
     { name: "Wishlist", icon: <FiHeart />, href: "/dashboard/wishlist" },
+    { name: "My Bids", icon: <FaGavel />, href: "/dashboard/bids" },
     { name: "My Offers", icon: <FiGift />, href: "/dashboard/offers" },
     { name: "Gift Vouchers", icon: <FiGift />, href: "/dashboard/gift-vouchers" },
     // { name: "Payment Method", icon: <FiCreditCard />, href: "/dashboard/payment" },

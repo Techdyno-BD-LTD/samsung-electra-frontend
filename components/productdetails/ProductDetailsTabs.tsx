@@ -199,7 +199,19 @@ export default function ProductDetailsTabs({
   const hasPolicyHtml = isHtmlContent(policyHtml);
   const policyHeading = policyTitle ?? 'Product Policy';
   const descriptionBlocks = descriptionText ? splitPlainText(descriptionText) : [];
-  const specificationRows = specifications ?? [];
+  let specificationRows: any[] = [];
+  if (Array.isArray(specifications)) {
+    specificationRows = specifications;
+  } else if (typeof specifications === 'string') {
+    try {
+      const parsed = JSON.parse(specifications);
+      if (Array.isArray(parsed)) {
+        specificationRows = parsed;
+      }
+    } catch {
+      specificationRows = [];
+    }
+  }
   const fallbackReviewRows = [
     { star: 5, count: 0 },
     { star: 4, count: 0 },

@@ -705,6 +705,32 @@ const Checkout = () => {
         );
     }
 
+    const isUnderDevelopment = true; // Set to false to enable checkout page content
+
+    if (isUnderDevelopment) {
+        return (
+            <div className="flex items-center justify-center min-h-[70vh] px-4 py-12 mt-12">
+                <div className="max-w-md w-full bg-white rounded-2xl border border-gray-100 shadow-xl p-8 text-center animate-fadeIn">
+                    <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-5">
+                        <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                    <h2 className="text-xl font-bold text-gray-900 mb-2">Website Under Development</h2>
+                    <p className="text-gray-500 text-sm leading-relaxed mb-6">
+                        The checkout feature is currently disabled for maintenance and testing. Please check back later.
+                    </p>
+                    <button 
+                        onClick={() => router.push('/')}
+                        className="inline-flex items-center justify-center bg-[#1877f2] hover:bg-blue-600 text-white font-semibold py-2.5 px-6 rounded-xl transition-colors text-sm shadow-sm"
+                    >
+                        Return Home
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <>
             <div className="px-2 mt-12">
@@ -969,7 +995,7 @@ const Checkout = () => {
                                             />
                                             <span className="font-medium text-[13px] lg:text-[15px] text-gray-800 group-hover:text-[#1877f2] transition-colors">{method.heading}</span>
                                             {method.heading === 'Cash On Delivery' && (
-                                                <span className="text-[#1877f2] text-[11px] lg:text-[12px] xl:ml-2 font-medium">(Advanced pay 10% For Order confirmation)</span>
+                                                <span className="text-[#1877f2] text-[11px] lg:text-[12px] xl:ml-2 font-medium"></span>
                                             )}
                                         </label>
                                         <div className="ml-[24px] lg:ml-[28px] mt-1.5 text-[11px] lg:text-[12px] text-gray-500">
@@ -1040,7 +1066,9 @@ const Checkout = () => {
                                                 <p className="text-[11px] text-gray-500 mt-1">QTY : {item.quantity}</p>
                                             </div>
                                             <div className="text-right flex flex-col items-end whitespace-nowrap flex-shrink-0 pl-1">
-                                                <span className="text-[9px] lg:text-[11px] text-[#a1a1aa] line-through font-medium">{item.originalPrice}</span>
+                                                {parseCurrency(item.originalPrice) > parseCurrency(item.price) && (
+                                                    <span className="text-[9px] lg:text-[11px] text-[#a1a1aa] line-through font-medium">{item.originalPrice}</span>
+                                                )}
                                                 <span className="font-bold text-[13px] lg:text-[15px] mt-0.5 text-black">{item.price}</span>
                                             </div>
                                         </div>
@@ -1055,12 +1083,14 @@ const Checkout = () => {
                             <div className="pt-1.5 border-t border-gray-200">
                                 <h3 className="text-[14px] lg:text-[16px] font-bold mb-2 lg:mb-3 text-gray-900">Sub -Total</h3>
                                 <div className="space-y-2 lg:space-y-2.5 text-[12px] lg:text-[14px]">
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-600">Save</span>
-                                        <span className="font-bold text-gray-900">
-                                            {formatCurrency(totals.savings)}
-                                        </span>
-                                    </div>
+                                    {totals.savings > 0 && (
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">Save</span>
+                                            <span className="font-bold text-gray-900">
+                                                {formatCurrency(totals.savings)}
+                                            </span>
+                                        </div>
+                                    )}
                                     <div className="flex justify-between">
                                         <span className="text-gray-600">Delivery</span>
                                         <span className="font-bold text-gray-900">{totals.delivery > 0 ? formatCurrency(totals.delivery) : 'Free'}</span>

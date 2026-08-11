@@ -5,13 +5,15 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.SITE_URL ?? 'ht
 export default function robots() {
   const siteUrl = SITE_URL.replace(/\/$/, '');
 
+  const isDevServer = siteUrl.includes('dev.') || !siteUrl.includes('electrabd.com');
+
   return {
     rules: [
       {
         userAgent: '*',
-        allow: '/',
+        ...(isDevServer ? { disallow: '/' } : { allow: '/' }),
       },
     ],
-    sitemap: `${siteUrl}/sitemap.xml`,
+    sitemap: isDevServer ? undefined : `${siteUrl}/sitemap.xml`,
   };
 }

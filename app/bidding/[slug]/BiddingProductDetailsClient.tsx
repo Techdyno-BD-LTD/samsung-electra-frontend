@@ -1,7 +1,7 @@
 'use client';
 
 import Image from "next/image";
-import { FaHeart, FaMinus, FaPlus, FaRegShareSquare, FaStar, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaHeart, FaPlus, FaRegShareSquare, FaStar, FaChevronLeft, FaChevronRight, FaGavel, FaEye } from "react-icons/fa";
 import { useEffect, useState, useMemo, useRef } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -9,7 +9,7 @@ import { pushToDataLayer, cleanPrice } from "@/lib/gtm";
 
 import ProductDetailsTabs from "@/components/productdetails/ProductDetailsTabs";
 import MobileProductGallery from "@/components/productdetails/MobileProductGallery";
-import MobileStickyPurchaseBar from "@/components/productdetails/MobileStickyPurchaseBar";
+// import MobileStickyPurchaseBar from "@/components/productdetails/MobileStickyPurchaseBar";
 import MobileOfferDetails from "@/components/productdetails/MobileOfferDetails";
 import MobileMadeInFeatures from "@/components/productdetails/MobileMadeInFeatures";
 import MobileBackButton from "@/components/productdetails/MobileBackButton";
@@ -160,7 +160,7 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
   const slug = (params.slug as string) || propSlug;
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const { isAuthenticated } = useAppSelector((state) => state.auth);
+  const { isAuthenticated, token, user } = useAppSelector((state) => state.auth);
 
   const [productData, setProductData] = useState<ProductData | null>(initialData);
   const [loading, setLoading] = useState(!initialData);
@@ -175,7 +175,117 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
   const [lensPosition, setLensPosition] = useState({ x: 0, y: 0 });
   const [containerSize, setContainerSize] = useState({ width: 520, height: 700 });
   const [isHovered, setIsHovered] = useState(false);
-  const [quantity, setQuantity] = useState(1);
+  const quantity = 1;
+  const [bidAmount, setBidAmount] = useState("");
+  const [timeLeft, setTimeLeft] = useState({ days: "00", hours: "00", minutes: "00", seconds: "00" });
+
+  useEffect(() => {
+    if (!productData?.auction_end_date) return;
+    const endTimeMs = Number(productData.auction_end_date) * 1000;
+
+    const updateTimer = () => {
+      const now = Date.now();
+      const diff = endTimeMs - now;
+
+      if (diff <= 0) {
+        setTimeLeft({ days: "00", hours: "00", minutes: "00", seconds: "00" });
+        return;
+      }
+
+      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const m = Math.floor((diff / (1000 * 60)) % 60);
+      const s = Math.floor((diff / 1000) % 60);
+
+      setTimeLeft({
+        days: String(d).padStart(2, "0"),
+        hours: String(h).padStart(2, "0"),
+        minutes: String(m).padStart(2, "0"),
+        seconds: String(s).padStart(2, "0"),
+      });
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
+  }, [productData?.auction_end_date]);
+
+  const formattedEndDate = useMemo(() => {
+    if (!productData?.auction_end_date) return "";
+    const date = new Date(Number(productData.auction_end_date) * 1000);
+    return date.toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    }) + " " + date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }, [productData?.auction_end_date]);
+
+  const formattedStartDate = useMemo(() => {
+    if (!productData?.auction_start_date) return "";
+    const date = new Date(Number(productData.auction_start_date) * 1000);
+    return date.toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    }) + " " + date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }, [productData?.auction_start_date]);
+
+  const handlePlaceBid = async () => {
+    if (!isAuthenticated) {
+      router.push(`/login?redirect=${window.location.pathname}`);
+      return;
+    }
+    const amount = Number(bidAmount);
+    if (isNaN(amount) || amount <= 0) {
+      dispatch(showToast({ message: "Please enter a valid bid amount", type: "error" }));
+      return;
+    }
+    const highestBid = Number(productData?.highest_bid || productData?.starting_bid || 0);
+    if (amount <= highestBid) {
+      dispatch(showToast({ message: `Bid must be greater than ${highestBid}`, type: "error" }));
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/v2/auction/place-bid', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          product_id: productData?.id,
+          amount: amount
+        })
+      });
+
+      const resData = await response.json();
+      if (resData.success || response.ok) {
+        dispatch(showToast({ message: "Bid placed successfully!", type: "success" }));
+        if (productData?.slug) {
+          const updatedResp = await fetch(`/api/v2/auction/products/${productData.slug}`, {
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+          });
+          const updatedJson = await updatedResp.json();
+          if (updatedJson.success && updatedJson.data?.[0]) {
+            setProductData(updatedJson.data[0]);
+          }
+        }
+        setBidAmount("");
+      } else {
+        dispatch(showToast({ message: resData.message || "Failed to place bid", type: "error" }));
+      }
+    } catch (error) {
+      console.error(error);
+      dispatch(showToast({ message: "Something went wrong while placing bid", type: "error" }));
+    }
+  };
 
   const thumbnailContainerRef = useRef<HTMLDivElement>(null);
   const hasFiredViewItemRef = useRef<number | null>(null);
@@ -192,8 +302,7 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
     }
   };
 
-  const handleIncrement = () => setQuantity((prev) => prev + 1);
-  const handleDecrement = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
+
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
@@ -213,6 +322,8 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
     if (x > width - lensWidth) x = width - lensWidth;
     if (y < 0) y = 0;
     if (y > height - lensHeight) y = height - lensHeight;
+
+
 
     setLensPosition({ x, y });
     setContainerSize({ width, height });
@@ -242,7 +353,9 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
         setLoading(true);
         setError(null);
 
-        const response = await fetch(`/api/products/${slug}`);
+        const response = await fetch(`/api/v2/auction/products/${slug}`, {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
 
         if (!response.ok) {
           throw new Error('Failed to fetch product');
@@ -264,26 +377,30 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
     };
 
     fetchProduct();
-  }, [slug, initialData]);
+  }, [slug, initialData, token]);
 
   useEffect(() => {
     if (!productData) return;
 
     const nextSelectedAttributes: Record<string, string> = {};
-    let attrs: any[] = [];
-    if (Array.isArray(productData.attributes)) {
-      attrs = productData.attributes;
-    } else if (typeof productData.attributes === 'string') {
+    let attrs: unknown[] = [];
+    const rawAttributes = productData.attributes as unknown;
+    if (Array.isArray(rawAttributes)) {
+      attrs = rawAttributes;
+    } else if (typeof rawAttributes === 'string') {
       try {
-        const parsed = JSON.parse(productData.attributes);
+        const parsed = JSON.parse(rawAttributes);
         if (Array.isArray(parsed)) attrs = parsed;
       } catch {}
     }
     attrs.forEach((attribute) => {
-      const attributeKey = String(attribute.attribute_id ?? attribute.name ?? "");
-      const firstValue = attribute.values?.[0];
-      if (attributeKey && firstValue) {
-        nextSelectedAttributes[attributeKey] = firstValue;
+      if (attribute && typeof attribute === 'object') {
+        const attrObj = attribute as { attribute_id?: string | number; name?: string; values?: string[] };
+        const attributeKey = String(attrObj.attribute_id ?? attrObj.name ?? "");
+        const firstValue = attrObj.values?.[0];
+        if (attributeKey && firstValue) {
+          nextSelectedAttributes[attributeKey] = firstValue;
+        }
       }
     });
 
@@ -326,7 +443,7 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
         tags: productData.tags,
       };
 
-      const filteredList = list.filter((item: any) => item.id !== productInfo.id);
+      const filteredList = list.filter((item: { id?: number }) => item.id !== productInfo.id);
       filteredList.unshift(productInfo);
       localStorage.setItem('recently_viewed_products', JSON.stringify(filteredList.slice(0, 3)));
     } catch (err) {
@@ -377,10 +494,6 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
 
   const discountLabel = hasDisc ? (productData?.discount || (isDemoMode ? "0% Off" : "")) : "";
   const saveLabel = hasDisc ? (saveAmountText || (isDemoMode ? "Save Amount" : "")) : "";
-  const offersLabel = "View offers";
-  const emiText = productData?.emi_start || (isDemoMode ? "EMI Available" : "");
-  const emiDetailsLabel = productData?.emi_facility?.link_label ? productData.emi_facility.link_label : "See details";
-  const colorLabel = "Color";
   const features = productData?.tags || [];
   const descriptionHtml = productData?.description || "";
   const featuresList = parseHtmlFeatures(productData?.other_features) || productData?.tags || [];
@@ -462,11 +575,11 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
     return items;
   }, [productData, categoryName]);
 
-  const flatOfferPercent = (discountLabel || "0%").toString().match(/\d+%/)?.[0] ?? "0%";
 
-  const parsedAttributes = useMemo((): Array<{ attribute_id?: number | string; name?: string; values?: string[] }> => {
+
+  const parsedAttributes = useMemo(() => {
     const attrs = productData?.attributes;
-    if (Array.isArray(attrs)) return attrs as any;
+    if (Array.isArray(attrs)) return attrs;
     if (typeof attrs === 'string') {
       try {
         const parsed = JSON.parse(attrs);
@@ -577,16 +690,23 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
   const buildCartPayload = () => {
     const variantName = selectedVariant?.variant || activeColorName || "";
     const uniqueId = variantName ? `${slug}-${variantName}` : (slug || title || "product");
+    const isAuction = productData?.auction_product === 1;
+    const isEnded = isAuction && productData?.auction_end_date && (Date.now() > Number(productData.auction_end_date) * 1000);
+    const isWinner = isEnded && user && Number(user.id) === Number(productData?.highest_bid_user_id);
+    const cartPrice = isWinner && productData?.highest_bid 
+      ? String(productData.highest_bid) 
+      : (price ? String(price).split('/')[0].trim() : "0");
+
     return {
       id: uniqueId,
       slug: slug,
       title: title || "Product",
       brand: brandName || "Brand",
       image: selectedVariant?.image || finalMainImage || "",
-      price: price ? String(price).split('/')[0].trim() : "0",
-      originalPrice: originalPrice ? String(originalPrice).split('/')[0].trim() : "0",
-      discountPercent: discountLabel || "0%",
-      saveAmount: saveLabel || "0",
+      price: cartPrice,
+      originalPrice: isWinner ? cartPrice : (originalPrice ? String(originalPrice).split('/')[0].trim() : "0"),
+      discountPercent: isWinner ? "0%" : (discountLabel || "0%"),
+      saveAmount: isWinner ? "0" : (saveLabel || "0"),
       color: activeColorName,
       variant: selectedVariant?.variant || "",
       type: category,
@@ -636,35 +756,7 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
     hasFiredViewItemRef.current = Number(productData.id);
   }, [productData, slug, selectedVariant, activeColorName, price, title, brandName, category]);
 
-  const handleAddToCart = () => {
-    if (!productData) return;
-    const cartPayload = buildCartPayload();
-    dispatch(addToCart(cartPayload));
 
-    const parsedPrice = cleanPrice(price);
-
-    pushToDataLayer({
-      event: "add_to_cart",
-      ecommerce: {
-        currency: "BDT",
-        value: parsedPrice * quantity,
-        items: [{
-          id: String(cartPayload.productId),
-          item_id: String(cartPayload.productId),
-          item_name: cartPayload.title,
-          currency: "BDT",
-          price: parsedPrice,
-          item_brand: cartPayload.brand,
-          item_category: productData.category_info?.parent_category_name || cartPayload.type,
-          item_category2: productData.category_info?.parent_category_name ? cartPayload.type : undefined,
-          item_variant: cartPayload.variant,
-          quantity: cartPayload.quantity,
-        }]
-      }
-    });
-
-    setShowSuccessModal(true);
-  };
 
   const handleBuyNow = () => {
     if (!productData) return;
@@ -1031,157 +1123,11 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
                 <span className="text-[#0A67C8]">{selectedAvailability}</span>
               </div>
 
-              <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:hidden">
-                <p className="text-[22px] font-medium leading-none text-[#0C73DA]">{price}</p>
-                {productData?.higher_sale ? (
-                  <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
-                    <div className="flex flex-col">
-                      <span className="text-[8px] text-slate-500 font-bold uppercase">Down</span>
-                      <span className="text-xs font-bold text-[#0081FF]">৳{productData.down_payment?.toLocaleString()}</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-[8px] text-slate-500 font-bold uppercase">Monthly</span>
-                      <span className="text-xs font-bold text-[#0081FF]">৳{productData.monthly_installment?.toLocaleString()}</span>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    {hasDisc && (
-                      <>
-                        <div className="flex flex-col items-center leading-none">
-                          <p className="text-[8px] font-semibold text-[#15A85B]">{discountLabel}</p>
-                          <p className="text-[10px] text-slate-400 line-through">{originalPrice}</p>
-                        </div>
-                        {saveLabel && (
-                          <span className="rounded-tl-3xl rounded-br-3xl bg-[#F13D36] px-3 py-1 text-[8px] font-semibold leading-none text-white">{saveLabel}</span>
-                        )}
-                      </>
-                    )}
-                    <button type="button" className="text-[8px] font-semibold leading-none text-[#0C73DA]">
-                      {offersLabel}
-                    </button>
-                  </>
-                )}
-              </div>
+              
 
-              <div className="hidden flex-wrap items-center gap-8 lg:flex">
-                <p className="text-4xl font-medium text-[#0C73DA]">{price}</p>
 
-                {productData?.higher_sale ? (
-                  <div className="flex items-center gap-6 border-l border-slate-200 pl-8">
-                    <div className="flex flex-col">
-                      <p className="text-[10px] text-slate-500 uppercase font-bold">Down Payment</p>
-                      <p className="text-xl font-bold text-[#0081FF]">৳ {productData.down_payment?.toLocaleString()}</p>
-                    </div>
-                    <div className="flex flex-col">
-                      <p className="text-[10px] text-slate-500 uppercase font-bold">Monthly Installment</p>
-                      <p className="text-xl font-bold text-[#0081FF]">৳ {productData.monthly_installment?.toLocaleString()} <span className="text-[10px] font-normal text-slate-400">(for 6 month)</span></p>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <div className="h-[1px] w-8 border-t border-dashed border-[#15A85B]"></div>
-                      <span className="text-[10px] font-semibold text-[#15A85B]">1% processing free</span>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    {hasDisc && (
-                      <>
-                        <div className="flex flex-col items-center">
-                          <p className="text-base font-semibold text-[#15A85B]">{discountLabel}</p>
-                          <p className="text-md text-slate-400 line-through">{originalPrice}</p>
-                        </div>
 
-                        {saveLabel && (
-                          <span className="rounded-tl-3xl rounded-br-3xl bg-[#F13D36] px-6 py-1 text-sm font-semibold text-white">
-                            {saveLabel}
-                          </span>
-                        )}
-                      </>
-                    )}
-
-                    <Link href="/offers" type="button" className="text-sm font-semibold text-[#0C73DA]">
-                      {offersLabel}
-                    </Link>
-                  </>
-                )}
-              </div>
-
-              {(isDemoMode || emiText) && (
-                <div className="flex items-center  gap-2 border-b border-slate-200 pb-3 text-[12px] lg:text-[16px] text-slate-700">
-                  <Image src="/images/EMI.png" alt="EMI" width={20} height={20} className="lg:h-5 h-4 w-4 lg:w-5 object-contain" />
-                  EMI Starts From <span >{emiText}</span>
-                  <button
-                    type="button"
-                    className="font-semibold text-[#0C73DA]"
-                    onClick={() => setIsBankEmiModalOpen(true)}
-                  >
-                    | {emiDetailsLabel}
-                  </button>
-                </div>
-              )}
-
-              <div className="space-y-2">
-                {attributesForUi.length > 0 ? (
-                  attributesForUi.map((attribute) => {
-                    const attributeKey = String(attribute.attribute_id ?? attribute.name ?? "");
-                    const selectedValue = selectedAttributes[attributeKey];
-                    return (
-                      <div key={attributeKey} className="flex items-center gap-3 text-[12px] lg:text-sm">
-                        <span className="text-slate-700">{attribute.name || "Attribute"} :</span>
-                        {(attribute.values ?? []).map((value) => {
-                          const isSelected = selectedValue === value;
-                          return (
-                            <button
-                              key={`${attributeKey}-${value}`}
-                              type="button"
-                              onClick={() => {
-                                setSelectedAttributes((prev) => ({ ...prev, [attributeKey]: value }));
-                              }}
-                              className={`min-w-16 rounded border lg:px-4 lg:py-1.5 lg:text-xs px-2 py-0.5 text-[10px] ${isSelected ? "border-slate-500 bg-slate-100 text-slate-900" : "border-slate-200 text-slate-600"}`}
-                            >
-                              {value}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    );
-                  })
-                ) : (
-                  isDemoMode && (
-                    <div className="flex items-center gap-3 text-[12px] lg:text-sm">
-                      <span className="text-slate-700">Capacity :</span>
-                      <span className="text-slate-400">Not specified</span>
-                    </div>
-                  )
-                )}
-
-                {(colorOptions.length > 0 || isDemoMode) && (
-                  <div className="flex items-center gap-3 text-[12px] lg:text-sm">
-                    <span className="text-slate-700">{colorLabel} :</span>
-                    {colorOptions.length > 0 ? (
-                      colorOptions.map((color) => {
-                        const isSelected = toComparable(color.name) === toComparable(activeColorName);
-                        return (
-                          <button
-                            key={color.key}
-                            type="button"
-                            onClick={() => setSelectedColorName(color.name)}
-                            className={`rounded border p-1 ${isSelected ? "border-slate-600" : "border-slate-200"}`}
-                            title={color.name}
-                          >
-                            <span className="flex items-center gap-1.5">
-                              <Image src={color.image} alt={color.name} width={36} height={36} className="lg:h-9 lg:w-9 w-6 h-6 object-contain" />
-                              <span className="text-[10px] text-slate-700 lg:text-xs">{color.name}</span>
-                            </span>
-                          </button>
-                        );
-                      })
-                    ) : (
-                      <span className="text-slate-400">Not specified</span>
-                    )}
-                  </div>
-                )}
-              </div>
+              
 
               {(featuresList.length > 0 || isDemoMode) && (
                 <div className="text-[14px] text-slate-700 hidden lg:block space-y-1">
@@ -1204,145 +1150,176 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
                 </div>
               )}
 
-              <div className="flex items-start gap-2 lg:hidden">
-                <div className="relative h-[55px] w-[65px] overflow-hidden rounded-lg">
-                  <Image
-                    src="/images/flatoffers.jpeg"
-                    alt={`Flat ${flatOfferPercent} off`}
-                    fill
-                    className="object-cover"
-                  />
-                  <div className="absolute bottom-0.5 right-3 flex flex-col justify-end p-2 text-white">
-                    <p className="mt-1 text-[8px] tracking-wide">Flat</p>
-                    <div className="flex items-center gap-1">
-                      <div><p className="text-[15px] font-black leading-none"> {flatOfferPercent?.replace('%', '')}</p></div>
-                      <div className="space-y-0.5">
-                        <div>
-                          <p className="text-[8px] font-black uppercase leading-none">%</p>
-                        </div>
-                        <div><p className="text-[6px] font-black uppercase leading-none">OFF</p></div>
-                      </div>
-                    </div>
+              
+              {/* Countdown Timer Block */}
+              <div className="py-2 border-t border-slate-100 mt-2">
+                <div className="flex items-center gap-4">
+                  <div className="flex flex-col items-center">
+                    <span className="text-2xl lg:text-3xl font-semibold text-slate-800 pb-1 border-b-2 border-[#0081FF] w-12 text-center">{timeLeft.days}</span>
+                    <span className="text-[10px] text-slate-400 mt-1 font-medium">Days</span>
+                  </div>
+                  <span className="text-xl font-bold text-slate-400 -mt-4">:</span>
+                  <div className="flex flex-col items-center">
+                    <span className="text-2xl lg:text-3xl font-semibold text-slate-800 pb-1 border-b-2 border-[#0081FF] w-12 text-center">{timeLeft.hours}</span>
+                    <span className="text-[10px] text-slate-400 mt-1 font-medium">Hour</span>
+                  </div>
+                  <span className="text-xl font-bold text-slate-400 -mt-4">:</span>
+                  <div className="flex flex-col items-center">
+                    <span className="text-2xl lg:text-3xl font-semibold text-slate-800 pb-1 border-b-2 border-[#0081FF] w-12 text-center">{timeLeft.minutes}</span>
+                    <span className="text-[10px] text-slate-400 mt-1 font-medium">Minute</span>
+                  </div>
+                  <span className="text-xl font-bold text-slate-400 -mt-4">:</span>
+                  <div className="flex flex-col items-center">
+                    <span className="text-2xl lg:text-3xl font-semibold text-slate-800 pb-1 border-b-2 border-[#0081FF] w-12 text-center">{timeLeft.seconds}</span>
+                    <span className="text-[10px] text-slate-400 mt-1 font-medium">Second</span>
                   </div>
                 </div>
+                {formattedEndDate && (
+                  <p className="text-[14px] text-slate-400 mt-4 font-medium">
+                    Auction Ends: {formattedEndDate}
+                  </p>
+                )}
+              </div>
 
-                <div className="min-w-0 flex-1 space-y-1.5">
-                  {showroomTitle && (
-                    <button type="button" className="inline-flex items-center gap-1.5 whitespace-nowrap text-[11px] font-medium tracking-wide text-[#0C73DA] leading-none">
-                      <Image src="/images/shop.png" alt="Showroom" width={12} height={12} className="h-3 w-3 object-contain" />
-                      {showroomTitle}
-                    </button>
-                  )}
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-3 rounded-md border border-slate-300 px-7 py-1">
-                      <button type="button" onClick={handleDecrement} className="text-slate-600">
-                        <FaMinus className="h-3.5 w-3.5" />
-                      </button>
-                      <span className="w-4 text-center text-[11px] text-slate-700">{quantity.toString().padStart(2, '0')}</span>
-                      <button type="button" onClick={handleIncrement} className="text-slate-600">
-                        <FaPlus className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-
-                    <button type="button" onClick={handleToggleWishlist} className="text-slate-600">
-                      <FaHeart className={`h-5 w-5 ${isWishlisted ? "text-red-500" : "text-slate-400"}`} />
-                    </button>
-                    <button type="button" className="text-slate-600">
-                      <FaRegShareSquare className="h-5 w-5" />
-                    </button>
-                    <button type="button" className="text-[11px] text-slate-600 leading-none">
-                      Share
-                    </button>
-                  </div>
+              {/* Bids and Views Counter Row */}
+              <div className="flex items-center gap-4 text-xs font-medium text-slate-500 py-2 border-t border-slate-100">
+                <div className="flex items-center gap-1.5 text-[#E88E00]">
+                  <FaGavel className="h-4 w-4" />
+                  <span>Bids : {productData?.total_bids ? String(productData.total_bids).padStart(2, '0') : '00'}</span>
+                </div>
+                <span className="text-slate-200">|</span>
+                <div className="flex items-center gap-1.5 text-[#F13D36]">
+                  <FaEye className="h-4 w-4" />
+                  <span>Views : {productData?.views ? Number(productData.views).toLocaleString() : '1,326'}</span>
                 </div>
               </div>
 
-              <div className="hidden lg:flex lg:flex-row lg:items-stretch gap-3">
-                <div className="relative h-[88px] w-[112px] overflow-hidden rounded-lg lg:flex-shrink-0">
-                  <Image
-                    src="/images/flatoffers.jpeg"
-                    alt={`Flat ${flatOfferPercent} off`}
-                    fill
-                    className="object-cover"
-                  />
-                  <div className="absolute -bottom-1 right-2  flex flex-col justify-end p-3 text-white">
-                    <p className="text-[12px] mt-1 tracking-wide">Flat</p>
-                    <div className="flex items-center gap-1">
-                      <div><p className=" text-[38px] font-black leading-none"> {flatOfferPercent?.replace('%', '')}</p></div>
-                      <div className="space-y-1">
-                        <div>
-                          <p className="text-[20px] font-black uppercase leading-none">%</p>
+              {/* Actions Row */}
+              <div className="flex items-center gap-4 text-xs font-medium text-slate-500 pb-4 border-b border-slate-100">
+                <button 
+                  type="button" 
+                  onClick={handleToggleWishlist} 
+                  className="flex items-center gap-1.5 hover:text-red-500 transition-colors"
+                >
+                  <FaHeart className={`h-4 w-4 ${isWishlisted ? "text-red-500" : "text-slate-400"}`} />
+                  <span>Wishlist</span>
+                </button>
+                <button 
+                  type="button" 
+                  className="flex items-center gap-1.5 hover:text-blue-500 transition-colors"
+                >
+                  <FaRegShareSquare className="h-4 w-4 text-slate-400" />
+                  <span>Share</span>
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => {
+                    const el = document.getElementById('product-details-tabs');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  }} 
+                  className="text-[#0C73DA] hover:underline"
+                >
+                  Biding product policy
+                </button>
+              </div>
+
+              {/* Bid Section */}
+              <div className="space-y-4">
+                {(() => {
+                  const now = Date.now();
+                  const auctionStartMs = productData?.auction_start_date ? Number(productData.auction_start_date) * 1000 : 0;
+                  const auctionEndMs = productData?.auction_end_date ? Number(productData.auction_end_date) * 1000 : 0;
+                  const isUpcoming = now < auctionStartMs;
+                  const isEnded = now >= auctionEndMs;
+                  const isWinner = isEnded && user && Number(user.id) === Number(productData?.highest_bid_user_id);
+
+                  if (isEnded) {
+                    if (isWinner) {
+                      return (
+                        <div className="p-5 rounded-2xl bg-emerald-50 border border-emerald-100 space-y-4 max-w-[400px]">
+                          <div className="text-emerald-800">
+                            <h4 className="font-bold text-lg mb-1 flex items-center gap-2">
+                              🎉 Congratulations!
+                            </h4>
+                            <p className="text-sm leading-relaxed">
+                              You won this auction with a winning bid of <strong className="text-emerald-950 font-semibold">৳ {Number(productData?.highest_bid || 0).toLocaleString()}</strong>.
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={handleBuyNow}
+                            className="w-full rounded-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white py-3 text-sm font-semibold transition-colors shadow-sm"
+                          >
+                            Proceed to Checkout
+                          </button>
                         </div>
-                        <div>  <p className=" text-[14px] font-black uppercase leading-none">OFF</p></div>
+                      );
+                    } else {
+                      return (
+                        <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 max-w-[400px]">
+                          <p className="text-sm font-medium text-slate-500">
+                            This auction has ended.
+                          </p>
+                        </div>
+                      );
+                    }
+                  }
+
+                  if (isUpcoming) {
+                    return (
+                      <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 max-w-[400px] space-y-1">
+                        <p className="text-sm font-semibold text-slate-800">
+                          Auction Starts Soon
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          Bidding will open on {formattedStartDate}
+                        </p>
+                      </div>
+                    );
+                  }
+
+                  // Default Active Bidding Form
+                  const userBid = productData?.user_bid_amount ? Number(productData.user_bid_amount) : null;
+                  const highestBidVal = Number(productData?.highest_bid || productData?.starting_bid || 0);
+                  const isUserHighest = userBid && userBid >= highestBidVal;
+
+                  return (
+                    <div className="space-y-3">
+                      <div className="flex flex-col gap-1">
+                        <p className="text-base font-bold text-slate-800">
+                          Starting From : ৳ {productData?.highest_bid?.toLocaleString() || productData?.starting_bid?.toLocaleString() || '56,500'}
+                        </p>
+                        {userBid && (
+                          <div className="text-xs font-semibold flex items-center gap-1.5 mt-1">
+                            <span className="text-slate-500">Your Bid:</span>
+                            <span className="text-slate-900">৳ {userBid.toLocaleString()}</span>
+                            {isUserHighest ? (
+                              <span className="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full text-[10px] font-bold">Highest Bid</span>
+                            ) : (
+                              <span className="text-red-500 bg-red-50 px-2 py-0.5 rounded-full text-[10px] font-bold">Outbid</span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex flex-col gap-3 max-w-[400px]">
+                        <input
+                          type="number"
+                          value={bidAmount}
+                          onChange={(e) => setBidAmount(e.target.value)}
+                          placeholder="Start your bid"
+                          className="w-full rounded-full border border-slate-200 bg-slate-50 px-5 py-3 text-sm focus:border-blue-500 focus:bg-white focus:outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={handlePlaceBid}
+                          className="w-full rounded-full bg-[#0081FF] py-2 text-sm font-semibold text-white hover:bg-[#0070DF] active:bg-[#0060CF] transition-colors shadow-sm"
+                        >
+                          Place Your Bid
+                        </button>
                       </div>
                     </div>
-                  </div>
-                </div>
-
-                <div className="flex-1 space-y-2">
-                  <div className="flex flex-wrap items-center gap-4 lg:flex-nowrap">
-                    <div className="flex items-center gap-4 rounded-xl border border-slate-300 px-4 py-2 text-base">
-                      <button type="button" onClick={handleDecrement} className="text-slate-600">
-                        <FaMinus className="h-4 w-4" />
-                      </button>
-                      <span className="w-6 text-center">{quantity.toString().padStart(2, '0')}</span>
-                      <button type="button" onClick={handleIncrement} className="text-slate-600">
-                        <FaPlus className="h-4 w-4" />
-                      </button>
-                    </div>
-
-                    <button type="button" onClick={handleToggleWishlist} className="text-slate-600">
-                      <FaHeart className={`h-6 w-6 ${isWishlisted ? "text-red-500" : "text-slate-400"}`} />
-                    </button>
-                    <button type="button" className="text-slate-600">
-                      <FaRegShareSquare className="h-6 w-6" />
-                    </button>
-                    <button type="button" className="text-[16px] text-slate-600 leading-none">
-                      Share
-                    </button>
-                    {showroomTitle && (
-                      <button type="button" className="whitespace-nowrap text-[16px] font-semibold text-[#0C73DA] leading-none">
-                        {showroomTitle}
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="sm:grid gap-3 sm:grid-cols-2 hidden ">
-                    {productData?.higher_sale ? (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setIsHigherSaleModalOpen(true);
-                          }}
-                          className="h-[34px] rounded-full bg-[#0081FF] px-4 text-[12px] font-medium text-white whitespace-nowrap active:bg-[#006ED9]"
-                        >
-                          Apply for Kisti
-                        </button>
-                        <button
-                          type="button"
-                          className="flex items-center justify-center gap-3 rounded-full border border-[#9CB7D8] py-1 text-[14px] font-semibold leading-none text-slate-900"
-                        >
-                          Available Showroom
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button
-                          type="button"
-                          onClick={handleBuyNow}
-                          className="h-[34px] rounded-full bg-[#0081FF] px-4 text-[12px] font-medium text-white whitespace-nowrap active:bg-[#006ED9]"
-                        >
-                          Buy Now
-                        </button>
-                        <button type="button" onClick={handleAddToCart} className="flex items-center justify-center gap-3 rounded-full border border-[#9CB7D8] py-1 text-[14px] font-semibold leading-none text-slate-900">
-                          <Image src="/images/shopping-cart.png" alt="Cart" width={24} height={24} className="h-6 w-6 object-contain" />
-                          Add to Cart
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </div>
+                  );
+                })()}
               </div>
 
               {(isDemoMode || (shippingInfo || warrantyInfo || emiFacilityInfo || exchangeInfo || showroomTitle || (specialOffers && specialOffers.length > 0))) && (
@@ -1487,21 +1464,7 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
         reviews={productData?.reviews as ProductData['reviews']}
       />
 
-      <MobileStickyPurchaseBar
-        productData={productData || undefined}
-        availability={selectedAvailability}
-        price={price}
-        discountLabel={discountLabel}
-        originalPrice={originalPrice}
-        saveLabel={saveLabel}
-        emiText={emiText}
-        emiDetailsLabel={emiDetailsLabel}
-        onAddToCart={handleAddToCart}
-        onBuyNow={handleBuyNow}
-        onApplyForInstallment={() => {
-          setIsHigherSaleModalOpen(true);
-        }}
-      />
+
 
       <FooterBreadcrumbPortal>
         <div className="">

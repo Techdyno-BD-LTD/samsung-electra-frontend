@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AddToCartModal, { ProductData } from "./AddToCartModal";
 import CartSuccessModal from "@/components/common/CartSuccessModal";
 import { FaHeart, FaBalanceScale, FaShoppingCart, FaStar, FaEye, FaGavel } from "react-icons/fa";
@@ -17,13 +17,14 @@ import BankEmiModal from "../productdetails/BankEmiModal";
 import { pushToDataLayer } from "@/lib/gtm";
 
 interface ProductCardProps {
-  cardVariant?: "default" | "flashDeal" | "specialDeal";
+  cardVariant?: "default" | "flashDeal" | "specialDeal" | "auction";
   category?: string;
   brand?: string;
   brandLogo?: string;
   title?: string;
   slug?: string;
   image?: string;
+  userBidAmount?:number;
   rating?: number;
   ratingCount?: string;
   type?: string;
@@ -55,6 +56,11 @@ interface ProductCardProps {
   bidButtonLabel?: string;
   dealImageHeight?: string;
   productData?: ProductData;
+  startingBid?: number;
+  highestBid?: number;
+  totalBids?: number;
+  auctionStartDate?: number;
+  auctionEndDate?: number;
 }
 
 const hasDiscount = (
@@ -130,10 +136,54 @@ const ProductCard = ({
   startingFrom = "৳ 56,500",
   dealImageHeight = "180px",
   productData,
+  startingBid,
+  highestBid,
+  totalBids,
+  auctionStartDate,
+  auctionEndDate,
+  userBidAmount,
 }: ProductCardProps) => {
   const dispatch = useAppDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEmiModalOpen, setIsEmiModalOpen] = useState(false);
+
+  // Auction Countdown State & Logic
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0, hasEnded: false, isUpcoming: false });
+
+  useEffect(() => {
+    if (cardVariant !== "auction" || !auctionEndDate) return;
+
+    const calculateTimeLeft = () => {
+      const nowMs = Date.now();
+      const startMs = auctionStartDate ? auctionStartDate * 1000 : 0;
+      const endMs = auctionEndDate * 1000;
+
+      if (nowMs < startMs) {
+        // Upcoming
+        const diff = startMs - nowMs;
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const m = Math.floor((diff / 1000 / 60) % 60);
+        const s = Math.floor((diff / 1000) % 60);
+        setTimeLeft({ days: d, hours: h, minutes: m, seconds: s, hasEnded: false, isUpcoming: true });
+      } else if (nowMs >= endMs) {
+        // Ended
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0, hasEnded: true, isUpcoming: false });
+      } else {
+        // Active
+        const diff = endMs - nowMs;
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const m = Math.floor((diff / 1000 / 60) % 60);
+        const s = Math.floor((diff / 1000) % 60);
+        setTimeLeft({ days: d, hours: h, minutes: m, seconds: s, hasEnded: false, isUpcoming: false });
+      }
+    };
+
+    calculateTimeLeft();
+    const interval = setInterval(calculateTimeLeft, 1000);
+    return () => clearInterval(interval);
+  }, [cardVariant, auctionStartDate, auctionEndDate]);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [addedItemDetails, setAddedItemDetails] = useState<{
     title: string;
@@ -402,6 +452,145 @@ const ProductCard = ({
       </div>
     );
   };
+
+  if (cardVariant === "auction") {
+    const isLive = !timeLeft.hasEnded && !timeLeft.isUpcoming;
+    const isUpcoming = timeLeft.isUpcoming;
+    const isEnded = timeLeft.hasEnded;
+
+    const statusLabel = isEnded
+      ? "Closed"
+      : isUpcoming
+      ? "Upcoming"
+      : "Live Bid";
+
+    const badgeBg = isEnded
+      ? "bg-slate-500"
+      : isUpcoming
+      ? "bg-amber-500"
+      : "bg-emerald-600";
+
+    const displayPrice = highestBid && highestBid > 0 ? highestBid : (startingBid || 0);
+    const priceLabel = highestBid && highestBid > 0 ? "Highest Bid" : "Starting Bid";
+
+    const padZero = (n: number) => String(n).padStart(2, "0");
+
+    return (
+      <article className="group relative w-full overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-300 hover:shadow-md flex flex-col justify-between min-h-[460px]">
+        {/* Wishlist on Hover */}
+        <div className="absolute right-3 top-3 z-10 flex flex-col gap-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+          <button type="button" onClick={handleToggleWishlist} aria-label="Toggle wishlist" className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white shadow-md transition-colors hover:bg-gray-100">
+            <FaHeart className={`h-4 w-4 ${isWishlisted ? "text-red-500" : "text-gray-600"}`} />
+          </button>
+        </div>
+
+        {/* Live / Status Badge */}
+        <span className={`absolute left-0 top-0 rounded-br-2xl rounded-tl-2xl px-4 py-1 text-xs font-semibold text-white tracking-wide uppercase ${badgeBg}`}>
+          {statusLabel}
+        </span>
+
+        <div className="pt-6 flex flex-col flex-1">
+          {/* Brand Logo */}
+          <div className="mb-3 flex justify-center">
+            {brandLogo ? (
+              <Image src={brandLogo} alt={brand || "Brand logo"} width={100} height={25} className="h-5 w-auto object-contain" />
+            ) : (
+              <span className="text-xs font-bold uppercase tracking-wide text-slate-800">{brand}</span>
+            )}
+          </div>
+
+          {/* Product Image */}
+          <Link href={`/bidding/${productSlug}`} className="mb-4 flex items-center justify-center rounded-md h-[180px] overflow-hidden">
+            <Image src={image || "/images/wm2.png"} alt={title} width={200} height={180} className="h-full w-auto object-contain transition-transform duration-500 group-hover:scale-105" />
+          </Link>
+
+          {/* Product Title */}
+          <h3 className="line-clamp-2 min-h-[48px] text-[15px] font-semibold leading-6 text-slate-900 mb-2">
+            <Link href={`/bidding/${productSlug}`} className="hover:text-[#2B7FE8] transition-colors">{title}</Link>
+          </h3>
+
+          {/* Countdown timer */}
+          <div className="mb-4">
+            <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5 text-center">
+              {isEnded ? "Auction Status" : isUpcoming ? "Auction Starts In" : "Time Remaining"}
+            </p>
+            {isEnded ? (
+              <div className="rounded-xl bg-slate-100 py-2.5 text-center text-sm font-semibold text-slate-600 border border-slate-200">
+                Auction Ended
+              </div>
+            ) : (
+              <div className="grid grid-cols-4 gap-1 text-center text-[#2B7FE8]">
+                <div className="bg-blue-50/50 rounded-lg p-1 border border-blue-100">
+                  <div className="text-[16px] font-bold leading-none">{padZero(timeLeft.days)}</div>
+                  <p className="text-[9px] text-slate-500 mt-0.5">Days</p>
+                </div>
+                <div className="bg-blue-50/50 rounded-lg p-1 border border-blue-100">
+                  <div className="text-[16px] font-bold leading-none">{padZero(timeLeft.hours)}</div>
+                  <p className="text-[9px] text-slate-500 mt-0.5">Hours</p>
+                </div>
+                <div className="bg-blue-50/50 rounded-lg p-1 border border-blue-100">
+                  <div className="text-[16px] font-bold leading-none">{padZero(timeLeft.minutes)}</div>
+                  <p className="text-[9px] text-slate-500 mt-0.5">Mins</p>
+                </div>
+                <div className="bg-blue-50/50 rounded-lg p-1 border border-blue-100">
+                  <div className="text-[16px] font-bold leading-none">{padZero(timeLeft.seconds)}</div>
+                  <p className="text-[9px] text-slate-500 mt-0.5">Secs</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Price & Bids stats */}
+        <div className="mt-auto border-t border-slate-100 pt-3">
+          <div className="flex items-center justify-between text-xs text-slate-500 mb-2">
+            <span className="flex items-center gap-1.5">
+              <FaGavel className="h-3.5 w-3.5 text-slate-400" />
+              Bids: <strong className="text-slate-800 font-semibold">{totalBids || 0}</strong>
+            </span>
+            <span className="font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full text-[10px]">
+              {priceLabel}
+            </span>
+          </div>
+
+          <div className="text-lg font-bold text-slate-900 mb-3 flex items-baseline gap-1">
+            <span className="text-sm font-medium">৳</span>
+            <span>{displayPrice.toLocaleString('en-US')}</span>
+          </div>
+
+          {userBidAmount && (
+            <div className="flex items-center gap-1.5 text-xs font-semibold mb-3">
+              <span className="text-slate-500">Your Bid:</span>
+              <span className="text-slate-800">৳ {userBidAmount.toLocaleString()}</span>
+              {highestBid && userBidAmount >= highestBid ? (
+                <span className="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full text-[9px] font-bold">Winning</span>
+              ) : (
+                <span className="text-red-500 bg-red-50 px-2 py-0.5 rounded-full text-[9px] font-bold">Outbid</span>
+              )}
+            </div>
+          )}
+
+          {/* CTA Buttons */}
+          {isEnded ? (
+            <button
+              type="button"
+              disabled
+              className="w-full rounded-xl bg-red-100 py-2.5 text-[14px] font-semibold text-red-500 cursor-not-allowed border border-red-200"
+            >
+              Bid Closed
+            </button>
+          ) : (
+            <Link
+              href={`/bidding/${productSlug}`}
+              className="block w-full text-center rounded-xl bg-[#2B7FE8] py-2.5 text-[14px] font-semibold text-white transition-all hover:bg-[#1a66c4] hover:shadow-md shadow-sm"
+            >
+              Place Bid
+            </Link>
+          )}
+        </div>
+      </article>
+    );
+  }
 
   if (cardVariant === "flashDeal") {
     const dealBadgeBg = dealLabel.toLowerCase() === "cashback" ? "bg-red-600" : "bg-[#2B7FE8]";
