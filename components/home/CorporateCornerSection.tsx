@@ -138,7 +138,7 @@ export default function CorporateCornerSection() {
                 const cardClasses = `relative flex-shrink-0 transition-all duration-500 ease-out  overflow-hidden shadow-lg border border-gray-100 ${
                   isActive
                     ? "scale-100 opacity-100 z-10 border-blue-200"
-                    : "scale-[0.85] opacity-100 z-0 pointer-events-none"
+                    : "scale-[0.85] opacity-100 z-0"
                 }`;
 
                 const cardStyle = {
