@@ -43,11 +43,11 @@ export default function FloatingContact() {
   const messengerUrl = getMessengerHref(footerData?.facebook_link);
 
   return (
-    <div className="fixed right-6 lg:right-10 top-[48%]  z-[9999] flex flex-col items-end pointer-events-none">
+    <div className="fixed right-6 lg:right-10 top-[48%] [@media(max-height:720px)]:top-[45%] z-[9999] flex flex-col items-end pointer-events-none">
       {/* Floating Trigger Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-16 h-16 rounded-2xl overflow-hidden bg-[#3B82F6] shadow-[0_4px_20px_rgba(0,0,0,0.15)] transition-all duration-300 hover:scale-105 active:scale-95 border border-white/20 focus:outline-none pointer-events-auto"
+        className="w-16 h-16 [@media(max-height:720px)]:w-12 [@media(max-height:720px)]:h-12 rounded-2xl overflow-hidden bg-[#3B82F6] shadow-[0_4px_20px_rgba(0,0,0,0.15)] transition-all duration-300 hover:scale-105 active:scale-95 border border-white/20 focus:outline-none pointer-events-auto"
       >
         <Image
           src="/images/flotingIcon2.png"
@@ -61,45 +61,45 @@ export default function FloatingContact() {
 
       {/* Contact Menu Card */}
       <div
-        className={`mt-3 w-[320px] sm:w-[350px] bg-white rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] border border-slate-100 overflow-hidden transition-all duration-300 transform origin-top-right ${
+        className={`mt-3 w-[320px] sm:w-[350px] [@media(max-height:720px)]:w-[280px] bg-white rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] border border-slate-100 overflow-hidden transition-all duration-300 transform origin-top-right ${
           isOpen
             ? "opacity-100 scale-100 translate-y-0 pointer-events-auto"
             : "opacity-0 scale-95 -translate-y-4 pointer-events-none"
         }`}
       >
         {/* Card Header */}
-        <div className="relative text-center py-4 border-b border-slate-100">
-          <span className="font-semibold text-slate-800 text-[15px]">Support & Contact</span>
+        <div className="relative text-center py-4 [@media(max-height:720px)]:py-2.5 border-b border-slate-100">
+          <span className="font-semibold text-slate-800 text-[15px] [@media(max-height:720px)]:text-xs">Support & Contact</span>
           {/* Decorative bar */}
-          <div className="w-12 h-1 bg-slate-200 rounded-full mx-auto mt-2" />
+          <div className="w-12 h-1 bg-slate-200 rounded-full mx-auto mt-2 [@media(max-height:720px)]:mt-1" />
           <button
             onClick={() => setIsOpen(false)}
             className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors p-1"
             aria-label="Close contact menu"
           >
-            <IoClose className="w-5 h-5" />
+            <IoClose className="w-5 h-5 [@media(max-height:720px)]:w-4 [@media(max-height:720px)]:h-4" />
           </button>
         </div>
 
         {/* Card Body */}
-        <div className="p-6 text-left">
-          <h3 className="font-bold text-2xl text-slate-800 mb-2">Hello!</h3>
-          <p className="text-slate-500 text-sm leading-relaxed mb-6">
+        <div className="p-6 [@media(max-height:720px)]:p-4 text-left">
+          <h3 className="font-bold text-2xl [@media(max-height:720px)]:text-lg text-slate-800 mb-2 [@media(max-height:720px)]:mb-1">Hello!</h3>
+          <p className="text-slate-500 text-sm [@media(max-height:720px)]:text-xs leading-relaxed mb-6 [@media(max-height:720px)]:mb-4">
             Get Faster answers! Connect with us for personalized support & expert advice.
           </p>
 
-          <div className="space-y-4">
+          <div className="space-y-4 [@media(max-height:720px)]:space-y-2">
             {/* Whatsapp Option */}
             <a
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3.5 p-1 rounded-xl hover:bg-slate-50 transition-colors group"
+              className="flex items-center gap-3.5 [@media(max-height:720px)]:gap-2 p-1 rounded-xl hover:bg-slate-50 transition-colors group"
             >
-              <div className="w-11 h-11 rounded-full bg-[#25D366] flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
-                <FaWhatsapp className="w-6 h-6" />
+              <div className="w-11 h-11 [@media(max-height:720px)]:w-9 [@media(max-height:720px)]:h-9 rounded-full bg-[#25D366] flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
+                <FaWhatsapp className="w-6 h-6 [@media(max-height:720px)]:w-5 [@media(max-height:720px)]:h-5" />
               </div>
-              <span className="text-[15px] font-semibold text-slate-700 group-hover:text-slate-900">
+              <span className="text-[15px] [@media(max-height:720px)]:text-xs font-semibold text-slate-700 group-hover:text-slate-900">
                 Chat on Whatsapp
               </span>
             </a>
@@ -109,12 +109,12 @@ export default function FloatingContact() {
               href={messengerUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3.5 p-1 rounded-xl hover:bg-slate-50 transition-colors group"
+              className="flex items-center gap-3.5 [@media(max-height:720px)]:gap-2 p-1 rounded-xl hover:bg-slate-50 transition-colors group"
             >
-              <div className="w-11 h-11 rounded-full bg-gradient-to-tr from-[#006AFF] to-[#00B2FF] flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
-                <SiMessenger className="w-[22px] h-[22px]" />
+              <div className="w-11 h-11 [@media(max-height:720px)]:w-9 [@media(max-height:720px)]:h-9 rounded-full bg-gradient-to-tr from-[#006AFF] to-[#00B2FF] flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
+                <SiMessenger className="w-[22px] h-[22px] [@media(max-height:720px)]:w-4 [@media(max-height:720px)]:h-4" />
               </div>
-              <span className="text-[15px] font-semibold text-slate-700 group-hover:text-slate-900">
+              <span className="text-[15px] [@media(max-height:720px)]:text-xs font-semibold text-slate-700 group-hover:text-slate-900">
                 Chat on messenger
               </span>
             </a>
