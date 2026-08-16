@@ -51,6 +51,12 @@ const config: Config = {
         // New Marquee Animation (25s is a good readable speed)
         marquee: "marquee 25s linear infinite",
       },
+      fontFamily: {
+        sans: ["var(--font-samsung-sans)", "var(--font-poppins)", "sans-serif"],
+        poppins: ["var(--font-poppins)", "sans-serif"],
+        "samsung-sans": ["var(--font-samsung-sans)", "sans-serif"],
+        "samsung-sharp-sans": ["var(--font-samsung-sharp-sans)", "sans-serif"],
+      },
     },
   },
   plugins: [],

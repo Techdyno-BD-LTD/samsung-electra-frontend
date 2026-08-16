@@ -8,7 +8,7 @@ export default function Navbar() {
   return (
     <header className="fixed inset-x-0 top-0 z-[1001] bg-white pt-safe">
       {/* Desktop Navigation - Hidden on mobile */}
-      <div className="hidden lg:block">
+      <div className="hidden lg:block ">
         <TopBar />
         <MainBar />
         <BottomBar />

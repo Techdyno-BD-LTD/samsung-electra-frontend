@@ -3,7 +3,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { FaSearch, FaChevronDown, FaUser, FaTimes } from "react-icons/fa";
+import { FaSearch, FaUser, FaTimes } from "react-icons/fa";
+import { FiHeart, FiShoppingCart } from "react-icons/fi";
+import { BiGitCompare } from "react-icons/bi";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { useRouter } from "next/navigation";
 
@@ -29,9 +31,6 @@ export default function MainBar() {
   const compareTotalCount = useAppSelector((state) => state.compare.slots.filter(Boolean).length);
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
   const [suggestions, setSuggestions] = useState<unknown[]>([]);
-  const [categories, setCategories] = useState<{ id: number; name: string; subcategories: { id: number; name: string }[] }[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<{ id: number; name: string } | null>(null);
-  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const [isCartDropdownOpen, setIsCartDropdownOpen] = useState(false);
 
   useEffect(() => {
@@ -60,28 +59,7 @@ export default function MainBar() {
     };
   }, []);
 
-  useEffect(() => {
-    async function loadCategories() {
-      try {
-        const response = await fetch("/api/categories");
-        if (response.ok) {
-          const payload = await response.json();
-          const all = payload.data || [];
-          const tree = all
-            .filter((c: { parent_id: number; id: number; name: string; number_of_products?: number }) => c.parent_id === 0 && (c.number_of_products || 0) > 0)
-            .map((c: { id: number; name: string }) => ({
-              id: c.id,
-              name: c.name,
-              subcategories: all.filter((s: { parent_id: number; number_of_products?: number }) => s.parent_id === c.id && (s.number_of_products || 0) > 0)
-            }));
-          setCategories(tree);
-        }
-      } catch (error) {
-        console.error("Error loading categories:", error);
-      }
-    }
-    loadCategories();
-  }, []);
+
 
   useEffect(() => {
     if (!searchQuery.trim()) {
@@ -91,8 +69,7 @@ export default function MainBar() {
 
     const timer = setTimeout(async () => {
       try {
-        const categoryParam = selectedCategory ? `&category_id=${selectedCategory.id}` : "";
-        const response = await fetch(`/api/products/search?name=${encodeURIComponent(searchQuery)}${categoryParam}`);
+        const response = await fetch(`/api/products/search?name=${encodeURIComponent(searchQuery)}`);
         if (response.ok) {
           const payload = await response.json();
           setSuggestions(payload.data?.slice(0, 7) || []);
@@ -103,17 +80,13 @@ export default function MainBar() {
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [searchQuery, selectedCategory]);
+  }, [searchQuery]);
 
   const handleSearch = () => {
     const query = searchQuery.trim();
     if (!query) return;
     setShowSuggestions(false);
-    let url = `/search?q=${encodeURIComponent(query)}`;
-    if (selectedCategory) {
-      url += `&cat=${selectedCategory.id}`;
-    }
-    router.push(url);
+    router.push(`/search?q=${encodeURIComponent(query)}`);
   };
 
   const handleLogout = () => {
@@ -123,9 +96,9 @@ export default function MainBar() {
   };
 
   return (
-    <div className="bg-white border-b h-[4.75rem]  flex items-center border-slate-200">
-      <div className="mainwidth">
-        <div className="flex items-center justify-between py-4">
+    <div className="bg-black   flex items-center ">
+      <div className="lg:w-10/12 w-full mx-auto">
+        <div className="flex items-center justify-between py-8">
           {/* Logo */}
           {logoUrl ? (
             <Link href="/" className="flex items-center">
@@ -134,78 +107,15 @@ export default function MainBar() {
                 alt="SAMSUNG electra"
                 width={283}
                 height={48}
-                className="h-8 md:h-10 lg:h-12 w-auto"
+                className="h-8 md:h-10 lg:h-11 w-auto"
               />
             </Link>
           ) : null}
 
           {/* Search Bar */}
-          <div className="flex-1 max-w-3xl mx-8">
+          <div className="flex-1 max-w-[700px] mx-8">
             <div className="relative">
-              <div className="relative flex items-stretch h-12 border-2 border-[#0054A6] rounded-lg">
-              {/* Category Dropdown Section */}
-              <div className="relative flex items-center bg-white border-r border-[#0054A6] rounded-l-md">
-                <button 
-                  type="button"
-                  onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
-                  className="flex items-center gap-2 px-4 h-full text-sm font-semibold text-[#002B5B] focus:outline-none whitespace-nowrap"
-                >
-                  {selectedCategory?.name || "All Categories"}
-                  <FaChevronDown className={`transition-transform duration-200 ${isCategoryDropdownOpen ? "rotate-180" : ""}`} />
-                </button>
-
-                {isCategoryDropdownOpen && (
-                  <>
-                    <div className="fixed inset-0 z-[110]" onClick={() => setIsCategoryDropdownOpen(false)} />
-                    <div className="absolute left-0 top-full mt-1 z-[120] w-[280px] max-h-[400px] overflow-y-auto bg-white rounded-lg shadow-2xl border border-slate-100 py-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedCategory(null);
-                          setIsCategoryDropdownOpen(false);
-                        }}
-                        className="w-full text-left px-4 py-2 text-sm font-semibold hover:bg-blue-50 text-slate-800 transition-colors"
-                      >
-                        All Categories
-                      </button>
-                      
-                      {categories.map((cat) => (
-                        <div key={cat.id} className="group/cat">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setSelectedCategory({ id: cat.id, name: cat.name });
-                              setIsCategoryDropdownOpen(false);
-                            }}
-                            className="w-full text-left px-4 py-2 text-sm font-semibold hover:bg-blue-50 text-slate-800 transition-colors"
-                          >
-                            {cat.name}
-                          </button>
-                          
-                          {cat.subcategories?.length > 0 && (
-                            <div className="bg-slate-50/50">
-                              {cat.subcategories.map((sub: { id: number; name: string }) => (
-                                <button
-                                  key={sub.id}
-                                  type="button"
-                                  onClick={() => {
-                                    setSelectedCategory({ id: sub.id, name: sub.name });
-                                    setIsCategoryDropdownOpen(false);
-                                  }}
-                                  className="w-full text-left pl-8 pr-4 py-1.5 text-xs font-medium text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition-colors"
-                                >
-                                  {sub.name}
-                                </button>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
-
+              <div className="relative flex items-stretch h-14 border-2 border-[#0054A6] rounded-lg">
               {/* Search Input */}
               <input
                 type="text"
@@ -222,11 +132,11 @@ export default function MainBar() {
                     handleSearch();
                   }
                 }}
-                className="flex-1 px-4 py-2 text-sm text-slate-400 focus:outline-none"
+                className="flex-1 px-4 py-2 text-sm text-slate-800 bg-white focus:outline-none rounded-l-lg"
               />
 
               {/* Search Button - Full Height Blue Background */}
-              <button onClick={handleSearch} className="flex items-center justify-center w-14 bg-[#0054A6] text-white hover:bg-blue-800 transition-colors rounded-r-md">
+              <button onClick={handleSearch} className="flex items-center justify-center w-14 bg-[#266BF9] text-white hover:bg-blue-800 transition-colors rounded-r-md">
                 <FaSearch className="h-5 w-5" />
               </button>
               </div>
@@ -251,82 +161,56 @@ export default function MainBar() {
               )}
             </div>
           </div>
-
-
-
-
           {/* Action Buttons */}
-         <div className="flex items-center gap-8">
-  {/* Wishlist */}
-  <Link href="/wishlist" className="relative flex items-center gap-3 tracking-tight font-medium text-[#001e3c] hover:opacity-80 transition">
-    <div className="relative flex items-center justify-center">
-      <Image
-        src="/images/heart.png"
-        alt="Wishlist"
-        width={20}
-        height={20}
-        quality={100}
-        priority
-      />
-      {mounted && wishlistTotalCount > 0 && (
-        <span className="absolute -top-1.5 -right-2 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-[#ef4444] text-[9px] font-bold text-white border-2 border-white leading-none">
-          {wishlistTotalCount < 10 ? `0${wishlistTotalCount}` : wishlistTotalCount}
-        </span>
-      )}
-    </div>
-    <span className="text-base">Wishlist</span>
-  </Link>
+          <div className="flex items-center gap-2">
+            {/* Wishlist */}
+            <Link href="/wishlist" className="relative flex items-center gap-3 tracking-tight font-medium text-[#ffffff] hover:opacity-80 transition">
+              <div className="relative flex items-center justify-center">
+                <FiHeart className="w-8 h-8 text-[#2b85ff]" />
+                {mounted && wishlistTotalCount > 0 && (
+                  <span className="absolute -top-3 -right-3 flex h-[18px] w-[18px] items-center justify-center text-[18px] font-base tracking-wider text-[#F7941D]  leading-none">
+                    {wishlistTotalCount < 10 ? `0${wishlistTotalCount}` : wishlistTotalCount}
+                  </span>
+                )}
+              </div>
+              <span className="text-base">Wishlist</span>
+            </Link>
 
-  {/* Compare */}
-  <Link href="/compare" className="relative flex items-center gap-3 tracking-tight font-medium text-[#001e3c] hover:opacity-80 transition">
-    <div className="relative flex items-center justify-center">
-      <Image
-        src="/images/compare.png"
-        alt="Compare"
-        width={20}
-        height={20}
-        quality={100}
-        priority
-      />
-      {mounted && compareTotalCount > 0 && (
-        <span className="absolute -top-1.5 -right-2 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-[#ef4444] text-[9px] font-bold text-white border-2 border-white leading-none">
-          {compareTotalCount < 10 ? `0${compareTotalCount}` : compareTotalCount}
-        </span>
-      )}
-    </div>
-    <span className="text-base">Compare</span>
-  </Link>
+            {/* Compare */}
+            <Link href="/compare" className="relative flex items-center gap-2 tracking-tight font-medium text-[#ffffff] hover:opacity-80 transition">
+              <div className="relative flex items-center justify-center">
+                <BiGitCompare className="w-8 h-8 text-[#2b85ff]" />
+                {mounted && compareTotalCount > 0 && (
+                  <span className="absolute -top-3 -right-3 flex h-[18px] w-[18px] items-center justify-center text-[18px] font-base tracking-wider text-[#F7941D]  leading-none">
+                    {compareTotalCount < 10 ? `0${compareTotalCount}` : compareTotalCount}
+                  </span>
+                )}
+              </div>
+              <span className="text-base">Compare</span>
+            </Link>
 
-  {/* Cart with Dropdown */}
-  <div className="relative group/cart-nav">
-    <button
-      onClick={() => setIsCartDropdownOpen(!isCartDropdownOpen)}
-      className="relative flex items-center gap-3 tracking-tight font-medium text-[#001e3c] hover:opacity-80 transition"
-    >
-      <div className="relative flex items-center justify-center">
-        <Image
-          src="/images/shopping-cart.png"
-          alt="Cart"
-          width={24}
-          height={24}
-          quality={100}
-          priority
-        />
-        {mounted && cartTotalCount > 0 && (
-          <span className="absolute -top-1.5 -right-2 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-[#ef4444] text-[9px] font-bold text-white border-2 border-white leading-none">
-            {cartTotalCount < 10 ? `0${cartTotalCount}` : cartTotalCount}
-          </span>
-        )}
-      </div>
-      <span className="text-base">Cart</span>
-    </button>
+            {/* Cart with Dropdown */}
+            <div className="relative group/cart-nav">
+              <button
+                onClick={() => setIsCartDropdownOpen(!isCartDropdownOpen)}
+                className="relative flex items-center gap-2 tracking-tight font-medium mr-2 text-[#ffffff] hover:opacity-80 transition"
+              >
+                <div className="relative flex items-center justify-center">
+                  <FiShoppingCart className="w-8 h-8 text-[#2b85ff]" />
+                  {mounted && cartTotalCount > 0 && (
+                    <span className="absolute -top-3 -right-3 flex h-[18px] w-[18px] items-center justify-center text-[18px] font-base tracking-wider text-[#F7941D]  leading-none">
+                      {cartTotalCount < 10 ? `0${cartTotalCount}` : cartTotalCount}
+                    </span>
+                  )}
+                </div>
+                <span className="text-base">Cart</span>
+              </button>
 
-    {isCartDropdownOpen && (
-      <>
-        {/* Backdrop for mobile or just to close on click outside */}
-        <div className="fixed inset-0 z-40" onClick={() => setIsCartDropdownOpen(false)} />
-        
-        <div className="absolute right-0 top-full mt-2 w-[350px] bg-white rounded-lg shadow-[0_10px_40px_rgba(0,0,0,0.12)] border border-slate-100 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+              {isCartDropdownOpen && (
+                <>
+                  {/* Backdrop for mobile or just to close on click outside */}
+                  <div className="fixed inset-0 z-40" onClick={() => setIsCartDropdownOpen(false)} />
+                  <div className="absolute right-0 top-full mt-2 w-[350px] bg-white rounded-lg shadow-[0_10px_40px_rgba(0,0,0,0.12)] border border-slate-100 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-slate-50">
             <h3 className="font-bold text-[#001E3C] text-[15px]">Cart Items</h3>

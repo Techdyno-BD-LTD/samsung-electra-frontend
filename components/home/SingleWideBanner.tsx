@@ -55,13 +55,13 @@ export default function SingleWideBanner() {
         href={href}
         target={isExternal ? "_blank" : undefined}
         rel={isExternal ? "noopener noreferrer" : undefined}
-        className="relative block w-full overflow-hidden rounded-2xl aspect-[1840/400]"
+        className="relative block w-full aspect-[1920/280]"
       >
         <Image
           src={item.image}
           alt="Promotional wide banner"
           fill
-          sizes="(max-width: 1536px) 100vw, 1840px"
+          sizes="100vw"
           className="object-contain"
           priority
         />

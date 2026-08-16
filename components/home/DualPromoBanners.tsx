@@ -49,29 +49,37 @@ export default function DualPromoBanners() {
   if (!rendered.length) return null;
 
   return (
-    <section className="w-full">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4">
+    <section className="w-full py-6 select-none">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
         {rendered.map((item, index) => {
           const href = item.link || item.external_link || "#";
           const isExternal = /^https?:\/\//i.test(href);
 
           return (
-            <a
+            <div
               key={item.id}
-              href={href}
-              target={isExternal ? "_blank" : undefined}
-              rel={isExternal ? "noopener noreferrer" : undefined}
-              className={`relative w-full overflow-hidden rounded-2xl aspect-[910/318] ${index === 1 ? "hidden lg:block" : ""}`}
+              className="relative w-full overflow-hidden  aspect-[940/600] group"
             >
+              {/* Main Banner Image with object-contain */}
               <Image
                 src={item.image}
                 alt={`Promotional banner ${index + 1}`}
                 fill
-                sizes="(max-width: 1024px) 100vw, 910px"
-                className="object-contain"
+                sizes="(max-width: 768px) 100vw, 940px"
+                className="object-contain w-full h-full"
                 priority
               />
-            </a>
+
+              {/* Bottom Right "See All" Action Link */}
+              <a
+                href={href}
+                target={isExternal ? "_blank" : undefined}
+                rel={isExternal ? "noopener noreferrer" : undefined}
+                className="absolute right-6 bottom-6 z-10 px-6 py-2 text-sm font-semibold tracking-wide rounded-full transition-all duration-300 transform active:scale-95 bg-transparent border border-white text-white hover:bg-white hover:text-black"
+              >
+                See All
+              </a>
+            </div>
           );
         })}
       </div>

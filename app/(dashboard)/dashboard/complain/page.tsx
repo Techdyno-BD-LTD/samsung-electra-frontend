@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { FiImage, FiChevronDown, FiLoader } from "react-icons/fi";
+import { FiImage, FiChevronDown } from "react-icons/fi";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { showToast } from "@/store/features/toast/toastSlice";
 import Skeleton from "@/components/common/Skeleton";

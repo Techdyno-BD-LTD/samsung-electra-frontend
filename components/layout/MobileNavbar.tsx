@@ -16,7 +16,6 @@ import {
   FaWhatsapp 
 } from "react-icons/fa";
 import { useAppSelector } from "@/store/hooks";
-import { usePathname } from "next/navigation";
 
 type HeaderNavItem = {
   id: number;
@@ -48,7 +47,6 @@ type NavItem = {
 
 export default function MobileNavbar() {
   const [mounted, setMounted] = useState(false);
-  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
@@ -160,35 +158,51 @@ export default function MobileNavbar() {
 
   return (
     <>
-      <div className="lg:hidden bg-white border-b border-slate-200 relative">
-        <div className="flex items-center justify-between px-4 py-3">
-          {logoUrl ? (
-            <Link href="/" className="flex items-center">
-              <Image src={logoUrl} alt="SAMSUNG electra" width={200} height={34} className="h-8 w-auto" />
-            </Link>
-          ) : <div className="h-8" />}
+      <div className="lg:hidden bg-black border-none relative">
+        <div className="flex items-center justify-between px-4 py-2.5 bg-black select-none">
+          {/* Left: Hamburger menu */}
+          <button 
+            onClick={() => setIsOpen(!isOpen)} 
+            className="flex items-center justify-center w-8 h-8 rounded-full bg-white text-black hover:bg-slate-200 transition-all" 
+            aria-label="Toggle menu"
+          >
+            {isOpen ? <FaTimes size={15} /> : <FaBars size={15} />}
+          </button>
 
-          <div className="flex items-center gap-4">
-            <button className="text-slate-600 hover:text-slate-900" aria-label="Search">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          {/* Center: Logo */}
+          <div className="flex-1 flex justify-center">
+            {logoUrl ? (
+              <Link href="/" className="flex items-center justify-center">
+                <Image src={logoUrl} alt="SAMSUNG electra" width={150} height={26} className="h-6 w-auto object-contain" />
+              </Link>
+            ) : (
+              <div className="h-6" />
+            )}
+          </div>
+
+          {/* Right: Search and Cart buttons */}
+          <div className="flex items-center gap-2.5">
+            {/* Search circular button */}
+            <button className="flex items-center justify-center w-8 h-8 rounded-full bg-white text-black hover:bg-slate-200 transition-all" aria-label="Search">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </button>
 
-            {pathname?.includes("/products/") && (
-              <Link href="/cart" className="relative">
-                <Image src="/images/shopping-cart.png" alt="Cart" width={20} height={20} className="w-5 h-5" />
-                {mounted && cartTotalCount > 0 && (
-                  <span className="absolute -top-2 -right-2 flex h-[14px] w-[14px] items-center justify-center rounded-full bg-[#ef4444] text-[8px] font-bold text-white border border-white">
-                    {cartTotalCount < 10 ? `0${cartTotalCount}` : cartTotalCount}
-                  </span>
-                )}
-              </Link>
-            )}
-
-            <button onClick={() => setIsOpen(!isOpen)} className="text-slate-600 hover:text-slate-900" aria-label="Toggle menu">
-              {isOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
-            </button>
+            {/* Cart circular button */}
+            <Link 
+              href="/cart" 
+              className="relative flex items-center justify-center w-8 h-8 rounded-full bg-[#1e40af] text-white hover:bg-blue-800 transition-all"
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+              </svg>
+              {mounted && cartTotalCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 flex h-[14px] w-[14px] items-center justify-center rounded-full bg-red-500 text-[8px] font-bold text-white border border-white">
+                  {cartTotalCount}
+                </span>
+              )}
+            </Link>
           </div>
         </div>
       </div>

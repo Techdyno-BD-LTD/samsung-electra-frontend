@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FiStar, FiMessageCircle, FiMoreVertical, FiCheckCircle, FiLoader, FiSave, FiChevronDown } from "react-icons/fi";
+import { FiStar, FiMessageCircle, FiMoreVertical, FiCheckCircle, FiSave, FiChevronDown } from "react-icons/fi";
 import { useAppSelector } from "@/store/hooks";
 import Skeleton from "@/components/common/Skeleton";
 

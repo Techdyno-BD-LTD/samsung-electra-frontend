@@ -1,19 +1,24 @@
 
 
 import HeroSection from "@/components/home/HeroSection";
-import ServiceHighlights from "@/components/home/ServiceHighlights";
-import ShopByCategory from "@/components/home/ShopByCategory";
-import PopularProducts from "@/components/home/PopularProducts";
-import CategoryWiseProducts from "@/components/home/CategoryWiseProducts";
+import HomeSliderTwo from "@/components/home/HomeSliderTwo";
+// import ServiceHighlights from "@/components/home/ServiceHighlights";
+// import ShopByCategory from "@/components/home/ShopByCategory";
+// import PopularProducts from "@/components/home/PopularProducts";
+// import CategoryWiseProducts from "@/components/home/CategoryWiseProducts";
 import StoreBanner from "@/components/home/StoreBanner";
 import OurBrands from "@/components/home/OurBrands";
-import BestSellingProducts from "@/components/home/BestSellingProducts";
+// import BestSellingProducts from "@/components/home/BestSellingProducts";
 import DualPromoBanners from "@/components/home/DualPromoBanners";
 // import FlashDeals from "@/components/home/FlashDeals";
 import SingleWideBanner from "@/components/home/SingleWideBanner";
-import Newsletter from "@/components/home/Newsletter";
-import SpecialDeals from "@/components/home/SpecialDeals";
+import ExclusiveDeals from "@/components/home/ExclusiveDeals";
+import HomepageTabsSlider from "@/components/home/HomepageTabsSlider";
 import AboutElectraHtmlSection from "@/components/home/AboutElectraHtmlSection";
+import OurStoresSection from "@/components/home/OurStoresSection";
+import CorporateCornerSection from "@/components/home/CorporateCornerSection";
+import CustomerStoriesSection from "@/components/home/CustomerStoriesSection";
+import HearFromYouForm from "@/components/home/HearFromYouForm";
 // Metadata is now dynamically handled in layout.tsx
 
 type HomepageCategoryWiseProductSection = {
@@ -96,40 +101,55 @@ async function getHomepageCategorySections(): Promise<HomepageCategoryWiseProduc
 }
 
 export default async function Home() {
-  const categorySections = await getHomepageCategorySections();
-  const primarySections = categorySections.slice(0, 3);
-  const secondarySections = categorySections.slice(3);
+  await getHomepageCategorySections();
 
   return (
-    <div className="space-y-16">
-      <section className=" mx-auto mt-16 lg:mt-8  py-6 ">
-        <HeroSection />
-        <div className="mt-5">
+    <div className="">
+      <HeroSection />
+      <div className="bg-[#EDF2FB]">
+  <HomeSliderTwo />
+      </div>
+    
+      <section className=" mx-auto  ">
+        {/* <div className="mt-5">
           <ServiceHighlights />
-        </div>
-        <div className="lg:mt-14 mt-5">
-          <ShopByCategory />
-        </div>
-        <div className="lg:mt-14 mt-5">
-          <PopularProducts />
-        </div>
-        <div className="lg:mt-14 mt-5">
-          <StoreBanner />
-        </div>
+        </div> */}
         <div className="lg:mt-14 mt-5 ">
           <OurBrands />
         </div>
+         <div className="lg:mt-14 mt-5">
+          <SingleWideBanner />
+        </div>
         <div className="lg:mt-14 mt-5">
-          <BestSellingProducts />
+          <ExclusiveDeals />
+        </div>
+        <div className="lg:mt-10 mt-5">
+          <StoreBanner />
+        </div>
+        <div className="lg:mt-14 mt-5 w-9/12 mx-auto">
+          <HomepageTabsSlider />
         </div>
         <div className="lg:mt-14 mt-5">
           <DualPromoBanners />
         </div>
+      
+        {/* <div className="lg:mt-14 mt-5">
+          <ShopByCategory />
+        </div> */}
+        
+        {/* <div className="lg:mt-14 mt-5">
+          <PopularProducts />
+        </div> */}
+        
+        {/* <div className="lg:mt-14 mt-5">
+          <BestSellingProducts />
+        </div> */}
+        
         {/* <div className="lg:mt-14 mt-5">
           <FlashDeals />
         </div> */}
 
-        {primarySections.map((section) => (
+        {/* {primarySections.map((section) => (
           <div className="lg:mt-14 mt-5" key={`${section.categoryId}-${section.categorySlug}`}>
             <CategoryWiseProducts
               title={section.title}
@@ -138,13 +158,11 @@ export default async function Home() {
               seeMoreHref={section.seeMoreHref}
             />
           </div>
-        ))}
+        ))} */}
 
-        <div className="lg:mt-14 mt-5">
-          <SingleWideBanner />
-        </div>
+       
 
-        {secondarySections.map((section) => (
+        {/* {secondarySections.map((section) => (
           <div className="lg:mt-14 mt-5" key={`${section.categoryId}-${section.categorySlug}`}>
             <CategoryWiseProducts
               title={section.title}
@@ -153,16 +171,27 @@ export default async function Home() {
               seeMoreHref={section.seeMoreHref}
             />
           </div>
-        ))}
+        ))} */}
 
-        <div className="lg:mt-14 mt-5">
+        {/* <div className="lg:mt-14 mt-5">
           <Newsletter />
         </div>
         <div className="lg:mt-14 mt-5">
           <SpecialDeals />
-        </div>
+        </div> */}
         <div className="lg:mt-14 mt-5">
           <AboutElectraHtmlSection />
+        </div>
+
+        <div className="lg:mt-0 mt-5">
+          <OurStoresSection />
+        </div>
+
+        {/* Combined Media & Testimonials Section with continuous background gradient */}
+        <div className="w-full bg-gradient-to-tr from-[#854da5] via-[#fffefe] to-[#cec3ff]">
+          <CorporateCornerSection />
+          <CustomerStoriesSection />
+          <HearFromYouForm />
         </div>
 
 

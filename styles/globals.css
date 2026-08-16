@@ -113,7 +113,7 @@ html {
 }
 
 body {
-  font-family: var(--font-open-sans), "Open Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--font-samsung-sans), "Samsung Sans", var(--font-poppins), "Poppins", "Samsung Sharp Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   @apply bg-gradient-to-b from-white to-slate-50 text-slate-900;
   overflow-x: hidden;
   position: relative;

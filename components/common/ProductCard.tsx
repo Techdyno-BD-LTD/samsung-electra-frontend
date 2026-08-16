@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { toProductSlug } from "@/lib/productSlug";
 import BankEmiModal from "../productdetails/BankEmiModal";
 import { pushToDataLayer } from "@/lib/gtm";
+import { BiGitCompare } from "react-icons/bi";
 
 interface ProductCardProps {
   cardVariant?: "default" | "flashDeal" | "specialDeal" | "auction";
@@ -454,7 +455,6 @@ const ProductCard = ({
   };
 
   if (cardVariant === "auction") {
-    const isLive = !timeLeft.hasEnded && !timeLeft.isUpcoming;
     const isUpcoming = timeLeft.isUpcoming;
     const isEnded = timeLeft.hasEnded;
 
@@ -1003,296 +1003,173 @@ const ProductCard = ({
   }
 
   return (
-    <div className="group relative w-full max-w-full overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-shadow duration-300 hover:shadow-lg">
-      {/* EMI Badge */}
-      {displayBadgeLabel && (
-        <div
-          className="absolute top-8 right-2 z-20 flex h-12 w-12 items-center justify-center bg-[#0081FF] p-1 text-center text-[9px] font-semibold leading-tight text-white sm:top-14 sm:right-6 sm:h-[70px] sm:w-[70px] sm:p-2 sm:text-[12px]"
-          style={{ clipPath: "polygon(50% 0%, 61% 18%, 80% 8%, 82% 28%, 100% 38%, 84% 50%, 100% 62%, 82% 72%, 80% 92%, 61% 82%, 50% 100%, 39% 82%, 20% 92%, 18% 72%, 0% 62%, 16% 50%, 0% 38%, 18% 28%, 20% 8%, 39% 18%)" }}
-        >
-          {displayBadgeLabel}
-        </div>
-      )}
-
-      {/* Primary Product Badge (Sale/New/Hot/Sold Out/Special) */}
-      {badgeStyleTag && (
-        <span className={`absolute top-0 left-0 z-10 rounded-br-2xl px-2 py-1 text-[10px] font-semibold text-white sm:px-4 sm:py-1.5 sm:text-xs ${badgeClassName}`}>
-          {badgeStyleTag}
-        </span>
-      )}
-
-      {/* Hover Action Buttons */}
-      <div
-        className="absolute right-3 top-3 z-10 hidden flex-row gap-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100 sm:flex"
-      >
-        <button onClick={handleToggleWishlist} aria-label="Toggle wishlist" className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md border border-border transition-colors hover:bg-gray-100">
-          <FaHeart className={`h-4 w-4 ${isWishlisted ? "text-red-500" : "text-gray-600"}`} />
-        </button>
-        <button onClick={handleToggleCompare} aria-label="Toggle compare" className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md border border-border transition-colors hover:bg-gray-100">
-          <FaBalanceScale className={`h-4 w-4 ${isCompared ? "text-[#2b7fe8]" : "text-gray-600"}`} />
-        </button>
-      </div>
-
-      {/* Brand Header */}
-      <div className="flex justify-center pt-4 pb-1 sm:pt-6 sm:pb-2">
-        {(productData?.brand?.logo || brandLogo) ? (
-          <Image
-            src={productData?.brand?.logo || brandLogo || ""}
-            alt={productData?.brand?.name || brand || "Brand logo"}
-            width={140}
-            height={36}
-            className="h-4 w-auto object-contain sm:h-7"
-          />
-        ) : (
-          <span className="text-sm font-bold tracking-wide text-foreground uppercase sm:text-lg">
-            {productData?.brand?.name || brand}
-          </span>
-        )}
-      </div>
-
-      {/* Product Image */}
-      <div className="relative mx-auto flex items-center justify-center overflow-hidden px-2 py-1.5 sm:px-3 sm:py-2">
-        <Link href={productHref} onClick={handleSelectItem}>
-          <Image
-            src={productData?.thumbnail_image || image || ""}
-            alt={title}
-            width={300}
-            height={180}
-            className="h-[96px] w-auto object-contain sm:h-[200px]"
-          />
-        </Link>
-
-        {/* Add to cart removed from here as per user request */}
-
-        {hasWarranty && (
-          <div className="absolute -bottom-2 left-2 sm:-bottom-6 sm:left-5">
-            <Image
-              src={warrantyBadgeImage}
-              alt="Warranty badge"
-              width={64}
-              height={64}
-              className="h-8 w-8 object-contain sm:h-20 sm:w-20"
-            />
-          </div>
-        )}
-      </div>
-
-      <p className="hidden sm:block pb-2 text-center text-[9px] uppercase tracking-wide text-muted-foreground sm:pb-3 sm:text-[10px] sm:tracking-wider">
-        <button
-          type="button"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setIsModalOpen(true);
-          }}
-          className="hover:underline"
-        >
-          Quick Look
-        </button>
-      </p>
-
-      {/* Type and Rating Section (Stars are now close to the type) */}
-      <div className="flex items-start justify-between px-2 pb-1.5 sm:items-center sm:px-4 sm:pb-2">
-        <div className="min-w-0 flex items-center gap-1 sm:gap-2">
-          <span className="text-[10px] font-medium text-gray-500 sm:text-xs">{productData?.category?.name || type}</span>
-          <div className="flex items-center gap-0.5 sm:gap-1">
-            <div className="flex items-center gap-0.5 sm:hidden">
-              <FaStar className="h-3 w-3 fill-orange-400 text-orange-400" />
-              <span className="text-[9px] font-medium text-[#0054A6]">{Number(productData?.rating ?? rating).toFixed(1)}</span>
-            </div>
-            <div className="hidden items-center gap-0.5 sm:flex">
-              {renderStars(Number(productData?.rating ?? rating))}
-              <span className="text-[10px] font-medium text-[#0054A6]">{productData?.rating_count ?? ratingCount}</span>
-            </div>
-          </div>
-        </div>
-        <span className="text-[10px] font-semibold text-blue-600 sm:text-xs">
-          {productData?.variants?.[0]?.variant || "No Variant"}
-        </span>
-      </div>
-
-      <h3 className="line-clamp-2 h-[32px] overflow-hidden px-2 text-[12px] mb-2 font-semibold leading-4 sm:h-[48px] sm:leading-6 sm:px-4 sm:pb-1 sm:text-[16px] sm:font-medium">
-        <Link href={productHref} onClick={handleSelectItem}>{productData?.name || title}</Link>
-      </h3>
-
-      {/* EMI and Pricing with Hover Add to Cart */}
-      <div className="relative min-h-[70px] overflow-hidden">
-        {/* EMI & Pricing Info - fades out on hover */}
-        <div className="w-full transition-all duration-300 ease-in-out group-hover:pointer-events-none group-hover:opacity-0 group-hover:-translate-y-2">
-          {/* EMI Info */}
-          <div className="flex items-start justify-between gap-1 px-2 pb-2 sm:items-center sm:px-4">
-            <span className="flex min-w-0 items-center gap-1 text-[10px] text-muted-foreground sm:text-xs">
-              {/* Icon Image Tag */}
-              <Image
-                src="/images/EMI.png" // Tomar icon er file path ekhane hobe
-                alt="EMI Icon"
-                width={12}  // Size tulo-namulok bhabe choto rakha hoyeche text er sathe milate
-                height={12}
-                className="object-contain"
-              />
-              <span className="line-clamp-2 leading-4 sm:line-clamp-1">
-                EMI From {productData?.emi_start || emiPrice} Tk/Month
-              </span>
+    <div className="group/card relative w-full max-w-full overflow-hidden rounded-2xl border-2 border-sky-200 bg-white shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[400px]">
+      
+      {/* Top half with light background */}
+      <div className="relative w-full  p-3 flex flex-col items-center justify-center min-h-[265px]">
+        {/* Top Left Badges: Discount percentage & NEW/Status Badges stacked */}
+        <div className="absolute left-3 top-3 z-10 flex flex-col gap-1.5 items-start">
+          {hasDiscount(productData?.discount || discountPercent, productData?.main_price || price, productData?.stroked_price || originalPrice) && (
+            <span className="bg-[#2563eb] text-white px-4 py-1 rounded-2xl text-[14px] font-semibold tracking-wide">
+              {productData?.discount || discountPercent}
             </span>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setIsEmiModalOpen(true);
-              }}
-              className="shrink-0 text-[10px] font-semibold text-blue-600 hover:underline sm:text-xs"
-            >
-              EMI Details
-            </button>
-          </div>
-
-          {/* Pricing */}
-          <div className="flex flex-wrap items-center gap-1.5 px-2 pb-2 sm:gap-2 sm:px-4">
-            <span className="text-[14px] font-bold text-[#0081FF] sm:text-[17px]">
-              {productData?.main_price || price}
+          )}
+          {displayBadgeLabel && (
+            <span className={`${
+              displayBadgeLabel.toLowerCase() === "new" ? "bg-black" :
+              displayBadgeLabel.toLowerCase() === "hot" ? "bg-[#e53e3e]" :
+              displayBadgeLabel.toLowerCase() === "top rated" ? "bg-[#dd6b20]" :
+              "bg-black"
+            } text-white px-3 py-1 rounded-2xl text-[12px] font-semibold tracking-wide uppercase`}>
+              {displayBadgeLabel}
             </span>
-            {hasDiscount(productData?.discount || discountPercent, productData?.main_price || price, productData?.stroked_price || originalPrice) && (
-              <>
-                {(productData?.stroked_price || originalPrice) && (
-                  <span className="text-[11px] text-[#909090] line-through sm:text-[13px]">
-                    {productData?.stroked_price || originalPrice}
-                  </span>
-                )}
-                {(productData?.discount || discountPercent) && (
-                  <span className="text-[10px] font-semibold text-red-600 sm:text-xs">
-                    {productData?.discount || discountPercent}
-                  </span>
-                )}
-
-                <div>
-                  {(() => {
-                    const parsePrice = (priceStr?: string | number) => {
-                      if (priceStr === null || priceStr === undefined) return 0;
-                      const normalized = String(priceStr).replace(/[^\d.]/g, '');
-                      return parseFloat(normalized) || 0;
-                    };
-
-                    const original = parsePrice(productData?.stroked_price || originalPrice);
-                    const current = parsePrice(productData?.main_price || price);
-                    const savings = original - current;
-
-                    if (savings <= 0) return null;
-
-                    return (
-                      <span className="inline-block rounded-tl-2xl rounded-br-2xl bg-red-600 px-2 py-0.5 text-[9px] font-medium text-white uppercase sm:px-3 sm:py-1 sm:text-[10px]">
-                        Save: {savings.toLocaleString('en-US', { minimumFractionDigits: 0 })}
-                      </span>
-                    );
-                  })()}
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* Add to cart / See Details - slides up and fades in on hover */}
-        <div className="absolute inset-0 flex items-center opacity-0 translate-y-10 transition-all duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100 px-2 sm:px-4">
-          {productData?.higher_sale ? (
-            <Link
-              href={productHref}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0054A6] py-2 text-sm font-semibold text-white transition-all hover:bg-[#004487]"
-            >
-              <FaEye className="h-4 w-4" />
-              See Details
-            </Link>
-          ) : (
-            <button
-              onClick={handleAddToCart}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0054A6] py-2 text-sm font-semibold text-white transition-all hover:bg-[#004487]"
-            >
-              <FaShoppingCart className="h-4 w-4" />
-              Add to cart
-            </button>
           )}
         </div>
+
+        {/* Top Right Actions: Shopping Cart, Heart, Compare stacked */}
+        <div className="absolute right-3 top-3 z-10 flex flex-col gap-2">
+          {/* <button 
+            type="button" 
+            onClick={handleAddToCart} 
+            aria-label="Add to cart" 
+            className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-gray-400 hover:text-gray-600 shadow-sm border border-gray-100 transition-colors"
+          >
+            <FaShoppingCart className="h-3 w-3" />
+          </button> */}
+          <button 
+            type="button" 
+            onClick={handleToggleWishlist} 
+            aria-label="Toggle wishlist" 
+            className="flex h-7 w-7 items-center justify-center rounded-full bg-[#EDF2FB] shadow-sm border border-gray-100 transition-colors"
+          >
+            <FaHeart className={`h-4 w-4 ${isWishlisted ? "text-red-500 fill-red-500" : "text-gray-400 hover:text-gray-600"}`} />
+          </button>
+          <button 
+            type="button" 
+            onClick={handleToggleCompare} 
+            aria-label="Toggle compare" 
+            className="flex h-7 w-7 items-center justify-center rounded-full bg-[#EDF2FB] shadow-sm border border-gray-100 transition-colors"
+          >
+            <BiGitCompare className={`h-4 w-4 ${isCompared ? "text-blue-500" : "text-gray-400 hover:text-gray-600"}`} />
+          </button>
+        </div>
+
+        {/* Top Center Brand name/logo */}
+        <div className=" mt-1 flex justify-center">
+          {(productData?.brand?.logo || brandLogo) ? (
+            <Image
+              src={productData?.brand?.logo || brandLogo || ""}
+              alt={productData?.brand?.name || brand || "Brand logo"}
+              width={100}
+              height={24}
+              className="h-10 w-auto object-contain"
+            />
+          ) : (
+            <span className="text-[11px] font-bold tracking-wider text-slate-800 uppercase">
+              {productData?.brand?.name || brand}
+            </span>
+          )}
+        </div>
+
+        {/* Centered Product Image */}
+        <div className="relative w-full h-64 flex items-center justify-center p-1">
+          <Link href={productHref} onClick={handleSelectItem} className="block hover:scale-[1.02] transition-transform duration-200">
+            <Image
+              src={productData?.thumbnail_image || image || ""}
+              alt={title}
+              width={220}
+              height={180}
+              className="h-[220px] w-[220px]  object-contain"
+            />
+          </Link>
+        </div>
+
+        {/* Quick View Bar */}
+        <button
+          type="button"
+          onClick={() => setIsModalOpen(true)}
+          className="absolute bottom-0 left-0 right-0 bg-[#e7ebf1] hover:bg-[#dce2ec] text-slate-800 font-semibold py-1.5 text-center text-sm tracking-wide transition-colors"
+        >
+          Quick View
+        </button>
       </div>
 
-      {/* Tags Section */}
+      {/* Bottom half with white background */}
+      <div className="w-full bg-white p-3 pb-0 flex flex-col justify-between flex-1 relative">
+        <div>
+          {/* Category */}
+          <p className="text-[14px] font-semibold text-gray-400 text-center uppercase tracking-wider mb-1 mt-1">
+            {productData?.category_info?.category_name || productData?.category?.name || category || type || "Category"}
+          </p>
+
+          {/* Title */}
+          <h3 className="line-clamp-2 text-center text-[16px] font-medium text-gray-700 leading-tight mb-2 tracking-tight min-h-[32px] px-2">
+            <Link href={productHref} onClick={handleSelectItem} className="hover:text-[#2563eb] transition-colors">
+              {productData?.name || title}
+            </Link>
+          </h3>
+
+          {/* Price Center */}
+          <div className="flex flex-wrap items-center justify-center gap-2 mb-3">
+  <span className="text-[18px] font-medium text-[#000000]">
+    BDT.
+  </span>
+
+  <span className="text-[32px] font-bold text-[#2563eb]">
+    {(() => {
+      const pr = productData?.main_price || price;
+      if (!pr) return "";
+      const clean = String(pr).replace(/[^\d]/g, "");
+      return Number(clean).toLocaleString("en-US");
+    })()}
+  </span>
+
+  {hasDiscount(
+    productData?.discount || discountPercent,
+    productData?.main_price || price,
+    productData?.stroked_price || originalPrice
+  ) && (
+    <span className="text-[18px] text-gray-400 line-through">
       {(() => {
-        interface TagObject {
-          value?: string;
-          label?: string;
-        }
-        let displayTags: string | (string | TagObject)[] = (productData?.tags as string[] | undefined) || tags || [];
+        const pr = productData?.stroked_price || originalPrice;
+        if (!pr) return "";
+        const clean = String(pr).replace(/[^\d]/g, "");
+        return Number(clean).toLocaleString("en-US");
+      })()}
+    </span>
+  )}
+</div>
+        </div>
 
-        // Handle string cases from API
-        if (typeof displayTags === 'string') {
-          try {
-            displayTags = JSON.parse(displayTags as string);
-          } catch {
-            // Fallback to comma separated or single tag
-            displayTags = (displayTags as string).split(',').map((t: string) => t.trim()).filter(Boolean);
-          }
-        }
+        {/* Divider and Sliding Action Area */}
+        <div className="mt-auto">
+          <div className="border-t border-gray-100 my-1"></div>
+          
+          <div className="relative overflow-hidden h-[44px] w-[calc(100%+24px)] -mx-3 flex items-center">
+            {/* Default State: Model & EMI */}
+            <div className="flex items-center justify-between text-[11px] text-black w-full transition-all duration-300 ease-in-out group-hover/card:-translate-y-full group-hover/card:opacity-0 px-3 pb-1">
+              <span>Model: {productData?.model_number || "N/A"}</span>
+              <span>
+                EMI Starts From <span className="font-semibold text-blue-600">৳{productData?.emi_start || "N/A"}</span>
+              </span>
+            </div>
 
-        if (!Array.isArray(displayTags) || displayTags.length === 0) return null;
-
-        return (
-          <div className="hidden lg:block px-2 pb-3 sm:px-4 sm:pb-4">
-            <div className="w-full">
-              <div
-                className="grid gap-1.5"
-                style={{
-                  gridTemplateColumns: `repeat(${displayTags.length}, 1fr)`,
-                }}
+            {/* Hover State: Add to Cart Button (flush with bottom/left/right) */}
+            <div className="absolute inset-0 opacity-0 translate-y-full transition-all duration-300 ease-out group-hover/card:translate-y-0 group-hover/card:opacity-100">
+              <button
+                type="button"
+                onClick={handleAddToCart}
+                className="flex w-full h-full items-center justify-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white font-semibold text-[14px] transition-colors"
               >
-                {displayTags.map((tag, index) => {
-                  try {
-                    // If tag is already an object, use it directly
-                    if (typeof tag === 'object' && tag !== null) {
-                      const tagObj = tag as TagObject;
-                      return (
-                        <span key={index} className="rounded-full bg-[#E7EEF6] py-1 text-center text-[9px] font-semibold text-[#0054A6] sm:text-[10px]">
-                          {tagObj.value || tagObj.label || JSON.stringify(tag)}
-                        </span>
-                      );
-                    }
-
-                    // Otherwise try to parse as JSON string
-                    const cleanedTag = String(tag).replace(/^\[|\]$/g, "");
-                    const tagObj = JSON.parse(cleanedTag);
-                    return (
-                      <span
-                        key={index}
-                        className="rounded-full bg-[#E7EEF6] py-1 text-center text-[9px] font-semibold text-[#0054A6] sm:text-[10px]"
-                      >
-                        {tagObj.value || tagObj.label || tagObj}
-                      </span>
-                    );
-                  } catch {
-                    // Fallback to raw string
-                    return (
-                      <span key={index} className="rounded-full bg-[#E7EEF6] py-1 text-center text-[9px] font-semibold text-[#0054A6] sm:text-[10px]">
-                        {typeof tag === 'object' ? (tag as { value?: string, label?: string }).value || (tag as { value?: string, label?: string }).label || 'Tag' : String(tag)}
-                      </span>
-                    );
-                  }
-                })}
-              </div>
+                <FaShoppingCart className="h-4 w-4" />
+                Add to Cart
+              </button>
             </div>
           </div>
-        );
-      })()}
-
-      {/* Mobile CTA */}
-      <div className="px-2 pb-3 sm:hidden">
-        {productData?.higher_sale ? (
-          <Link href={productHref} className="flex w-6/12 mx-auto items-center justify-center rounded-xl bg-[#0054A6] py-1.5 text-[11px] font-semibold text-white transition-colors hover:bg-[#004487]">
-            See Details
-          </Link>
-        ) : (
-          <button onClick={handleAddToCart} className="flex w-6/12 mx-auto items-center justify-center rounded-xl bg-[#0054A6] py-1.5 text-[11px] font-semibold text-white transition-colors hover:bg-[#004487]">
-            Buy Now
-          </button>
-        )}
+        </div>
       </div>
 
-      {/* Add to Cart - show only on hover */}
+      {/* Modals & Overlays */}
       <AddToCartModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

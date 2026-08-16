@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { FiShoppingBag, FiLoader, FiX } from "react-icons/fi";
+import { FiShoppingBag, FiX } from "react-icons/fi";
 import Skeleton from "@/components/common/Skeleton";
 
 export const dynamic = "force-dynamic";

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Open_Sans } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "../styles/globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -9,11 +9,35 @@ import StoreProvider from "@/store/StoreProvider";
 import AuthInit from "@/components/auth/AuthInit";
 import GlobalToast from "@/components/common/GlobalToast";
 import GoogleTagManager from "@/components/analytics/GoogleTagManager";
+import PageWrapper from "@/components/layout/PageWrapper";
+import FloatingContact from "@/components/common/FloatingContact";
 
-const openSans = Open_Sans({
-  variable: "--font-open-sans",
+import localFont from "next/font/local";
+
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+});
+
+const samsungSans = localFont({
+  src: [
+    { path: "../fonts/Samsung-font/SamsungSans-Thin.ttf", weight: "100", style: "normal" },
+    { path: "../fonts/Samsung-font/SamsungSans-Light.ttf", weight: "300", style: "normal" },
+    { path: "../fonts/Samsung-font/SamsungSans-Regular.ttf", weight: "400", style: "normal" },
+    { path: "../fonts/Samsung-font/SamsungSans-Medium.ttf", weight: "500", style: "normal" },
+    { path: "../fonts/Samsung-font/SamsungSans-Bold.ttf", weight: "700", style: "normal" },
+  ],
+  variable: "--font-samsung-sans",
+});
+
+const samsungSharpSans = localFont({
+  src: [
+    { path: "../fonts/Samsung Sharp Sans/SamsungSharpSans-Regular.otf", weight: "400", style: "normal" },
+    { path: "../fonts/Samsung Sharp Sans/SamsungSharpSans-Medium.ttf", weight: "500", style: "normal" },
+    { path: "../fonts/Samsung Sharp Sans/SamsungSharpSans-Bold.ttf", weight: "700", style: "normal" },
+  ],
+  variable: "--font-samsung-sharp-sans",
 });
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -85,19 +109,22 @@ export default async function RootLayout({
   return (
     <html lang="en" data-theme="light" suppressHydrationWarning>
       <body
-        className={`${openSans.variable} antialiased`}
+        className={`${poppins.variable} ${samsungSans.variable} ${samsungSharpSans.variable} antialiased`}
       >
         <StoreProvider>
           <GoogleTagManager gtmId={gtmId} />
           <AuthInit />
           <GlobalToast />
           <Navbar />
-          <main className="mainwidth lg:pb-20 pt-2 lg:pt-32 min-h-screen-safe overflow-x-hidden">
-            {children}
+          <main className=" lg:pb-0 pt-2 lg:pt-32 min-h-screen-safe">
+            <PageWrapper>
+              {children}
+            </PageWrapper>
           </main>
           <div id="footer-breadcrumb-target" className="lg:hidden mx-auto mainwidthmore mb-4 px-4"></div>
           <Footer />
           <MobileBottomNav />
+          <FloatingContact />
         </StoreProvider>
       </body>
     </html>

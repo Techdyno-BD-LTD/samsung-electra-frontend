@@ -33,6 +33,7 @@ export default function OurBrands() {
   const [brandSections, setBrandSections] = useState<BrandSection[]>([]);
   const [loading, setLoading] = useState(true);
   const [title, setTitle] = useState("Our Brands");
+  const [subtitle, setSubtitle] = useState("There are many variations of Home Appliances");
   const [activeRowIndex, setActiveRowIndex] = useState<number>(0);
 
   const sliderRef = useRef<HTMLDivElement | null>(null);
@@ -42,7 +43,7 @@ export default function OurBrands() {
   const updateScrollState = () => {
     const slider = sliderRef.current;
     if (!slider) return;
-    const tolerance = 2;
+    const tolerance = 5;
     setCanScrollLeft(slider.scrollLeft > tolerance);
     setCanScrollRight(slider.scrollLeft < slider.scrollWidth - slider.clientWidth - tolerance);
   };
@@ -72,6 +73,7 @@ export default function OurBrands() {
         if (data?.success && Array.isArray(data?.data)) {
           setBrandSections(data.data);
           setTitle(data.title || "Our Brands");
+          setSubtitle(data.subtitle || "There are many variations of Home Appliances");
           if (data.data.length > 0) {
             setActiveRowIndex(data.data[0].row_index);
           }
@@ -102,6 +104,9 @@ export default function OurBrands() {
     slider.addEventListener("scroll", onScroll);
     window.addEventListener("resize", onResize);
 
+    // Initial check after rendering categories
+    setTimeout(updateScrollState, 100);
+
     return () => {
       slider.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
@@ -120,181 +125,148 @@ export default function OurBrands() {
     return null;
   }
 
-  const hasMultipleCategories = activeSection.selected_categories.length > 2;
-
   return (
-    <section className="mx-auto">
-      <div className="text-center">
-        <h2 className="text-[18px] font-semibold text-slate-900 sm:text-[2.1rem]">{title}</h2>
-        <div className="mt-3 h-[1px] w-full bg-gradient-to-r from-transparent via-[#2F73BD]/70 to-transparent" />
+    <section className="w-full max-w-[1400px] mx-auto px-4 pt-0 pb-8 select-none">
+      {/* Title & Subtitle */}
+      <div className="text-center flex flex-col items-center justify-center mb-4">
+        <h2 className="text-[28px] lg:text-[32px] 2xl:text-[48px] font-medium text-gray-900 tracking-tight">
+          {title}
+        </h2>
+        <p className="text-sm lg:text-[16px]  2xl:text-[20px] max-w-[900px] md:text-base text-gray-900 mt-2">
+          {subtitle}
+        </p>
       </div>
 
-      <div className="mt-4 grid grid-cols-4 gap-2 sm:grid-cols-4 sm:gap-3">
-        {brandSections.map((section) => {
-          const isActive = section.row_index === activeRowIndex;
-          return (
-            <button
-              key={section.row_index}
-              type="button"
-              onClick={() => setActiveRowIndex(section.row_index)}
-              className={`group border border-slate-200 px-2 py-1 text-center transition-all duration-200 ${
-                isActive ? "bg-[#f3f3f3]" : "bg-white"
-              }`}
-              aria-label={`Show ${section.brand.name} categories`}
-              aria-pressed={isActive}
-            >
-              <div className="relative mx-auto h-10 w-full max-w-[180px] sm:h-12">
-                <Image
-                  src={section.brand.logo}
-                  alt={`${section.brand.name} logo`}
-                  fill
-                  sizes="(max-width: 640px) 120px, 170px"
-                  className={`object-contain transition-all duration-200 ${
-                    isActive ? "opacity-100" : "opacity-90 group-hover:opacity-100"
-                  }`}
-                />
-              </div>
-              <div
-                className={`mt-1 h-[3px] w-full transition-colors duration-200 ${
-                  isActive ? "bg-[#2F73BD]" : "bg-[#2F73BD]/45 group-hover:bg-[#2F73BD]/70"
+      {/* Brand Tabs */}
+      <div className="flex justify-center border-b border-gray-100 max-w-[1550px] mx-auto mb-4">
+        <div 
+          className="grid w-full" 
+          style={{ gridTemplateColumns: `repeat(${brandSections.length}, minmax(0, 1fr))` }}
+        >
+          {brandSections.map((section) => {
+            const isActive = section.row_index === activeRowIndex;
+            return (
+              <button
+                key={section.row_index}
+                type="button"
+                onClick={() => setActiveRowIndex(section.row_index)}
+                className={`py-3.5 flex flex-col items-center justify-center transition-all duration-300 border-b-[10px] ${
+                  isActive ? "border-blue-600 bg-white" : "border-gray-200 hover:border-gray-300 bg-white"
                 }`}
-              />
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Desktop categories grid (exactly as it was) */}
-      <div className="mt-4 hidden sm:grid grid-cols-2 gap-3 xl:grid-cols-4">
-        {activeSection.selected_categories.slice(0, 4).map((category) => (
-          <Link
-            key={`${activeSection.row_index}-${category.id}-desktop`}
-            href={`/category/${category.slug}?brands=${activeSection.brand.slug}`}
-            className="block border border-slate-200 bg-white px-4 pb-3 pt-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[#2F73BD]/30 hover:shadow-md"
-          >
-            <div className="relative mx-auto h-7 w-full max-w-[130px]">
-              <Image
-                src={activeSection.brand.logo}
-                alt={`${activeSection.brand.name} category logo`}
-                fill
-                sizes="130px"
-                className="object-contain"
-              />
-            </div>
-
-            <div className="relative mx-auto mt-5 h-[200px] w-full max-w-[320px] sm:h-[260px]">
-              <Image
-                src={category.cover_image || "/assets/img/placeholder.jpg"}
-                alt={category.name}
-                fill
-                sizes="210px"
-                className="object-contain"
-              />
-            </div>
-
-            <h3 className="mt-5 text-center text-[12px] xl:text-base font-medium text-slate-900">
-              {category.name}
-            </h3>
-          </Link>
-        ))}
-      </div>
-
-      {/* Mobile view */}
-      {hasMultipleCategories ? (
-        <div className="relative mt-4 block sm:hidden">
-          <button
-            type="button"
-            onClick={() => scrollByOneCard(-1)}
-            disabled={!canScrollLeft}
-            aria-label="Previous categories"
-            className="absolute left-1 top-1/2 -translate-y-1/2 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white/95 text-[#1D3C61] shadow-md transition hover:border-[#2F73BD] hover:text-[#2F73BD] disabled:cursor-not-allowed disabled:border-slate-100 disabled:text-slate-300"
-          >
-            <FaChevronLeft className="h-3 w-3" />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => scrollByOneCard(1)}
-            disabled={!canScrollRight}
-            aria-label="Next categories"
-            className="absolute right-1 top-1/2 -translate-y-1/2 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white/95 text-[#1D3C61] shadow-md transition hover:border-[#2F73BD] hover:text-[#2F73BD] disabled:cursor-not-allowed disabled:border-slate-100 disabled:text-slate-300"
-          >
-            <FaChevronRight className="h-3 w-3" />
-          </button>
-
-          <div
-            ref={sliderRef}
-            className="flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-          >
-            {activeSection.selected_categories.map((category) => (
-              <Link
-                key={`${activeSection.row_index}-${category.id}-slider`}
-                href={`/category/${category.slug}?brands=${activeSection.brand.slug}`}
-                data-brand-category-card
-                className="min-w-[70%] snap-start block border border-slate-200 bg-white px-4 pb-3 pt-6 shadow-sm transition-all duration-200 hover:border-[#2F73BD]/30 hover:shadow-md"
+                aria-label={`Show ${section.brand.name} categories`}
+                aria-pressed={isActive}
               >
-                <div className="relative mx-auto h-6 w-full max-w-[100px]">
+                <div className="relative h-24 w-28 lg:w-72 2xl:w-96">
                   <Image
-                    src={activeSection.brand.logo}
-                    alt={`${activeSection.brand.name} category logo`}
-                    fill
-                    sizes="100px"
-                    className="object-contain"
-                  />
-                </div>
-
-                <div className="relative mx-auto mt-4 h-[160px] w-full max-w-[240px]">
-                  <Image
-                    src={category.cover_image || "/assets/img/placeholder.jpg"}
-                    alt={category.name}
+                    src={section.brand.logo}
+                    alt={`${section.brand.name} logo`}
                     fill
                     sizes="180px"
                     className="object-contain"
                   />
                 </div>
-
-                <h3 className="mt-4 text-center text-[12px] font-medium text-slate-900">
-                  {category.name}
-                </h3>
-              </Link>
-            ))}
-          </div>
+              </button>
+            );
+          })}
         </div>
-      ) : (
-        <div className="mt-4 grid grid-cols-2 gap-2 block sm:hidden">
+      </div>
+
+      {/* Choose Category Header */}
+      <div className="text-center mb-3">
+        <h3 className="text-2xl lg:text-[28px] py-3 font-medium text-gray-800 tracking-normal">Choose Category</h3>
+      </div>
+
+      {/* Sliding Categories Wrapper (Desktop & Mobile) */}
+      <div className="relative max-w-[1550px] mx-auto px-4 md:px-0">
+        {/* Left Arrow Button */}
+        {canScrollLeft && (
+          <button
+            type="button"
+            onClick={() => scrollByOneCard(-1)}
+            aria-label="Previous categories"
+            className="absolute left-0 md:-left-20 top-1/2 -translate-y-1/2 z-10 flex h-16 w-16 items-center justify-center rounded-full border border-gray-100 bg-[#F1F2F2] shadow-md transition-all hover:bg-gray-50 text-gray-600"
+          >
+            <FaChevronLeft className="h-6 w-6" />
+          </button>
+        )}
+
+        {/* Right Arrow Button */}
+        {canScrollRight && (
+          <button
+            type="button"
+            onClick={() => scrollByOneCard(1)}
+            aria-label="Next categories"
+            className="absolute right-0 md:-right-20 top-1/2 -translate-y-1/2 z-10 flex h-16 w-16 items-center justify-center rounded-full border border-gray-100 bg-[#F1F2F2] shadow-md transition-all hover:bg-gray-50 text-gray-600"
+          >
+            <FaChevronRight className="h-6 w-6" />
+          </button>
+        )}
+
+        {/* Categories Horizontal Scroll viewport */}
+        <div
+          ref={sliderRef}
+          onScroll={updateScrollState}
+          className="flex overflow-x-auto scroll-smooth gap-6 py-4 select-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        >
           {activeSection.selected_categories.map((category) => (
             <Link
-              key={`${activeSection.row_index}-${category.id}-grid-mobile`}
+              key={`${activeSection.row_index}-${category.id}-card`}
               href={`/category/${category.slug}?brands=${activeSection.brand.slug}`}
-              className="block border border-slate-200 bg-white px-4 pb-3 pt-6 shadow-sm transition-all duration-200 hover:border-[#2F73BD]/30 hover:shadow-md"
+              data-brand-category-card
+              className="group flex-shrink-0 w-[220px] sm:w-[295px] block rounded-2xl border border-gray-100 bg-white overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
             >
-              <div className="relative mx-auto h-6 w-full max-w-[100px]">
-                <Image
-                  src={activeSection.brand.logo}
-                  alt={`${activeSection.brand.name} category logo`}
-                  fill
-                  sizes="100px"
-                  className="object-contain"
-                />
+              {/* Top blue-grey category block */}
+              <div className="relative bg-[#F1F6FD] w-full h-[350px] px-4 flex flex-col justify-end pb-4">
+                {/* Brand Logo Top-Center */}
+                <div className="absolute top-4 left-1/2 -translate-x-1/2 h-10 w-40 flex items-center justify-center text-center">
+                  <Image
+                    src={activeSection.brand.logo}
+                    alt={activeSection.brand.name}
+                    fill
+                    sizes="80px"
+                    className="object-contain object-center"
+                  />
+                </div>
+
+                {/* Wishlist Heart Icon Top-Right */}
+                <div className="absolute top-4 right-4 bg-white rounded-full p-1.5 shadow-sm text-gray-400 hover:text-red-500 transition-colors">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                  </svg>
+                </div>
+
+                {/* Share Icon below Heart */}
+                <div className="absolute top-11 right-4 bg-white rounded-full p-1.5 shadow-sm text-gray-400 hover:text-blue-600 transition-colors">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185zm0-10.628a2.25 2.25 0 103.933-2.186 2.25 2.25 0 00-3.933 2.186z"/>
+                  </svg>
+                </div>
+
+                {/* Cover Image */}
+                <div className="relative mx-auto h-[220px] w-full max-w-[230px]">
+                  <Image
+                    src={category.cover_image || "/assets/img/placeholder.jpg"}
+                    alt={category.name}
+                    fill
+                    sizes="230px"
+                    className="object-contain group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
               </div>
 
-              <div className="relative mx-auto mt-4 h-[160px] w-full max-w-[240px]">
-                <Image
-                  src={category.cover_image || "/assets/img/placeholder.jpg"}
-                  alt={category.name}
-                  fill
-                  sizes="180px"
-                  className="object-contain"
-                />
+              {/* Bottom white section */}
+              <div className="bg-white py-8 px-4 flex flex-col items-center">
+                <h3 className="text-center text-sm md:text-[24px] font-medium tracking-wide text-[#6D6E71] mb-3">
+                  {category.name}
+                </h3>
+                <span className="bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white px-10 py-2 rounded-lg text-xs mt-5 md:text-lg font-semibold hover:bg-blue-700 transition-colors">
+                  See More
+                </span>
               </div>
-
-              <h3 className="mt-4 text-center text-[12px] font-medium text-slate-900">
-                {category.name}
-              </h3>
             </Link>
           ))}
         </div>
-      )}
+      </div>
     </section>
   );
 }

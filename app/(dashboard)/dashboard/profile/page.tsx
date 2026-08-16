@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { FiCamera, FiUser, FiMail, FiPhone, FiMapPin, FiSave, FiLoader } from "react-icons/fi";
+import { FiCamera, FiUser, FiMail, FiPhone, FiMapPin, FiSave } from "react-icons/fi";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { updateUser } from "@/store/features/auth/authSlice";
 import Skeleton from "@/components/common/Skeleton";

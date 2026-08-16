@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FiMapPin, FiPhone, FiMail, FiArrowRight, FiLoader } from "react-icons/fi";
+import { FiMapPin, FiPhone, FiMail, FiArrowRight } from "react-icons/fi";
 import { useAppDispatch } from "@/store/hooks";
 import { showToast } from "@/store/features/toast/toastSlice";
 import Skeleton from "@/components/common/Skeleton";
