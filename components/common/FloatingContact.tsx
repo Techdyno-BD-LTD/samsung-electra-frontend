@@ -62,7 +62,7 @@ const scrollToTop = () => {
 
   return (
     <>
-      <div className="fixed right-4 bottom-20 lg:bottom-auto lg:top-[48%] lg:[@media(max-height:720px)]:top-[45%] lg:right-10 z-[9999] flex flex-col-reverse lg:flex-col items-end pointer-events-none">
+      <div className="fixed right-4 bottom-20 lg:bottom-auto lg:top-[48%] lg:[@media(max-height:720px)]:top-[45%] lg:right-10 z-[10000] flex flex-col-reverse lg:flex-col items-end pointer-events-none">
       {/* Floating Trigger Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
@@ -176,10 +176,10 @@ const scrollToTop = () => {
     </div>
 
       {/* Separate Scroll To Top Button (At the bottom right) */}
-      <div className="fixed right-4 bottom-4 lg:right-10 lg:bottom-8 z-[9999] pointer-events-none">
+      <div className="fixed right-4 bottom-36 lg:right-10 lg:bottom-8 z-[9999] pointer-events-none">
         <button
           onClick={scrollToTop}
-          className={`w-12 h-12 lg:w-14 lg:h-14 rounded-full bg-[#2B7FE8] hover:bg-blue-600 text-white shadow-[0_4px_20px_rgba(0,0,0,0.15)] transition-all duration-300 flex items-center justify-center pointer-events-auto focus:outline-none hover:scale-105 active:scale-95 ${
+          className={`w-10 h-10 lg:w-14 lg:h-14 rounded-full bg-[#2B7FE8] hover:bg-blue-600 text-white shadow-[0_4px_20px_rgba(0,0,0,0.15)] transition-all duration-300 flex items-center justify-center pointer-events-auto focus:outline-none hover:scale-105 active:scale-95 ${
             showScroll ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none h-0 w-0 overflow-hidden"
           }`}
           aria-label="Scroll to top"
