@@ -75,7 +75,7 @@ export default function DualPromoBanners() {
                 href={href}
                 target={isExternal ? "_blank" : undefined}
                 rel={isExternal ? "noopener noreferrer" : undefined}
-                className="absolute right-6 bottom-6 z-10 px-6 py-2 text-sm font-semibold tracking-wide rounded-full transition-all duration-300 transform active:scale-95 bg-transparent border border-white text-white hover:bg-white hover:text-black"
+                className="absolute right-2 bottom-2 lg:right-6 lg:bottom-6 z-10 px-6 py-2 text-sm font-semibold tracking-wide rounded-full transition-all duration-300 transform active:scale-95 bg-transparent border border-white text-white hover:bg-white hover:text-black"
               >
                 See All
               </a>

@@ -56,10 +56,10 @@ export default function ExclusiveDeals() {
   if (deals.length === 0) return null;
 
   return (
-    <section className="w-full pt-8 pb-0 select-none">
+    <section className="w-full lg:pt-8 pb-0 select-none">
       {/* Title & Subtitle */}
-      <div className="text-center mb-16 px-4">
-        <h2 className="text-[28px] md:text-[48px] font-medium text-gray-900 tracking-tight">
+      <div className="text-center mb-4 lg:mb-16 px-4">
+        <h2 className="text-xl md:text-[48px] font-bold text-gray-900 tracking-tight">
           {title}
         </h2>
         <p className="text-sm md:text-[20px] text-gray-500 mt-2 max-w-[800px] mx-auto">
@@ -68,7 +68,7 @@ export default function ExclusiveDeals() {
       </div>
 
       {/* Grid of Banners (max 2 side-by-side) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+      <div className="grid grid-cols-2 md:grid-cols-2 gap-2 lg:gap-6 w-full">
         {deals.slice(0, 2).map((deal) => (
           <Link
             key={deal.id}

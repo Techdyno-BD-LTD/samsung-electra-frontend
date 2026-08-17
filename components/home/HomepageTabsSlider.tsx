@@ -67,11 +67,11 @@ export default function HomepageTabsSlider() {
   ];
 
   return (
-    <section className="w-full max-w-[1700px] mx-auto px-4  select-none relative">
+    <section className="w-full max-w-[1700px] mx-auto px-4 select-none relative">
       <style dangerouslySetInnerHTML={{ __html: `
         .custom-slider-item {
-          width: calc(100% - 16px) !important;
-          min-width: calc(100% - 16px) !important;
+          width: calc(50% - 5px) !important;
+          min-width: calc(50% - 5px) !important;
           flex-shrink: 0 !important;
         }
         @media (min-width: 640px) {
@@ -102,14 +102,14 @@ export default function HomepageTabsSlider() {
       `}} />
       
       {/* Tabs list (left-aligned) */}
-      <div className="flex gap-4 mb-8 overflow-x-auto pb-1 scrollbar-none">
+      <div className="flex gap-2.5 sm:gap-4 mb-6 sm:mb-8 overflow-x-auto pb-1 scrollbar-none">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-7 py-4 rounded-lg text-xl font-semibold tracking-wide border transition-all duration-300 ${
+              className={`px-4 py-2 sm:px-7 sm:py-4 rounded-lg text-sm sm:text-xl font-semibold tracking-wide border transition-all duration-300 ${
                 isActive
                   ? "bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white border-[#2563EB]"
                   : "bg-white text-[#2563EB] border-blue-400 hover:bg-gray-50"
@@ -128,24 +128,24 @@ export default function HomepageTabsSlider() {
         <button
           onClick={() => handleScroll("left")}
           aria-label="Previous slide"
-          className="absolute -left-7 top-1/2 -translate-y-1/2 z-20 flex h-12 w-12 items-center justify-center rounded-full bg-[#f1f1f1] hover:bg-gray-250 text-gray-700 hover:scale-105 transition-all active:scale-95"
+          className="absolute -left-3 sm:-left-7 top-1/2 -translate-y-1/2 z-20 flex h-7 w-7 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-[#f1f1f1] hover:bg-gray-250 text-gray-700 hover:scale-105 transition-all active:scale-95"
         >
-          <FaChevronLeft className="h-4 w-4" />
+          <FaChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
         </button>
 
         {/* Right Arrow Button */}
         <button
           onClick={() => handleScroll("right")}
           aria-label="Next slide"
-          className="absolute -right-7 top-1/2 -translate-y-1/2 z-20 flex h-12 w-12 items-center justify-center rounded-full bg-[#f1f1f1] hover:bg-gray-250 text-gray-700 hover:scale-105 transition-all active:scale-95"
+          className="absolute -right-3 sm:-right-7 top-1/2 -translate-y-1/2 z-20 flex h-7 w-7 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-[#f1f1f1] hover:bg-gray-250 text-gray-700 hover:scale-105 transition-all active:scale-95"
         >
-          <FaChevronRight className="h-4 w-4" />
+          <FaChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
         </button>
 
         {/* Scrollable Flex Container */}
         <div
           ref={scrollContainer}
-          className="flex w-full gap-6 overflow-x-auto scroll-smooth no-scrollbar pb-4"
+          className="flex w-full gap-2.5 sm:gap-6 overflow-x-auto scroll-smooth no-scrollbar pb-4"
           style={{
             scrollSnapType: "x mandatory",
           }}
@@ -156,7 +156,7 @@ export default function HomepageTabsSlider() {
                 key={i}
                 className="custom-slider-item"
               >
-                <Skeleton className="h-[400px] w-full rounded-2xl" />
+                <Skeleton className="h-[250px] sm:h-[400px] w-full rounded-2xl" />
               </div>
             ))
           ) : products.length === 0 ? (

@@ -126,7 +126,7 @@ export default async function Home() {
         <div className="lg:mt-10 mt-5">
           <StoreBanner />
         </div>
-        <div className="lg:mt-14 mt-5 w-9/12 mx-auto">
+        <div className="lg:mt-14 mt-5 w-full lg:w-9/12 mx-auto">
           <HomepageTabsSlider />
         </div>
         <div className="lg:mt-14 mt-5">
@@ -183,7 +183,7 @@ export default async function Home() {
           <AboutElectraHtmlSection />
         </div>
 
-        <div className="lg:mt-0 mt-5">
+        <div className="lg:mt-0 mt-0">
           <OurStoresSection />
         </div>
 

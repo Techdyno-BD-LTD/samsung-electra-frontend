@@ -167,7 +167,7 @@ export default function HeroSection() {
   const shouldShowTimer = Boolean(activeSlideData?.showTimer);
 
   return (
-    <section className="w-screen  relative left-1/2 right-1/2 -translate-x-1/2 lg:mt-[80px] mt-12">
+    <section className="w-screen  relative left-1/2 right-1/2 -translate-x-1/2 lg:mt-[80px] mt-[42px]">
       <div className="flex flex-col gap-2">
         <div className="relative w-full overflow-hidden">
           <div className="relative w-full" style={{ aspectRatio: HERO_SLIDE_ASPECT_RATIO }}>

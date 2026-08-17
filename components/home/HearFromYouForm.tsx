@@ -85,7 +85,7 @@ export default function HearFromYouForm() {
 
           <form onSubmit={handleSubmit} className="flex-1 w-full flex flex-col lg:flex-row items-center justify-between gap-8">
             <div className="flex flex-col gap-3 max-w-[320px] text-left">
-              <p className="text-white text-xs sm:text-sm font-light leading-relaxed">
+              <p className="text-white text-xs sm:text-sm font-light text-center lg:text-left leading-relaxed">
                 Dear Valued Customer, thank you for choosing Electra International! How was your recent experience with us?
               </p>
               
@@ -98,7 +98,7 @@ export default function HearFromYouForm() {
                     onMouseEnter={() => setHoverRating(star)}
                     onMouseLeave={() => setHoverRating(null)}
                     disabled={!isUserLoggedIn}
-                    className="w-12 h-12 bg-white rounded-xl flex items-center justify-center border border-gray-150 shadow-sm focus:outline-none transition-transform hover:scale-105 disabled:opacity-80"
+                    className="w-14 h-10 bg-white rounded-xl flex items-center justify-center border border-gray-150 shadow-sm focus:outline-none transition-transform hover:scale-105 disabled:opacity-80"
                   >
                     <FaStar
                       className={`w-6 h-6 ${

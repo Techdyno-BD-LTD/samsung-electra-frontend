@@ -17,42 +17,43 @@ interface Testimonial {
 const fallbackTestimonials: Testimonial[] = [
   {
     id: 1,
-    name: "Ishtiaque Hasan",
-    avatar: "/images/customer1.png",
-    rating: 5,
-    comment: "The sales team was incredibly helpful in guiding us to the right deep freezer for our home. Highly recommended!",
-    created_at: "2026-07-24T12:00:00.000Z"
-  },
-  {
-    id: 2,
-    name: "Adiba Jahan",
-    avatar: "/images/customer1.png",
-    rating: 5,
-    comment: "Fast delivery, authentic products, and hassle-free installation. Electra is always my go-to for home electronics.",
-    created_at: "2026-04-23T12:00:00.000Z"
-  },
-  {
-    id: 3,
-    name: "Rajib Ghosh",
+    name: "RajibGhosh",
     avatar: "/images/customer1.png",
     rating: 5,
     comment: "Upgraded our home appliances with Electra International, and the quality is exceptional. Great value for money!",
-    created_at: "2026-03-10T12:00:00.000Z"
+    created_at: "2026-03-10T12:00:00.000Z",
+  },
+  {
+    id: 2,
+    name: "Ishtiaque",
+    avatar: "/images/customer1.png",
+    rating: 5,
+    comment: "The sales team was incredibly helpful in guiding us to the right deep freezer for our home. Highly recommended!",
+    created_at: "2026-07-24T12:00:00.000Z",
+  },
+  {
+    id: 3,
+    name: "AdibaJahan",
+    avatar: "/images/customer1.png",
+    rating: 5,
+    comment: "Fast delivery, authentic products, and hassle-free installation. Electra is always my go-to for home electronics.",
+    created_at: "2026-04-23T12:00:00.000Z",
   },
   {
     id: 4,
-    name: "Isha Haque",
+    name: "IshaHaque",
     avatar: "/images/customer1.png",
     rating: 5,
     comment: "Bought a inverter AC last week—cooling is fantastic and energy consumption is noticeably low. Very satisfied!",
-    created_at: "2026-11-14T12:00:00.000Z"
-  }
+    created_at: "2026-11-14T12:00:00.000Z",
+  },
 ];
 
 export default function CustomerStoriesSection() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [startIndex, setStartIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [activeStackIndex, setActiveStackIndex] = useState(3);
 
   useEffect(() => {
     fetch("/api/testimonials/approved")
@@ -89,6 +90,12 @@ export default function CustomerStoriesSection() {
 
   const displayedTestimonials = testimonials.slice(startIndex, startIndex + 4);
 
+  // Calculates visual stack level from 0 (top-most card) to 3 (front active card)
+  const getSlotPosition = (cardIndex: number) => {
+    const total = displayedTestimonials.length;
+    return (cardIndex - activeStackIndex + 3 + total) % total;
+  };
+
   const formatDate = (dateStr: string) => {
     try {
       const date = new Date(dateStr);
@@ -103,84 +110,145 @@ export default function CustomerStoriesSection() {
   };
 
   return (
-    <section className="relative w-full bg-transparent pt-16 overflow-hidden">
-      {/* Header (Centered Container) */}
-      <div className="max-w-[1700px] mb-10 mx-auto text-center px-6 md:px-16 lg:px-24">
-        <h2 className="text-3xl sm:text-4xl lg:text-[32px] 2xl:text-[48px] font-bold text-gray-900 mb-2">
+    <section className="relative w-full bg-transparent lg:pt-16 overflow-hidden">
+      {/* Header */}
+      <div className="max-w-[1700px] mb-1 lg:mb-10 mx-auto text-center px-6 md:px-16 lg:px-24">
+        <h2 className="text-xl sm:text-4xl lg:text-[32px] 2xl:text-[48px] font-bold text-gray-900 mb-2">
           Customer Stories
         </h2>
-        <p className="text-gray-500 text-sm lg:text-[16px]  2xl:text-[20px] mb-60 max-w-2xl mx-auto">
+        <p className="text-gray-500 text-sm lg:text-[16px] 2xl:text-[20px] mb-40 lg:mb-60 max-w-2xl mx-auto">
           Now Serving You Across 37 Outlets Nationwide
         </p>
       </div>
 
-      {/* Overlapping Blue Backdrop (Full Width) */}
-      <div className="relative w-full rounded-t-[50px] bg-blue-600 pt-28 pb-12">
+      {/* Overlapping Blue Backdrop */}
+      <div className="relative w-full rounded-t-[50px] bg-blue-600 lg:pt-28 pt-20 pb-12">
         <div className="max-w-[1700px] mx-auto px-6 md:px-16 lg:px-24 flex items-center justify-between gap-6 relative">
           
-          {/* Prev Arrow */}
+          {/* Prev Arrow (Desktop Only) */}
           <button
             onClick={handlePrev}
-            className="absolute left-0 lg:left-6 top-1/2 -translate-y-[150px] z-20 flex items-center justify-center w-12 h-12 bg-white/20 hover:bg-white text-white hover:text-blue-600 rounded-full transition-all shadow-md focus:outline-none"
+            className="absolute left-0 lg:left-6 top-1/2 -translate-y-[150px] z-20 hidden lg:flex items-center justify-center w-12 h-12 bg-white/20 hover:bg-white text-white hover:text-blue-600 rounded-full transition-all shadow-md focus:outline-none"
           >
             <FiChevronLeft className="w-6 h-6" />
           </button>
 
           {/* Testimonial Cards Wrapper */}
-          <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 justify-center items-center -mt-64 relative z-10 px-8 mx-auto w-full">
-            {displayedTestimonials.map((item) => (
-              <div
-                key={item.id}
-                className="relative bg-white rounded-3xl pt-16 pb-8 px-6 text-center shadow-lg border border-gray-100 flex flex-col justify-between h-[500px]"
-              >
-                {/* Overlapping Avatar */}
-                <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-24 h-24 rounded-full border-4 border-blue-500 bg-blue-100 shadow-md overflow-hidden flex items-center justify-center">
-                  <Image
-                    src={item.avatar || "/assets/img/avatar-place.png"}
-                    alt={item.name}
-                    width={96}
-                    height={96}
-                    className="object-cover w-full h-full"
-                  />
-                </div>
+          <div className="flex-1 relative h-[310px] lg:h-auto lg:grid lg:grid-cols-4 gap-6 lg:gap-8 -mt-56 lg:-mt-64 z-10 px-3 sm:px-8 mx-auto w-full max-w-[370px] sm:max-w-[420px] lg:max-w-none">
+            {displayedTestimonials.map((item, index) => {
+              const slot = getSlotPosition(index); // 0 = back/top card, 3 = front/bottom card
+              const isCardActive = slot === 3;
 
-                {/* Big Quote marks styling */}
-                <span className="text-[80px] text-gray-200 font-serif leading-none absolute top-6 left-6 select-none">“</span>
-                
-                {/* Comment Text */}
-                <p className="text-gray-900 2xl:text-xl leading-relaxed line-clamp-4 font-base pt-2 flex-grow flex items-center justify-center">
-                  {item.comment}
-                </p>
-                
-                <span className="text-[80px] text-gray-200 font-serif leading-none absolute bottom-20 right-6 select-none">”</span>
-
-                {/* Bottom section (Name, Rating, Date) */}
-                <div className="mt-4 border-t border-gray-100 pt-4">
-                  {/* Rating Stars */}
-                  <div className="flex items-center justify-center gap-1 mb-2">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <FaStar
-                        key={i}
-                        className={`w-4 h-4 ${
-                          i < item.rating ? "text-yellow-400" : "text-gray-200"
-                        }`}
+              return (
+                <React.Fragment key={item.id}>
+                  {/* --- Desktop Layout (Unchanged) --- */}
+                  <div className="hidden lg:flex relative bg-white rounded-3xl pt-16 pb-8 px-6 text-center shadow-lg border border-gray-100 flex-col justify-between h-[500px]">
+                    <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-24 h-24 rounded-full border-4 border-blue-500 bg-blue-100 shadow-md overflow-hidden flex items-center justify-center">
+                      <Image
+                        src={item.avatar || "/assets/img/avatar-place.png"}
+                        alt={item.name}
+                        width={96}
+                        height={96}
+                        className="object-cover w-full h-full"
                       />
-                    ))}
+                    </div>
+
+                    <span className="text-[80px] text-gray-200 font-serif leading-none absolute top-6 left-6 select-none">“</span>
+                    
+                    <p className="text-gray-900 2xl:text-xl leading-relaxed line-clamp-4 font-base pt-2 flex-grow flex items-center justify-center">
+                      {item.comment}
+                    </p>
+                    
+                    <span className="text-[80px] text-gray-200 font-serif leading-none absolute bottom-20 right-6 select-none">”</span>
+
+                    <div className="mt-4 border-t border-gray-100 pt-4">
+                      <div className="flex items-center justify-center gap-1 mb-2">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <FaStar
+                            key={i}
+                            className={`w-4 h-4 ${
+                              i < item.rating ? "text-yellow-400" : "text-gray-200"
+                            }`}
+                          />
+                        ))}
+                      </div>
+
+                      <h4 className="font-bold text-gray-900 text-[20px]">{item.name}</h4>
+                      <p className="text-[16px] text-gray-400 font-medium mt-0.5">
+                        Reviewed On {formatDate(item.created_at)}
+                      </p>
+                    </div>
                   </div>
 
-                  <h4 className="font-bold text-gray-900 text-[20px]">{item.name}</h4>
-                  <p className="text-[16px] text-gray-400 font-medium mt-0.5">
-                    Reviewed On {formatDate(item.created_at)}
-                  </p>
-                </div>
-              </div>
-            ))}
+                  {/* --- Mobile Stacked Deck Layout --- */}
+                  <div
+                    onClick={() => setActiveStackIndex(index)}
+                    className="block lg:hidden absolute inset-x-0 top-0 rounded-2xl border border-blue-200 bg-[#f4f8ff] p-3.5 shadow-[0_10px_25px_rgba(0,0,0,0.08)] transition-all duration-500 ease-out cursor-pointer select-none"
+                    style={{
+                      transform: `translateY(${slot * 38}px) scale(${0.91 + slot * 0.03})`,
+                      transformOrigin: "top center",
+                      zIndex: 10 + slot * 10,
+                      opacity: 1,
+                    }}
+                  >
+                    {/* Header Row: Avatar, Name & Stars */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-full border-2 border-blue-500 bg-white p-[1px] shadow-sm flex-shrink-0 overflow-hidden flex items-center justify-center">
+                          <Image
+                            src={item.avatar || "/assets/img/avatar-place.png"}
+                            alt={item.name}
+                            width={32}
+                            height={32}
+                            className="rounded-full object-cover w-full h-full"
+                          />
+                        </div>
+                        <span className="font-bold text-slate-800 text-[14px]">
+                          {item.name}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-0.5">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <FaStar
+                            key={i}
+                            className={`w-3.5 h-3.5 ${
+                              i < item.rating ? "text-amber-400 fill-amber-400" : "text-slate-200"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Active Card Body: Comment Text & Date */}
+                    <div
+                      className={`grid transition-[grid-template-rows,opacity] duration-500 ease-out ${
+                        isCardActive
+                          ? "grid-rows-[1fr] opacity-100 mt-3 pt-2"
+                          : "grid-rows-[0fr] opacity-0"
+                      }`}
+                    >
+                      <div className="overflow-hidden">
+                        <p className="text-xs text-slate-700 leading-relaxed font-normal">
+                          &ldquo;{item.comment}&rdquo;
+                        </p>
+                        <div className="mt-2 text-right">
+                          <span className="text-[11px] font-medium text-slate-500">
+                            Reviewed On {formatDate(item.created_at)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </React.Fragment>
+              );
+            })}
           </div>
 
-          {/* Next Arrow */}
+          {/* Next Arrow (Desktop Only) */}
           <button
             onClick={handleNext}
-            className="absolute right-0 lg:right-6 top-1/2 -translate-y-[150px] z-20 flex items-center justify-center w-12 h-12 bg-white/20 hover:bg-white text-white hover:text-blue-600 rounded-full transition-all shadow-md focus:outline-none"
+            className="absolute right-0 lg:right-6 top-1/2 -translate-y-[150px] z-20 hidden lg:flex items-center justify-center w-12 h-12 bg-white/20 hover:bg-white text-white hover:text-blue-600 rounded-full transition-all shadow-md focus:outline-none"
           >
             <FiChevronRight className="w-6 h-6" />
           </button>

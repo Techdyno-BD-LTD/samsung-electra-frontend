@@ -2,7 +2,7 @@ import TopBar from "./TopBar";
 import MainBar from "./MainBar";
 import BottomBar from "./BottomBar";
 import MobileNavbar from "./MobileNavbar";
-import MobileBottomBar from "./MobileBottomBar";
+// import MobileBottomBar from "./MobileBottomBar";
 
 export default function Navbar() {
   return (
@@ -17,7 +17,7 @@ export default function Navbar() {
       {/* Mobile Navigation - Hidden on desktop */}
       <div className="lg:hidden">
         <MobileNavbar />
-        <MobileBottomBar />
+        {/* <MobileBottomBar /> */}
       </div>
     </header>
   );

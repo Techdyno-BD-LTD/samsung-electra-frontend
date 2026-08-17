@@ -16,6 +16,10 @@ export default function MobileBottomNav() {
   const pathname = usePathname();
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   
+  const cartTotalCount = useSelector((state: RootState) =>
+    state.cart.items.reduce((total, item) => total + item.quantity, 0)
+  );
+  
   const isProductDetailsRoute = pathname?.startsWith("/products/") || pathname?.startsWith("/product/");
 
   if (isProductDetailsRoute) {
@@ -24,56 +28,57 @@ export default function MobileBottomNav() {
 
   const navItems = [
     {
-      icon: <HiOutlineHome size={26} />,
+      icon: <HiOutlineHome size={22} />,
       href: "/",
       label: "Home",
       active: pathname === "/"
     },
     {
-      icon: <HiOutlineSquares2X2 size={26} />,
+      icon: <HiOutlineSquares2X2 size={22} />,
       href: "/mobile-categories",
       label: "Categories",
       active: pathname === "/mobile-categories"
     },
     {
-      icon: <HiOutlineMegaphone size={26} />,
-      href: "/camping",
-      label: "Camping",
-      active: pathname === "/camping"
+      icon: <HiOutlineMegaphone size={22} />,
+      href: "/offers",
+      label: "Offers",
+      active: pathname === "/offers"
     },
     {
-      icon: <HiOutlineShoppingCart size={26} />,
+      icon: <HiOutlineShoppingCart size={22} />,
       href: "/cart",
       label: "Cart",
       active: pathname === "/cart"
     },
     {
-      icon: <HiOutlineUserCircle size={26} />,
+      icon: <HiOutlineUserCircle size={22} />,
       href: isAuthenticated ? "/dashboard" : "/login",
-      label: "Profile",
+      label: "Account",
       active: pathname === "/dashboard" || pathname === "/login"
     }
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[999] bg-white/90 backdrop-blur-md border-t border-gray-100 px-2 pb-safe md:hidden">
-      <div className="flex justify-between items-center py-2 max-w-lg mx-auto">
+    <div className="fixed bottom-0 left-0 right-0 z-[999] bg-[#EDF2FB] border-t border-gray-100 px-2 pb-safe md:hidden select-none shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+      <div className="flex justify-between items-center py-1 max-w-lg mx-auto">
         {navItems.map((item) => (
           <Link 
             key={item.href}
             href={item.href} 
-            className={`flex flex-col items-center justify-center min-w-[64px] transition-colors ${
-              item.active ? "text-blue-600" : "text-gray-400"
+            className={`flex flex-col items-center justify-center min-w-[60px] py-1 transition-colors ${
+              item.active ? "text-[#2B7FE8]" : "text-slate-500"
             }`}
           >
-            <div className="relative">
+            <div className="relative flex items-center justify-center h-6">
               {item.icon}
-              {item.label === "Cart" && (
-                <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white">
-                  0
+              {item.label === "Cart" && cartTotalCount > 0 && (
+                <span className="absolute -right-2.5 -top-1.5 flex h-[14px] w-[14px] items-center justify-center rounded-full bg-red-500 text-[8px] font-bold text-white border border-white">
+                  {cartTotalCount}
                 </span>
               )}
             </div>
+            <span className="text-[10px] font-semibold mt-1 leading-none">{item.label}</span>
           </Link>
         ))}
       </div>

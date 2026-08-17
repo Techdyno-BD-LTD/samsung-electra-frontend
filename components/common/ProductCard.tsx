@@ -1003,14 +1003,14 @@ const ProductCard = ({
   }
 
   return (
-    <div className="group/card relative w-full max-w-full overflow-hidden rounded-2xl border-2 border-sky-200 bg-white shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[400px]">
+    <div className="group/card relative w-full max-w-full overflow-hidden rounded-2xl border-2 border-sky-200 bg-white shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[340px] sm:min-h-[400px]">
       
       {/* Top half with light background */}
-      <div className="relative w-full  p-3 flex flex-col items-center justify-center min-h-[265px]">
+      <div className="relative w-full p-2 sm:p-3 flex flex-col items-center justify-center min-h-[150px] sm:min-h-[265px]">
         {/* Top Left Badges: Discount percentage & NEW/Status Badges stacked */}
-        <div className="absolute left-3 top-3 z-10 flex flex-col gap-1.5 items-start">
+        <div className="absolute left-2 top-2 sm:left-3 sm:top-3 z-10 flex flex-col gap-1 sm:gap-1.5 items-start">
           {hasDiscount(productData?.discount || discountPercent, productData?.main_price || price, productData?.stroked_price || originalPrice) && (
-            <span className="bg-[#2563eb] text-white px-4 py-1 rounded-2xl text-[14px] font-semibold tracking-wide">
+            <span className="bg-[#2563eb] text-white px-2 py-0.5 sm:px-4 sm:py-1 rounded-2xl text-[10px] sm:text-[14px] font-semibold tracking-wide">
               {productData?.discount || discountPercent}
             </span>
           )}
@@ -1020,66 +1020,58 @@ const ProductCard = ({
               displayBadgeLabel.toLowerCase() === "hot" ? "bg-[#e53e3e]" :
               displayBadgeLabel.toLowerCase() === "top rated" ? "bg-[#dd6b20]" :
               "bg-black"
-            } text-white px-3 py-1 rounded-2xl text-[12px] font-semibold tracking-wide uppercase`}>
+            } text-white px-1.5 py-0.5 sm:px-3 sm:py-1 rounded-2xl text-[8px] sm:text-[12px] font-semibold tracking-wide uppercase`}>
               {displayBadgeLabel}
             </span>
           )}
         </div>
 
         {/* Top Right Actions: Shopping Cart, Heart, Compare stacked */}
-        <div className="absolute right-3 top-3 z-10 flex flex-col gap-2">
-          {/* <button 
-            type="button" 
-            onClick={handleAddToCart} 
-            aria-label="Add to cart" 
-            className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-gray-400 hover:text-gray-600 shadow-sm border border-gray-100 transition-colors"
-          >
-            <FaShoppingCart className="h-3 w-3" />
-          </button> */}
+        <div className="absolute right-2 top-2 sm:right-3 sm:top-3 z-10 flex flex-col gap-1.5 sm:gap-2">
           <button 
             type="button" 
             onClick={handleToggleWishlist} 
             aria-label="Toggle wishlist" 
-            className="flex h-7 w-7 items-center justify-center rounded-full bg-[#EDF2FB] shadow-sm border border-gray-100 transition-colors"
+            className="flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-[#EDF2FB] shadow-sm border border-gray-100 transition-colors"
           >
-            <FaHeart className={`h-4 w-4 ${isWishlisted ? "text-red-500 fill-red-500" : "text-gray-400 hover:text-gray-600"}`} />
+            <FaHeart className={`h-3 w-3 sm:h-4 sm:w-4 ${isWishlisted ? "text-red-500 fill-red-500" : "text-gray-400 hover:text-gray-600"}`} />
           </button>
           <button 
             type="button" 
             onClick={handleToggleCompare} 
             aria-label="Toggle compare" 
-            className="flex h-7 w-7 items-center justify-center rounded-full bg-[#EDF2FB] shadow-sm border border-gray-100 transition-colors"
+            className="flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-[#EDF2FB] shadow-sm border border-gray-100 transition-colors"
           >
-            <BiGitCompare className={`h-4 w-4 ${isCompared ? "text-blue-500" : "text-gray-400 hover:text-gray-600"}`} />
+            <BiGitCompare className={`h-3 w-3 sm:h-4 sm:w-4 ${isCompared ? "text-blue-500" : "text-gray-400 hover:text-gray-600"}`} />
           </button>
         </div>
 
         {/* Top Center Brand name/logo */}
-        <div className=" mt-1 flex justify-center">
+        <div className="mt-1 flex justify-center">
           {(productData?.brand?.logo || brandLogo) ? (
             <Image
               src={productData?.brand?.logo || brandLogo || ""}
               alt={productData?.brand?.name || brand || "Brand logo"}
               width={100}
               height={24}
-              className="h-10 w-auto object-contain"
+              className="h-6 sm:h-10 w-auto object-contain"
             />
           ) : (
-            <span className="text-[11px] font-bold tracking-wider text-slate-800 uppercase">
+            <span className="text-[9px] sm:text-[11px] font-bold tracking-wider text-slate-800 uppercase">
               {productData?.brand?.name || brand}
             </span>
           )}
         </div>
 
         {/* Centered Product Image */}
-        <div className="relative w-full h-64 flex items-center justify-center p-1">
+        <div className="relative w-full h-28 sm:h-64 flex items-center justify-center p-1">
           <Link href={productHref} onClick={handleSelectItem} className="block hover:scale-[1.02] transition-transform duration-200">
             <Image
               src={productData?.thumbnail_image || image || ""}
               alt={title}
               width={220}
               height={180}
-              className="h-[220px] w-[220px]  object-contain"
+              className="h-[100px] w-[100px] sm:h-[220px] sm:w-[220px] object-contain"
             />
           </Link>
         </div>
@@ -1088,64 +1080,75 @@ const ProductCard = ({
         <button
           type="button"
           onClick={() => setIsModalOpen(true)}
-          className="absolute bottom-0 left-0 right-0 bg-[#e7ebf1] hover:bg-[#dce2ec] text-slate-800 font-semibold py-1.5 text-center text-sm tracking-wide transition-colors"
+          className="absolute bottom-0 left-0 right-0 bg-[#e7ebf1] hover:bg-[#dce2ec] text-slate-800 font-semibold py-1 sm:py-1.5 text-center text-xs sm:text-sm tracking-wide transition-colors"
         >
           Quick View
         </button>
       </div>
 
+      {/* Model & EMI below Quick View on Mobile */}
+      <div className="flex sm:hidden items-center justify-center gap-1.5 text-[8px] xs:text-[9px] text-gray-500 border-b border-gray-100 py-1.5 px-2 bg-gray-50/70 w-full text-center">
+        <span className="truncate">Model: {productData?.model_number || "N/A"}</span>
+        <span className="text-gray-300">|</span>
+        <span className="truncate">
+          EMI Starts From <span className="font-semibold text-blue-600">৳{productData?.emi_start || "N/A"}</span>
+        </span>
+      </div>
+
       {/* Bottom half with white background */}
-      <div className="w-full bg-white p-3 pb-0 flex flex-col justify-between flex-1 relative">
+      <div className="w-full bg-white p-2 sm:p-3 pb-0 flex flex-col justify-between flex-1 relative">
         <div>
           {/* Category */}
-          <p className="text-[14px] font-semibold text-gray-400 text-center uppercase tracking-wider mb-1 mt-1">
+          <p className="text-[10px] sm:text-[14px] font-semibold text-gray-400 text-center uppercase tracking-wider mb-0.5 sm:mb-1 mt-0.5 sm:mt-1">
             {productData?.category_info?.category_name || productData?.category?.name || category || type || "Category"}
           </p>
 
           {/* Title */}
-          <h3 className="line-clamp-2 text-center text-[16px] font-medium text-gray-700 leading-tight mb-2 tracking-tight min-h-[32px] px-2">
+          <h3 className="line-clamp-2 text-center text-[12px] sm:text-[16px] font-medium text-gray-700 leading-tight mb-1.5 sm:mb-2 tracking-tight min-h-[28px] sm:min-h-[32px] px-1 sm:px-2">
             <Link href={productHref} onClick={handleSelectItem} className="hover:text-[#2563eb] transition-colors">
               {productData?.name || title}
             </Link>
           </h3>
 
           {/* Price Center */}
-          <div className="flex flex-wrap items-center justify-center gap-2 mb-3">
-  <span className="text-[18px] font-medium text-[#000000]">
-    BDT.
-  </span>
+          <div className="flex flex-wrap items-center justify-center gap-1 sm:gap-2 mb-2 sm:mb-3">
+            <span className="text-[11px] sm:text-[18px] font-medium text-[#000000]">
+              BDT.
+            </span>
 
-  <span className="text-[32px] font-bold text-[#2563eb]">
-    {(() => {
-      const pr = productData?.main_price || price;
-      if (!pr) return "";
-      const clean = String(pr).replace(/[^\d]/g, "");
-      return Number(clean).toLocaleString("en-US");
-    })()}
-  </span>
+            <span className="text-[16px] sm:text-[32px] font-bold text-[#2563eb]">
+              {(() => {
+                const pr = productData?.main_price || price;
+                if (!pr) return "";
+                const clean = String(pr).replace(/[^\d]/g, "");
+                return Number(clean).toLocaleString("en-US");
+              })()}
+            </span>
 
-  {hasDiscount(
-    productData?.discount || discountPercent,
-    productData?.main_price || price,
-    productData?.stroked_price || originalPrice
-  ) && (
-    <span className="text-[18px] text-gray-400 line-through">
-      {(() => {
-        const pr = productData?.stroked_price || originalPrice;
-        if (!pr) return "";
-        const clean = String(pr).replace(/[^\d]/g, "");
-        return Number(clean).toLocaleString("en-US");
-      })()}
-    </span>
-  )}
-</div>
+            {hasDiscount(
+              productData?.discount || discountPercent,
+              productData?.main_price || price,
+              productData?.stroked_price || originalPrice
+            ) && (
+              <span className="text-[11px] sm:text-[18px] text-gray-400 line-through">
+                {(() => {
+                  const pr = productData?.stroked_price || originalPrice;
+                  if (!pr) return "";
+                  const clean = String(pr).replace(/[^\d]/g, "");
+                  return Number(clean).toLocaleString("en-US");
+                })()}
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Divider and Sliding Action Area */}
         <div className="mt-auto">
-          <div className="border-t border-gray-100 my-1"></div>
+          {/* Desktop divider */}
+          <div className="hidden sm:block border-t border-gray-100 my-1"></div>
           
-          <div className="relative overflow-hidden h-[44px] w-[calc(100%+24px)] -mx-3 flex items-center">
+          {/* Desktop Hover Sliding Area */}
+          <div className="hidden sm:flex relative overflow-hidden h-[44px] w-[calc(100%+24px)] -mx-3 items-center">
             {/* Default State: Model & EMI */}
             <div className="flex items-center justify-between text-[11px] text-black w-full transition-all duration-300 ease-in-out group-hover/card:-translate-y-full group-hover/card:opacity-0 px-3 pb-1">
               <span>Model: {productData?.model_number || "N/A"}</span>
@@ -1154,7 +1157,7 @@ const ProductCard = ({
               </span>
             </div>
 
-            {/* Hover State: Add to Cart Button (flush with bottom/left/right) */}
+            {/* Hover State: Add to Cart Button */}
             <div className="absolute inset-0 opacity-0 translate-y-full transition-all duration-300 ease-out group-hover/card:translate-y-0 group-hover/card:opacity-100">
               <button
                 type="button"
@@ -1165,6 +1168,18 @@ const ProductCard = ({
                 Add to Cart
               </button>
             </div>
+          </div>
+
+          {/* Mobile Always-Visible Add to Cart Button */}
+          <div className="block sm:hidden w-[calc(100%+16px)] -mx-2">
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              className="flex w-full items-center justify-center gap-1.5 bg-[#2563eb] hover:bg-blue-700 text-white font-semibold text-[12px] py-2 transition-colors"
+            >
+              <FaShoppingCart className="h-3 w-3" />
+              Add to Cart
+            </button>
           </div>
         </div>
       </div>
