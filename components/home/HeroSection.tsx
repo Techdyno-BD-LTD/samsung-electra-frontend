@@ -19,6 +19,7 @@ type HeroPayload = {
   promoBarText: string;
   autoplayMs: number;
   slides: HeroSlide[];
+  slidesMobile: HeroSlide[];
 };
 
 type SliderItem = {
@@ -32,6 +33,7 @@ type SliderApiResponse = {
   data: {
     text: string;
     sliders: SliderItem[];
+    sliders_mobile?: SliderItem[];
   };
   success: boolean;
   status: number;
@@ -63,6 +65,7 @@ function getCountdown(targetDate: string, now: number) {
 export default function HeroSection() {
   const [heroData, setHeroData] = useState<HeroPayload | null>(null);
   const [slideIndex, setSlideIndex] = useState(0);
+  const [mobileSlideIndex, setMobileSlideIndex] = useState(0);
   const [isSliding, setIsSliding] = useState(true);
   const [tick, setTick] = useState(Date.now());
 
@@ -89,11 +92,25 @@ export default function HeroSection() {
           showTimer: false,
         }));
 
+        const slidesMobile: HeroSlide[] = (sliderPayload.data?.sliders_mobile && sliderPayload.data.sliders_mobile.length > 0)
+          ? sliderPayload.data.sliders_mobile.map((item, index) => ({
+              id: item.id,
+              title: `Slide ${index + 1}`,
+              subtitle: "",
+              imageUrl: item.image,
+              ctaLabel: "",
+              ctaHref: item.external_link || "#",
+              countdownTarget: new Date().toISOString(),
+              showTimer: false,
+            }))
+          : slides;
+
         if (isMounted) {
           setHeroData({
             promoBarText: sliderPayload.data?.text || "Discover Samsung Electra seasonal offers.",
             autoplayMs: 5000,
             slides,
+            slidesMobile,
           });
         }
       } catch {
@@ -102,6 +119,7 @@ export default function HeroSection() {
             promoBarText: "Seasonal campaign is loading...",
             autoplayMs: 5000,
             slides: [],
+            slidesMobile: [],
           });
         }
       }
@@ -127,6 +145,7 @@ export default function HeroSection() {
     const interval = setInterval(() => {
       setIsSliding(true);
       setSlideIndex((prev) => prev + 1);
+      setMobileSlideIndex((prev) => prev + 1);
     }, heroData.autoplayMs);
 
     return () => clearInterval(interval);
@@ -140,6 +159,15 @@ export default function HeroSection() {
       setSlideIndex(0);
     }
   }, [slideIndex, heroData]);
+
+  useEffect(() => {
+    if (!heroData) return;
+    const slidesMobile = heroData.slidesMobile;
+    if (slidesMobile.length > 1 && mobileSlideIndex === slidesMobile.length + 1) {
+      setIsSliding(false);
+      setMobileSlideIndex(0);
+    }
+  }, [mobileSlideIndex, heroData]);
 
   const activeCountdown = useMemo(() => {
     const slides = heroData?.slides ?? [];
@@ -166,94 +194,163 @@ export default function HeroSection() {
   const activeSlideData = slides[activeSlide];
   const shouldShowTimer = Boolean(activeSlideData?.showTimer);
 
-  return (
-    <section className="w-screen  relative left-1/2 right-1/2 -translate-x-1/2 lg:mt-[80px] mt-[42px]">
-      <div className="flex flex-col gap-2">
-        <div className="relative w-full overflow-hidden">
-          <div className="relative w-full" style={{ aspectRatio: HERO_SLIDE_ASPECT_RATIO }}>
-            <div
-              className={`flex h-full w-full ${isSliding ? "transition-transform duration-700 ease-in-out" : ""}`}
-              style={{ transform: `translateX(-${slideIndex * 100}%)` }}
-              onTransitionEnd={() => {
-                if (slides.length > 1 && slideIndex === slides.length) {
-                  setIsSliding(false);
-                  setSlideIndex(0);
+  const slidesMobile = heroData.slidesMobile;
+  const loopedSlidesMobile = slidesMobile.length > 1 ? [...slidesMobile, slidesMobile[0]] : slidesMobile;
+  const activeSlideMobile = slidesMobile.length ? mobileSlideIndex % slidesMobile.length : 0;
 
-                  requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                      setIsSliding(true);
-                    });
-                  });
-                }
+  return (
+    <>
+      {/* Mobile Slider View (414x402) */}
+      <div className="lg:hidden w-full max-w-[414px] mx-auto mt-[42px] relative overflow-hidden select-none" style={{ height: "402px" }}>
+        <div
+          className={`flex h-full w-full ${isSliding ? "transition-transform duration-700 ease-in-out" : ""}`}
+          style={{ transform: `translateX(-${mobileSlideIndex * 100}%)` }}
+          onTransitionEnd={() => {
+            if (slidesMobile.length > 1 && mobileSlideIndex === slidesMobile.length) {
+              setIsSliding(false);
+              setMobileSlideIndex(0);
+
+              requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                  setIsSliding(true);
+                });
+              });
+            }
+          }}
+        >
+          {loopedSlidesMobile.map((slide, index) => (
+            <div key={`${slide.id}-mob-${index}`} className="relative h-full min-w-full">
+              {slide.ctaHref && slide.ctaHref !== "#" ? (
+                <Link href={slide.ctaHref} className="block relative w-full h-full">
+                  <Image
+                    src={slide.imageUrl}
+                    alt={slide.title}
+                    fill
+                    sizes="100vw"
+                    className="object-cover object-center cursor-pointer"
+                    priority={index === 0}
+                  />
+                </Link>
+              ) : (
+                <Image
+                  src={slide.imageUrl}
+                  alt={slide.title}
+                  fill
+                  sizes="100vw"
+                  className="object-cover object-center"
+                  priority={index === 0}
+                />
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Dots */}
+        <div className="absolute bottom-3 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 rounded-full bg-white/80 px-3 py-1.5 backdrop-blur-sm">
+          {slidesMobile.map((slide, index) => (
+            <button
+              key={`dot-mob-${slide.id}-${index}`}
+              type="button"
+              aria-label={`Go to slide ${index + 1}`}
+              onClick={() => {
+                setIsSliding(true);
+                setMobileSlideIndex(index);
               }}
-            >
-              {loopedSlides.map((slide, index) => (
-                <div key={`${slide.id}-${index}`} className="relative h-full min-w-full">
-                  {slide.ctaHref && slide.ctaHref !== "#" ? (
-                    <Link href={slide.ctaHref} className="block relative w-full h-full">
+              className={`h-2 rounded-full transition-all ${index === activeSlideMobile ? "w-6 bg-[#0e56af]" : "w-2 bg-slate-300"}`}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Desktop Slider View (1530x588) */}
+      <section className="hidden lg:block w-screen relative left-1/2 right-1/2 -translate-x-1/2 lg:mt-[30px]">
+        <div className="flex flex-col gap-2">
+          <div className="relative w-full overflow-hidden">
+            <div className="relative w-full" style={{ aspectRatio: HERO_SLIDE_ASPECT_RATIO }}>
+              <div
+                className={`flex h-full w-full ${isSliding ? "transition-transform duration-700 ease-in-out" : ""}`}
+                style={{ transform: `translateX(-${slideIndex * 100}%)` }}
+                onTransitionEnd={() => {
+                  if (slides.length > 1 && slideIndex === slides.length) {
+                    setIsSliding(false);
+                    setSlideIndex(0);
+
+                    requestAnimationFrame(() => {
+                      requestAnimationFrame(() => {
+                        setIsSliding(true);
+                      });
+                    });
+                  }
+                }}
+              >
+                {loopedSlides.map((slide, index) => (
+                  <div key={`${slide.id}-${index}`} className="relative h-full min-w-full">
+                    {slide.ctaHref && slide.ctaHref !== "#" ? (
+                      <Link href={slide.ctaHref} className="block relative w-full h-full">
+                        <Image
+                          src={slide.imageUrl}
+                          alt={slide.title}
+                          fill
+                          sizes="100vw"
+                          className="object-contain object-center cursor-pointer"
+                          priority={index === 0}
+                        />
+                      </Link>
+                    ) : (
                       <Image
                         src={slide.imageUrl}
                         alt={slide.title}
                         fill
                         sizes="100vw"
-                        className="object-contain object-center cursor-pointer"
+                        className="object-contain object-center"
                         priority={index === 0}
                       />
-                    </Link>
-                  ) : (
-                    <Image
-                      src={slide.imageUrl}
-                      alt={slide.title}
-                      fill
-                      sizes="100vw"
-                      className="object-contain object-center"
-                      priority={index === 0}
-                    />
-                  )}
-                </div>
-              ))}
-            </div>
-
-            <div className="absolute bottom-3 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 rounded-full bg-white/80 px-3 py-1.5 backdrop-blur-sm lg:bottom-4">
-              {slides.map((slide, index) => (
-                <button
-                  key={slide.id}
-                  type="button"
-                  aria-label={`Go to slide ${index + 1}`}
-                  onClick={() => {
-                    setIsSliding(true);
-                    setSlideIndex(index);
-                  }}
-                  className={`h-2.5 rounded-full transition-all ${index === activeSlide ? "w-7 bg-[#0e56af]" : "w-2.5 bg-slate-300"}`}
-                />
-              ))}
-            </div>
-
-            {shouldShowTimer && (
-              <div className="absolute bottom-2 right-2 z-40 rounded-xl border border-white/20 bg-black/40 p-1.5 text-white backdrop-blur-md sm:bottom-5 sm:right-5 sm:rounded-2xl sm:p-4 lg:bottom-6 lg:right-6">
-                <div className="grid grid-cols-4 gap-1 text-center text-[8px] sm:gap-3 sm:text-sm">
-                  <div>
-                    <div className="rounded bg-[#1976d2] px-1.5 py-1 text-[11px] font-semibold sm:rounded-lg sm:px-3 sm:text-lg">{activeCountdown.days}</div>
-                    <p className="mt-0.5 font-medium text-white/90 sm:mt-2">Days</p>
+                    )}
                   </div>
-                  <div>
-                    <div className="rounded bg-[#1976d2] px-1.5 py-1 text-[11px] font-semibold sm:rounded-lg sm:px-3 sm:text-lg">{activeCountdown.hours}</div>
-                    <p className="mt-0.5 font-medium text-white/90 sm:mt-2">Hour</p>
-                  </div>
-                  <div>
-                    <div className="rounded bg-[#1976d2] px-1.5 py-1 text-[11px] font-semibold sm:rounded-lg sm:px-3 sm:text-lg">{activeCountdown.minutes}</div>
-                    <p className="mt-0.5 font-medium text-white/90 sm:mt-2">Minute</p>
-                  </div>
-                  <div>
-                    <div className="rounded bg-[#1976d2] px-1.5 py-1 text-[11px] font-semibold sm:rounded-lg sm:px-3 sm:text-lg">{activeCountdown.seconds}</div>
-                    <p className="mt-0.5 font-medium text-white/90 sm:mt-2">Second</p>
-                  </div>
-                </div>
+                ))}
               </div>
-            )}
+
+              <div className="absolute bottom-4 right-[12%] lg:right-[16%] xl:right-[18%] 2xl:right-[10%] z-40 flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-2 backdrop-blur-md lg:bottom-6">
+                {slides.map((slide, index) => (
+                  <button
+                    key={slide.id}
+                    type="button"
+                    aria-label={`Go to slide ${index + 1}`}
+                    onClick={() => {
+                      setIsSliding(true);
+                      setSlideIndex(index);
+                    }}
+                    className={`h-2.5 rounded-full transition-all ${index === activeSlide ? "w-7 bg-white" : "w-2.5 bg-white/50"}`}
+                  />
+                ))}
+              </div>
+
+              {shouldShowTimer && (
+                <div className="absolute bottom-2 right-2 z-40 rounded-xl border border-white/20 bg-black/40 p-1.5 text-white backdrop-blur-md sm:bottom-5 sm:right-5 sm:rounded-2xl sm:p-4 lg:bottom-6 lg:right-6">
+                  <div className="grid grid-cols-4 gap-1 text-center text-[8px] sm:gap-3 sm:text-sm">
+                    <div>
+                      <div className="rounded bg-[#1976d2] px-1.5 py-1 text-[11px] font-semibold sm:rounded-lg sm:px-3 sm:text-lg">{activeCountdown.days}</div>
+                      <p className="mt-0.5 font-medium text-white/90 sm:mt-2">Days</p>
+                    </div>
+                    <div>
+                      <div className="rounded bg-[#1976d2] px-1.5 py-1 text-[11px] font-semibold sm:rounded-lg sm:px-3 sm:text-lg">{activeCountdown.hours}</div>
+                      <p className="mt-0.5 font-medium text-white/90 sm:mt-2">Hour</p>
+                    </div>
+                    <div>
+                      <div className="rounded bg-[#1976d2] px-1.5 py-1 text-[11px] font-semibold sm:rounded-lg sm:px-3 sm:text-lg">{activeCountdown.minutes}</div>
+                      <p className="mt-0.5 font-medium text-white/90 sm:mt-2">Minute</p>
+                    </div>
+                    <div>
+                      <div className="rounded bg-[#1976d2] px-1.5 py-1 text-[11px] font-semibold sm:rounded-lg sm:px-3 sm:text-lg">{activeCountdown.seconds}</div>
+                      <p className="mt-0.5 font-medium text-white/90 sm:mt-2">Second</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }

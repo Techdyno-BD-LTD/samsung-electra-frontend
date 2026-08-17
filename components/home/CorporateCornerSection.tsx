@@ -90,11 +90,11 @@ export default function CorporateCornerSection() {
     if (width < 1024) return 380; // md
     if (width < 1280) return 300; // lg (approx 1024px viewport)
     if (width < 1536) return 420; // xl (approx 1280px-1440px viewport)
-    return 550; // 2xl (1536px and above)
+    return 460; // 2xl (1536px and above)
   };
   
   const cardWidth = getCardWidth(windowWidth);
-  const gap = isMobile ? -6 : 16;
+  const gap = isMobile ? -6 : 2;
 
   // Repeat the slides list 5 times for seamless looping
   const repeatedBlogs = [...blogs, ...blogs, ...blogs, ...blogs, ...blogs];
@@ -106,15 +106,15 @@ export default function CorporateCornerSection() {
     <section className="w-full bg-transparent py-12 sm:py-16 overflow-hidden select-none">
       <div className="max-w-[1900px] mx-auto text-center">
         {/* Header */}
-        <h2 className="text-xl sm:text-4xl lg:text-[32px] 2xl:text-[48px] font-bold text-gray-900 mb-2 sm:mb-5">
+        <h2 className="text-xl sm:text-4xl lg:text-[32px] 2xl:text-[38px] font-bold text-gray-900 mb-2 sm:mb-5">
           Corporate Corner
         </h2>
-        <p className="text-gray-900 text-sm lg:text-[16px] 2xl:text-[20px] mb-8 sm:mb-12 max-w-2xl mx-auto px-4">
+        <p className="text-gray-900 text-sm lg:text-[16px] 2xl:text-[18px] mb-8 sm:mb-12 max-w-2xl mx-auto px-4">
           Explore our latest press features, news highlights, and media coverage.
         </p>
 
         {/* Carousel Outer Container */}
-        <div className="relative max-w-[1700px] mx-auto px-4 sm:px-12">
+        <div className="relative max-w-[1500px] mx-auto px-4 sm:px-12">
           {/* Prev Arrow */}
           <button
             onClick={handlePrev}
@@ -138,12 +138,12 @@ export default function CorporateCornerSection() {
                 const cardClasses = `relative flex-shrink-0 transition-all duration-500 ease-out overflow-hidden shadow-lg border border-gray-100 rounded-none ${
                   isActive
                     ? "scale-100 opacity-100 z-10 border-blue-200"
-                    : "scale-[0.85] opacity-50 z-0"
+                    : "scale-[0.85] opacity-100 z-0"
                 }`;
 
                 const cardStyle = {
                   width: `${cardWidth}px`,
-                  height: isMobile ? "280px" : "440px",
+                  height: isMobile ? "280px" : "380px",
                   marginRight: `${gap}px`,
                 };
 
@@ -162,9 +162,9 @@ export default function CorporateCornerSection() {
                       {/* Overlay */}
                       {isActive ? (
                         /* Active Slide Blue Banner style from Figma */
-                        <div className="absolute bottom-0 inset-x-0 bg-blue-600 text-white px-4 py-3 sm:px-8 sm:py-4 text-left flex flex-row items-center justify-between gap-3 h-[85px] sm:h-[110px]">
+                        <div className="absolute bottom-0 inset-x-0 bg-blue-600 text-white px-4 py-3 sm:px-4 sm:py-4 text-left flex flex-row items-center justify-between gap-3 h-[85px] sm:h-[100px]">
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-bold text-xs sm:text-xl line-clamp-1 mb-0.5 sm:mb-1">
+                            <h3 className="font-bold text-xs sm:text-lg line-clamp-1 mb-0.5 sm:mb-1">
                               {blog.title}
                             </h3>
                             <p className="text-[10px] sm:text-base text-blue-100 line-clamp-2 font-light leading-snug">

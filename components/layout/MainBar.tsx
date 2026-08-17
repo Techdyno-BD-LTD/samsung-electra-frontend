@@ -98,7 +98,7 @@ export default function MainBar() {
   return (
     <div className="bg-black   flex items-center ">
       <div className="lg:w-10/12 w-full mx-auto">
-        <div className="flex items-center justify-between py-8">
+        <div className="flex items-center justify-between py-4">
           {/* Logo */}
           {logoUrl ? (
             <Link href="/" className="flex items-center">
@@ -107,15 +107,15 @@ export default function MainBar() {
                 alt="SAMSUNG electra"
                 width={283}
                 height={48}
-                className="h-8 md:h-10 lg:h-11 w-auto"
+                className="h-8 md:h-10 lg:h-8 w-auto"
               />
             </Link>
           ) : null}
 
           {/* Search Bar */}
-          <div className="flex-1 max-w-[700px] mx-8">
+          <div className="flex-1 max-w-[620px] mx-8">
             <div className="relative">
-              <div className="relative flex items-stretch h-14 border-2 border-[#0054A6] rounded-lg">
+              <div className="relative flex items-stretch h-12 border-2 border-[#0054A6] rounded-lg">
               {/* Search Input */}
               <input
                 type="text"
@@ -166,27 +166,27 @@ export default function MainBar() {
             {/* Wishlist */}
             <Link href="/wishlist" className="relative flex items-center gap-3 tracking-tight font-medium text-[#ffffff] hover:opacity-80 transition">
               <div className="relative flex items-center justify-center">
-                <FiHeart className="w-8 h-8 text-[#2b85ff]" />
+                <FiHeart className="w-6 h-6 text-[#2b85ff]" />
                 {mounted && wishlistTotalCount > 0 && (
-                  <span className="absolute -top-3 -right-3 flex h-[18px] w-[18px] items-center justify-center text-[18px] font-base tracking-wider text-[#F7941D]  leading-none">
+                  <span className="absolute -top-4 -right-4 flex h-[18px] w-[18px] items-center justify-center text-[18px] font-base tracking-wider text-[#F7941D]  leading-none">
                     {wishlistTotalCount < 10 ? `0${wishlistTotalCount}` : wishlistTotalCount}
                   </span>
                 )}
               </div>
-              <span className="text-base">Wishlist</span>
+              <span className="text-sm tracking-wide">Wishlist</span>
             </Link>
 
             {/* Compare */}
             <Link href="/compare" className="relative flex items-center gap-2 tracking-tight font-medium text-[#ffffff] hover:opacity-80 transition">
               <div className="relative flex items-center justify-center">
-                <BiGitCompare className="w-8 h-8 text-[#2b85ff]" />
+                <BiGitCompare className="w-6 h-6 text-[#2b85ff]" />
                 {mounted && compareTotalCount > 0 && (
-                  <span className="absolute -top-3 -right-3 flex h-[18px] w-[18px] items-center justify-center text-[18px] font-base tracking-wider text-[#F7941D]  leading-none">
+                  <span className="absolute -top-4 -right-4 flex h-[18px] w-[18px] items-center justify-center text-[18px] font-base tracking-wider text-[#F7941D]  leading-none">
                     {compareTotalCount < 10 ? `0${compareTotalCount}` : compareTotalCount}
                   </span>
                 )}
               </div>
-              <span className="text-base">Compare</span>
+              <span className="text-sm tracking-wide">Compare</span>
             </Link>
 
             {/* Cart with Dropdown */}
@@ -196,14 +196,14 @@ export default function MainBar() {
                 className="relative flex items-center gap-2 tracking-tight font-medium mr-2 text-[#ffffff] hover:opacity-80 transition"
               >
                 <div className="relative flex items-center justify-center">
-                  <FiShoppingCart className="w-8 h-8 text-[#2b85ff]" />
+                  <FiShoppingCart className="w-6 h-6 text-[#2b85ff]" />
                   {mounted && cartTotalCount > 0 && (
-                    <span className="absolute -top-3 -right-3 flex h-[18px] w-[18px] items-center justify-center text-[18px] font-base tracking-wider text-[#F7941D]  leading-none">
+                    <span className="absolute -top-4 -right-4 flex h-[18px] w-[18px] items-center justify-center text-[18px] font-base tracking-wider text-[#F7941D]  leading-none">
                       {cartTotalCount < 10 ? `0${cartTotalCount}` : cartTotalCount}
                     </span>
                   )}
                 </div>
-                <span className="text-base">Cart</span>
+                <span className="text-sm tracking-wide">Cart</span>
               </button>
 
               {isCartDropdownOpen && (

@@ -78,7 +78,7 @@ export default function HearFromYouForm() {
       <div className="max-w-[1700px] mx-auto px-6 md:px-16 lg:px-24">
         <div className="w-full bg-white/20 rounded-[30px] p-8 md:p-8 text-white flex flex-col lg:flex-row items-center justify-between gap-8 shadow-xl">
           <div className="shrink-0 text-center">
-            <h2 className="text-3xl sm:text-4xl font-bold text-center leading-tight text-white select-none">
+            <h2 className="text-xl sm:text-3xl font-bold text-center leading-tight text-white select-none">
               We want to hear<br />from you!
             </h2>
           </div>
@@ -121,9 +121,9 @@ export default function HearFromYouForm() {
                     required
                     className="w-full px-6 py-4 rounded-[20px] border-none bg-gray-100/90 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm shadow-sm resize-none"
                   />
-                  <div className="text-xs text-white/80 mt-2 ml-2">
+                  {/* <div className="text-xs text-white/80 mt-2 ml-2">
                     Posting review as: <span className="font-semibold text-white">{user?.name}</span>
-                  </div>
+                  </div> */}
                 </>
               ) : (
                 <div 

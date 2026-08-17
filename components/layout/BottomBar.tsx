@@ -182,7 +182,7 @@ export default function BottomBar() {
   }, []);
 
   return (
-    <nav className="bg-[#266BF9] h-[3.125rem]  flex items-center  relative z-30">
+    <nav className="bg-[#266BF9]  flex items-center py-0.5  relative z-30">
       <div className="mainwidth flex items-center justify-between gap-6">
         {/* Category Button & Sidebar Dropdown */}
         <div className="relative flex-shrink-0">
@@ -327,12 +327,12 @@ export default function BottomBar() {
         </div>
 
         {/* Existing Navigation Links */}
-        <ul className="flex flex-nowrap uppercase items-center justify-center flex-1 gap-2 lg:gap-6 py-3">
+        <ul className="flex flex-nowrap uppercase items-center justify-center flex-1 gap-2 lg:gap-6 py-1">
           {/* HOME link with separator */}
           <li className="relative flex items-center group  pl-2 lg:pl-4">
             <Link
               href="/"
-              className="text-[14px] 2xl:text-[16px] flex items-center gap-1 transition-colors whitespace-nowrap py-1 text-[#ffffff] hover:text-[#000000] font-medium"
+              className="text-[14px] 2xl:text-[14px] flex items-center gap-1 transition-colors whitespace-nowrap py-1 text-[#ffffff] hover:text-[#000000] font-medium"
             >
               <FaHome className="text-[18px] mr-1 flex-shrink-0" />
               <span>HOME</span>
@@ -349,7 +349,7 @@ export default function BottomBar() {
               {link.href.startsWith("http") ? (
                 <a
                   href={link.href}
-                  className={`text-[14px] 2xl:text-[16px] flex items-center gap-1 transition-colors whitespace-nowrap py-1 ${link.active
+                  className={`text-[14px] 2xl:text-[14px] flex items-center gap-1 transition-colors whitespace-nowrap py-1 ${link.active
                       ? "text-[#ffffff] font-bold border-b-2 border-[#0054A6]"
                       : "text-[#ffffff] hover:text-[#000000] font-medium"
                     }`}
@@ -359,7 +359,7 @@ export default function BottomBar() {
               ) : link.href ? (
                 <Link
                   href={link.href}
-                  className={`text-[14px] 2xl:text-[16px] flex items-center gap-1 transition-colors whitespace-nowrap py-1 ${link.active
+                  className={`text-[14px] 2xl:text-[14px] flex items-center gap-1 transition-colors whitespace-nowrap py-1 ${link.active
                       ? "text-[#ffffff] font-bold border-b-2 border-[#0054A6]"
                       : "text-[#ffffff] hover:text-[#000000] font-medium"
                     }`}

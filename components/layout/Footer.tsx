@@ -188,7 +188,7 @@ export default function Footer() {
                     </svg>
                   ), 
                   href: footerData?.facebook_link, 
-                  color: "text-[#2563EB] border-[#2563EB] hover:bg-blue-50" 
+                  color: "text-slate-300 border-slate-400 hover:text-[#2563EB] hover:border-[#2563EB] hover:bg-blue-50" 
                 },
                 { 
                   icon: (
@@ -198,17 +198,17 @@ export default function Footer() {
                     </svg>
                   ), 
                   href: footerData?.instagram_link, 
-                  color: "text-slate-300 border-slate-400 hover:bg-slate-50" 
+                  color: "text-slate-300 border-slate-400 hover:text-[#E1306C] hover:border-[#E1306C] hover:bg-pink-50" 
                 },
                 { 
                   icon: (
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 00-1.95 1.96A29 29 0 001 12a29 29 0 00.46 5.58 2.78 2.78 0 001.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 001.95-1.96A29 29 0 0023 12a29 29 0 00-.46-5.58z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 00-1.95 1.96A29 29 0 001 12a29 29 0 00.46 5.58 2.78 2.78 0 001.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 00-1.95-1.96A29 29 0 0023 12a29 29 0 00-.46-5.58z" />
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 15.02l5.75-3.02-5.75-3z" />
                     </svg>
                   ), 
                   href: footerData?.youtube_link, 
-                  color: "text-slate-300 border-slate-400 hover:bg-slate-50" 
+                  color: "text-slate-300 border-slate-400 hover:text-[#FF0000] hover:border-[#FF0000] hover:bg-red-50" 
                 },
                 { 
                   icon: (
@@ -217,16 +217,16 @@ export default function Footer() {
                     </svg>
                   ), 
                   href: footerData?.linkedin_link, 
-                  color: "text-slate-300 border-slate-400 hover:bg-slate-50" 
+                  color: "text-slate-300 border-slate-400 hover:text-[#0077B5] hover:border-[#0077B5] hover:bg-blue-50" 
                 },
                 { 
                   icon: (
                     <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.41 7.61 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.166-1.495-.69-2.433-2.878-2.433-4.617 0-3.77 2.739-7.23 7.894-7.23 4.15 0 7.375 2.957 7.375 6.9 0 4.124-2.593 7.44-6.19 7.44-1.205 0-2.338-.625-2.725-1.363l-.742 2.828c-.269 1.025-1.006 2.308-1.499 3.097 1.12.347 2.309.537 3.541.537 6.62 0 11.988-5.367 11.988-11.987C24 5.367 18.632 0 12.017 0z" />
+                      <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.86.02 1.72.01 2.58.02v3.83c-1.12-.01-2.24-.26-3.23-.83-.49-.29-.92-.68-1.25-1.14-.02 2.76-.01 5.51-.02 8.27 0 1.63-.53 3.22-1.5 4.47-.94 1.25-2.36 2.08-3.92 2.33-1.42.23-2.92.01-4.21-.62-1.43-.72-2.52-2-3.04-3.51-.55-1.57-.42-3.34.37-4.81.76-1.46 2.1-2.58 3.7-3.04.53-.15 1.09-.23 1.65-.23.01 1.34 0 2.68.01 4.02-.63.02-1.26.18-1.78.53-.61.41-.99 1.09-1.03 1.83-.07.96.53 1.91 1.45 2.19.68.22 1.43.15 2.05-.2.62-.35 1.05-.98 1.13-1.69.04-3.94.02-7.88.03-11.82z" />
                     </svg>
                   ), 
-                  href: footerData?.tiktok_link || "#", 
-                  color: "text-slate-300 border-slate-400 hover:bg-slate-50" 
+                  href: footerData?.tiktok_link || undefined, 
+                  color: "text-slate-300 border-slate-400 hover:text-black hover:border-black hover:bg-slate-100" 
                 }
               ].map((soc, sIdx) => {
                 if (!soc.href) return null;
@@ -271,9 +271,13 @@ export default function Footer() {
                 }`}
               >
                 <span>POPULAR</span>
-                <span className="text-[10px]">{mobileExpanded === "popular" ? "▼" : "▶"}</span>
+                <span className="text-[10px] transition-transform duration-300" style={{ transform: mobileExpanded === "popular" ? "rotate(90deg)" : "rotate(0deg)" }}>▶</span>
               </button>
-              {mobileExpanded === "popular" && (
+              <div 
+                className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                  mobileExpanded === "popular" ? "max-h-[300px] opacity-100" : "max-h-0 opacity-0 pointer-events-none"
+                }`}
+              >
                 <ul className="px-4 py-2 space-y-2 text-[12px] text-white/80 bg-black/10 border-x border-b border-white/5 rounded-b-lg">
                   {popularSection.links.map((link, i) => (
                     <li key={i} className="py-1 border-b border-white/10 last:border-0">
@@ -283,7 +287,7 @@ export default function Footer() {
                     </li>
                   ))}
                 </ul>
-              )}
+              </div>
             </div>
 
             {/* 2. COMPANY ACCORDION */}
@@ -295,9 +299,13 @@ export default function Footer() {
                 }`}
               >
                 <span>COMPANY</span>
-                <span className="text-[10px]">{mobileExpanded === "company" ? "▼" : "▶"}</span>
+                <span className="text-[10px] transition-transform duration-300" style={{ transform: mobileExpanded === "company" ? "rotate(90deg)" : "rotate(0deg)" }}>▶</span>
               </button>
-              {mobileExpanded === "company" && (
+              <div 
+                className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                  mobileExpanded === "company" ? "max-h-[300px] opacity-100" : "max-h-0 opacity-0 pointer-events-none"
+                }`}
+              >
                 <ul className="px-4 py-2 space-y-2 text-[12px] text-white/80 bg-black/10 border-x border-b border-white/5 rounded-b-lg">
                   {companySection.links.map((link, i) => (
                     <li key={i} className="py-1 border-b border-white/10 last:border-0">
@@ -307,7 +315,7 @@ export default function Footer() {
                     </li>
                   ))}
                 </ul>
-              )}
+              </div>
             </div>
 
             {/* 3. ACCOUNT ACCORDION */}
@@ -319,9 +327,13 @@ export default function Footer() {
                 }`}
               >
                 <span>ACCOUNT</span>
-                <span className="text-[10px]">{mobileExpanded === "account" ? "▼" : "▶"}</span>
+                <span className="text-[10px] transition-transform duration-300" style={{ transform: mobileExpanded === "account" ? "rotate(90deg)" : "rotate(0deg)" }}>▶</span>
               </button>
-              {mobileExpanded === "account" && (
+              <div 
+                className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                  mobileExpanded === "account" ? "max-h-[300px] opacity-100" : "max-h-0 opacity-0 pointer-events-none"
+                }`}
+              >
                 <ul className="px-4 py-2 space-y-2 text-[12px] text-white/80 bg-black/10 border-x border-b border-white/5 rounded-b-lg">
                   {myAccountSection.links.map((link, i) => (
                     <li key={i} className="py-1 border-b border-white/10 last:border-0">
@@ -331,7 +343,7 @@ export default function Footer() {
                     </li>
                   ))}
                 </ul>
-              )}
+              </div>
             </div>
 
             {/* 4. AFTER SALES ACCORDION */}
@@ -343,9 +355,13 @@ export default function Footer() {
                 }`}
               >
                 <span>AFTER SALES SUPPORT</span>
-                <span className="text-[10px]">{mobileExpanded === "aftersales" ? "▼" : "▶"}</span>
+                <span className="text-[10px] transition-transform duration-300" style={{ transform: mobileExpanded === "aftersales" ? "rotate(90deg)" : "rotate(0deg)" }}>▶</span>
               </button>
-              {mobileExpanded === "aftersales" && (
+              <div 
+                className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                  mobileExpanded === "aftersales" ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0 pointer-events-none"
+                }`}
+              >
                 <ul className="px-4 py-2 space-y-3.5 text-[11px] text-white/80 bg-black/10 border-x border-b border-white/5 rounded-b-lg">
                   {afterSalesSection.links.map((link, i) => {
                     const parts = link.label.split('-');
@@ -359,7 +375,7 @@ export default function Footer() {
                     );
                   })}
                 </ul>
-              )}
+              </div>
             </div>
           </div>
         </div>
@@ -443,16 +459,18 @@ export default function Footer() {
           </div>
 
           {/* Grid containing all 6 columns */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 w-full items-start">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 w-full items-start">
             {/* Column 1: CONTACT */}
-            <div className="space-y-4">
+            <div className="space-y-4 lg:col-span-3 md:col-span-1 col-span-1">
               <h3 className="text-[14px] font-bold text-white uppercase tracking-wider border-b border-white/20 pb-2">
                 Contact
               </h3>
               <div className="space-y-3 text-[13px] text-white/80">
-                <div className="flex items-start gap-2">
-                  <Image src="/images/phone-call.png" alt="Phone" width={14} height={14} className="mt-0.5" />
-                  <p>
+                <div className="flex items-start gap-2.5">
+                  <svg className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
+                  <p className="font-semibold text-white/95">
                     {phones.map((phone, idx) => (
                       <span key={idx}>
                         {phone}
@@ -461,13 +479,18 @@ export default function Footer() {
                     ))}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Image src="/images/mail.png" alt="Email" width={14} height={14} />
-                  <p>{footerData?.email || "info@electrabd.com"}</p>
+                <div className="flex items-center gap-2.5">
+                  <svg className="w-4 h-4 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  <p className="font-semibold text-white/95">{footerData?.email || "info@electrabd.com"}</p>
                 </div>
-                <div className="flex items-start gap-2">
-                  <Image src="/images/map-pin.png" alt="Address" width={14} height={14} className="mt-0.5" />
-                  <p className="leading-relaxed">
+                <div className="flex items-start gap-2.5">
+                  <svg className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <p className="leading-relaxed font-semibold text-white/95">
                     {footerData?.address || "Tropical Mollah Tower (6th Floor), 15/1-15/4 Pragati Sarani, Middle Badda, Dhaka - 1212, Bangladesh"}
                   </p>
                 </div>
@@ -476,13 +499,13 @@ export default function Footer() {
               {/* Email signup form */}
               <div className="pt-4 space-y-2">
                 <p className="text-[13px] font-bold text-white">Don&apos;t Miss Your Cart!</p>
-                <div className="flex w-full max-w-[240px] items-center bg-[#1A1A1A]/80 border border-white/20 rounded-md overflow-hidden">
+                <div className="flex w-full max-w-[340px] items-center bg-[#1A1A1A]/80 border border-white/20 rounded-md overflow-hidden">
                   <input 
                     type="email" 
                     placeholder="Enter email" 
-                    className="w-full bg-transparent px-3 py-1.5 text-xs text-white placeholder-white/40 focus:outline-none"
+                    className="w-full bg-transparent px-3 py-23 text-xs text-white placeholder-white/40 focus:outline-none"
                   />
-                  <button className="bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold px-3 py-1.5 transition-colors">
+                  <button className="bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold px-6 py-3 transition-colors whitespace-nowrap">
                     SIGN UP
                   </button>
                 </div>
@@ -490,7 +513,7 @@ export default function Footer() {
             </div>
 
             {/* Column 2: POPULAR */}
-            <div>
+            <div className="lg:col-span-1 md:col-span-1 col-span-1">
               <h3 className="text-[14px] font-bold text-white uppercase tracking-wider border-b border-white/20 pb-2 mb-4">
                 {popularSection.title || "Popular"}
               </h3>
@@ -506,7 +529,7 @@ export default function Footer() {
             </div>
 
             {/* Column 3: COMPANY */}
-            <div>
+            <div className="lg:col-span-2 md:col-span-1 col-span-1">
               <h3 className="text-[14px] font-bold text-white uppercase tracking-wider border-b border-white/20 pb-2 mb-4">
                 {companySection.title || "Company"}
               </h3>
@@ -522,7 +545,7 @@ export default function Footer() {
             </div>
 
             {/* Column 4: ACCOUNT */}
-            <div>
+            <div className="lg:col-span-2 md:col-span-1 col-span-1">
               <h3 className="text-[14px] font-bold text-white uppercase tracking-wider border-b border-white/20 pb-2 mb-4">
                 {myAccountSection.title || "Account"}
               </h3>
@@ -538,7 +561,7 @@ export default function Footer() {
             </div>
 
             {/* Column 5: AFTER SALES SUPPORT */}
-            <div>
+            <div className="lg:col-span-2 md:col-span-1 col-span-1">
               <h3 className="text-[14px] font-bold text-white uppercase tracking-wider border-b border-white/20 pb-2 mb-4">
                 {afterSalesSection.title || "After Sales Support"}
               </h3>
@@ -558,7 +581,7 @@ export default function Footer() {
             </div>
 
             {/* Column 6: ABOUT US */}
-            <div className="space-y-4">
+            <div className="lg:col-span-2 md:col-span-1 col-span-1 space-y-4">
               <h3 className="text-[14px] font-bold text-white uppercase tracking-wider border-b border-white/20 pb-2">
                 About Us
               </h3>
@@ -639,7 +662,7 @@ export default function Footer() {
         </div>
 
         {/* Footer Bottom */}
-        <div className="w-full bg-blue-500 py-2 px-4 lg:px-12 mt-12 relative border-t border-white/10">
+        <div className="w-full bg-blue-500 py-2 px-4 lg:px-12 mt-2 relative border-t border-white/10">
           <p className="text-center text-white text-[16px] tracking-wide font-medium">
             {footerData?.copyright_text || `© ${mounted ? currentYear : 2026} samsung electra.all rights reserved`}
           </p>

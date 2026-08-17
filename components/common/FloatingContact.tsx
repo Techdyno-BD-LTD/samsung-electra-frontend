@@ -3,12 +3,13 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { IoClose } from "react-icons/io5";
-import { FaWhatsapp } from "react-icons/fa";
+import { FaChevronUp, FaWhatsapp } from "react-icons/fa";
 import { SiMessenger } from "react-icons/si";
 
 export default function FloatingContact() {
   const [isOpen, setIsOpen] = useState(false);
   const [footerData, setFooterData] = useState<any>(null);
+  const [showScroll, setShowScroll] = useState(false);
 
   useEffect(() => {
     fetch("/api/footer-settings")
@@ -20,6 +21,18 @@ export default function FloatingContact() {
       })
       .catch((err) => console.error("Failed to fetch footer data:", err));
   }, []);
+
+  useEffect(() => {
+    const checkScrollTop = () => {
+      if (!showScroll && window.scrollY > 300) {
+        setShowScroll(true);
+      } else if (showScroll && window.scrollY <= 300) {
+        setShowScroll(false);
+      }
+    };
+    window.addEventListener("scroll", checkScrollTop);
+    return () => window.removeEventListener("scroll", checkScrollTop);
+  }, [showScroll]);
 
   const getWhatsappHref = (raw: string | undefined) => {
     if (!raw) return "#";
@@ -33,7 +46,12 @@ export default function FloatingContact() {
     }
     return `https://wa.me/${cleaned}`;
   };
-
+const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
   const getMessengerHref = (facebookLink: string | undefined) => {
     if (!facebookLink) return "#";
     return facebookLink.trim().replace(/(https?:\/\/)?(www\.)?facebook\.com\//, "https://m.me/");
@@ -43,7 +61,8 @@ export default function FloatingContact() {
   const messengerUrl = getMessengerHref(footerData?.facebook_link);
 
   return (
-    <div className="fixed right-4 bottom-20 lg:bottom-auto lg:top-[48%] lg:[@media(max-height:720px)]:top-[45%] lg:right-10 z-[9999] flex flex-col-reverse lg:flex-col items-end pointer-events-none">
+    <>
+      <div className="fixed right-4 bottom-20 lg:bottom-auto lg:top-[48%] lg:[@media(max-height:720px)]:top-[45%] lg:right-10 z-[9999] flex flex-col-reverse lg:flex-col items-end pointer-events-none">
       {/* Floating Trigger Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
@@ -105,22 +124,69 @@ export default function FloatingContact() {
             </a>
 
             {/* Messenger Option */}
-            <a
-              href={messengerUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 lg:gap-3.5 p-1 rounded-xl hover:bg-slate-50 transition-colors group"
-            >
-              <div className="w-9 h-9 lg:w-11 lg:h-11 rounded-full bg-gradient-to-tr from-[#006AFF] to-[#00B2FF] flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
-                <SiMessenger className="w-4 h-4 lg:w-[22px] lg:h-[22px]" />
-              </div>
-              <span className="text-xs lg:text-[15px] font-semibold text-slate-700 group-hover:text-slate-900">
-                Chat on messenger
-              </span>
-            </a>
+           <a
+  href={messengerUrl}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="flex items-center gap-2 lg:gap-3.5 p-1 rounded-xl hover:bg-slate-50 transition-colors group"
+>
+  {/* Messenger Icon */}
+  <div className="w-9 h-9 lg:w-11 lg:h-11 flex items-center justify-center shadow-sm transition-transform group-hover:scale-105">
+    <svg
+      viewBox="0 0 48 48"
+      className="w-full h-full"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <defs>
+        <linearGradient
+          id="messengerGradient"
+          x1="6.8"
+          y1="41.2"
+          x2="41.2"
+          y2="6.8"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop offset="0%" stopColor="#0099FF" />
+          <stop offset="35%" stopColor="#A033FF" />
+          <stop offset="70%" stopColor="#FF52A0" />
+          <stop offset="100%" stopColor="#FF7061" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M24 4C12.95 4 4 12.4 4 22.8c0 5.9 2.87 11.2 7.37 14.8V44l6.19-3.4c2.04.57 4.2.88 6.44.88 11.05 0 20-8.4 20-18.8S35.05 4 24 4z"
+        fill="url(#messengerGradient)"
+      />
+      <path
+        d="M25.8 28.5l-5.6-6-10.9 6 12-12.7 5.6 6 10.9-6-12 12.7z"
+        fill="#FFFFFF"
+      />
+    </svg>
+  </div>
+
+  <span className="text-xs lg:text-[15px] font-semibold text-slate-700 group-hover:text-slate-900">
+    Chat on messenger
+  </span>
+</a>
           </div>
         </div>
       </div>
+
+    
     </div>
+
+      {/* Separate Scroll To Top Button (At the bottom right) */}
+      <div className="fixed right-4 bottom-4 lg:right-10 lg:bottom-8 z-[9999] pointer-events-none">
+        <button
+          onClick={scrollToTop}
+          className={`w-12 h-12 lg:w-14 lg:h-14 rounded-full bg-[#2B7FE8] hover:bg-blue-600 text-white shadow-[0_4px_20px_rgba(0,0,0,0.15)] transition-all duration-300 flex items-center justify-center pointer-events-auto focus:outline-none hover:scale-105 active:scale-95 ${
+            showScroll ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none h-0 w-0 overflow-hidden"
+          }`}
+          aria-label="Scroll to top"
+        >
+          <FaChevronUp className="w-5 h-5 lg:w-6 lg:h-6" />
+        </button>
+      </div>
+    </>
   );
 }

@@ -13,6 +13,7 @@ type BackendSliderResponse = {
 	data: {
 		text: string;
 		sliders: BackendSlider[];
+		sliders_mobile?: BackendSlider[];
 	};
 	success: boolean;
 	status: number;
@@ -25,7 +26,7 @@ export async function GET() {
 	if (!baseUrl || !systemKey) {
 		return NextResponse.json(
 			{
-				data: { text: "", sliders: [] },
+				data: { text: "", sliders: [], sliders_mobile: [] },
 				success: false,
 				status: 500,
 				message: "Missing API_BASE_URL or API_SYSTEM_KEY in frontend env.",
@@ -48,7 +49,7 @@ export async function GET() {
 		if (!response.ok) {
 			return NextResponse.json(
 				{
-					data: { text: '', sliders: [] },
+					data: { text: '', sliders: [], sliders_mobile: [] },
 					success: false,
 					status: response.status,
 					message: "Failed to fetch sliders from backend.",
@@ -62,7 +63,7 @@ export async function GET() {
 	} catch {
 		return NextResponse.json(
 			{
-				data: { text: "", sliders: [] },
+				data: { text: "", sliders: [], sliders_mobile: [] },
 				success: false,
 				status: 500,
 				message: "Unable to reach backend sliders API.",

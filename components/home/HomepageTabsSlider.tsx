@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import Link from "next/link";
 import ProductCard from "../common/ProductCard";
 import Skeleton from "../common/Skeleton";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
@@ -101,24 +102,35 @@ export default function HomepageTabsSlider() {
         }
       `}} />
       
-      {/* Tabs list (left-aligned) */}
-      <div className="flex gap-2.5 sm:gap-4 mb-6 sm:mb-8 overflow-x-auto pb-1 scrollbar-none">
-        {tabs.map((tab) => {
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 sm:px-7 sm:py-4 rounded-lg text-sm sm:text-xl font-semibold tracking-wide border transition-all duration-300 ${
-                isActive
-                  ? "bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white border-[#2563EB]"
-                  : "bg-white text-[#2563EB] border-blue-400 hover:bg-gray-50"
-              }`}
-            >
-              {tab.label}
-            </button>
-          );
-        })}
+      {/* Tabs list and See All Button wrapper */}
+      <div className="flex items-center justify-center lg:justify-between mb-6 sm:mb-8 gap-4">
+        {/* Tabs list (left-aligned) */}
+        <div className="flex gap-2.5 sm:gap-4 overflow-x-auto pb-1 justify-center lg:justify-start scrollbar-none">
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-4 py-2 sm:px-6 sm:py-3 rounded-lg text-sm sm:text-[18px] font-semibold tracking-wide border transition-all duration-300 ${
+                  isActive
+                    ? "bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white border-[#2563EB]"
+                    : "bg-white text-[#2563EB] border-blue-400 hover:bg-gray-50"
+                }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* See All Button */}
+        <Link
+          href={`/search?tab=${activeTab}`}
+          className="px-4 py-2 sm:px-6 sm:py-2.5 hidden lg:block rounded-lg text-sm sm:text-[18px] font-semibold text-blue-600 border border-blue-400 hover:bg-blue-500 hover:text-white transition-all duration-300 flex-shrink-0"
+        >
+          See All
+        </Link>
       </div>
 
       {/* Slider Viewport Container */}

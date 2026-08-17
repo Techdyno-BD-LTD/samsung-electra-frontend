@@ -106,7 +106,7 @@ export default function HomeSliderTwo() {
   };
 
   const isMobile = windowWidth < 768;
-  const slideWidth = isMobile ? Math.min(windowWidth * 0.72, 340) : 520;
+  const slideWidth = isMobile ? Math.min(windowWidth * 0.72, 340) : 440;
   const gap = isMobile ? -10 : 5;
 
   // Repeat the slides list 5 times for seamless looping
@@ -120,16 +120,16 @@ export default function HomeSliderTwo() {
       {/* Title & Navigation Header */}
       <div className="relative w-full max-w-[1650px] mx-auto lg:mb-8 mt-4 lg:mt-16 flex flex-col items-center justify-center text-center">
         <div className="px-4">
-          <h2 className="text-xl lg:text-[32px] 2xl:text-[48px] font-bold text-gray-900 tracking-tight mb-2">
+          <h2 className="text-xl lg:text-[32px] 2xl:text-[38px] font-bold text-gray-900 tracking-tight mb-2">
             {title}
           </h2>
-          <p className="text-sm lg:text-[16px]  2xl:text-[20px] lg:mt-7  text-gray-500 max-w-[400px] lg:max-w-[750px] mx-auto">
+          <p className="text-sm lg:text-[16px]  2xl:text-[18px] lg:mt-7  text-gray-500 max-w-[400px] lg:max-w-[750px] mx-auto">
             {text}
           </p>
         </div>
 
         {/* Custom Navigation Arrows */}
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 hidden md:flex gap-2">
+        <div className="absolute right-32 top-1/2 -translate-y-1/2 hidden md:flex gap-2">
           <button
             onClick={handlePrev}
             className="w-10 h-10 flex items-center justify-center rounded bg-blue-600 text-white hover:bg-blue-700 transition-colors"
@@ -172,7 +172,7 @@ export default function HomeSliderTwo() {
       </div>
 
       {/* Sliding Track Viewport */}
-      <div className="relative w-full max-w-[1500px] mx-auto overflow-hidden min-h-[300px] md:min-h-[580px] py-4">
+      <div className="relative w-full max-w-[1400px] mx-auto overflow-hidden min-h-[300px] md:min-h-[480px] ">
         {/* Left Arrow for Mobile (Overlaid on left card) */}
         <button
           onClick={handlePrev}

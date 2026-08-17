@@ -1027,7 +1027,7 @@ const ProductCard = ({
         </div>
 
         {/* Top Right Actions: Shopping Cart, Heart, Compare stacked */}
-        <div className="absolute right-2 top-2 sm:right-3 sm:top-3 z-10 flex flex-col gap-1.5 sm:gap-2">
+        <div className="absolute right-2 top-2 sm:right-3 sm:top-3 z-10 flex flex-col gap-1.5 sm:gap-2 sm:opacity-0 sm:group-hover/card:opacity-100 transition-opacity duration-300">
           <button 
             type="button" 
             onClick={handleToggleWishlist} 
@@ -1096,7 +1096,7 @@ const ProductCard = ({
       </div>
 
       {/* Bottom half with white background */}
-      <div className="w-full bg-white p-2 sm:p-3 pb-0 flex flex-col justify-between flex-1 relative">
+      <div className="w-full bg-white p-2  pb-0 flex flex-col justify-between flex-1 relative">
         <div>
           {/* Category */}
           <p className="text-[10px] sm:text-[14px] font-semibold text-gray-400 text-center uppercase tracking-wider mb-0.5 sm:mb-1 mt-0.5 sm:mt-1">
@@ -1104,7 +1104,7 @@ const ProductCard = ({
           </p>
 
           {/* Title */}
-          <h3 className="line-clamp-2 text-center text-[12px] sm:text-[16px] font-medium text-gray-700 leading-tight mb-1.5 sm:mb-2 tracking-tight min-h-[28px] sm:min-h-[32px] px-1 sm:px-2">
+          <h3 className="line-clamp-2 text-center text-[12px] sm:text-[14px] font-medium text-gray-700 leading-tight mb-1.5 sm:mb-2 tracking-tight min-h-[28px] sm:min-h-[32px] px-1 sm:px-2">
             <Link href={productHref} onClick={handleSelectItem} className="hover:text-[#2563eb] transition-colors">
               {productData?.name || title}
             </Link>
@@ -1116,7 +1116,7 @@ const ProductCard = ({
               BDT.
             </span>
 
-            <span className="text-[16px] sm:text-[32px] font-bold text-[#2563eb]">
+            <span className="text-[16px] sm:text-[26px] font-bold text-[#2563eb]">
               {(() => {
                 const pr = productData?.main_price || price;
                 if (!pr) return "";
@@ -1145,7 +1145,7 @@ const ProductCard = ({
         {/* Divider and Sliding Action Area */}
         <div className="mt-auto">
           {/* Desktop divider */}
-          <div className="hidden sm:block border-t border-gray-100 my-1"></div>
+          <div className="hidden sm:block border-t border-gray-100 "></div>
           
           {/* Desktop Hover Sliding Area */}
           <div className="hidden sm:flex relative overflow-hidden h-[44px] w-[calc(100%+24px)] -mx-3 items-center">

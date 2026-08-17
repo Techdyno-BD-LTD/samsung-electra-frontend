@@ -110,19 +110,19 @@ export default function CustomerStoriesSection() {
   };
 
   return (
-    <section className="relative w-full bg-transparent lg:pt-16 overflow-hidden">
+    <section className="relative w-full bg-transparent lg:pt-4 overflow-hidden">
       {/* Header */}
       <div className="max-w-[1700px] mb-1 lg:mb-10 mx-auto text-center px-6 md:px-16 lg:px-24">
-        <h2 className="text-xl sm:text-4xl lg:text-[32px] 2xl:text-[48px] font-bold text-gray-900 mb-2">
+        <h2 className="text-xl sm:text-4xl lg:text-[32px] 2xl:text-[38px] font-bold text-gray-900 mb-2 lg:mb-4">
           Customer Stories
         </h2>
-        <p className="text-gray-500 text-sm lg:text-[16px] 2xl:text-[20px] mb-40 lg:mb-60 max-w-2xl mx-auto">
+        <p className="text-gray-500 text-sm lg:text-[16px] 2xl:text-[18px] mb-40 lg:mb-60 max-w-2xl mx-auto">
           Now Serving You Across 37 Outlets Nationwide
         </p>
       </div>
 
       {/* Overlapping Blue Backdrop */}
-      <div className="relative w-full rounded-t-[50px] bg-blue-600 lg:pt-28 pt-20 pb-12">
+      <div className="relative w-full rounded-t-[150px] bg-blue-600 lg:pt-28 pt-20 pb-12">
         <div className="max-w-[1700px] mx-auto px-6 md:px-16 lg:px-24 flex items-center justify-between gap-6 relative">
           
           {/* Prev Arrow (Desktop Only) */}
@@ -142,8 +142,8 @@ export default function CustomerStoriesSection() {
               return (
                 <React.Fragment key={item.id}>
                   {/* --- Desktop Layout (Unchanged) --- */}
-                  <div className="hidden lg:flex relative bg-white rounded-3xl pt-16 pb-8 px-6 text-center shadow-lg border border-gray-100 flex-col justify-between h-[500px]">
-                    <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-24 h-24 rounded-full border-4 border-blue-500 bg-blue-100 shadow-md overflow-hidden flex items-center justify-center">
+                  <div className="hidden lg:flex relative bg-white rounded-3xl pt-16 pb-8 px-6 text-center shadow-lg border border-gray-100 flex-col justify-between h-[350px]">
+                    <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-[88px] h-[88px] rounded-full border-4 border-blue-500 bg-blue-100 shadow-md overflow-hidden flex items-center justify-center">
                       <Image
                         src={item.avatar || "/assets/img/avatar-place.png"}
                         alt={item.name}
@@ -153,13 +153,13 @@ export default function CustomerStoriesSection() {
                       />
                     </div>
 
-                    <span className="text-[80px] text-gray-200 font-serif leading-none absolute top-6 left-6 select-none">“</span>
+                    <span className="text-[80px] text-gray-200 font-serif leading-none absolute top-16 left-6 select-none">“</span>
                     
-                    <p className="text-gray-900 2xl:text-xl leading-relaxed line-clamp-4 font-base pt-2 flex-grow flex items-center justify-center">
+                    <p className="text-gray-900 xl:text-base leading-relaxed line-clamp-4 font-base pt-2 flex-grow flex items-center justify-center">
                       {item.comment}
                     </p>
                     
-                    <span className="text-[80px] text-gray-200 font-serif leading-none absolute bottom-20 right-6 select-none">”</span>
+                    <span className="text-[80px] text-gray-200 font-serif leading-none absolute bottom-24 right-6 select-none">”</span>
 
                     <div className="mt-4 border-t border-gray-100 pt-4">
                       <div className="flex items-center justify-center gap-1 mb-2">
@@ -173,8 +173,8 @@ export default function CustomerStoriesSection() {
                         ))}
                       </div>
 
-                      <h4 className="font-bold text-gray-900 text-[20px]">{item.name}</h4>
-                      <p className="text-[16px] text-gray-400 font-medium mt-0.5">
+                      <h4 className="font-bold text-gray-900 text-[16px]">{item.name}</h4>
+                      <p className="text-[14px] text-gray-400 font-medium mt-0.5">
                         Reviewed On {formatDate(item.created_at)}
                       </p>
                     </div>

@@ -16,8 +16,9 @@ export async function generateMetadata({ searchParams }: { searchParams: { q?: s
     };
 }
 
-export default async function SearchPage({ searchParams }: { searchParams: { q?: string; cat?: string } }) {
+export default async function SearchPage({ searchParams }: { searchParams: { q?: string; cat?: string; tab?: string } }) {
   const query = searchParams.q || "";
+  const tab = searchParams.tab || "";
   const categoryId = searchParams.cat || null;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
@@ -51,6 +52,13 @@ export default async function SearchPage({ searchParams }: { searchParams: { q?:
     console.error("Error fetching search page banner:", err);
   }
 
+  const tabNames: { [key: string]: string } = {
+    "new-arrivals": "New Arrivals",
+    "hot-sale": "Hot Sale",
+    "top-rated": "Top Rated",
+  };
+  const displayName = tab ? (tabNames[tab] || "Products") : `"${query}"`;
+
   return (
     <div className="mainwidth mx-auto px-4 lg:px-0">
       <div className="mt-4 lg:mt-16">
@@ -76,7 +84,7 @@ export default async function SearchPage({ searchParams }: { searchParams: { q?:
           <span className="text-slate-400">›</span>
           <span className="text-slate-700">Search Results</span>
           <span className="text-slate-400">›</span>
-          <span className="text-slate-700">&quot;{query}&quot;</span>
+          <span className="text-slate-700">{displayName}</span>
         </nav>
 
         {/* ═══════════════ MAIN LAYOUT ═══════════════ */}
@@ -106,6 +114,7 @@ export default async function SearchPage({ searchParams }: { searchParams: { q?:
             <SearchProductGrid 
               query={query} 
               categoryId={categoryId} 
+              tab={tab}
               filteringAttributes={filteringAttributes} 
             />
           </div>
@@ -113,7 +122,7 @@ export default async function SearchPage({ searchParams }: { searchParams: { q?:
 
         {/* Search FAQ or relevant content */}
         <div className="mt-8 lg:mt-0">
-          <CategoryFAQ categoryName={`Search: ${query}`} />
+          <CategoryFAQ categoryName={displayName} />
         </div>
       </div>
     </div>

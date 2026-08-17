@@ -9,6 +9,8 @@ type BottomBannerIcon = {
 
 type BottomBannerItem = {
   image: string | null;
+  mobile_image?: string | null;
+  mobile_link?: string | null;
   title: string | null;
   subtitle: string | null;
   icons: BottomBannerIcon[];

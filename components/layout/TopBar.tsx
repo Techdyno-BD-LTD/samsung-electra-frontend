@@ -61,13 +61,13 @@ export default function TopBar() {
   const getUtilityIcon = (title: string) => {
     const lower = title.toLowerCase();
     if (lower.includes("b2b") || lower.includes("dealership")) {
-      return <FiGlobe className="text-[#1e90ff] text-[24px] flex-shrink-0" />;
+      return <FiGlobe className="text-[#1e90ff] text-[18px] flex-shrink-0" />;
     }
     if (lower.includes("store") || lower.includes("location")) {
-      return <HiOutlineBuildingStorefront className="text-[#1e90ff] text-[24px] flex-shrink-0" />;
+      return <HiOutlineBuildingStorefront className="text-[#1e90ff] text-[18px] flex-shrink-0" />;
     }
     if (lower.includes("track") || lower.includes("order")) {
-      return <FiPackage className="text-[#1e90ff] text-[24px] flex-shrink-0" />;
+      return <FiPackage className="text-[#1e90ff] text-[18px] flex-shrink-0" />;
     }
     return null;
   };
@@ -78,9 +78,9 @@ export default function TopBar() {
         <div className="flex items-center justify-between py-1.5 ">
 
           {supportText ? (
-            <div className="flex items-center gap-2">
+            <div className="flex text-[14px] items-center gap-2">
               <span className="text-gray-700">|</span>
-              <RiPhoneFill className="text-[#1e90ff] text-[24px] flex-shrink-0" />
+              <RiPhoneFill className="text-[#1e90ff] md:text-[18px] text-[10px] flex-shrink-0" />
               <span className="text-white tracking-wide">{supportText}</span>
             </div>
           ) : <div />}
@@ -136,7 +136,7 @@ export default function TopBar() {
                 );
               }
 
-              return renderLink(item.id, linkHref, content, "flex items-center gap-2 text-white hover:text-blue-400 transition font-semibold");
+              return renderLink(item.id, linkHref, content, "flex items-center gap-2 text-[14px] text-white hover:text-blue-400 transition font-semibold");
             })}
           </div>
 

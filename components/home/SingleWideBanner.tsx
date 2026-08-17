@@ -9,6 +9,7 @@ type BannerItem = {
   file_name: string;
   link: string | null;
   external_link: string | null;
+  is_mobile?: boolean;
 };
 
 type BannersResponse = {
@@ -20,7 +21,8 @@ type BannersResponse = {
 };
 
 export default function SingleWideBanner() {
-  const [item, setItem] = useState<BannerItem | null>(null);
+  const [pcItem, setPcItem] = useState<BannerItem | null>(null);
+  const [mobileItem, setMobileItem] = useState<BannerItem | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -31,10 +33,17 @@ export default function SingleWideBanner() {
         if (!response.ok) return;
         const payload = (await response.json()) as BannersResponse;
         if (isMounted) {
-          setItem(payload.data?.bannersTwo?.[0] ?? null);
+          const list = payload.data?.bannersTwo ?? [];
+          const pc = list.find((item) => !item.is_mobile) ?? list[0] ?? null;
+          const mob = list.find((item) => !!item.is_mobile) ?? pc;
+          setPcItem(pc);
+          setMobileItem(mob);
         }
       } catch {
-        if (isMounted) setItem(null);
+        if (isMounted) {
+          setPcItem(null);
+          setMobileItem(null);
+        }
       }
     }
 
@@ -44,21 +53,25 @@ export default function SingleWideBanner() {
     };
   }, []);
 
-  if (!item) return null;
+  if (!pcItem) return null;
 
-  const href = item.link || item.external_link || "#";
-  const isExternal = /^https?:\/\//i.test(href);
+  const pcHref = pcItem.link || pcItem.external_link || "#";
+  const pcIsExternal = /^https?:\/\//i.test(pcHref);
+
+  const mobHref = mobileItem ? (mobileItem.link || mobileItem.external_link || "#") : pcHref;
+  const mobIsExternal = /^https?:\/\//i.test(mobHref);
 
   return (
     <section className="w-full">
+      {/* Desktop Banner (1920x280) */}
       <a
-        href={href}
-        target={isExternal ? "_blank" : undefined}
-        rel={isExternal ? "noopener noreferrer" : undefined}
-        className="relative block w-full aspect-[1920/280]"
+        href={pcHref}
+        target={pcIsExternal ? "_blank" : undefined}
+        rel={pcIsExternal ? "noopener noreferrer" : undefined}
+        className="hidden lg:block relative w-full aspect-[1920/280]"
       >
         <Image
-          src={item.image}
+          src={pcItem.image}
           alt="Promotional wide banner"
           fill
           sizes="100vw"
@@ -66,6 +79,25 @@ export default function SingleWideBanner() {
           priority
         />
       </a>
+
+      {/* Mobile Banner (414x138) */}
+      {mobileItem && (
+        <a
+          href={mobHref}
+          target={mobIsExternal ? "_blank" : undefined}
+          rel={mobIsExternal ? "noopener noreferrer" : undefined}
+          className="lg:hidden block relative w-full max-w-[414px] mx-auto aspect-[414/138]"
+        >
+          <Image
+            src={mobileItem.image}
+            alt="Promotional wide banner mobile"
+            fill
+            sizes="100vw"
+            className="object-cover object-center"
+            priority
+          />
+        </a>
+      )}
     </section>
   );
 }

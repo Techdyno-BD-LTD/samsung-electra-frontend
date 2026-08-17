@@ -9,6 +9,7 @@ import Skeleton from "@/components/common/Skeleton";
 type SearchProductGridProps = {
   query: string;
   categoryId?: string | null;
+  tab?: string;
   filteringAttributes?: { 
     id: number; 
     name: string; 
@@ -16,7 +17,7 @@ type SearchProductGridProps = {
   }[];
 };
 
-export default function SearchProductGrid({ query, categoryId, filteringAttributes }: SearchProductGridProps) {
+export default function SearchProductGrid({ query, categoryId, tab, filteringAttributes }: SearchProductGridProps) {
   const searchParams = useSearchParams();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [sortOption, setSortOption] = useState("default");
@@ -29,9 +30,18 @@ export default function SearchProductGrid({ query, categoryId, filteringAttribut
     async function fetchProducts() {
       setIsLoading(true);
       try {
-        let url = `/api/products/search?name=${encodeURIComponent(query)}`;
-        if (categoryId) {
-          url += `&category_id=${categoryId}`;
+        let url = "";
+        if (tab === "new-arrivals") {
+          url = "/api/products/new-arrivals";
+        } else if (tab === "hot-sale") {
+          url = "/api/products/hot-sale";
+        } else if (tab === "top-rated") {
+          url = "/api/products/top-rated";
+        } else {
+          url = `/api/products/search?name=${encodeURIComponent(query)}`;
+          if (categoryId) {
+            url += `&category_id=${categoryId}`;
+          }
         }
         const response = await fetch(url);
         if (response.ok) {
@@ -45,10 +55,10 @@ export default function SearchProductGrid({ query, categoryId, filteringAttribut
       }
     }
 
-    if (query) {
+    if (query || tab) {
       fetchProducts();
     }
-  }, [query, categoryId]);
+  }, [query, categoryId, tab]);
 
   /* ---- Client-Side Filtering ---- */
   const filteredProducts = useMemo(() => {
@@ -124,6 +134,13 @@ export default function SearchProductGrid({ query, categoryId, filteringAttribut
     );
   }
 
+  const tabNames: { [key: string]: string } = {
+    "new-arrivals": "New Arrivals",
+    "hot-sale": "Hot Sale",
+    "top-rated": "Top Rated",
+  };
+  const searchLabel = tab ? (tabNames[tab] || "Products") : `"${query}"`;
+
   return (
     <div className="flex flex-col gap-4">
       {/* ═══════════════ DESKTOP TOOLBAR ═══════════════ */}
@@ -131,7 +148,7 @@ export default function SearchProductGrid({ query, categoryId, filteringAttribut
         <div className="flex items-center gap-4">
           <span className="text-[13px] font-medium text-slate-500">
             <span className="font-semibold text-[#2B7FE8]">{totalItems}</span>{" "}
-            Items Found for &quot;{query}&quot;
+            Items Found for {searchLabel}
           </span>
 
           <div className="hidden items-center gap-1 sm:flex">
@@ -215,7 +232,7 @@ export default function SearchProductGrid({ query, categoryId, filteringAttribut
       </div>
 
       <h2 className="text-[14px] font-semibold text-slate-800 -mt-1 mb-2 px-1">
-        {totalItems} Items Found for &quot;{query}&quot;
+        {totalItems} Items Found for {searchLabel}
       </h2>
 
       {/* ═══════════════ PRODUCT GRID ═══════════════ */}

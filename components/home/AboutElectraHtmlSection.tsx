@@ -52,7 +52,7 @@ export default function AboutElectraHtmlSection() {
     .filter(Boolean);
 
   return (
-    <section className="relative w-full h-auto md:h-[790px] overflow-hidden select-none bg-black">
+    <section className="relative w-full h-auto md:h-[640px] overflow-hidden select-none bg-black">
       {/* Background Image (1920x790, object-cover to prevent blank spaces) */}
       <div className="absolute inset-0 w-full h-full">
         <Image
@@ -67,10 +67,10 @@ export default function AboutElectraHtmlSection() {
 
       {/* Content Overlay Container */}
       <div className="relative md:absolute inset-0 bg-black/10 flex items-center py-12 md:py-0">
-        <div className="w-full max-w-[1600px] mx-auto px-6 md:px-16 lg:px-24 flex flex-col md:flex-row items-center justify-center md:justify-start gap-8 md:gap-16 lg:gap-24">
+        <div className="w-full max-w-[1600px] mx-auto px-6 md:px-16 lg:px-24 flex flex-col md:flex-row items-center justify-center md:justify-center gap-8 md:gap-16 lg:gap-24">
           
           {/* Left Column: Uploaded about image scaled down on xl and original size on 2xl */}
-          <div className="relative w-[260px] h-[330px] sm:w-[350px] sm:h-[450px] md:w-[400px] md:h-[514px] lg:w-[400px] lg:h-[514px] xl:w-[420px] xl:h-[540px] 2xl:w-[500px] 2xl:h-[643px] flex-shrink-0 rounded-3xl overflow-hidden border-2 border-sky-300/40 shadow-lg">
+          <div className="relative w-[260px] h-[330px] sm:w-[350px] sm:h-[450px] md:w-[400px] md:h-[514px] lg:w-[400px] lg:h-[514px]  flex-shrink-0 rounded-3xl overflow-hidden border-2 border-sky-300/40 shadow-lg">
             {uploadedImage ? (
               <Image
                 src={uploadedImage}
@@ -88,19 +88,19 @@ export default function AboutElectraHtmlSection() {
 
           {/* Right Column: Text content scaled for xl and 2xl resolutions */}
           <div className="flex-1 text-white max-w-2xl text-center md:text-left flex flex-col items-center md:items-start">
-            <p className="text-sm sm:text-base md:text-2xl xl:text-2xl 2xl:text-3xl text-gray-400 mb-2 md:mb-4 xl:mb-5 2xl:mb-6 tracking-wider font-medium">
+            <p className="text-sm sm:text-base md:text-2xl xl:text-2xl  text-gray-400 mb-2 md:mb-4 xl:mb-5 2xl:mb-6 tracking-wider font-medium">
               {founderTag}
             </p>
-            <h2 className="text-2xl sm:text-3xl md:text-[36px] lg:text-[36px] xl:text-[40px] 2xl:text-[48px] font-bold leading-tight mb-2 md:mb-4 xl:mb-5 2xl:mb-6 text-white drop-shadow">
+            <h2 className="text-2xl sm:text-3xl md:text-[36px] lg:text-[36px] xl:text-[40px]  font-bold leading-tight mb-2 md:mb-4 xl:mb-5 2xl:mb-6 text-white drop-shadow">
               {founderName}
             </h2>
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5 mb-4 md:mb-4 xl:mb-5 2xl:mb-6 text-xs sm:text-sm md:text-[20px] 2xl:text-3xl font-medium">
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5 mb-4 md:mb-4 xl:mb-5 2xl:mb-6 text-xs sm:text-sm md:text-[20px] xl:text-2xl font-medium">
               <span className="text-white font-bold">{brandName}</span>
-              <span className="text-gray-500 font-light">Established in</span>
+              <span className="text-gray-400 font-light">Established in</span>
               <span className="text-white font-bold">{establishedDate.replace(/^Established in\s+/i, '')}</span>
             </div>
 
-            <div className="space-y-4 text-xs sm:text-sm md:text-xl xl:text-base 2xl:text-xl text-gray-300 leading-relaxed tracking-wider drop-shadow-sm font-light mb-6 xl:mb-7 2xl:mb-8 max-w-lg md:max-w-none">
+            <div className="space-y-4 text-xs sm:text-sm md:text-xl xl:text-base 2xl:text-lg  text-gray-300 leading-relaxed tracking-wider drop-shadow-sm font-light text-justify  mb-6 xl:mb-7 2xl:mb-8 max-w-lg md:max-w-6xl">
               {loading ? (
                 <div className="space-y-3 animate-pulse w-full">
                   <div className="h-4 bg-white/20 rounded w-full"></div>
@@ -125,7 +125,7 @@ export default function AboutElectraHtmlSection() {
               <div className="w-full flex justify-center md:justify-start">
                 <Link 
                   href={buttonLink || "/about"}
-                  className="inline-flex items-center justify-center px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-md text-xs sm:text-sm md:text-base"
+                  className="inline-flex items-center justify-center px-8 py-3 bg-[#3B82F6] hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-md text-xs sm:text-sm md:text-base"
                 >
                   {buttonText}
                 </Link>

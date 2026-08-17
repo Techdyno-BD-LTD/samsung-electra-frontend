@@ -517,86 +517,82 @@ export default function MobileNavbar() {
           </div>
 
           {/* Support Banner Info */}
-          <div className="flex items-center gap-3 p-4 bg-white border-t border-slate-100 select-none">
-            <svg className="w-8 h-8 text-blue-600 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
-              {/* Phone receiver */}
-              <path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57a1.02 1.02 0 00-1.02.24l-2.2 2.2a15.04 15.04 0 01-6.59-6.59l2.2-2.2c.28-.28.36-.67.25-1.02A11.36 11.36 0 018.5 4c0-.56-.44-1-1-1H4c-.56 0-1 .44-1 1 0 9.39 7.61 17 17 17 .56 0 1-.44 1-1v-3.5c0-.56-.44-1-1-1z" />
-              {/* Left-pointing arrow */}
-              <path d="M19 8h-6m0 0l2.5-2.5M13 8l2.5 2.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-            </svg>
-            <div className="text-left text-xs font-semibold text-slate-800 leading-tight">
-              <p>Need Online help?</p>
-              <p className="text-slate-500 font-medium mt-0.5">Call Us- 09639-023023, Sat-Thu (09:00AM - 6:00PM)</p>
+          {supportText && (
+            <div className="flex items-center gap-3 p-4 bg-white border-t border-slate-100 select-none">
+              <svg className="w-8 h-8 text-blue-600 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                {/* Phone receiver */}
+                <path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57a1.02 1.02 0 00-1.02.24l-2.2 2.2a15.04 15.04 0 01-6.59-6.59l2.2-2.2c.28-.28.36-.67.25-1.02A11.36 11.36 0 018.5 4c0-.56-.44-1-1-1H4c-.56 0-1 .44-1 1 0 9.39 7.61 17 17 17 .56 0 1-.44 1-1v-3.5c0-.56-.44-1-1-1z" />
+                {/* Left-pointing arrow */}
+                <path d="M19 8h-6m0 0l2.5-2.5M13 8l2.5 2.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+              </svg>
+              <div className="text-left text-xs font-semibold text-slate-800 leading-tight">
+                <p>Need Online help?</p>
+                <p className="text-slate-500 font-medium mt-0.5">{supportText}</p>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Social Follow Us block */}
-          <div className="border-t border-slate-200 p-4 flex gap-3 items-center justify-center text-center bg-white select-none">
-            <p className="text-sm font-semibold items text-slate-800 ">Follow Us</p>
-            <div className="flex justify-center gap-3">
-              {[
-                { 
-                  icon: (
-                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M9 8H7v3h2v9h3v-9h3.6l.4-3H12V6c0-.9.2-1.2 1.1-1.2H15V1h-2.9C9.7 1 9 2.2 9 4.8V8z" />
-                    </svg>
-                  ), 
-                  href: socialLinks.facebook || undefined, 
-                  color: "text-[#2563EB] border-[#2563EB] hover:bg-blue-50" 
-                },
-                { 
-                  icon: (
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                      <rect x={2} y={2} width={20} height={20} rx={5} ry={5} />
-                      <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37zM17.5 6.5h.01" />
-                    </svg>
-                  ), 
-                  href: socialLinks.instagram || undefined, 
-                  color: "text-slate-500 border-slate-300 hover:bg-slate-50" 
-                },
-                { 
-                  icon: (
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 00-1.95 1.96A29 29 0 001 12a29 29 0 00.46 5.58 2.78 2.78 0 001.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 001.95-1.96A29 29 0 0023 12a29 29 0 00-.46-5.58z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 15.02l5.75-3.02-5.75-3z" />
-                    </svg>
-                  ), 
-                  href: socialLinks.youtube || undefined, 
-                  color: "text-slate-500 border-slate-300 hover:bg-slate-50" 
-                },
-                { 
-                  icon: (
-                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
-                    </svg>
-                  ), 
-                  href: socialLinks.linkedin || undefined, 
-                  color: "text-slate-500 border-slate-300 hover:bg-slate-50" 
-                },
-                { 
-                  icon: (
-                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.41 7.61 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.166-1.495-.69-2.433-2.878-2.433-4.617 0-3.77 2.739-7.23 7.894-7.23 4.15 0 7.375 2.957 7.375 6.9 0 4.124-2.593 7.44-6.19 7.44-1.205 0-2.338-.625-2.725-1.363l-.742 2.828c-.269 1.025-1.006 2.308-1.499 3.097 1.12.347 2.309.537 3.541.537 6.62 0 11.988-5.367 11.988-11.987C24 5.367 18.632 0 12.017 0z" />
-                    </svg>
-                  ), 
-                  href: "#", 
-                  color: "text-slate-500 border-slate-300 hover:bg-slate-50" 
-                }
-              ].map((soc, sIdx) => {
-                return (
-                  <a 
-                    key={sIdx} 
-                    href={soc.href} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className={`flex items-center justify-center w-8 h-8 rounded-full border transition-colors ${soc.color}`}
-                  >
-                    {soc.icon}
-                  </a>
-                );
-              })}
+          {(socialLinks.facebook || socialLinks.instagram || socialLinks.youtube || socialLinks.linkedin || socialLinks.whatsapp) && (
+            <div className="border-t border-slate-200 p-4 flex gap-3 items-center justify-center text-center bg-white select-none">
+              <p className="text-sm font-semibold items text-slate-800 ">Follow Us</p>
+              <div className="flex justify-center gap-3">
+                {[
+                  { 
+                    icon: (
+                      <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M9 8H7v3h2v9h3v-9h3.6l.4-3H12V6c0-.9.2-1.2 1.1-1.2H15V1h-2.9C9.7 1 9 2.2 9 4.8V8z" />
+                      </svg>
+                    ), 
+                    href: socialLinks.facebook || undefined, 
+                    color: "text-slate-500 border-slate-300 hover:text-[#2563EB] hover:border-[#2563EB] hover:bg-blue-50" 
+                  },
+                  { 
+                    icon: (
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                        <rect x={2} y={2} width={20} height={20} rx={5} ry={5} />
+                        <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37zM17.5 6.5h.01" />
+                      </svg>
+                    ), 
+                    href: socialLinks.instagram || undefined, 
+                    color: "text-slate-500 border-slate-300 hover:text-[#E1306C] hover:border-[#E1306C] hover:bg-pink-50" 
+                  },
+                  { 
+                    icon: (
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 00-1.95 1.96A29 29 0 001 12a29 29 0 00.46 5.58 2.78 2.78 0 001.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 00-1.95 1.96A29 29 0 0023 12a29 29 0 00-.46-5.58z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 15.02l5.75-3.02-5.75-3z" />
+                      </svg>
+                    ), 
+                    href: socialLinks.youtube || undefined, 
+                    color: "text-slate-500 border-slate-300 hover:text-[#FF0000] hover:border-[#FF0000] hover:bg-red-50" 
+                  },
+                  { 
+                    icon: (
+                      <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+                      </svg>
+                    ), 
+                    href: socialLinks.linkedin || undefined, 
+                    color: "text-slate-500 border-slate-300 hover:text-[#0077B5] hover:border-[#0077B5] hover:bg-blue-50" 
+                  }
+                ].map((soc, sIdx) => {
+                  if (!soc.href) return null;
+                  return (
+                    <a 
+                      key={sIdx} 
+                      href={soc.href} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className={`flex items-center justify-center w-8 h-8 rounded-full border transition-colors ${soc.color}`}
+                    >
+                      {soc.icon}
+                    </a>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 

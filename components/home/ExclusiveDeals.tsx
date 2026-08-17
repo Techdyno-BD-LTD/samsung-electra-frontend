@@ -58,34 +58,36 @@ export default function ExclusiveDeals() {
   return (
     <section className="w-full lg:pt-8 pb-0 select-none">
       {/* Title & Subtitle */}
-      <div className="text-center mb-4 lg:mb-16 px-4">
-        <h2 className="text-xl md:text-[48px] font-bold text-gray-900 tracking-tight">
+      <div className="text-center mb-4 lg:mb-12 px-4">
+        <h2 className="text-xl md:text-[48px] lg:text-[30px] font-bold text-gray-900 tracking-tight lg:mb-4">
           {title}
         </h2>
-        <p className="text-sm md:text-[20px] text-gray-500 mt-2 max-w-[800px] mx-auto">
+        <p className="text-sm md:text-[20px] lg:text-[18px] text-gray-500 mt-2 max-w-[800px] mx-auto">
           {subtitle}
         </p>
       </div>
 
       {/* Grid of Banners (max 2 side-by-side) */}
-      <div className="grid grid-cols-2 md:grid-cols-2 gap-2 lg:gap-6 w-full">
-        {deals.slice(0, 2).map((deal) => (
-          <Link
-            key={deal.id}
-            href={`/offers/details/${deal.slug}`}
-            className="relative block w-full aspect-[950/700] overflow-hidden shadow-sm hover:shadow-md hover:scale-[1.005] transition-all duration-300 bg-gray-50"
-          >
-            <Image
-              src={deal.exclusive_banner || "/assets/img/placeholder.jpg"}
-              alt={deal.title}
-              fill
-              sizes="(max-width: 768px) 100vw, 850px"
-              className="object-contain"
-              priority
-            />
-          </Link>
-        ))}
-      </div>
+     <div className="grid grid-cols-2 md:grid-cols-2 gap-2 lg:gap-6 w-full">
+  {deals.slice(0, 2).map((deal, index) => (
+    <Link
+      key={deal.id}
+      href={`/offers/details/${deal.slug}`}
+      className={`relative block w-full aspect-[950/700] overflow-hidden shadow-sm hover:shadow-md hover:scale-[1.005] transition-all duration-300 bg-gray-50 ${
+        index === 0 ? "rounded-r-3xl" : "rounded-l-3xl"
+      }`}
+    >
+      <Image
+        src={deal.exclusive_banner || "/assets/img/placeholder.jpg"}
+        alt={deal.title}
+        fill
+        sizes="(max-width: 768px) 100vw, 850px"
+        className="object-contain"
+        priority
+      />
+    </Link>
+  ))}
+</div>
     </section>
   );
 }

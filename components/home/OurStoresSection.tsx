@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 
 interface StoresData {
   stores_title: string;
@@ -13,11 +14,15 @@ interface StoresData {
   stores_map_link: string | null;
 }
 
-const AnimatedNumber = ({ value }: { value: string }) => {
+const AnimatedNumber = ({ value, trigger }: { value: string; trigger: boolean }) => {
   const endValue = parseInt(value.replace(/\D/g, ""), 10) || 0;
   const [count, setCount] = useState(0);
 
   useEffect(() => {
+    if (!trigger) {
+      setCount(0);
+      return;
+    }
     let startTime: number | null = null;
     const duration = 1200; // 1.2 seconds animation
     let animationFrameId: number;
@@ -39,7 +44,7 @@ const AnimatedNumber = ({ value }: { value: string }) => {
 
     animationFrameId = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animationFrameId);
-  }, [endValue]);
+  }, [endValue, trigger]);
 
   const suffix = value.replace(/[\d\s]/g, "");
 
@@ -47,6 +52,24 @@ const AnimatedNumber = ({ value }: { value: string }) => {
 };
 
 export default function OurStoresSection() {
+  const [inView, setInView] = useState(false);
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setInView(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
   const [data, setData] = useState<StoresData>({
     stores_title: "Our Stores",
     stores_description: "Now Serving You Across 37 Retail Outlets Nationwide",
@@ -93,7 +116,7 @@ export default function OurStoresSection() {
   const bgImage = data.stores_gif || "";
 
   return (
-    <>
+    <div ref={containerRef} className="w-full">
       {/* Mobile Layout */}
       <div 
         className="md:hidden w-full max-w-[414px] h-[438px] mx-auto bg-cover bg-center flex flex-col justify-between p-4 select-none relative" 
@@ -115,25 +138,25 @@ export default function OurStoresSection() {
             <div className="flex flex-col">
               <span className="text-[15px] font-bold text-slate-700">Districts</span>
               <span className="text-[30px] font-extrabold text-[#2B7FE8] leading-none mt-1">
-                <AnimatedNumber value={data.stores_districts} />
+                <AnimatedNumber value={data.stores_districts} trigger={inView} />
               </span>
             </div>
             <div className="flex flex-col">
               <span className="text-[15px] font-bold text-slate-700">Own Retail</span>
               <span className="text-[30px] font-extrabold text-[#2B7FE8] leading-none mt-1">
-                <AnimatedNumber value={data.stores_own_retail} />
+                <AnimatedNumber value={data.stores_own_retail} trigger={inView} />
               </span>
             </div>
             <div className="flex flex-col">
               <span className="text-[15px] font-bold text-slate-700">Dealers</span>
               <span className="text-[30px] font-extrabold text-[#2B7FE8] leading-none mt-1">
-                <AnimatedNumber value={data.stores_dealers} />+
+                <AnimatedNumber value={data.stores_dealers} trigger={inView} />
               </span>
             </div>
             <div className="flex flex-col">
               <span className="text-[15px] font-bold text-slate-700">Employees</span>
               <span className="text-[30px] font-extrabold text-[#2B7FE8] leading-none mt-1">
-                <AnimatedNumber value={data.stores_employees} />+
+                <AnimatedNumber value={data.stores_employees} trigger={inView} />
               </span>
             </div>
           </div>
@@ -156,54 +179,54 @@ export default function OurStoresSection() {
       >
         {/* Top Center: Title and Description */}
         <div className="w-full text-center mt-4">
-          <h2 className="text-2xl sm:text-3xl lg:text-[32px] 2xl:text-[48px] font-bold text-gray-900 mb-1 lg:mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-[32px] 2xl:text-[38px] font-bold text-gray-900 mb-1 lg:mb-4">
             {data.stores_title}
           </h2>
-          <p className="text-gray-600 text-xs sm:text-sm lg:text-[16px] 2xl:text-[20px] font-medium max-w-2xl mx-auto">
+          <p className="text-gray-600 text-xs sm:text-sm lg:text-[16px] 2xl:text-[18px] font-medium max-w-2xl mx-auto">
             {data.stores_description}
           </p>
         </div>
 
         {/* Bottom Right: Statistics and Map Link */}
-        <div className="self-end mr-4 mb-4 lg:mr-8 lg:mb-4 xl:mr-6 xl:mt-36 2xl:mr-16 2xl:mb-8 text-left bg-white/10 backdrop-blur-sm p-4 xl:p-5 2xl:p-6 rounded-2xl shadow-lg max-w-sm sm:max-w-md lg:max-w-[480px] xl:max-w-[600px] 2xl:max-w-[1000px]">
+        <div className="self-end mr-4 mb-4 lg:mr-8 lg:mb-4 xl:mr-6 xl:mt-36 2xl:mr-36 2xl:mb-8 text-left bg-white/10 backdrop-blur-sm p-4 xl:p-5 2xl:p-6 rounded-2xl  max-w-sm sm:max-w-md lg:max-w-[480px] xl:max-w-[600px] 2xl:max-w-[1000px]">
           <div className="grid grid-cols-4 gap-3 xl:gap-5 2xl:gap-6 items-end mb-4 xl:mb-5 2xl:mb-6">
             {/* Districts */}
             <div className="flex flex-col text-left">
-              <span className="text-[10px] sm:text-xs lg:text-[13px] xl:text-[16px] 2xl:text-[20px] font-semibold text-gray-700 mb-2 xl:mb-3 2xl:mb-4">
+              <span className="text-[10px] sm:text-xs lg:text-[13px] xl:text-[16px] 2xl:text-[18px] font-semibold text-gray-700 mb-2 xl:mb-3 2xl:mb-4">
                 Districts
               </span>
-              <span className="text-xl sm:text-2xl lg:text-[28px] xl:text-[38px] 2xl:text-[56px] font-extrabold text-blue-600 leading-none">
-                <AnimatedNumber value={data.stores_districts} />
+              <span className="text-xl sm:text-2xl lg:text-[28px] xl:text-[38px] 2xl:text-[48px] font-extrabold text-blue-600 leading-none">
+                <AnimatedNumber value={data.stores_districts} trigger={inView} />
               </span>
             </div>
 
             {/* Own Retail */}
             <div className="flex flex-col text-left">
-              <span className="text-[10px] sm:text-xs lg:text-[13px] xl:text-[16px] 2xl:text-[20px] font-semibold text-gray-700 mb-2 xl:mb-3 2xl:mb-4">
+              <span className="text-[10px] sm:text-xs lg:text-[13px] xl:text-[16px] 2xl:text-[18px] font-semibold text-gray-700 mb-2 xl:mb-3 2xl:mb-4">
                 Own Retail
               </span>
-              <span className="text-xl sm:text-2xl lg:text-[28px] xl:text-[38px] 2xl:text-[56px] font-extrabold text-blue-600 leading-none">
-                <AnimatedNumber value={data.stores_own_retail} />
+              <span className="text-xl sm:text-2xl lg:text-[28px] xl:text-[38px] 2xl:text-[48px] font-extrabold text-blue-600 leading-none">
+                <AnimatedNumber value={data.stores_own_retail} trigger={inView} />
               </span>
             </div>
 
             {/* Dealers */}
             <div className="flex flex-col text-left">
-              <span className="text-[10px] sm:text-xs lg:text-[13px] xl:text-[16px] 2xl:text-[20px] font-semibold text-gray-700 mb-2 xl:mb-3 2xl:mb-4">
+              <span className="text-[10px] sm:text-xs lg:text-[13px] xl:text-[16px] 2xl:text-[18px] font-semibold text-gray-700 mb-2 xl:mb-3 2xl:mb-4">
                 Dealers
               </span>
-              <span className="text-xl sm:text-2xl lg:text-[28px] xl:text-[38px] 2xl:text-[56px] font-extrabold text-blue-600 leading-none whitespace-nowrap">
-                <AnimatedNumber value={data.stores_dealers} />
+              <span className="text-xl sm:text-2xl lg:text-[28px] xl:text-[38px] 2xl:text-[48px] font-extrabold text-blue-600 leading-none whitespace-nowrap">
+                <AnimatedNumber value={data.stores_dealers} trigger={inView} />
               </span>
             </div>
 
             {/* Employees */}
             <div className="flex flex-col text-left">
-              <span className="text-[10px] sm:text-xs lg:text-[13px] xl:text-[16px] 2xl:text-[20px] font-semibold text-gray-700 mb-2 xl:mb-3 2xl:mb-4">
+              <span className="text-[10px] sm:text-xs lg:text-[13px] xl:text-[16px]  font-semibold text-gray-700 mb-2 xl:mb-3 2xl:mb-4">
                 Employees
               </span>
-              <span className="text-xl sm:text-2xl lg:text-[28px] xl:text-[38px] 2xl:text-[56px] font-extrabold text-blue-600 leading-none whitespace-nowrap">
-                <AnimatedNumber value={data.stores_employees} />
+              <span className="text-xl sm:text-2xl lg:text-[28px] xl:text-[38px] 2xl:text-[48px] font-extrabold text-blue-600 leading-none whitespace-nowrap">
+                <AnimatedNumber value={data.stores_employees} trigger={inView} />
               </span>
             </div>
           </div>
@@ -213,12 +236,12 @@ export default function OurStoresSection() {
             href={data.stores_map_link || "/stores"}
             target={data.stores_map_link ? "_blank" : undefined}
             rel={data.stores_map_link ? "noopener noreferrer" : undefined}
-            className="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm xl:text-base px-5 py-2 xl:px-6 xl:py-2.5 rounded-lg shadow-md transition-all select-none"
+            className="inline-flex items-center lg:mt-2 justify-center bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm xl:text-base px-5 py-2 xl:px-6 xl:py-2.5 rounded-lg shadow-md transition-all select-none"
           >
             Google Map
           </a>
         </div>
       </section>
-    </>
+    </div>
   );
 }
