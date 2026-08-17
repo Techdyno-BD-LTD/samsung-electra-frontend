@@ -114,7 +114,7 @@ export default function Footer() {
       >
         <div className="px-6 space-y-6">
           {/* Logo centered */}
-          <div className="flex justify-center w-full pb-2 border-b border-white/10">
+          <div className="flex justify-start w-full pb-2 border-b border-white/10">
             {footerData?.footer_logo ? (
               <Image
                 src={footerData.footer_logo}

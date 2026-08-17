@@ -123,7 +123,7 @@ export default function HomeSliderTwo() {
           <h2 className="text-xl lg:text-[32px] 2xl:text-[38px] font-bold text-gray-900 tracking-tight mb-2">
             {title}
           </h2>
-          <p className="text-sm lg:text-[16px]  2xl:text-[18px] lg:mt-7  text-gray-500 max-w-[400px] lg:max-w-[750px] mx-auto">
+          <p className="text-sm lg:text-[16px]  2xl:text-[18px] lg:mt-7 mb-6 lg:mb-0  text-gray-500 max-w-[400px] lg:max-w-[750px] mx-auto">
             {text}
           </p>
         </div>
