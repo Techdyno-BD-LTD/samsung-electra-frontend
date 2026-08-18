@@ -116,7 +116,7 @@ export default async function RootLayout({
           <AuthInit />
           <GlobalToast />
           <Navbar />
-          <main className=" lg:pb-0 pt-2 lg:pt-32 min-h-screen-safe">
+          <main className=" lg:pb-0 pt-2 lg:pt-0 min-h-screen-safe">
             <PageWrapper>
               {children}
             </PageWrapper>

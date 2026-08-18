@@ -1003,10 +1003,10 @@ const ProductCard = ({
   }
 
   return (
-    <div className="group/card relative w-full max-w-full overflow-hidden rounded-2xl border-2 border-sky-200 bg-white shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[340px] sm:min-h-[400px]">
+    <div className="group/card relative w-full max-w-full overflow-hidden rounded-2xl border-2 border-sky-200 bg-white shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[300px] sm:min-h-[400px]">
       
       {/* Top half with light background */}
-      <div className="relative w-full p-2 sm:p-3 flex flex-col items-center justify-center min-h-[150px] sm:min-h-[265px]">
+      <div className="relative w-full p-2 sm:p-3 flex flex-col items-center justify-center min-h-[170px] sm:min-h-[265px]">
         {/* Top Left Badges: Discount percentage & NEW/Status Badges stacked */}
         <div className="absolute left-2 top-2 sm:left-3 sm:top-3 z-10 flex flex-col gap-1 sm:gap-1.5 items-start">
           {hasDiscount(productData?.discount || discountPercent, productData?.main_price || price, productData?.stroked_price || originalPrice) && (
@@ -1047,7 +1047,7 @@ const ProductCard = ({
         </div>
 
         {/* Top Center Brand name/logo */}
-        <div className="mt-1 flex justify-center">
+        <div className="absolute top-2 sm:relative sm:top-auto sm:mt-1 left-1/2 -translate-x-1/2 z-10 flex justify-center">
           {(productData?.brand?.logo || brandLogo) ? (
             <Image
               src={productData?.brand?.logo || brandLogo || ""}
@@ -1080,43 +1080,43 @@ const ProductCard = ({
         <button
           type="button"
           onClick={() => setIsModalOpen(true)}
-          className="absolute bottom-0 left-0 right-0 bg-[#e7ebf1] hover:bg-[#dce2ec] text-slate-800 font-semibold py-1 sm:py-1.5 text-center text-xs sm:text-sm tracking-wide transition-colors"
+          className="absolute bottom-0 left-0 right-0 bg-[#e7ebf1] hover:bg-[#dce2ec] text-black font-bold py-1 sm:py-1.5 text-center text-[6.79px] sm:text-sm tracking-wide transition-colors"
         >
           Quick View
         </button>
       </div>
 
       {/* Model & EMI below Quick View on Mobile */}
-      <div className="flex sm:hidden items-center justify-center gap-1.5 text-[8px] xs:text-[9px] text-gray-500 border-b border-gray-100 py-1.5 px-2 bg-gray-50/70 w-full text-center">
+      <div className="flex sm:hidden items-center justify-center gap-1.5 text-[6px] xs:text-[9px] text-gray-500 border-b border-gray-100 py-1.5 px-2 bg-gray-50/70 w-full text-center">
         <span className="truncate">Model: {productData?.model_number || "N/A"}</span>
         <span className="text-gray-300">|</span>
         <span className="truncate">
-          EMI Starts From <span className="font-semibold text-blue-600">৳{productData?.emi_start || "N/A"}</span>
+          EMI: ৳{productData?.emi_start || "N/A"}
         </span>
       </div>
 
-      {/* Bottom half with white background */}
-      <div className="w-full bg-white p-2  pb-0 flex flex-col justify-between flex-1 relative">
+      {/* Info Body */}
+      <div className="w-full bg-white p-2 pb-0 flex flex-col justify-between flex-1 relative">
         <div>
           {/* Category */}
-          <p className="text-[10px] sm:text-[14px] font-semibold text-gray-400 text-center uppercase tracking-wider mb-0.5 sm:mb-1 mt-0.5 sm:mt-1">
+          <p className="text-[6px] sm:text-[14px] font-semibold text-gray-400 text-center uppercase tracking-wider mb-0.5 sm:mb-1 mt-0.5 sm:mt-1">
             {productData?.category_info?.category_name || productData?.category?.name || category || type || "Category"}
           </p>
 
           {/* Title */}
-          <h3 className="line-clamp-2 text-center text-[12px] sm:text-[14px] font-medium text-gray-700 leading-tight mb-1.5 sm:mb-2 tracking-tight min-h-[28px] sm:min-h-[32px] px-1 sm:px-2">
+          <h3 className="line-clamp-2 text-center text-[8px] sm:text-[14px] font-bold lg:font-medium text-gray-700 leading-tight  sm:mb-2 tracking-tight min-h-[22px] sm:min-h-[32px] px-1 sm:px-2">
             <Link href={productHref} onClick={handleSelectItem} className="hover:text-[#2563eb] transition-colors">
               {productData?.name || title}
             </Link>
           </h3>
 
           {/* Price Center */}
-          <div className="flex flex-wrap items-center justify-center gap-1 sm:gap-2 mb-2 sm:mb-3">
-            <span className="text-[11px] sm:text-[18px] font-medium text-[#000000]">
+          <div className="flex flex-wrap items-center justify-center gap-1 sm:gap-2 mb-0.5 sm:mb-3">
+            <span className="text-[7px] sm:text-[18px] font-medium text-[#000000]">
               BDT.
             </span>
 
-            <span className="text-[16px] sm:text-[26px] font-bold text-[#2563eb]">
+            <span className="text-[14px] sm:text-[26px] font-bold text-[#2563eb]">
               {(() => {
                 const pr = productData?.main_price || price;
                 if (!pr) return "";
@@ -1130,7 +1130,7 @@ const ProductCard = ({
               productData?.main_price || price,
               productData?.stroked_price || originalPrice
             ) && (
-              <span className="text-[11px] sm:text-[18px] text-gray-400 line-through">
+              <span className="text-[7px] sm:text-[18px] text-gray-400 line-through">
                 {(() => {
                   const pr = productData?.stroked_price || originalPrice;
                   if (!pr) return "";
@@ -1175,7 +1175,7 @@ const ProductCard = ({
             <button
               type="button"
               onClick={handleAddToCart}
-              className="flex w-full items-center justify-center gap-1.5 bg-[#2563eb] hover:bg-blue-700 text-white font-semibold text-[12px] py-2 transition-colors"
+              className="flex w-full items-center justify-center gap-1.5 bg-[#2563eb] hover:bg-blue-700 text-white font-medium text-[12px] py-2 transition-colors"
             >
               <FaShoppingCart className="h-3 w-3" />
               Add to Cart

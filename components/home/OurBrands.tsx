@@ -126,7 +126,7 @@ export default function OurBrands() {
   }
 
   return (
-    <section className="w-full max-w-[1400px] mx-auto px-4 pt-0 pb-8 select-none">
+    <section className="w-full max-w-[1400px] mx-auto px-4 pt-0 lg:pb-8 select-none">
       {/* Title & Subtitle */}
       <div className="text-center flex flex-col items-center justify-center mb-4">
         <h2 className="text-xl lg:text-[32px] 2xl:text-[38px] font-bold text-gray-900 tracking-tight lg:mb-4">
@@ -138,9 +138,9 @@ export default function OurBrands() {
       </div>
 
       {/* Brand Tabs */}
-      <div className="flex justify-center border-b border-gray-100 max-w-[1260px] mx-auto mb-4">
+      <div className="flex justify-center border-b border-gray-100 max-w-[1260px] w-[90%] lg:w-full mx-auto mb-4">
         <div 
-          className="grid w-full" 
+          className="grid w-full gap-2 lg:gap-0" 
           style={{ gridTemplateColumns: `repeat(${brandSections.length}, minmax(0, 1fr))` }}
         >
           {brandSections.map((section) => {
@@ -184,7 +184,7 @@ export default function OurBrands() {
             type="button"
             onClick={() => scrollByOneCard(-1)}
             aria-label="Previous categories"
-            className="absolute left-0 md:-left-20 top-1/2 -translate-y-1/2 z-10 flex h-8 w-8 lg:h-12 lg:w-12 items-center justify-center rounded-full border border-gray-100 bg-[#F1F2F2] shadow-md transition-all hover:bg-gray-50 text-gray-600"
+            className="absolute left-0 lg:-left-2  2xl:-left-20 top-1/2 -translate-y-1/2 z-10 flex h-8 w-8 lg:h-12 lg:w-12 items-center justify-center rounded-full border border-gray-100 bg-[#F1F2F2] shadow-md transition-all hover:bg-gray-50 text-gray-600"
           >
             <FaChevronLeft className="h-4 w-4 lg:h-6 lg:w-6" />
           </button>
@@ -196,7 +196,7 @@ export default function OurBrands() {
             type="button"
             onClick={() => scrollByOneCard(1)}
             aria-label="Next categories"
-            className="absolute right-0 md:-right-20 top-1/2 -translate-y-1/2 z-10 flex h-8 w-8 lg:h-12 lg:w-12 items-center justify-center rounded-full border border-gray-100 bg-[#F1F2F2] shadow-md transition-all hover:bg-gray-50 text-gray-600"
+            className="absolute right-0 lg:-right-2 2xl:-right-20 top-1/2 -translate-y-1/2 z-10 flex h-8 w-8 lg:h-12 lg:w-12 items-center justify-center rounded-full border border-gray-100 bg-[#F1F2F2] shadow-md transition-all hover:bg-gray-50 text-gray-600"
           >
             <FaChevronRight className="h-4 w-4 lg:h-6 lg:w-6" />
           </button>
@@ -213,7 +213,7 @@ export default function OurBrands() {
               key={`${activeSection.row_index}-${category.id}-card`}
               href={`/category/${category.slug}?brands=${activeSection.brand.slug}`}
               data-brand-category-card
-              className="group flex-shrink-0 w-[calc(50%-6px)] md:w-[calc(25%-12px)] block rounded-2xl border border-gray-100 bg-white overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
+              className="group flex-shrink-0 w-[calc(50%-6px)] md:w-[calc(25%-12px)] block rounded-lg border border-gray-100 bg-white overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
             >
               {/* Top blue-grey category block */}
               <div className="relative bg-[#F1F6FD] w-full h-[180px] sm:h-[220px] px-3 sm:px-4 flex flex-col justify-end pb-3 sm:pb-4">

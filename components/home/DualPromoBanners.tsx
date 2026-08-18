@@ -49,8 +49,8 @@ export default function DualPromoBanners() {
   if (!rendered.length) return null;
 
   return (
-    <section className="w-full py-6 select-none">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
+    <section className="w-full lg:py-6 select-none">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 lg:gap-6">
         {rendered.map((item, index) => {
           const href = item.link || item.external_link || "#";
           const isExternal = /^https?:\/\//i.test(href);
@@ -75,7 +75,7 @@ export default function DualPromoBanners() {
                 href={href}
                 target={isExternal ? "_blank" : undefined}
                 rel={isExternal ? "noopener noreferrer" : undefined}
-                className="absolute right-2 bottom-2 lg:right-6 lg:bottom-6 z-10 px-6 py-2 text-sm font-semibold tracking-wide rounded-full transition-all duration-300 transform active:scale-95 bg-transparent border border-white text-white hover:bg-white hover:text-black"
+                className="absolute right-2 bottom-2 lg:right-6 lg:bottom-6 z-10 lgpx-6 lg:py-2 py-1 px-4 text-sm font-semibold tracking-wide rounded-lg transition-all duration-300 transform active:scale-95 bg-transparent border border-white text-white hover:bg-white hover:text-black"
               >
                 See All
               </a>

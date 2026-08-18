@@ -283,3 +283,8 @@ body {
   scrollbar-width: thin;
   scrollbar-color: #cbd5e1 transparent;
 }
+
+/* Hide floating contact & scroll-to-top buttons when mobile search is open */
+html.mobile-search-open .fixed.right-4 {
+  display: none !important;
+}

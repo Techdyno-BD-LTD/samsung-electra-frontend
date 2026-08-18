@@ -201,7 +201,7 @@ export default function HeroSection() {
   return (
     <>
       {/* Mobile Slider View (414x402) */}
-      <div className="lg:hidden w-full max-w-[414px] mx-auto mt-[42px] relative overflow-hidden select-none" style={{ height: "402px" }}>
+      <div className="lg:hidden w-full max-w-full mx-auto mt-[42px] relative overflow-hidden select-none" style={{ height: "402px" }}>
         <div
           className={`flex h-full w-full ${isSliding ? "transition-transform duration-700 ease-in-out" : ""}`}
           style={{ transform: `translateX(-${mobileSlideIndex * 100}%)` }}
@@ -263,7 +263,7 @@ export default function HeroSection() {
       </div>
 
       {/* Desktop Slider View (1530x588) */}
-      <section className="hidden lg:block w-screen relative left-1/2 right-1/2 -translate-x-1/2 lg:mt-[30px]">
+      <section className="hidden lg:block w-screen relative left-1/2 right-1/2 -translate-x-1/2 lg:mt-[0px]">
         <div className="flex flex-col gap-2">
           <div className="relative w-full overflow-hidden">
             <div className="relative w-full" style={{ aspectRatio: HERO_SLIDE_ASPECT_RATIO }}>

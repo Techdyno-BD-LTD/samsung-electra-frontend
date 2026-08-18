@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 type SliderItem = {
   id: number;
@@ -29,6 +29,12 @@ export default function HomeSliderTwo() {
   const [transitionEnabled, setTransitionEnabled] = useState(true);
   const [loading, setLoading] = useState(true);
   const [windowWidth, setWindowWidth] = useState(1200);
+
+  // Drag and Swipe Gesture states
+  const [startX, setStartX] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState(0);
+  const wasDragging = useRef(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -65,13 +71,13 @@ export default function HomeSliderTwo() {
 
   // Re-enable transition on next frame
   useEffect(() => {
-    if (!transitionEnabled) {
+    if (!transitionEnabled && !isDragging) {
       const timer = setTimeout(() => {
         setTransitionEnabled(true);
       }, 50);
       return () => clearTimeout(timer);
     }
-  }, [transitionEnabled]);
+  }, [transitionEnabled, isDragging]);
 
   const isMobile = windowWidth < 768;
   const slideWidth = isMobile ? Math.min(windowWidth * 0.72, 340) : 440;
@@ -156,11 +162,94 @@ export default function HomeSliderTwo() {
     }
   };
 
+  // Touch handlers for mobile swipe
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setStartX(e.touches[0].clientX);
+    setIsDragging(true);
+    setTransitionEnabled(false);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return;
+    const diff = e.touches[0].clientX - startX;
+    setDragOffset(diff);
+    if (Math.abs(diff) > 10) {
+      wasDragging.current = true;
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    
+    const threshold = 50;
+    setTransitionEnabled(true);
+    setDragOffset(0);
+
+    if (dragOffset < -threshold) {
+      setCurrentIndex((prev) => prev + 1);
+    } else if (dragOffset > threshold) {
+      setCurrentIndex((prev) => prev - 1);
+    }
+
+    setTimeout(() => {
+      wasDragging.current = false;
+    }, 100);
+  };
+
+  // Mouse handlers for PC drag
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setStartX(e.clientX);
+    setIsDragging(true);
+    setTransitionEnabled(false);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    const diff = e.clientX - startX;
+    setDragOffset(diff);
+    if (Math.abs(diff) > 10) {
+      wasDragging.current = true;
+    }
+  };
+
+  const handleMouseUp = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    
+    const threshold = 50;
+    setTransitionEnabled(true);
+    setDragOffset(0);
+
+    if (dragOffset < -threshold) {
+      setCurrentIndex((prev) => prev + 1);
+    } else if (dragOffset > threshold) {
+      setCurrentIndex((prev) => prev - 1);
+    }
+
+    setTimeout(() => {
+      wasDragging.current = false;
+    }, 100);
+  };
+
+  const handleMouseLeave = () => {
+    if (isDragging) {
+      handleMouseUp();
+    }
+  };
+
+  const handleLinkClick = (e: React.MouseEvent) => {
+    if (wasDragging.current) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  };
+
   // Repeat the slides list 5 times for seamless looping
   const repeatedSlides = [...slides, ...slides, ...slides, ...slides, ...slides];
 
-  // Calculate translation offset based on currentIndex
-  const translationX = `calc(50% - ${currentIndex * (slideWidth + gap)}px - ${slideWidth / 2}px)`;
+  // Calculate translation offset based on currentIndex and dragOffset
+  const translationX = `calc(50% - ${currentIndex * (slideWidth + gap)}px - ${slideWidth / 2}px + ${dragOffset}px)`;
 
   return (
     <section className="w-full mx-auto px-4 pt-2 select-none overflow-hidden">
@@ -219,7 +308,16 @@ export default function HomeSliderTwo() {
       </div>
 
       {/* Sliding Track Viewport */}
-      <div className="relative w-full max-w-[1390px] mx-auto overflow-hidden min-h-[300px] md:min-h-[480px]">
+      <div 
+        className="relative w-full max-w-[1390px] mx-auto overflow-hidden min-h-[300px] md:min-h-[480px] cursor-grab active:cursor-grabbing"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseLeave}
+      >
         {/* Left Arrow for Mobile (Overlaid on left card) */}
         <button
           onClick={handlePrev}
@@ -257,14 +355,15 @@ export default function HomeSliderTwo() {
             }`;
 
             const slideContent = (
-              <div className="relative w-full h-full">
+              <div className="relative w-full h-full" onDragStart={(e) => e.preventDefault()}>
                 <Image
                   src={slide.image}
                   alt={slide.file_name || `Slide ${slide.id}`}
                   fill
                   sizes="(max-width: 768px) 100vw, 620px"
-                  className="object-contain"
+                  className="object-contain pointer-events-none"
                   priority={isActive}
+                  draggable="false"
                 />
               </div>
             );
@@ -282,6 +381,7 @@ export default function HomeSliderTwo() {
                   href={slide.external_link}
                   className={cardClasses}
                   style={cardStyle}
+                  onClick={handleLinkClick}
                 >
                   {slideContent}
                 </Link>

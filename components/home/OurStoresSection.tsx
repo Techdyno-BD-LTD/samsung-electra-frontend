@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
+// import Image from "next/image";
 
 interface StoresData {
   stores_title: string;
@@ -137,26 +137,26 @@ export default function OurStoresSection() {
           <div className="grid grid-cols-4 w-full gap-1.5 text-left px-1">
             <div className="flex flex-col">
               <span className="text-[15px] font-bold text-slate-700">Districts</span>
-              <span className="text-[30px] font-extrabold text-[#2B7FE8] leading-none mt-1">
+              <span className="text-[30px] font-poppins font-extrabold text-[#2B7FE8] leading-none mt-1">
                 <AnimatedNumber value={data.stores_districts} trigger={inView} />
               </span>
             </div>
             <div className="flex flex-col">
               <span className="text-[15px] font-bold text-slate-700">Own Retail</span>
-              <span className="text-[30px] font-extrabold text-[#2B7FE8] leading-none mt-1">
+              <span className="text-[30px] font-poppins font-extrabold text-[#2B7FE8] leading-none mt-1">
                 <AnimatedNumber value={data.stores_own_retail} trigger={inView} />
               </span>
             </div>
             <div className="flex flex-col">
               <span className="text-[15px] font-bold text-slate-700">Dealers</span>
-              <span className="text-[30px] font-extrabold text-[#2B7FE8] leading-none mt-1">
-                <AnimatedNumber value={data.stores_dealers} trigger={inView} />
+              <span className="text-[30px] font-poppins font-extrabold text-[#2B7FE8] leading-none mt-1">
+                <AnimatedNumber value={data.stores_dealers} trigger={inView} />+
               </span>
             </div>
             <div className="flex flex-col">
               <span className="text-[15px] font-bold text-slate-700">Employees</span>
-              <span className="text-[30px] font-extrabold text-[#2B7FE8] leading-none mt-1">
-                <AnimatedNumber value={data.stores_employees} trigger={inView} />
+              <span className="text-[30px] font-poppins font-extrabold text-[#2B7FE8] leading-none mt-1">
+                <AnimatedNumber value={data.stores_employees} trigger={inView} />+
               </span>
             </div>
           </div>
@@ -195,7 +195,7 @@ export default function OurStoresSection() {
               <span className="text-[10px] sm:text-xs lg:text-[13px] xl:text-[16px] 2xl:text-[18px] font-semibold text-gray-700 mb-2 xl:mb-3 2xl:mb-4">
                 Districts
               </span>
-              <span className="text-xl sm:text-2xl lg:text-[28px] xl:text-[38px] 2xl:text-[48px] font-extrabold text-blue-600 leading-none">
+              <span className="text-xl sm:text-2xl lg:text-[28px] xl:text-[38px] font-poppins 2xl:text-[48px] font-extrabold text-blue-600 leading-none">
                 <AnimatedNumber value={data.stores_districts} trigger={inView} />
               </span>
             </div>
@@ -205,7 +205,7 @@ export default function OurStoresSection() {
               <span className="text-[10px] sm:text-xs lg:text-[13px] xl:text-[16px] 2xl:text-[18px] font-semibold text-gray-700 mb-2 xl:mb-3 2xl:mb-4">
                 Own Retail
               </span>
-              <span className="text-xl sm:text-2xl lg:text-[28px] xl:text-[38px] 2xl:text-[48px] font-extrabold text-blue-600 leading-none">
+              <span className="text-xl sm:text-2xl lg:text-[28px] xl:text-[38px] font-poppins 2xl:text-[48px] font-extrabold text-blue-600 leading-none">
                 <AnimatedNumber value={data.stores_own_retail} trigger={inView} />
               </span>
             </div>
@@ -215,7 +215,7 @@ export default function OurStoresSection() {
               <span className="text-[10px] sm:text-xs lg:text-[13px] xl:text-[16px] 2xl:text-[18px] font-semibold text-gray-700 mb-2 xl:mb-3 2xl:mb-4">
                 Dealers
               </span>
-              <span className="text-xl sm:text-2xl lg:text-[28px] xl:text-[38px] 2xl:text-[48px] font-extrabold text-blue-600 leading-none whitespace-nowrap">
+              <span className="text-xl sm:text-2xl lg:text-[28px] xl:text-[38px] font-poppins 2xl:text-[48px] font-extrabold text-blue-600 leading-none whitespace-nowrap">
                 <AnimatedNumber value={data.stores_dealers} trigger={inView} />
               </span>
             </div>
@@ -225,7 +225,7 @@ export default function OurStoresSection() {
               <span className="text-[10px] sm:text-xs lg:text-[13px] xl:text-[16px]  font-semibold text-gray-700 mb-2 xl:mb-3 2xl:mb-4">
                 Employees
               </span>
-              <span className="text-xl sm:text-2xl lg:text-[28px] xl:text-[38px] 2xl:text-[48px] font-extrabold text-blue-600 leading-none whitespace-nowrap">
+              <span className="text-xl sm:text-2xl lg:text-[28px] xl:text-[38px] font-poppins 2xl:text-[48px] font-extrabold text-blue-600 leading-none whitespace-nowrap">
                 <AnimatedNumber value={data.stores_employees} trigger={inView} />
               </span>
             </div>

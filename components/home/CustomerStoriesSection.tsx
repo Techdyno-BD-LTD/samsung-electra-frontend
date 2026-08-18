@@ -53,7 +53,16 @@ export default function CustomerStoriesSection() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [startIndex, setStartIndex] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [activeStackIndex, setActiveStackIndex] = useState(3);
+
+  // Carousel slider states for mobile
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [transitionEnabled, setTransitionEnabled] = useState(true);
+  const [windowWidth, setWindowWidth] = useState(1200);
+
+  // Drag and Swipe Gesture states
+  const [startX, setStartX] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState(0);
 
   useEffect(() => {
     fetch("/api/testimonials/approved")
@@ -61,16 +70,36 @@ export default function CustomerStoriesSection() {
       .then((payload) => {
         if (payload?.success && Array.isArray(payload.data) && payload.data.length > 0) {
           setTestimonials(payload.data);
+          setCurrentIndex(payload.data.length * 2);
         } else {
           setTestimonials(fallbackTestimonials);
+          setCurrentIndex(fallbackTestimonials.length * 2);
         }
       })
       .catch((err) => {
         console.error("Error loading testimonials, falling back to mock data:", err);
         setTestimonials(fallbackTestimonials);
+        setCurrentIndex(fallbackTestimonials.length * 2);
       })
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    setWindowWidth(window.innerWidth);
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Re-enable transition on next frame
+  useEffect(() => {
+    if (!transitionEnabled && !isDragging) {
+      const timer = setTimeout(() => {
+        setTransitionEnabled(true);
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [transitionEnabled, isDragging]);
 
   const handlePrev = () => {
     setStartIndex((prev) => (prev === 0 ? Math.max(0, testimonials.length - 4) : prev - 1));
@@ -78,6 +107,78 @@ export default function CustomerStoriesSection() {
 
   const handleNext = () => {
     setStartIndex((prev) => (prev >= testimonials.length - 4 ? 0 : prev + 1));
+  };
+
+  // Jump index instantly if we transition into the boundary copies
+  const handleTransitionEnd = () => {
+    const n = testimonials.length;
+    if (currentIndex < n || currentIndex >= n * 4) {
+      setTransitionEnabled(false);
+      const originalIndex = ((currentIndex % n) + n) % n;
+      setCurrentIndex(originalIndex + n * 2);
+    }
+  };
+
+  // Touch handlers for mobile swipe
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setStartX(e.touches[0].clientX);
+    setIsDragging(true);
+    setTransitionEnabled(false);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return;
+    const diff = e.touches[0].clientX - startX;
+    setDragOffset(diff);
+  };
+
+  const handleTouchEnd = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    
+    const threshold = 50;
+    setTransitionEnabled(true);
+    setDragOffset(0);
+
+    if (dragOffset < -threshold) {
+      setCurrentIndex((prev) => prev + 1);
+    } else if (dragOffset > threshold) {
+      setCurrentIndex((prev) => prev - 1);
+    }
+  };
+
+  // Mouse handlers for PC drag
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setStartX(e.clientX);
+    setIsDragging(true);
+    setTransitionEnabled(false);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    const diff = e.clientX - startX;
+    setDragOffset(diff);
+  };
+
+  const handleMouseUp = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    
+    const threshold = 50;
+    setTransitionEnabled(true);
+    setDragOffset(0);
+
+    if (dragOffset < -threshold) {
+      setCurrentIndex((prev) => prev + 1);
+    } else if (dragOffset > threshold) {
+      setCurrentIndex((prev) => prev - 1);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (isDragging) {
+      handleMouseUp();
+    }
   };
 
   if (loading) {
@@ -89,12 +190,6 @@ export default function CustomerStoriesSection() {
   }
 
   const displayedTestimonials = testimonials.slice(startIndex, startIndex + 4);
-
-  // Calculates visual stack level from 0 (top-most card) to 3 (front active card)
-  const getSlotPosition = (cardIndex: number) => {
-    const total = displayedTestimonials.length;
-    return (cardIndex - activeStackIndex + 3 + total) % total;
-  };
 
   const formatDate = (dateStr: string) => {
     try {
@@ -109,21 +204,31 @@ export default function CustomerStoriesSection() {
     }
   };
 
+  const isMobile = windowWidth < 1024;
+  const cardWidth = isMobile ? Math.min(windowWidth * 0.65, 230) : 360;
+  const gap = isMobile ? 8 : 24;
+
+  // Repeat the list 5 times for seamless looping on mobile
+  const repeatedTestimonials = [...testimonials, ...testimonials, ...testimonials, ...testimonials, ...testimonials];
+
+  // Calculate translation offset based on currentIndex and dragOffset
+  const translationX = `calc(50% - ${currentIndex * (cardWidth + gap)}px - ${cardWidth / 2}px + ${dragOffset}px)`;
+
   return (
     <section className="relative w-full bg-transparent lg:pt-4 overflow-hidden">
       {/* Header */}
-      <div className="max-w-[1700px] mb-1 lg:mb-10 mx-auto text-center px-6 md:px-16 lg:px-24">
+      <div className="max-w-[1700px]  lg:mb-10 mx-auto text-center px-6 md:px-16 lg:px-24">
         <h2 className="text-xl sm:text-4xl lg:text-[32px] 2xl:text-[38px] font-bold text-gray-900 mb-2 lg:mb-4">
           Customer Stories
         </h2>
-        <p className="text-gray-500 text-sm lg:text-[16px] 2xl:text-[18px] mb-40 lg:mb-60 max-w-2xl mx-auto">
+        <p className="text-gray-500 text-sm lg:text-[16px] 2xl:text-[18px] mb-[200px] lg:mb-60 max-w-2xl mx-auto">
           Now Serving You Across 37 Outlets Nationwide
         </p>
       </div>
 
       {/* Overlapping Blue Backdrop */}
-      <div className="relative w-full rounded-t-[150px] bg-blue-600 lg:pt-28 pt-20 pb-12">
-        <div className="max-w-[1700px] mx-auto px-6 md:px-16 lg:px-24 flex items-center justify-between gap-6 relative">
+      <div className="relative w-full lg:rounded-t-[100px] sm:rounded-t-[150px] bg-blue-600 lg:pt-28 pt-20 lg:pb-12 select-none">
+        <div className="max-w-[1700px] mx-auto px-0 md:px-16 lg:px-24 flex items-center justify-between gap-6 relative">
           
           {/* Prev Arrow (Desktop Only) */}
           <button
@@ -133,116 +238,127 @@ export default function CustomerStoriesSection() {
             <FiChevronLeft className="w-6 h-6" />
           </button>
 
-          {/* Testimonial Cards Wrapper */}
-          <div className="flex-1 relative h-[310px] lg:h-auto lg:grid lg:grid-cols-4 gap-6 lg:gap-8 -mt-56 lg:-mt-64 z-10 px-3 sm:px-8 mx-auto w-full max-w-[370px] sm:max-w-[420px] lg:max-w-none">
-            {displayedTestimonials.map((item, index) => {
-              const slot = getSlotPosition(index); // 0 = back/top card, 3 = front/bottom card
-              const isCardActive = slot === 3;
+          {/* Testimonial Cards Viewport (Desktop grid, Mobile sliding track) */}
+          <div className="flex-grow w-full relative z-10 -mt-64 lg:-mt-64">
+            
+            {/* Desktop Static Grid Layout */}
+            <div className="hidden lg:grid grid-cols-4 gap-6 lg:gap-8 mx-auto w-full">
+              {displayedTestimonials.map((item) => (
+                <div key={item.id} className="relative bg-white rounded-3xl pt-16 pb-8 px-6 text-center shadow-lg border border-gray-100 flex flex-col justify-between h-[350px]">
+                  <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-[88px] h-[88px] rounded-full border-4 border-blue-500 bg-blue-100 shadow-md overflow-hidden flex items-center justify-center">
+                    <Image
+                      src={item.avatar || "/assets/img/avatar-place.png"}
+                      alt={item.name}
+                      width={96}
+                      height={96}
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
 
-              return (
-                <React.Fragment key={item.id}>
-                  {/* --- Desktop Layout (Unchanged) --- */}
-                  <div className="hidden lg:flex relative bg-white rounded-3xl pt-16 pb-8 px-6 text-center shadow-lg border border-gray-100 flex-col justify-between h-[350px]">
-                    <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-[88px] h-[88px] rounded-full border-4 border-blue-500 bg-blue-100 shadow-md overflow-hidden flex items-center justify-center">
-                      <Image
-                        src={item.avatar || "/assets/img/avatar-place.png"}
-                        alt={item.name}
-                        width={96}
-                        height={96}
-                        className="object-cover w-full h-full"
-                      />
+                  <span className="text-[80px] text-gray-200 font-serif leading-none absolute top-16 left-6 select-none">“</span>
+                  
+                  <p className="text-gray-900 xl:text-base leading-relaxed line-clamp-4 font-base pt-2 flex-grow flex items-center justify-center">
+                    {item.comment}
+                  </p>
+                  
+                  <span className="text-[80px] text-gray-200 font-serif leading-none absolute bottom-24 right-6 select-none">”</span>
+
+                  <div className="mt-4 border-t border-gray-100 pt-4">
+                    <div className="flex items-center justify-center gap-1 mb-2">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <FaStar
+                          key={i}
+                          className={`w-4 h-4 ${
+                            i < item.rating ? "text-yellow-400" : "text-gray-200"
+                          }`}
+                        />
+                      ))}
                     </div>
 
-                    <span className="text-[80px] text-gray-200 font-serif leading-none absolute top-16 left-6 select-none">“</span>
-                    
-                    <p className="text-gray-900 xl:text-base leading-relaxed line-clamp-4 font-base pt-2 flex-grow flex items-center justify-center">
-                      {item.comment}
+                    <h4 className="font-bold text-gray-900 text-[16px]">{item.name}</h4>
+                    <p className="text-[14px] text-gray-400 font-medium mt-0.5">
+                      Reviewed On {formatDate(item.created_at)}
                     </p>
-                    
-                    <span className="text-[80px] text-gray-200 font-serif leading-none absolute bottom-24 right-6 select-none">”</span>
-
-                    <div className="mt-4 border-t border-gray-100 pt-4">
-                      <div className="flex items-center justify-center gap-1 mb-2">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <FaStar
-                            key={i}
-                            className={`w-4 h-4 ${
-                              i < item.rating ? "text-yellow-400" : "text-gray-200"
-                            }`}
-                          />
-                        ))}
-                      </div>
-
-                      <h4 className="font-bold text-gray-900 text-[16px]">{item.name}</h4>
-                      <p className="text-[14px] text-gray-400 font-medium mt-0.5">
-                        Reviewed On {formatDate(item.created_at)}
-                      </p>
-                    </div>
                   </div>
+                </div>
+              ))}
+            </div>
 
-                  {/* --- Mobile Stacked Deck Layout --- */}
-                  <div
-                    onClick={() => setActiveStackIndex(index)}
-                    className="block lg:hidden absolute inset-x-0 top-0 rounded-2xl border border-blue-200 bg-[#f4f8ff] p-3.5 shadow-[0_10px_25px_rgba(0,0,0,0.08)] transition-all duration-500 ease-out cursor-pointer select-none"
-                    style={{
-                      transform: `translateY(${slot * 38}px) scale(${0.91 + slot * 0.03})`,
-                      transformOrigin: "top center",
-                      zIndex: 10 + slot * 10,
-                      opacity: 1,
-                    }}
-                  >
-                    {/* Header Row: Avatar, Name & Stars */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-full border-2 border-blue-500 bg-white p-[1px] shadow-sm flex-shrink-0 overflow-hidden flex items-center justify-center">
-                          <Image
-                            src={item.avatar || "/assets/img/avatar-place.png"}
-                            alt={item.name}
-                            width={32}
-                            height={32}
-                            className="rounded-full object-cover w-full h-full"
-                          />
-                        </div>
-                        <span className="font-bold text-slate-800 text-[14px]">
-                          {item.name}
-                        </span>
-                      </div>
+            {/* Mobile Touch Slider Viewport */}
+            <div 
+              className="block lg:hidden relative w-full overflow-hidden py-10 cursor-grab active:cursor-grabbing"
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseLeave}
+            >
+              <div
+                className={`flex ${transitionEnabled ? "transition-transform duration-500 ease-out" : ""}`}
+                style={{ transform: `translateX(${translationX})` }}
+                onTransitionEnd={handleTransitionEnd}
+              >
+                {repeatedTestimonials.map((item, index) => {
+                  const isActive = index === currentIndex;
 
-                      <div className="flex items-center gap-0.5">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <FaStar
-                            key={i}
-                            className={`w-3.5 h-3.5 ${
-                              i < item.rating ? "text-amber-400 fill-amber-400" : "text-slate-200"
-                            }`}
-                          />
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Active Card Body: Comment Text & Date */}
+                  return (
                     <div
-                      className={`grid transition-[grid-template-rows,opacity] duration-500 ease-out ${
-                        isCardActive
-                          ? "grid-rows-[1fr] opacity-100 mt-3 pt-2"
-                          : "grid-rows-[0fr] opacity-0"
+                      key={`${item.id}-mob-slide-${index}`}
+                      className={`relative flex-shrink-0 bg-white rounded-3xl pt-14 pb-6 px-5 text-center shadow-lg border transition-all duration-500 ease-out flex flex-col justify-between ${
+                        isActive
+                          ? "scale-100 opacity-100 z-10 border-blue-200"
+                          : "scale-100 opacity-100 z-0 border-gray-100"
                       }`}
+                      style={{
+                        width: `${cardWidth}px`,
+                        height: "320px",
+                        marginRight: `${gap}px`,
+                      }}
                     >
-                      <div className="overflow-hidden">
-                        <p className="text-xs text-slate-700 leading-relaxed font-normal">
-                          &ldquo;{item.comment}&rdquo;
-                        </p>
-                        <div className="mt-2 text-right">
-                          <span className="text-[11px] font-medium text-slate-500">
-                            Reviewed On {formatDate(item.created_at)}
-                          </span>
+                      <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-[80px] h-[80px] rounded-full border-4 border-blue-500 bg-blue-100 shadow-md overflow-hidden flex items-center justify-center">
+                        <Image
+                          src={item.avatar || "/assets/img/avatar-place.png"}
+                          alt={item.name}
+                          width={80}
+                          height={80}
+                          className="object-cover w-full h-full"
+                          draggable="false"
+                        />
+                      </div>
+
+                      <span className="text-[70px] text-gray-300 font-serif leading-none absolute top-16 left-4 select-none">“</span>
+                      
+                      <p className="text-black text-xs leading-relaxed line-clamp-4 font-base pt-2 flex-grow flex items-center justify-center">
+                        {item.comment}
+                      </p>
+                      
+                      <span className="text-[70px] text-gray-300 font-serif leading-none absolute bottom-20 right-4 select-none">”</span>
+
+                      <div className="mt-3 border-t border-gray-100 pt-3">
+                        <div className="flex items-center justify-center gap-1 mb-1.5">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <FaStar
+                              key={i}
+                              className={`w-3.5 h-3.5 ${
+                                i < item.rating ? "text-yellow-400" : "text-gray-200"
+                              }`}
+                            />
+                          ))}
                         </div>
+
+                        <h4 className="font-bold text-gray-900 text-sm">{item.name}</h4>
+                        <p className="text-[11px] text-gray-400 font-medium mt-0.5">
+                          Reviewed On {formatDate(item.created_at)}
+                        </p>
                       </div>
                     </div>
-                  </div>
-                </React.Fragment>
-              );
-            })}
+                  );
+                })}
+              </div>
+            </div>
+
           </div>
 
           {/* Next Arrow (Desktop Only) */}

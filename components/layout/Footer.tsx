@@ -11,8 +11,11 @@ import {
   FaLinkedinIn,
   FaWhatsapp,
   FaTiktok,
-  FaChevronUp
+  
+  FaPhoneSquare
 } from "react-icons/fa";
+import { IoMdMail } from "react-icons/io";
+import { FaLocationDot } from "react-icons/fa6";
 
 type FooterLink = {
   label: string;
@@ -64,12 +67,12 @@ export default function Footer() {
       .catch((err) => console.error("Failed to fetch footer data:", err));
   }, []);
 
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
+  // const scrollToTop = () => {
+  //   window.scrollTo({
+  //     top: 0,
+  //     behavior: "smooth",
+  //   });
+  // };
 
   const getSection = (title: string) => {
     return footerData?.sections?.find((s) => s.title?.trim().toLowerCase() === title.trim().toLowerCase()) || { title, links: [] };
@@ -151,24 +154,17 @@ export default function Footer() {
             </h3>
             <div className="space-y-3 text-[12px] text-white/80">
               <div className="flex items-start gap-2.5">
-                <svg className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                </svg>
+                <FaPhoneSquare className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: "#007EEF" }} />
                 <p className="font-semibold text-white/90">
                   {phones.join(" | ")}
                 </p>
               </div>
               <div className="flex items-center gap-2.5">
-                <svg className="w-4 h-4 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
+                <IoMdMail className="w-4 h-4 flex-shrink-0" style={{ color: "#007EEF" }} />
                 <p className="font-semibold text-white/90">{footerData?.email || "info@electrabd.com"}</p>
               </div>
               <div className="flex items-start gap-2.5">
-                <svg className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
+                <FaLocationDot className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: "#007EEF" }} />
                 <p className="leading-relaxed font-semibold text-white/90">
                   {footerData?.address || "Tropical Mollah Tower (6th Floor), 15/1-15/4 Pragati Sarani, Middle Badda, Dhaka - 1212, Bangladesh"}
                 </p>
@@ -381,7 +377,7 @@ export default function Footer() {
         </div>
 
         {/* Scroll To Top floating arrow inside Mobile (absolute layout helper) */}
-        <div className="flex justify-end px-6 pt-6 select-none">
+        {/* <div className="flex justify-end px-6 pt-6 select-none">
           <button
             onClick={scrollToTop}
             className="flex items-center justify-center w-9 h-9 bg-white/10 hover:bg-white/20 border border-white/15 rounded-full shadow"
@@ -389,7 +385,7 @@ export default function Footer() {
           >
             <FaChevronUp className="w-4 h-4 text-white/85" />
           </button>
-        </div>
+        </div> */}
 
         {/* Secured Payment Method Section */}
         <div className="w-full border-t border-white/10 mt-6 py-4 px-6 flex flex-col items-center gap-4">
@@ -423,8 +419,8 @@ export default function Footer() {
         </div>
 
         {/* Footer Bottom copyright bar */}
-        <div className="w-full bg-blue-600 py-3.5 px-4 text-center border-t border-white/10 select-none pb-[56px] md:pb-3.5">
-          <p className="text-white text-[12px] font-semibold leading-relaxed">
+        <div className="w-full bg-blue-600 py-2 px-4 text-center border-t border-white/10 select-none pb-[56px] md:pb-3.5">
+          <p className="text-white text-[12px] mb-2 font-normal leading-relaxed">
             © Copyright {currentYear} | All rights reserved by Electra International
           </p>
         </div>
@@ -467,9 +463,7 @@ export default function Footer() {
               </h3>
               <div className="space-y-3 text-[13px] text-white/80">
                 <div className="flex items-start gap-2.5">
-                  <svg className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                  </svg>
+                  <FaPhoneSquare className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: "#007EEF" }} />
                   <p className="font-semibold text-white/95">
                     {phones.map((phone, idx) => (
                       <span key={idx}>
@@ -480,16 +474,11 @@ export default function Footer() {
                   </p>
                 </div>
                 <div className="flex items-center gap-2.5">
-                  <svg className="w-4 h-4 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
+                  <IoMdMail className="w-4 h-4 flex-shrink-0" style={{ color: "#007EEF" }} />
                   <p className="font-semibold text-white/95">{footerData?.email || "info@electrabd.com"}</p>
                 </div>
                 <div className="flex items-start gap-2.5">
-                  <svg className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
+                  <FaLocationDot className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: "#007EEF" }} />
                   <p className="leading-relaxed font-semibold text-white/95">
                     {footerData?.address || "Tropical Mollah Tower (6th Floor), 15/1-15/4 Pragati Sarani, Middle Badda, Dhaka - 1212, Bangladesh"}
                   </p>
@@ -663,7 +652,7 @@ export default function Footer() {
 
         {/* Footer Bottom */}
         <div className="w-full bg-blue-500 py-2 px-4 lg:px-12 mt-2 relative border-t border-white/10">
-          <p className="text-center text-white text-[16px] tracking-wide font-medium">
+          <p className="text-center text-white text-[16px] tracking-wide font-normal">
             {footerData?.copyright_text || `© ${mounted ? currentYear : 2026} samsung electra.all rights reserved`}
           </p>
 

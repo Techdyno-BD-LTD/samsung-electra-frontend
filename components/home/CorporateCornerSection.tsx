@@ -125,7 +125,7 @@ export default function CorporateCornerSection() {
           </button>
 
           {/* Slider Viewport */}
-          <div className="w-full overflow-hidden py-4 sm:py-6 relative">
+          <div className="w-full overflow-hidden py-4 sm:py-0 relative">
             {/* Slider Track */}
             <div
               className={`flex ${transitionEnabled ? "transition-transform duration-500 ease-out" : ""}`}
@@ -135,10 +135,10 @@ export default function CorporateCornerSection() {
               {repeatedBlogs.map((blog, index) => {
                 const isActive = index === currentIndex;
 
-                const cardClasses = `relative flex-shrink-0 transition-all duration-500 ease-out overflow-hidden shadow-lg border border-gray-100 rounded-none ${
+                const cardClasses = `relative flex-shrink-0 transition-all duration-500 ease-out overflow-hidden shadow-lg border border-gray-100 ${
                   isActive
-                    ? "scale-100 opacity-100 z-10 border-blue-200"
-                    : "scale-[0.85] opacity-100 z-0"
+                    ? "scale-100 opacity-100 z-10 border-blue-200 rounded-[10px]"
+                    : "scale-[0.85] opacity-100 z-0 rounded-[10px]"
                 }`;
 
                 const cardStyle = {

@@ -75,6 +75,17 @@ export default function MobileNavbar() {
   }, [pathname]);
 
   useEffect(() => {
+    if (isSearchOpen) {
+      document.documentElement.classList.add("mobile-search-open");
+    } else {
+      document.documentElement.classList.remove("mobile-search-open");
+    }
+    return () => {
+      document.documentElement.classList.remove("mobile-search-open");
+    };
+  }, [isSearchOpen]);
+
+  useEffect(() => {
     setMounted(true);
   }, []);
 

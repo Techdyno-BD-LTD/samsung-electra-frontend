@@ -151,25 +151,18 @@ export default function MobileCategoriesPage() {
 
           <div className="flex flex-col items-center gap-6">
             {displayedBrands.map((brand, idx) => {
-              // Emulate the active/highlighted style for Samsung in the mockup
-              const isSamsung = brand.name.toLowerCase() === "samsung";
-              
               return (
                 <Link
                   key={brand.id}
                   href={`/brand/${brand.slug}`}
-                  className={`flex items-center justify-center rounded-2xl border px-6 py-4 w-full max-w-[240px] h-[68px] transition-all active:scale-95 ${
-                    isSamsung
-                      ? "bg-[#2563EB] border-[#2563EB] text-white shadow-lg"
-                      : "bg-white border-slate-200 text-slate-800 shadow-sm"
-                  }`}
+                  className="flex items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-800 px-6 py-4 w-full max-w-[240px] h-[68px] transition-all shadow-sm active:scale-95 active:bg-[#2563EB] active:border-[#2563EB] active:text-white"
                 >
                   <div className="relative h-8 w-full max-w-[140px]">
                     <Image
                       src={brand.logo}
                       alt={brand.name}
                       fill
-                      className={`object-contain ${isSamsung ? "brightness-0 invert" : ""}`}
+                      className="object-contain"
                     />
                   </div>
                 </Link>

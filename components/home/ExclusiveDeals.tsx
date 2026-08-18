@@ -74,7 +74,7 @@ export default function ExclusiveDeals() {
       key={deal.id}
       href={`/offers/details/${deal.slug}`}
       className={`relative block w-full aspect-[950/700] overflow-hidden shadow-sm hover:shadow-md hover:scale-[1.005] transition-all duration-300 bg-gray-50 ${
-        index === 0 ? "rounded-r-3xl" : "rounded-l-3xl"
+        index === 0 ? "rounded-r-xl" : "rounded-l-xl"
       }`}
     >
       <Image
