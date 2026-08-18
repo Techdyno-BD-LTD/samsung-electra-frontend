@@ -148,11 +148,13 @@ export default function AddToCartModal({
   const [quantity, setQuantity] = useState(1);
   const thumbnailContainerRef = useRef<HTMLDivElement>(null);
 
-  const title = fallbackTitle || productData?.name || initialData?.name || "Product Title";
+  const isDemoMode = process.env.NEXT_PUBLIC_APP_MODE === 'demo';
+
+  const title = fallbackTitle || productData?.name || initialData?.name || (isDemoMode ? "Product Title" : "");
   const brandLogo = fallbackBrandLogo || productData?.brand?.logo || "/images/samsung.png";
   const ratingCount = productData?.rating_count?.toString() || "0";
-  const model = productData?.model_number || "Model";
-  const sku = productData?.variants?.[0]?.sku || "SKU";
+  const model = productData?.model_number || (isDemoMode ? "Model" : "");
+  const sku = productData?.variants?.[0]?.sku || (isDemoMode ? "SKU" : "");
 
   const productSlug = initialSlug || initialData?.slug || (title ? toProductSlug(title) : "");
   const isWishlisted = useAppSelector((state) => state.wishlist.items.some((item) => item.id === productSlug));
@@ -214,21 +216,21 @@ export default function AddToCartModal({
     setQuantity(1);
     setActiveImageIndex(0);
   }, [productData]);
-  const emiText = productData?.emi_start || "EMI Available";
+  const emiText = productData?.emi_start || (isDemoMode ? "EMI Available" : "");
   const emiDetailsLabel = productData?.emi_facility?.link_label || "See details";
   const colorLabel = "Color";
   const mainImage = fallbackImage || productData?.thumbnail_image || "/images/wm2.png";
   const warrantyBadgeImage = "/images/warrantybadge.png";
-  const specialOfferLeft = productData?.special_offer_title || "Special Offer";
-  const specialOfferOne = productData?.special_offers?.[0]?.text || "Offer 1";
-  const specialOfferTwo = productData?.special_offers?.[1]?.text || "Offer 2";
-  const showroomTitle = productData?.book_in_showroom_title || "Book in showroom Get 5% Off";
-  const shippingInfo = productData?.estimated_shipping_text || "Shipping information";
-  const warrantyInfo = productData?.warranty?.text || (productData?.warranty?.warranty_type ? `Warranty: ${productData.warranty.warranty_type}` : "Warranty information");
+  const specialOfferLeft = productData?.special_offer_title || (isDemoMode ? "Special Offer" : "");
+  const specialOfferOne = productData?.special_offers?.[0]?.text || (isDemoMode ? "Offer 1" : "");
+  const specialOfferTwo = productData?.special_offers?.[1]?.text || (isDemoMode ? "Offer 2" : "");
+  const showroomTitle = productData?.book_in_showroom_title || (isDemoMode ? "Book in showroom Get 5% Off" : "");
+  const shippingInfo = productData?.estimated_shipping_text || (isDemoMode ? "Shipping information" : "");
+  const warrantyInfo = productData?.warranty?.text || (productData?.warranty?.warranty_type ? `Warranty: ${productData.warranty.warranty_type}` : (isDemoMode ? "Warranty information" : ""));
   const warrantyLinkLabel = productData?.warranty?.link_label || "View policy";
-  const emiFacilityInfo = productData?.emi_facility?.text || "EMI information";
+  const emiFacilityInfo = productData?.emi_facility?.text || (isDemoMode ? "EMI information" : "");
   const emiLinkLabel = productData?.emi_facility?.link_label || "See EMI Details";
-  const madeInText = productData?.made_in_text || "Product information";
+  const madeInText = productData?.made_in_text || (isDemoMode ? "Product information" : "");
 
   const brandName = fallbackBrand || productData?.brand?.name || "Brand";
   const categoryName = fallbackCategory || productData?.category_info?.category_name ||
@@ -799,67 +801,83 @@ export default function AddToCartModal({
                     </p>
                   </div>
 
-                  <div className="rounded-xl border border-blue-100 bg-blue-50/30 p-3">
-                    <p className="text-xs font-bold text-[#0C73DA] mb-2">*{specialOfferLeft} =</p>
-                    <div className="flex flex-wrap gap-4">
-                      {(() => {
-                        let offers = productData?.special_offers || [];
-                        if (typeof offers === 'string') {
-                          try {
-                            offers = JSON.parse(offers);
-                          } catch {
-                            offers = [];
-                          }
-                        }
-                        if (Array.isArray(offers) && offers.length > 0) {
-                          return offers.map((offer: { image?: string | null; text?: string }, index: number) => (
-                            <div key={index} className="flex items-center gap-2 text-xs font-semibold text-slate-800">
-                              {offer.image && <Image src={offer.image} alt="Offer" width={32} height={20} className="h-5 w-auto object-contain" />}
-                              {offer.text}
-                            </div>
-                          ));
-                        }
-                        return (
-                          <>
-                            <div className="flex items-center gap-2 text-xs font-semibold text-slate-800">
-                              <Image src="/images/ebl.png" alt="EBL" width={32} height={20} className="h-5 w-auto object-contain" />
-                              {specialOfferOne}
-                            </div>
-                            <div className="flex items-center gap-2 text-xs font-semibold text-slate-800">
-                              <Image src="/images/nogod.png" alt="Nagad" width={32} height={20} className="h-5 w-auto object-contain" />
-                              {specialOfferTwo}
-                            </div>
-                          </>
-                        );
-                      })()}
+                  {(() => {
+                    let offers = productData?.special_offers || [];
+                    if (typeof offers === 'string') {
+                      try {
+                        offers = JSON.parse(offers);
+                      } catch {
+                        offers = [];
+                      }
+                    }
+                    const hasOffers = (Array.isArray(offers) && offers.length > 0);
+                    const showOffersBox = isDemoMode || hasOffers || (specialOfferLeft && specialOfferLeft.trim() !== "");
+
+                    if (!showOffersBox) return null;
+
+                    return (
+                      <div className="rounded-xl border border-blue-100 bg-blue-50/30 p-3">
+                        <p className="text-xs font-bold text-[#0C73DA] mb-2">*{specialOfferLeft} =</p>
+                        <div className="flex flex-wrap gap-4">
+                          {hasOffers ? (
+                            offers.map((offer: { image?: string | null; text?: string }, index: number) => (
+                              <div key={index} className="flex items-center gap-2 text-xs font-semibold text-slate-800">
+                                {offer.image && <Image src={offer.image} alt="Offer" width={32} height={20} className="h-5 w-auto object-contain" />}
+                                {offer.text}
+                              </div>
+                            ))
+                          ) : (
+                            <>
+                              <div className="flex items-center gap-2 text-xs font-semibold text-slate-800">
+                                <Image src="/images/ebl.png" alt="EBL" width={32} height={20} className="h-5 w-auto object-contain" />
+                                {specialOfferOne}
+                              </div>
+                              <div className="flex items-center gap-2 text-xs font-semibold text-slate-800">
+                                <Image src="/images/nogod.png" alt="Nagad" width={32} height={20} className="h-5 w-auto object-contain" />
+                                {specialOfferTwo}
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {(isDemoMode || shippingInfo || warrantyInfo || emiFacilityInfo) && (
+                    <div className="space-y-2 text-[11px] text-slate-500 font-medium">
+                      {(isDemoMode || shippingInfo) && (
+                        <p className="flex items-center gap-3">
+                          <Image src="/images/shippingtime.png" alt="Time" width={20} height={20} className="h-5 w-5 opacity-70" />
+                          <span>Shipping Timeline: {shippingInfo}</span>
+                        </p>
+                      )}
+                      {(isDemoMode || warrantyInfo) && (
+                        <p className="flex items-center gap-3">
+                          <Image src="/images/warranty.png" alt="Warranty" width={20} height={20} className="h-5 w-5 opacity-70" />
+                          <span>{warrantyInfo}</span>
+                          <button className="text-blue-600 font-bold hover:underline">{warrantyLinkLabel}</button>
+                        </p>
+                      )}
+                      {(isDemoMode || emiFacilityInfo) && (
+                        <p className="flex items-center gap-3">
+                          <Image src="/images/Vector.png" alt="EMI" width={20} height={20} className="h-5 w-5 opacity-70" />
+                          <span>{emiFacilityInfo}</span>
+                          <button 
+                            className="text-blue-600 font-bold hover:underline"
+                            onClick={() => setIsEmiModalOpen(true)}
+                          >
+                            {emiLinkLabel}
+                          </button>
+                        </p>
+                      )}
                     </div>
-                  </div>
+                  )}
 
-                  <div className="space-y-2 text-[11px] text-slate-500 font-medium">
-                    <p className="flex items-center gap-3">
-                      <Image src="/images/shippingtime.png" alt="Time" width={20} height={20} className="h-5 w-5 opacity-70" />
-                      <span>Shipping Timeline: {shippingInfo}</span>
+                  {(isDemoMode || madeInText) && (
+                    <p className="rounded-lg bg-slate-50 py-2 text-center text-xs font-bold text-[#0C73DA] tracking-widest uppercase border border-slate-100">
+                      {madeInText}
                     </p>
-                    <p className="flex items-center gap-3">
-                      <Image src="/images/warranty.png" alt="Warranty" width={20} height={20} className="h-5 w-5 opacity-70" />
-                      <span>{warrantyInfo}</span>
-                      <button className="text-blue-600 font-bold hover:underline">{warrantyLinkLabel}</button>
-                    </p>
-                    <p className="flex items-center gap-3">
-                      <Image src="/images/Vector.png" alt="EMI" width={20} height={20} className="h-5 w-5 opacity-70" />
-                      <span>{emiFacilityInfo}</span>
-                      <button 
-                        className="text-blue-600 font-bold hover:underline"
-                        onClick={() => setIsEmiModalOpen(true)}
-                      >
-                        {emiLinkLabel}
-                      </button>
-                    </p>
-                  </div>
-
-                  <p className="rounded-lg bg-slate-50 py-2 text-center text-xs font-bold text-[#0C73DA] tracking-widest uppercase border border-slate-100">
-                    {madeInText}
-                  </p>
+                  )}
                 </div>
               </div>
             </div>

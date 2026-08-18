@@ -73,11 +73,62 @@ export default function HomeSliderTwo() {
     }
   }, [transitionEnabled]);
 
+  const isMobile = windowWidth < 768;
+  const slideWidth = isMobile ? Math.min(windowWidth * 0.72, 340) : 440;
+  const gap = isMobile ? -10 : 5;
+
   if (loading) {
     return (
-      <div className="w-full h-[300px] flex items-center justify-center bg-gray-50/50 rounded-2xl animate-pulse">
-        <span className="text-gray-400 font-medium">Loading slider...</span>
-      </div>
+      <section className="w-full mx-auto px-4 pt-2 select-none overflow-hidden animate-pulse">
+        {/* Shimmer Header */}
+        <div className="relative w-full max-w-[1650px] mx-auto lg:mb-8 mt-4 lg:mt-16 flex flex-col items-center justify-center text-center">
+          <div className="flex flex-col items-center w-full px-4">
+            {/* Title Skeleton */}
+            <div className="h-7 lg:h-9 bg-gray-200 rounded-md w-3/4 max-w-[380px] mb-3" />
+            {/* Subtitle Skeleton */}
+            <div className="h-4 lg:h-5 bg-gray-200 rounded-md w-full max-w-[550px] lg:mt-6 mb-6 lg:mb-0" />
+          </div>
+
+          {/* Desktop Arrow Placeholders */}
+          <div className="absolute right-32 top-1/2 -translate-y-1/2 hidden md:flex gap-2">
+            <div className="w-10 h-10 rounded bg-gray-200" />
+            <div className="w-10 h-10 rounded bg-gray-200" />
+          </div>
+        </div>
+
+        {/* Shimmer Slider Viewport */}
+        <div className="relative w-full max-w-[1400px] mx-auto overflow-hidden min-h-[300px] md:min-h-[480px] flex items-center justify-center">
+          <div className="flex items-center justify-center">
+            {/* Left Card Skeleton */}
+            <div
+              className="flex-shrink-0 rounded-2xl bg-gray-200/70 border border-gray-100 scale-[0.85] shadow-sm"
+              style={{
+                width: `${slideWidth}px`,
+                aspectRatio: "620 / 570",
+                marginRight: `${gap}px`,
+              }}
+            />
+            {/* Center Active Card Skeleton */}
+            <div
+              className="flex-shrink-0 rounded-2xl bg-gray-200 border border-gray-100 scale-100 shadow-md"
+              style={{
+                width: `${slideWidth}px`,
+                aspectRatio: "620 / 570",
+                marginRight: `${gap}px`,
+              }}
+            />
+            {/* Right Card Skeleton */}
+            <div
+              className="flex-shrink-0 rounded-2xl bg-gray-200/70 border border-gray-100 scale-[0.85] shadow-sm"
+              style={{
+                width: `${slideWidth}px`,
+                aspectRatio: "620 / 570",
+                marginRight: `${gap}px`,
+              }}
+            />
+          </div>
+        </div>
+      </section>
     );
   }
 
@@ -105,10 +156,6 @@ export default function HomeSliderTwo() {
     }
   };
 
-  const isMobile = windowWidth < 768;
-  const slideWidth = isMobile ? Math.min(windowWidth * 0.72, 340) : 440;
-  const gap = isMobile ? -10 : 5;
-
   // Repeat the slides list 5 times for seamless looping
   const repeatedSlides = [...slides, ...slides, ...slides, ...slides, ...slides];
 
@@ -116,14 +163,14 @@ export default function HomeSliderTwo() {
   const translationX = `calc(50% - ${currentIndex * (slideWidth + gap)}px - ${slideWidth / 2}px)`;
 
   return (
-    <section className="w-full  mx-auto px-4 pt-2 select-none overflow-hidden">
+    <section className="w-full mx-auto px-4 pt-2 select-none overflow-hidden">
       {/* Title & Navigation Header */}
       <div className="relative w-full max-w-[1650px] mx-auto lg:mb-8 mt-4 lg:mt-16 flex flex-col items-center justify-center text-center">
         <div className="px-4">
           <h2 className="text-xl lg:text-[32px] 2xl:text-[38px] font-bold text-gray-900 tracking-tight mb-2">
             {title}
           </h2>
-          <p className="text-sm lg:text-[16px]  2xl:text-[18px] lg:mt-7 mb-6 lg:mb-0  text-gray-500 max-w-[400px] lg:max-w-[750px] mx-auto">
+          <p className="text-sm lg:text-[16px] 2xl:text-[18px] lg:mt-7 mb-6 lg:mb-0 text-gray-500 max-w-[400px] lg:max-w-[750px] mx-auto">
             {text}
           </p>
         </div>
@@ -172,7 +219,7 @@ export default function HomeSliderTwo() {
       </div>
 
       {/* Sliding Track Viewport */}
-      <div className="relative w-full max-w-[1400px] mx-auto overflow-hidden min-h-[300px] md:min-h-[480px] ">
+      <div className="relative w-full max-w-[1390px] mx-auto overflow-hidden min-h-[300px] md:min-h-[480px]">
         {/* Left Arrow for Mobile (Overlaid on left card) */}
         <button
           onClick={handlePrev}

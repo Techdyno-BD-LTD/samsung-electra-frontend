@@ -668,13 +668,13 @@ export default function Footer() {
           </p>
 
           {/* Scroll To Top Button (Inside Footer Only) */}
-          <button
+          {/* <button
             onClick={scrollToTop}
             className="absolute right-4 lg:right-12 -top-10 -translate-y-1/2 flex items-center justify-center w-10 h-10 bg-white/10 hover:bg-white/20 border border-white/10 rounded-full shadow transition-all duration-300 hover:scale-105 active:scale-95"
             aria-label="Scroll to top"
           >
             <FaChevronUp className="w-5 h-5 text-white" />
-          </button>
+          </button> */}
         </div>
       </footer>
     </>

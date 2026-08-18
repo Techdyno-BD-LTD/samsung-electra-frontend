@@ -138,7 +138,7 @@ export default function OurBrands() {
       </div>
 
       {/* Brand Tabs */}
-      <div className="flex justify-center border-b border-gray-100 max-w-[1090px] mx-auto mb-4">
+      <div className="flex justify-center border-b border-gray-100 max-w-[1260px] mx-auto mb-4">
         <div 
           className="grid w-full" 
           style={{ gridTemplateColumns: `repeat(${brandSections.length}, minmax(0, 1fr))` }}
@@ -177,7 +177,7 @@ export default function OurBrands() {
       </div>
 
       {/* Sliding Categories Wrapper (Desktop & Mobile) */}
-      <div className="relative max-w-[1090px] mx-auto px-4 md:px-0">
+      <div className="relative max-w-[1260px] mx-auto px-4 md:px-0">
         {/* Left Arrow Button */}
         {canScrollLeft && (
           <button
@@ -213,12 +213,12 @@ export default function OurBrands() {
               key={`${activeSection.row_index}-${category.id}-card`}
               href={`/category/${category.slug}?brands=${activeSection.brand.slug}`}
               data-brand-category-card
-              className="group flex-shrink-0 w-[calc(50%-6px)] sm:w-[260px] block rounded-2xl border border-gray-100 bg-white overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
+              className="group flex-shrink-0 w-[calc(50%-6px)] md:w-[calc(25%-12px)] block rounded-2xl border border-gray-100 bg-white overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
             >
               {/* Top blue-grey category block */}
-              <div className="relative bg-[#F1F6FD] w-full h-[180px] sm:h-[300px] px-3 sm:px-4 flex flex-col justify-end pb-3 sm:pb-4">
+              <div className="relative bg-[#F1F6FD] w-full h-[180px] sm:h-[220px] px-3 sm:px-4 flex flex-col justify-end pb-3 sm:pb-4">
                 {/* Brand Logo Top-Center */}
-                <div className="absolute top-3 sm:top-4 left-1/2 -translate-x-1/2 h-5 w-24 sm:h-10 sm:w-40 flex items-center justify-center text-center">
+                <div className="absolute top-3 sm:top-4 left-1/2 -translate-x-1/2 h-5 w-24 sm:h-8 sm:w-32 flex items-center justify-center text-center">
                   <Image
                     src={activeSection.brand.logo}
                     alt={activeSection.brand.name}
@@ -228,38 +228,24 @@ export default function OurBrands() {
                   />
                 </div>
 
-                {/* Wishlist Heart Icon Top-Right */}
-                {/* <div className="absolute top-3 right-3 sm:top-4 sm:right-4 bg-white rounded-full p-1 sm:p-1.5 shadow-sm text-gray-400 hover:text-red-500 transition-colors">
-                  <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                  </svg>
-                </div> */}
-
-                {/* Share Icon below Heart */}
-                {/* <div className="absolute top-9 sm:top-11 right-3 sm:right-4 bg-white rounded-full p-1 sm:p-1.5 shadow-sm text-gray-400 hover:text-blue-600 transition-colors">
-                  <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185zm0-10.628a2.25 2.25 0 103.933-2.186 2.25 2.25 0 00-3.933 2.186z"/>
-                  </svg>
-                </div> */}
-
                 {/* Cover Image */}
-                <div className="relative mx-auto h-[110px] sm:h-[180px] w-full max-w-[120px] sm:max-w-[230px]">
+                <div className="relative mx-auto h-[110px] sm:h-[130px] w-full max-w-[120px] sm:max-w-[170px]">
                   <Image
                     src={category.cover_image || "/assets/img/placeholder.jpg"}
                     alt={category.name}
                     fill
-                    sizes="230px"
+                    sizes="170px"
                     className="object-contain group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
               </div>
 
               {/* Bottom white section */}
-              <div className="bg-white py-4 sm:py-6 px-2 sm:px-4 flex flex-col items-center">
-                <h3 className="text-center text-xs sm:text-sm lg:text-[24px] font-medium tracking-wide text-[#6D6E71] mb-2 sm:mb-3 line-clamp-1">
+              <div className="bg-white py-3 sm:py-4 px-2 sm:px-3 flex flex-col items-center">
+                <h3 className="text-center text-xs sm:text-sm lg:text-[18px] font-semibold tracking-wide text-[#6D6E71] mb-1 sm:mb-2 line-clamp-1">
                   {category.name}
                 </h3>
-                <span className="bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white px-5 py-1.5 sm:px-10 sm:py-2 rounded-lg text-[10px] sm:text-xs mt-2 sm:mt-5 lg:text-lg font-semibold hover:bg-blue-700 transition-colors">
+                <span className="bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white px-4 py-1.5 sm:px-8 sm:py-2 rounded-lg text-[10px] sm:text-xs mt-1.5 sm:mt-3 lg:text-[14px] font-bold hover:bg-blue-700 transition-colors">
                   See More
                 </span>
               </div>

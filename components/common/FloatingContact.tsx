@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { IoClose } from "react-icons/io5";
 import { FaChevronUp, FaWhatsapp } from "react-icons/fa";
-import { SiMessenger } from "react-icons/si";
+// import { SiMessenger } from "react-icons/si";
 
 export default function FloatingContact() {
   const [isOpen, setIsOpen] = useState(false);
@@ -176,10 +176,10 @@ const scrollToTop = () => {
     </div>
 
       {/* Separate Scroll To Top Button (At the bottom right) */}
-      <div className="fixed right-4 bottom-36 lg:right-10 lg:bottom-8 z-[9999] pointer-events-none">
+      <div className="fixed right-4 bottom-36 lg:right-10 lg:bottom-14 z-[9999] pointer-events-none">
         <button
           onClick={scrollToTop}
-          className={`w-10 h-10 lg:w-14 lg:h-14 rounded-full bg-[#2B7FE8] hover:bg-blue-600 text-white shadow-[0_4px_20px_rgba(0,0,0,0.15)] transition-all duration-300 flex items-center justify-center pointer-events-auto focus:outline-none hover:scale-105 active:scale-95 ${
+          className={`w-10 h-10 lg:w-14 lg:h-14 rounded-full bg-gray-500/60 hover:bg-blue-200 text-white shadow-[0_4px_20px_rgba(0,0,0,0.15)] transition-all duration-300 flex items-center justify-center pointer-events-auto focus:outline-none hover:scale-105 active:scale-95 ${
             showScroll ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none h-0 w-0 overflow-hidden"
           }`}
           aria-label="Scroll to top"
@@ -190,3 +190,5 @@ const scrollToTop = () => {
     </>
   );
 }
+
+
