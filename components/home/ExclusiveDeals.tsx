@@ -59,7 +59,7 @@ export default function ExclusiveDeals() {
     <section className="w-full lg:pt-8 pb-0 select-none">
       {/* Title & Subtitle */}
       <div className="text-center mb-4 lg:mb-12 px-4">
-        <h2 className="text-xl md:text-[48px] lg:text-[30px] font-bold text-gray-900 tracking-tight lg:mb-4">
+        <h2 className="text-xl md:text-[48px] lg:text-[30px] 2xl:text-[38px] font-semibold text-gray-900 tracking-tight lg:mb-4">
           {title}
         </h2>
         <p className="text-sm md:text-[20px] lg:text-[18px] text-gray-500 mt-2 max-w-[800px] mx-auto">

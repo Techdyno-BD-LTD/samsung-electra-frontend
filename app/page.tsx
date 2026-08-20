@@ -106,18 +106,12 @@ export default async function Home() {
   return (
     <div className="">
       <HeroSection />
-      <div className="bg-[#EDF2FB]">
-  <HomeSliderTwo />
+      <div className="bg-[#EDF2FB] pb-0">
+        <HomeSliderTwo />
+        <OurBrands />
       </div>
-    
-      <section className=" mx-auto  ">
-        {/* <div className="mt-5">
-          <ServiceHighlights />
-        </div> */}
-        <div className="lg:mt-14 mt-5 ">
-          <OurBrands />
-        </div>
-         <div className="lg:mt-14 mt-5">
+      <section className="mx-auto">
+        <div className="lg:mt-14 mt-5">
           <SingleWideBanner />
         </div>
         <div className="lg:mt-14 mt-5">

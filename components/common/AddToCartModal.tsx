@@ -13,6 +13,7 @@ import BankEmiModal from "../productdetails/BankEmiModal";
 import { toProductSlug } from "@/lib/productSlug";
 import { formatCurrency } from "@/lib/currencyUtils";
 import { pushToDataLayer } from "@/lib/gtm";
+import { FiShoppingCart } from "react-icons/fi";
 
 const toComparable = (value?: string) => value?.trim().toLowerCase() ?? "";
 const isHexColor = (value?: string | null) => /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(value ?? "");
@@ -774,7 +775,7 @@ export default function AddToCartModal({
                       onClick={handleAddToCart}
                       className="flex items-center justify-center gap-3 h-8 rounded-xl border-2 border-[#9CB7D8] text-sm font-bold text-slate-800 hover:bg-slate-50 active:scale-[0.98] transition-all"
                     >
-                      <Image src="/images/shopping-cart.png" alt="Cart" width={20} height={20} className="h-5 w-5 object-contain" />
+                       <FiShoppingCart className="w-5 h-5 text-[#000000]" />
                       Add to Cart
                     </button>
                   </div>

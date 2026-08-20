@@ -179,7 +179,7 @@ export default function OurStoresSection() {
       >
         {/* Top Center: Title and Description */}
         <div className="w-full text-center mt-4">
-          <h2 className="text-2xl sm:text-3xl lg:text-[32px] 2xl:text-[38px] font-bold text-gray-900 mb-1 lg:mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-[32px] 2xl:text-[38px] font-semibold text-gray-900 mb-1 lg:mb-4">
             {data.stores_title}
           </h2>
           <p className="text-gray-600 text-xs sm:text-sm lg:text-[16px] 2xl:text-[18px] font-medium max-w-2xl mx-auto">

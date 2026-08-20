@@ -20,6 +20,9 @@ export default function CorporateCornerSection() {
   const [transitionEnabled, setTransitionEnabled] = useState(true);
   const [loading, setLoading] = useState(true);
   const [windowWidth, setWindowWidth] = useState(1200);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [dragOffset, setDragOffset] = useState(0);
 
   useEffect(() => {
     fetch("/api/blogs")
@@ -82,6 +85,31 @@ export default function CorporateCornerSection() {
     }
   };
 
+  const handleDragStart = (clientX: number) => {
+    setIsDragging(true);
+    setStartX(clientX);
+    setDragOffset(0);
+  };
+
+  const handleDragMove = (clientX: number) => {
+    if (!isDragging) return;
+    const diff = clientX - startX;
+    setDragOffset(diff);
+  };
+
+  const handleDragEnd = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    
+    const threshold = 50;
+    if (dragOffset > threshold) {
+      handlePrev();
+    } else if (dragOffset < -threshold) {
+      handleNext();
+    }
+    setDragOffset(0);
+  };
+
   const isMobile = windowWidth < 768;
   
   // Calculate card width based on screen width to fit 3 cards in viewport for lg-xl, and keep 550 for 2xl
@@ -103,10 +131,10 @@ export default function CorporateCornerSection() {
   const translationX = `calc(50% - ${currentIndex * (cardWidth + gap)}px - ${cardWidth / 2}px)`;
 
   return (
-    <section className="w-full bg-transparent py-12 sm:py-16 overflow-hidden select-none">
+    <section className="w-full bg-transparent pt-12 py-7 sm:pt-16 sm:py-16 overflow-hidden select-none">
       <div className="max-w-[1900px] mx-auto text-center">
         {/* Header */}
-        <h2 className="text-xl sm:text-4xl lg:text-[32px] 2xl:text-[38px] font-bold text-gray-900 mb-2 sm:mb-5">
+        <h2 className="text-xl sm:text-4xl lg:text-[32px] 2xl:text-[38px] font-semibold text-gray-900 mb-2 sm:mb-5">
           Corporate Corner
         </h2>
         <p className="text-gray-900 text-sm lg:text-[16px] 2xl:text-[18px] mb-8 sm:mb-12 max-w-2xl mx-auto px-4">
@@ -128,9 +156,17 @@ export default function CorporateCornerSection() {
           <div className="w-full overflow-hidden py-4 sm:py-0 relative">
             {/* Slider Track */}
             <div
-              className={`flex ${transitionEnabled ? "transition-transform duration-500 ease-out" : ""}`}
-              style={{ transform: `translateX(${translationX})` }}
+              className={`flex ${transitionEnabled && !isDragging ? "transition-transform duration-500 ease-out" : ""}`}
+              style={{ transform: `translateX(calc(${translationX} + ${dragOffset}px))` }}
               onTransitionEnd={handleTransitionEnd}
+              onMouseDown={(e) => handleDragStart(e.clientX)}
+              onMouseMove={(e) => handleDragMove(e.clientX)}
+              onMouseUp={handleDragEnd}
+              onMouseLeave={handleDragEnd}
+              onTouchStart={(e) => handleDragStart(e.touches[0].clientX)}
+              onTouchMove={(e) => handleDragMove(e.touches[0].clientX)}
+              onTouchEnd={handleDragEnd}
+              onDragStart={(e) => e.preventDefault()}
             >
               {repeatedBlogs.map((blog, index) => {
                 const isActive = index === currentIndex;

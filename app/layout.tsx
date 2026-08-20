@@ -11,6 +11,8 @@ import GlobalToast from "@/components/common/GlobalToast";
 import GoogleTagManager from "@/components/analytics/GoogleTagManager";
 import PageWrapper from "@/components/layout/PageWrapper";
 import FloatingContact from "@/components/common/FloatingContact";
+import MobileSplashLoader from "@/components/common/MobileSplashLoader";
+
 
 import localFont from "next/font/local";
 
@@ -112,8 +114,10 @@ export default async function RootLayout({
         className={`${poppins.variable} ${samsungSans.variable} ${samsungSharpSans.variable} antialiased`}
       >
         <StoreProvider>
+          <MobileSplashLoader />
           <GoogleTagManager gtmId={gtmId} />
           <AuthInit />
+
           <GlobalToast />
           <Navbar />
           <main className=" lg:pb-0 pt-2 lg:pt-0 min-h-screen-safe">

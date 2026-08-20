@@ -8,6 +8,7 @@ type BannerItem = {
 	file_name: string;
 	link: string | null;
 	external_link: string | null;
+	text?: string | null;
 };
 
 type BannerApiResponse = {

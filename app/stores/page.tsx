@@ -5,33 +5,27 @@ import { useEffect, useMemo, useState } from "react";
 import {
   FiChevronDown,
   FiCopy,
-  FiMapPin,
-  FiPhoneCall,
+
   FiSearch,
   FiShare2,
-  FiTarget,
 } from "react-icons/fi";
-import { FaWhatsapp } from "react-icons/fa6";
+
 import Image from "next/image";
 import Skeleton from "@/components/common/Skeleton";
-
-type StoreHour = {
-  day: string;
-  time: string;
-};
 
 type StoreItem = {
   id: number;
   title: string;
   address: string;
   phone: string;
+  email: string | null;
   callHref: string;
   messageHref: string;
   mapHref: string;
-  hours: StoreHour[];
+  openingHours: string;
   type: string;
   division: string;
-  district: string;
+  district: string; 
   area: string;
 };
 
@@ -40,6 +34,7 @@ interface StoreLocation {
   name: string;
   address: string;
   phone: string;
+  email?: string | null;
   whatsapp_number: string;
   embedded_map_link?: string;
   opening_hours?: string;
@@ -56,9 +51,9 @@ export default function StoresPage() {
   const [expandedStoreId, setExpandedStoreId] = useState<number>(0);
 
   const [query, setQuery] = useState("");
-  const [serviceType, setServiceType] = useState("All Types");
   const [division, setDivision] = useState("All Divisions");
   const [district, setDistrict] = useState("All Districts");
+  const [selectedShowroom, setSelectedShowroom] = useState("All Showrooms");
 
   useEffect(() => {
     async function fetchStores() {
@@ -71,13 +66,22 @@ export default function StoresPage() {
             title: loc.name,
             address: loc.address,
             phone: loc.phone,
+            email: loc.email || "info@electrabd.com",
             callHref: `tel:${loc.phone}`,
             messageHref: `https://wa.me/${loc.whatsapp_number}`,
-            mapHref: loc.embedded_map_link?.match(/src="([^"]+)"/)?.[1] || "",
-            hours: loc.opening_hours ? loc.opening_hours.split('\r\n').filter(Boolean).map((line: string) => {
-              const [day, time] = line.split(' : ');
-              return { day, time: time || "Closed" };
-            }) : [],
+            mapHref: (() => {
+              const raw = loc.embedded_map_link || "";
+              let href = raw.match(/src="([^"]+)"/)?.[1] || raw;
+              href = href.replace(/&amp;/g, "&");
+              if (href.includes("google.com/maps/embed") && !href.includes("!3f0")) {
+                href = href.replace("!3m2", "!3f0!3m2");
+              }
+              if (!href) {
+                return `https://maps.google.com/maps?q=${encodeURIComponent(loc.name + ", " + loc.address)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+              }
+              return encodeURI(href);
+            })(),
+            openingHours: loc.opening_hours || "10:00 AM - 08:00 PM (Friday Closed)",
             type: loc.type === "service_center" ? "Service Center" : loc.type === "store" ? "Brand Shop" : loc.type,
             division: loc.division,
             district: loc.district,
@@ -99,22 +103,30 @@ export default function StoresPage() {
   }, []);
 
   const filterOptions = useMemo(() => {
-    const types = new Set<string>(["All Types"]);
     const divisions = new Set<string>(["All Divisions"]);
     const districts = new Set<string>(["All Districts"]);
 
     stores.forEach(s => {
-      if (s.type) types.add(s.type);
       if (s.division) divisions.add(s.division);
       if (s.district) districts.add(s.district);
     });
 
     return {
-      types: Array.from(types),
       divisions: Array.from(divisions),
       districts: Array.from(districts)
     };
   }, [stores]);
+
+  const filteredShowroomsForDropdown = useMemo(() => {
+    let list = stores;
+    if (division !== "All Divisions") {
+      list = list.filter(s => s.division === division);
+    }
+    if (district !== "All Districts") {
+      list = list.filter(s => s.district === district);
+    }
+    return ["All Showrooms", ...list.map(s => s.title)];
+  }, [stores, division, district]);
 
   const filteredStores = useMemo(() => {
     let result = stores;
@@ -127,228 +139,317 @@ export default function StoresPage() {
       });
     }
 
-    if (serviceType !== "All Types") {
-      result = result.filter(s => s.type === serviceType);
-    }
     if (division !== "All Divisions") {
       result = result.filter(s => s.division === division);
     }
     if (district !== "All Districts") {
       result = result.filter(s => s.district === district);
     }
+    if (selectedShowroom !== "All Showrooms") {
+      result = result.filter(s => s.title === selectedShowroom);
+    }
 
     return result;
-  }, [query, stores, serviceType, division, district]);
+  }, [query, stores, division, district, selectedShowroom]);
 
   const activeMapUrl = useMemo(() => {
     const activeStore = stores.find(s => s.id === expandedStoreId);
     return activeStore?.mapHref || "";
   }, [expandedStoreId, stores]);
 
+  const handleShowroomChange = (val: string) => {
+    setSelectedShowroom(val);
+    if (val !== "All Showrooms") {
+      const found = stores.find(s => s.title === val);
+      if (found) {
+        setExpandedStoreId(found.id);
+      }
+    }
+  };
+
+  const parseOpeningDetails = (hoursStr: string) => {
+    // E.g. "10:00 AM - 09:00 PM (Friday Closed)"
+    const match = hoursStr.match(/^([^(]+)\s*\(([^)]+)\)$/);
+    if (match) {
+      return {
+        time: match[1].trim(),
+        holiday: match[2].replace(/Closed|Open/gi, "").trim() || "None"
+      };
+    }
+    return { time: hoursStr, holiday: "N/A" };
+  };
+
+  const handleCopy = (store: StoreItem) => {
+    const text = `${store.title}\n${store.address}\nPhone: ${store.phone}\nEmail: ${store.email}`;
+    navigator.clipboard.writeText(text);
+    alert("Store details copied to clipboard!");
+  };
+
+  const handleShare = (store: StoreItem) => {
+    if (navigator.share) {
+      navigator.share({
+        title: store.title,
+        text: `${store.address}\nPhone: ${store.phone}`,
+        url: window.location.href
+      }).catch(console.error);
+    } else {
+      handleCopy(store);
+    }
+  };
+
   if (loading) {
     return (
-      <div className="space-y-12 animate-in fade-in duration-500">
-        <Skeleton className="h-40 w-full rounded-xl" />
-        <div className="grid lg:grid-cols-[0.95fr_1.05fr] gap-6">
-          <div className="space-y-4">
-            <Skeleton className="h-10 w-full rounded-lg" />
-            {[1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-40 w-full rounded-2xl" />
+      <div className="max-w-full mx-auto px-4 md:px-8 py-24 space-y-12 animate-in fade-in duration-500">
+        <Skeleton className="h-64 w-full rounded-xl" />
+        <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="h-48 w-full rounded-lg" />
             ))}
           </div>
-          <Skeleton className="h-[600px] w-full rounded-2xl" />
+          <Skeleton className="h-[600px] w-full rounded-xl sticky top-24" />
         </div>
       </div>
     );
   }
 
   return (
-    <main className="mt-20 pb-10 sm:mt-24 sm:pb-14 lg:mt-16">
-      <section className="relative overflow-hidden rounded-lg border border-slate-200 bg-[#1E5AA4]">
+    <main className="max-w-full mx-auto   pt-20 pb-16 sm:pt-24 lg:pt-6">
+      {/* Breadcrumbs & Centered Title */}
+      <div className="relative w-11/12 mx-auto  flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 pb-4">
+        <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-slate-500">
+          <Link href="/" className="transition hover:text-slate-700">
+            Home
+          </Link>
+          <span className="text-slate-400">&gt;</span>
+          <span className="font-medium text-slate-700">Store Location</span>
+        </nav>
+        <h1 className="text-xl font-bold text-slate-800 text-center sm:absolute sm:left-1/2 sm:-translate-x-1/2">
+          Our Stores
+        </h1>
+        <div className="hidden sm:block w-20" />
+      </div>
+
+      {/* Hero Search Section */}
+      <section className="relative overflow-hidden  bg-[#1e293b] text-white min-h-[280px] flex flex-col justify-center items-center px-6 py-10 shadow-md">
         {banner ? (
-          <div className="relative aspect-[1810/393] w-full">
-            <Image src={banner} alt="Store Banner" fill className="object-contain" />
-          </div>
+          <Image
+            src={banner}
+            alt="Store Locations Banner"
+            fill
+            className="object-fill  pointer-events-none"
+            priority
+          />
         ) : (
-          <div className="flex aspect-[1840/400] w-full items-center justify-center">
-            <span className="text-3xl font-semibold text-white sm:text-4xl">Store Locations</span>
-          </div>
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-900 to-slate-900 opacity-60" />
         )}
+        
+        <div className="relative z-10 text-center w-full max-w-6xl space-y-6">
+          <h2 className="text-3xl font-normal font-poppins   tracking-wide sm:text-4xl text-white drop-shadow-sm">
+            Electra International All Stores
+          </h2>
+          <div className="relative mx-auto max-w-full w-full">
+            <div className="relative flex items-center ">
+              <input
+                type="text"
+                placeholder="Search your nearest place here..."
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                className="h-12 w-full border border-white bg-transparent   rounded-xl px-5 pr-14 text-sm text-white placeholder-slate-400 "
+              />
+              <button
+                type="button"
+                className="absolute right-0 top-0 flex h-12 w-14 rounded-r-xl items-center justify-center bg-[#2b7fe8] text-white hover:bg-blue-600 transition"
+                aria-label="Search"
+              >
+                <FiSearch className="text-lg" />
+              </button>
+            </div>
+          </div>
+        </div>
       </section>
 
-      <nav aria-label="Breadcrumb" className="mt-3 mb-3 flex items-center gap-2 text-[11px] text-slate-500 sm:text-xs">
-        <Link href="/" className="transition hover:text-slate-700">
-          Home
-        </Link>
-        <span className="text-slate-400">›</span>
-        <span className="font-medium text-slate-700">Store locations</span>
-      </nav>
-
-      <section className="rounded-xl border border-slate-200 bg-white p-2.5 shadow-sm sm:p-3">
-        <div className="relative mb-2">
-          <input
-            type="text"
-            placeholder="Enter - district- thana etc...."
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 pr-12 text-sm text-slate-700 outline-none transition focus:border-[#2b7fe8]/70"
-          />
-          <button
-            type="button"
-            className="absolute right-1.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded bg-[#001B33] text-white"
-            aria-label="Search"
-          >
-            <FiSearch className="text-sm" />
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-[180px_140px_130px_170px]">
-          <select
-            value={serviceType}
-            onChange={(event) => setServiceType(event.target.value)}
-            className="h-8 rounded border border-slate-200 bg-white px-2 text-[11px] text-slate-700 outline-none"
-          >
-            {filterOptions.types.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-          </select>
-
+      {/* Dropdown Filters Row */}
+      <section className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-7xl mx-auto">
+        {/* Division Selector */}
+        <div className="relative">
           <select
             value={division}
-            onChange={(event) => setDivision(event.target.value)}
-            className="h-8 rounded border border-slate-200 bg-white px-2 text-[11px] text-slate-700 outline-none"
+            onChange={(e) => {
+              setDivision(e.target.value);
+              setDistrict("All Districts");
+              setSelectedShowroom("All Showrooms");
+            }}
+            className="w-full appearance-none rounded-full border border-slate-200 bg-[#eff6ff] px-6 py-3 pr-10 text-sm font-semibold text-slate-800 outline-none transition focus:border-blue-400 focus:bg-white"
           >
-            {filterOptions.divisions.map((item) => (
+            <option value="All Divisions">Select Division</option>
+            {filterOptions.divisions.filter(d => d !== "All Divisions").map((item) => (
               <option key={item} value={item}>
-                {item}
+                Division: {item}
               </option>
             ))}
           </select>
+          <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-500">
+            <FiChevronDown className="text-base" />
+          </div>
+        </div>
 
+        {/* District Selector */}
+        <div className="relative">
           <select
             value={district}
-            onChange={(event) => setDistrict(event.target.value)}
-            className="h-8 rounded border border-slate-200 bg-white px-2 text-[11px] text-slate-700 outline-none"
+            onChange={(e) => {
+              setDistrict(e.target.value);
+              setSelectedShowroom("All Showrooms");
+            }}
+            className="w-full appearance-none rounded-full border border-slate-200 bg-[#eff6ff] px-6 py-3 pr-10 text-sm font-semibold text-slate-800 outline-none transition focus:border-blue-400 focus:bg-white"
           >
-            {filterOptions.districts.map((item) => (
+            <option value="All Districts">Select District</option>
+            {filterOptions.districts.filter(d => d !== "All Districts").map((item) => (
+              <option key={item} value={item}>
+                District: {item}
+              </option>
+            ))}
+          </select>
+          <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-500">
+            <FiChevronDown className="text-base" />
+          </div>
+        </div>
+
+        {/* Showroom Selector */}
+        <div className="relative">
+          <select
+            value={selectedShowroom}
+            onChange={(e) => handleShowroomChange(e.target.value)}
+            className="w-full appearance-none rounded-full border border-slate-200 bg-[#eff6ff] px-6 py-3 pr-10 text-sm font-semibold text-slate-800 outline-none transition focus:border-blue-400 focus:bg-white"
+          >
+            <option value="All Showrooms">Select Showroom</option>
+            {filteredShowroomsForDropdown.filter(s => s !== "All Showrooms").map((item) => (
               <option key={item} value={item}>
                 {item}
               </option>
             ))}
           </select>
-
-          <button
-            type="button"
-            className="flex h-8 items-center justify-center gap-1 rounded bg-[#2b7fe8] px-3 text-[11px] font-semibold text-white transition hover:bg-[#1a6ed9]"
-          >
-            <FiTarget className="text-sm" />
-            <span>Search your location</span>
-          </button>
+          <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-500">
+            <FiChevronDown className="text-base" />
+          </div>
         </div>
       </section>
 
-      <section className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-        <div className="order-2 space-y-2 lg:order-1">
+      {/* Main Split Layout */}
+      <section className="mt-10 grid gap-6 lg:grid-cols-[1.15fr_0.85fr] w-11/12 mx-auto items-start">
+        {/* Left Side: Store Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filteredStores.length > 0 ? (
             filteredStores.map((store) => {
-              const isExpanded = expandedStoreId === store.id;
+              const { time, holiday } = parseOpeningDetails(store.openingHours);
+              const isActive = expandedStoreId === store.id;
 
               return (
-                <article key={store.id} className="relative overflow-hidden rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
-                  <div className="absolute right-0 top-0 h-9 w-9 overflow-hidden">
-                    <div className="absolute right-[-10px] top-[8px] rotate-45 bg-[#1f68bf] px-4 py-[1px] text-[8px] font-semibold uppercase tracking-wide text-white">
-                      {store.type}
-                    </div>
-                  </div>
-
-                  <div className="mb-1.5 flex items-start justify-between gap-2 pr-6">
-                    <h2 className="text-[16px] font-semibold leading-5 text-slate-800">{store.title}</h2>
-                    <div className="flex items-center gap-2 text-slate-400">
-                      <button 
-                        type="button" 
-                        onClick={() => navigator.clipboard.writeText(`${store.title}\n${store.address}\nPhone: ${store.phone}`)}
-                        className="transition hover:text-[#2b7fe8]" 
-                        aria-label="Copy"
+                <article
+                  key={store.id}
+                  onClick={() => setExpandedStoreId(store.id)}
+                  className={`cursor-pointer flex flex-col justify-between overflow-hidden rounded-lg border transition-all duration-200 ${
+                    isActive ? "border-blue-400 ring-1 ring-blue-400" : "border-slate-200"
+                  } bg-[#EDF2FB] shadow-sm hover:shadow-md`}
+                >
+                  {/* Card Header Bar */}
+                  <div className={`flex items-center justify-between px-4 py-2.5 transition-colors ${
+                    isActive ? "bg-[#2b7fe8] text-white" : "bg-[#EDF2FB] text-slate-800"
+                  }`}>
+                    <h3 className="text-base font-bold tracking-wide truncate max-w-[80%]">
+                      {store.title}
+                    </h3>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(store)}
+                        className={`p-1 transition ${isActive ? "hover:text-blue-100 text-white" : "hover:text-slate-900 text-slate-500"}`}
+                        title="Copy details"
                       >
-                        <FiCopy className="text-[13px]" />
+                        <FiCopy className="text-xs" />
                       </button>
-                      <button type="button" className="transition hover:text-[#2b7fe8]" aria-label="Share">
-                        <FiShare2 className="text-[13px]" />
+                      <button
+                        type="button"
+                        onClick={() => handleShare(store)}
+                        className={`p-1 transition ${isActive ? "hover:text-blue-100 text-white" : "hover:text-slate-900 text-slate-500"}`}
+                        title="Share store"
+                      >
+                        <FiShare2 className="text-xs" />
                       </button>
                     </div>
                   </div>
 
-                  <p className="text-[12px] text-slate-600">{store.address}</p>
-                  <p className="mt-1 text-[12px] font-semibold text-slate-800">Phone: {store.phone}</p>
-
-                  <div className="mt-2">
-                    <button
-                      type="button"
-                      onClick={() => setExpandedStoreId((prev) => (prev === store.id ? 0 : store.id))}
-                      className="inline-flex items-center gap-1 rounded-full bg-slate-50 px-2 py-1 text-[9px] font-semibold text-slate-700"
-                    >
-                      <span>Store Opening Hours</span>
-                      <FiChevronDown className={`transition-transform ${isExpanded ? "rotate-180" : ""}`} />
-                    </button>
-
-                    {isExpanded && (
-                      <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-[10px] text-slate-600 sm:grid-cols-3">
-                        {store.hours.map((item, idx) => (
-                          <div key={`${store.id}-${item.day}-${idx}`} className="flex items-center gap-1">
-                            <span>{item.day}</span>
-                            <span className="font-semibold">: {item.time}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                  {/* Card Body */}
+                  <div className="p-4 flex-1 space-y-2 text-[11px] text-slate-600 bg-[#EDF2FB]">
+                    <p className="leading-relaxed font-medium text-slate-700 min-h-[32px]">
+                  {store.address}, {store.area}, {store.division}                    </p>
+                    <div className="space-y-0.5 pt-1 border-t border-slate-200/50">
+                      <p>
+                        <span className="font-semibold text-slate-800">Opening :</span> {time}
+                      </p>
+                      <p>
+                        <span className="font-semibold text-slate-800">Holiday :</span> {holiday}
+                      </p>
+                      <p>
+                        <span className="font-semibold text-slate-800">Phone :</span> {store.phone}
+                      </p>
+                      <p>
+                        <span className="font-semibold text-slate-800">Email :</span> {store.email}
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
+                  {/* Card Actions Footer */}
+                  <div className="grid grid-cols-3 2xl:grid-cols-4 gap-1.5 p-3 bg-[#EDF2FB] border-t border-slate-200/50">
                     <Link
                       href={store.callHref}
-                      className="flex h-8 items-center justify-center gap-1 rounded-full bg-[#2b7fe8] px-2 text-[11px] font-semibold text-white"
+                      className="flex h-8 items-center justify-center gap-1 rounded-full bg-gradient-to-t from-blue-600 to-blue-500 text-white hover:bg-blue-600 transition text-[12px] font-bold shadow-sm"
                     >
-                      <FiPhoneCall className="text-[11px]" />
-                      <span>Directly Call</span>
+                    
+                      <span>Call Now</span>
                     </Link>
                     <Link
                       href={store.messageHref}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex h-8 items-center justify-center gap-1 rounded-full bg-[#2b7fe8] px-2 text-[11px] font-semibold text-white"
+                      className="flex h-8 items-center justify-center gap-1 rounded-full border border-blue-500 bg-transparent  text-black hover:bg-blue-50 transition text-[12px] font-bold"
                     >
-                      <FaWhatsapp className="text-[11px]" />
-                      <span>Directly Message</span>
+                     
+                      <span>Send Message</span>
                     </Link>
                     <button
                       type="button"
                       onClick={() => setExpandedStoreId(store.id)}
-                      className="flex h-8 items-center justify-center gap-1 rounded-full bg-slate-100 px-2 text-[11px] font-semibold text-slate-700"
+                      className={`flex h-8 items-center justify-center gap-1 rounded-full border transition text-[12px] font-bold ${
+                        isActive
+                          ? "border-blue-400 bg-blue-50 text-black"
+                          : "border-blue-500 bg-transparent text-black  hover:bg-slate-50"
+                      }`}
                     >
-                      <FiMapPin className="text-[11px]" />
-                      <span>View map</span>
+                
+                      <span>View Map</span>
                     </button>
                   </div>
                 </article>
               );
             })
           ) : (
-            <div className="rounded-lg border border-slate-200 bg-white p-10 text-center text-slate-500">
+            <div className="col-span-full rounded-lg border border-slate-200 bg-white p-12 text-center text-slate-500 shadow-sm">
               No stores found matching your criteria.
             </div>
           )}
         </div>
 
-        <aside className="order-1 lg:order-2 lg:sticky lg:top-32 lg:h-fit">
+        {/* Right Side: Map Container */}
+        <aside className="lg:sticky lg:top-28">
           <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-            <div className="relative aspect-[16/11] w-full sm:aspect-[16/10] lg:aspect-[4/6]">
+            <div className="relative aspect-[16/12] w-full sm:aspect-[16/10] lg:aspect-[4/5]">
               {activeMapUrl ? (
                 <iframe
                   title="Store location map"
                   src={activeMapUrl}
-                  className="h-full w-full"
+                  className="h-full w-full border-none"
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                 />

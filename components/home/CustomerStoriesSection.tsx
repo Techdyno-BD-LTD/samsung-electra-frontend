@@ -218,7 +218,7 @@ export default function CustomerStoriesSection() {
     <section className="relative w-full bg-transparent lg:pt-4 overflow-hidden">
       {/* Header */}
       <div className="max-w-[1700px]  lg:mb-10 mx-auto text-center px-6 md:px-16 lg:px-24">
-        <h2 className="text-xl sm:text-4xl lg:text-[32px] 2xl:text-[38px] font-bold text-gray-900 mb-2 lg:mb-4">
+        <h2 className="text-xl sm:text-4xl lg:text-[32px] 2xl:text-[38px] font-semibold text-gray-900 mb-2 lg:mb-4">
           Customer Stories
         </h2>
         <p className="text-gray-500 text-sm lg:text-[16px] 2xl:text-[18px] mb-[200px] lg:mb-60 max-w-2xl mx-auto">
@@ -228,7 +228,7 @@ export default function CustomerStoriesSection() {
 
       {/* Overlapping Blue Backdrop */}
       <div className="relative w-full lg:rounded-t-[100px] sm:rounded-t-[150px] bg-blue-600 lg:pt-28 pt-20 lg:pb-12 select-none">
-        <div className="max-w-[1700px] mx-auto px-0 md:px-16 lg:px-24 flex items-center justify-between gap-6 relative">
+        <div className="max-w-[1500px] mx-auto px-0 md:px-16 lg:px-24 flex items-center justify-between gap-6 relative">
           
           {/* Prev Arrow (Desktop Only) */}
           <button
@@ -242,10 +242,10 @@ export default function CustomerStoriesSection() {
           <div className="flex-grow w-full relative z-10 -mt-64 lg:-mt-64">
             
             {/* Desktop Static Grid Layout */}
-            <div className="hidden lg:grid grid-cols-4 gap-6 lg:gap-8 mx-auto w-full">
+            <div className="hidden lg:grid grid-cols-4 gap-6 lg:gap-1 mx-auto w-full justify-items-center">
               {displayedTestimonials.map((item) => (
-                <div key={item.id} className="relative bg-white rounded-3xl pt-16 pb-8 px-6 text-center shadow-lg border border-gray-100 flex flex-col justify-between h-[350px]">
-                  <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-[88px] h-[88px] rounded-full border-4 border-blue-500 bg-blue-100 shadow-md overflow-hidden flex items-center justify-center">
+                <div key={item.id} className="relative bg-white rounded-3xl pt-16 pb-8 px-6 text-center shadow-lg border border-gray-100 flex flex-col justify-between h-[380px] w-72">
+                  <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-[92px] h-[92px] rounded-full border-4 border-blue-500 bg-blue-100 shadow-md overflow-hidden flex items-center justify-center">
                     <Image
                       src={item.avatar || "/assets/img/avatar-place.png"}
                       alt={item.name}
@@ -255,9 +255,9 @@ export default function CustomerStoriesSection() {
                     />
                   </div>
 
-                  <span className="text-[80px] text-gray-200 font-serif leading-none absolute top-16 left-6 select-none">“</span>
+                  <span className="text-[80px] text-gray-200 font-serif leading-none absolute top-20 left-3 select-none">“</span>
                   
-                  <p className="text-gray-900 xl:text-base leading-relaxed line-clamp-4 font-base pt-2 flex-grow flex items-center justify-center">
+                  <p className="text-gray-900 xl:text-[15px] font-poppins leading-relaxed line-clamp-4 font-base pt-2 flex-grow flex items-center justify-center">
                     {item.comment}
                   </p>
                   

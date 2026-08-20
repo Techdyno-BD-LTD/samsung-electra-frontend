@@ -4,7 +4,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
 import { HiViewGrid } from "react-icons/hi";
-import { FaHome } from "react-icons/fa";
+import { FaHome, FaSearch, FaUser } from "react-icons/fa";
+import { FiHeart, FiShoppingCart } from "react-icons/fi";
+import { useAppSelector } from "@/store/hooks";
+import { useRouter } from "next/navigation";
 
 type HeaderNavItem = {
   id: number;
@@ -56,6 +59,43 @@ export default function BottomBar() {
   const [activeMenuCategory, setActiveMenuCategory] = useState<HeroCategory | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const [mounted, setMounted] = useState(false);
+  const [isSticky, setIsSticky] = useState(false);
+  const router = useRouter();
+
+  const handleSearchClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const input = document.getElementById("mainbar-search-input");
+    if (input) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setTimeout(() => {
+        input.focus();
+      }, 500);
+    } else {
+      router.push("/search");
+    }
+  };
+
+  const cartItems = useAppSelector((state) => state.cart.items);
+  const cartTotalCount = cartItems.reduce((total, item) => total + item.quantity, 0);
+  const wishlistTotalCount = useAppSelector((state) => state.wishlist.items.length);
+  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+
+  useEffect(() => {
+    setMounted(true);
+
+    const handleScroll = () => {
+      if (window.scrollY > 120) {
+        setIsSticky(true);
+      } else {
+        setIsSticky(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleCategoryHover = (category: HeroCategory | null) => {
     if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
@@ -327,7 +367,7 @@ export default function BottomBar() {
         </div>
 
         {/* Existing Navigation Links */}
-        <ul className="flex flex-nowrap uppercase items-center justify-center flex-1 gap-2 lg:gap-6 py-1">
+        <ul className={`flex flex-nowrap uppercase items-center ${isSticky ? "justify-start ml-14 " : "justify-center"} flex-1 gap-2 lg:gap-6 py-1`}>
           {/* HOME link with separator */}
           <li className="relative flex items-center group  pl-2 lg:pl-4">
             <Link
@@ -411,6 +451,65 @@ export default function BottomBar() {
             </li>
           ))}
         </ul>
+
+        {/* Sticky Action Icons */}
+        {isSticky && (
+          <div className="flex items-center gap-5 text-white flex-shrink-0 mr-32">
+            {/* Search */}
+            <button onClick={handleSearchClick} className="hover:opacity-85 transition-opacity" title="Search">
+              <FaSearch className="text-[18px]" />
+            </button>
+
+            {/* Login / Profile */}
+            {mounted && isAuthenticated ? (
+              <Link href="/dashboard" className="hover:opacity-85 transition-opacity flex items-center" title="My Dashboard">
+                {user?.avatar || user?.avatar_original ? (
+                  <div className="h-6 w-6 overflow-hidden rounded-full border border-white">
+                    <Image
+                      src={user.avatar_original || user.avatar || ""}
+                      alt="User"
+                      width={24}
+                      height={24}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <FaUser className="text-[18px]" />
+                )}
+              </Link>
+            ) : (
+              <Link href="/login" className="hover:opacity-85 transition-opacity flex items-center" title="Login">
+                <Image
+                  src="/images/loginavatar.png"
+                  alt="Login"
+                  width={20}
+                  height={20}
+                  className="brightness-0 invert"
+                />
+              </Link>
+            )}
+
+            {/* Wishlist */}
+            <Link href="/wishlist" className="relative hover:opacity-85 transition-opacity" title="Wishlist">
+              <FiHeart className="text-[20px]" />
+              {mounted && wishlistTotalCount > 0 && (
+                <span className="absolute -top-2 -right-2 flex h-[15px] min-w-[15px] items-center justify-center rounded-full bg-[#F7941D] px-1 text-[9px] font-bold text-white leading-none">
+                  {wishlistTotalCount}
+                </span>
+              )}
+            </Link>
+
+            {/* Cart */}
+            <Link href="/cart" className="relative hover:opacity-85 transition-opacity" title="Cart">
+              <FiShoppingCart className="text-[20px]" />
+              {mounted && cartTotalCount > 0 && (
+                <span className="absolute -top-2 -right-2 flex h-[15px] min-w-[15px] items-center justify-center rounded-full bg-[#F7941D] px-1 text-[9px] font-bold text-white leading-none">
+                  {cartTotalCount}
+                </span>
+              )}
+            </Link>
+          </div>
+        )}
       </div>
     </nav>
   );

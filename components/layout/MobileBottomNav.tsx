@@ -4,13 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { 
-  HiOutlineHome, 
-  HiOutlineSquares2X2, 
-  HiOutlineMegaphone, 
-  HiOutlineShoppingCart, 
-  HiOutlineUserCircle 
-} from "react-icons/hi2";
+import Image from "next/image";
 
 export default function MobileBottomNav() {
   const pathname = usePathname();
@@ -28,31 +22,31 @@ export default function MobileBottomNav() {
 
   const navItems = [
     {
-      icon: <HiOutlineHome size={22} />,
+      icon: "/images/home.svg",
       href: "/",
       label: "Home",
       active: pathname === "/"
     },
     {
-      icon: <HiOutlineSquares2X2 size={22} />,
+      icon: "/images/categories.svg",
       href: "/mobile-categories",
       label: "Categories",
       active: pathname === "/mobile-categories"
     },
     {
-      icon: <HiOutlineMegaphone size={22} />,
+      icon: "/images/offers.svg",
       href: "/offers",
       label: "Offers",
       active: pathname === "/offers"
     },
     {
-      icon: <HiOutlineShoppingCart size={22} />,
+      icon: "/images/cart.svg",
       href: "/cart",
       label: "Cart",
       active: pathname === "/cart"
     },
     {
-      icon: <HiOutlineUserCircle size={22} />,
+      icon: "/images/account.svg",
       href: isAuthenticated ? "/dashboard" : "/login",
       label: "Account",
       active: pathname === "/dashboard" || pathname === "/login"
@@ -66,19 +60,28 @@ export default function MobileBottomNav() {
           <Link 
             key={item.href}
             href={item.href} 
-            className={`flex flex-col items-center justify-center min-w-[60px] py-1 transition-colors ${
-              item.active ? "text-[#2B7FE8]" : "text-slate-500"
-            }`}
+            className="flex flex-col items-center justify-center min-w-[60px] py-1 transition-colors"
           >
             <div className="relative flex items-center justify-center h-6">
-              {item.icon}
+              <Image 
+                src={item.icon} 
+                alt={item.label} 
+                width={22} 
+                height={22} 
+                className="object-contain transition-all duration-300"
+                style={{
+                  filter: item.active 
+                    ? "brightness(0) saturate(100%) invert(36%) sepia(91%) saturate(3015%) hue-rotate(213deg) brightness(101%) contrast(97%)" 
+                    : "none"
+                }}
+              />
               {item.label === "Cart" && cartTotalCount > 0 && (
                 <span className="absolute -right-2.5 -top-1.5 flex h-[14px] w-[14px] items-center justify-center rounded-full bg-red-500 text-[8px] font-bold text-white border border-white">
                   {cartTotalCount}
                 </span>
               )}
             </div>
-            <span className="text-[10px] font-semibold mt-1 leading-none">{item.label}</span>
+            <span className="text-[12px] font-semibold mt-1 leading-none text-black">{item.label}</span>
           </Link>
         ))}
       </div>

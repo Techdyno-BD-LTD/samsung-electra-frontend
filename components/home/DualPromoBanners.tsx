@@ -9,6 +9,7 @@ type BannerItem = {
   file_name: string;
   link: string | null;
   external_link: string | null;
+  text?: string | null;
 };
 
 type BannersResponse = {
@@ -52,36 +53,49 @@ export default function DualPromoBanners() {
     <section className="w-full lg:py-6 select-none">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 lg:gap-6">
         {rendered.map((item, index) => {
-          const href = item.link || item.external_link || "#";
-          const isExternal = /^https?:\/\//i.test(href);
+  const href = item.link || item.external_link || "#";
+  const isExternal = /^https?:\/\//i.test(href);
 
-          return (
-            <div
-              key={item.id}
-              className="relative w-full overflow-hidden  aspect-[940/600] group"
-            >
-              {/* Main Banner Image with object-contain */}
-              <Image
-                src={item.image}
-                alt={`Promotional banner ${index + 1}`}
-                fill
-                sizes="(max-width: 768px) 100vw, 940px"
-                className="object-contain w-full h-full"
-                priority
-              />
+  // প্রথম ইমেজের জন্য ডানে রাউন্ডেড, পরেরটার জন্য বামে রাউন্ডেড (শুধু ডেস্কটপ/ট্যাবলেট স্ক্রিনে)
+  const roundedClass = index === 0 ? "md:rounded-r-xl" : "md:rounded-l-xl";
 
-              {/* Bottom Right "See All" Action Link */}
-              <a
-                href={href}
-                target={isExternal ? "_blank" : undefined}
-                rel={isExternal ? "noopener noreferrer" : undefined}
-                className="absolute right-2 bottom-2 lg:right-6 lg:bottom-6 z-10 lgpx-6 lg:py-2 py-1 px-4 text-sm font-semibold tracking-wide rounded-lg transition-all duration-300 transform active:scale-95 bg-transparent border border-white text-white hover:bg-white hover:text-black"
-              >
-                See All
-              </a>
-            </div>
-          );
-        })}
+  return (
+    <div
+      key={item.id}
+      className={`relative w-full overflow-hidden aspect-[940/600] group rounded-none ${roundedClass}`}
+    >
+      {/* Main Banner Image with object-contain */}
+      <Image
+        src={item.image}
+        alt={`Promotional banner ${index + 1}`}
+        fill
+        sizes="(max-width: 768px) 100vw, 940px"
+        className="object-contain w-full h-full"
+        priority
+      />
+
+      {/* Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none z-10" />
+
+      {/* Banner Text Overlay */}
+      {item.text && (
+        <h3 className="absolute left-4 bottom-2 lg:left-8 lg:bottom-6 z-20 text-white font-poppins text-base sm:text-2xl lg:text-3xl font-semibold tracking-wide">
+          {item.text}
+        </h3>
+      )}
+
+      {/* Bottom Right "See All" Action Link */}
+      <a
+        href={href}
+        target={isExternal ? "_blank" : undefined}
+        rel={isExternal ? "noopener noreferrer" : undefined}
+        className="absolute right-2 bottom-2 lg:right-6 lg:bottom-6 z-20 lg:px-6 lg:py-2 py-1 px-4 text-sm font-semibold tracking-wide rounded-lg transition-all duration-300 transform active:scale-95 bg-transparent border border-white text-white hover:bg-white hover:text-black"
+      >
+        See All
+      </a>
+    </div>
+  );
+})}
       </div>
     </section>
   );

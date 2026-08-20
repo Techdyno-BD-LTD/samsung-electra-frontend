@@ -80,7 +80,7 @@ export default function HearFromYouForm() {
 
   return (
     <section className="w-full bg-blue-600 pb-16 -mt-[1px] lg:-mt-[1px]">
-      <div className="max-w-[1700px] mx-auto px-6 md:px-16 lg:px-24">
+      <div className="max-w-[1500px] mx-auto px-6 md:px-16 lg:px-24">
         <div className="w-full lg:bg-white/20 rounded-[30px] p-8 md:p-8 text-white flex flex-col lg:flex-row items-center justify-between gap-8 lg:shadow-xl">
           <div className="shrink-0 text-center">
             <h2 className="text-[32px] sm:text-3xl font-bold text-center leading-tight text-white select-none">

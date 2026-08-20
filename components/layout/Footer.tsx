@@ -5,15 +5,14 @@ import Image from "next/image";
 import Link from "next/link";
 
 import {
-  FaFacebookF,
-  FaInstagram,
-  FaYoutube,
-  FaLinkedinIn,
   FaWhatsapp,
   FaTiktok,
-  
+  FaPinterestP,
   FaPhoneSquare
 } from "react-icons/fa";
+import { FaYoutube } from "react-icons/fa6";
+import { TiSocialFacebook, TiSocialLinkedin } from "react-icons/ti";
+import { RiInstagramLine } from "react-icons/ri";
 import { IoMdMail } from "react-icons/io";
 import { FaLocationDot } from "react-icons/fa6";
 
@@ -41,10 +40,12 @@ type FooterData = {
   app_store_link: string;
   payment_title: string;
   payment_image: string;
+  cod_image?: string;
   facebook_link?: string;
   instagram_link?: string;
   youtube_link?: string;
   linkedin_link?: string;
+  pinterest_link?: string;
   whatsapp_link?: string;
   tiktok_link?: string;
   sections: FooterSection[];
@@ -108,6 +109,44 @@ export default function Footer() {
     setMobileExpanded(mobileExpanded === section ? null : section);
   };
 
+  const socialLinks = [
+    {
+      href: footerData?.facebook_link,
+      icon: <TiSocialFacebook size={24} />,
+      colorClass: "border-white text-white hover:border-[#1877F2] hover:text-[#1877F2] hover:bg-[#1877F2]/10",
+    },
+    {
+      href: footerData?.instagram_link,
+      icon: <RiInstagramLine size={18} />,
+      colorClass: "border-white text-white hover:border-[#1877F2] hover:text-[#1877F2] hover:bg-[#1877F2]/10",
+    },
+    {
+      href: footerData?.youtube_link,
+      icon: <FaYoutube size={18} />,
+      colorClass: "border-white text-white hover:border-[#1877F2] hover:text-[#1877F2] hover:bg-[#1877F2]/10",
+    },
+    {
+      href: footerData?.linkedin_link,
+      icon: <TiSocialLinkedin size={24} />,
+      colorClass: "border-white text-white hover:border-[#1877F2] hover:text-[#1877F2] hover:bg-[#1877F2]/10",
+    },
+    {
+      href: footerData?.pinterest_link,
+      icon: <FaPinterestP size={16} />,
+      colorClass: "border-white text-white hover:border-[#1877F2] hover:text-[#1877F2] hover:bg-[#1877F2]/10",
+    },
+    {
+      href: footerData?.whatsapp_link ? getWhatsappHref(footerData.whatsapp_link) : undefined,
+      icon: <FaWhatsapp size={18} />,
+      colorClass: "border-white text-white hover:border-[#1877F2] hover:text-[#1877F2] hover:bg-[#1877F2]/10",
+    },
+    {
+      href: footerData?.tiktok_link,
+      icon: <FaTiktok size={16} />,
+      colorClass: "border-white text-white hover:border-[#1877F2] hover:text-[#1877F2] hover:bg-[#1877F2]/10",
+    },
+  ].filter(item => !!item.href);
+
   return (
     <>
       {/* Mobile Layout */}
@@ -155,17 +194,17 @@ export default function Footer() {
             <div className="space-y-3 text-[12px] text-white/80">
               <div className="flex items-start gap-2.5">
                 <FaPhoneSquare className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: "#007EEF" }} />
-                <p className="font-semibold text-white/90">
+                <p className="font-normal text-white/90">
                   {phones.join(" | ")}
                 </p>
               </div>
               <div className="flex items-center gap-2.5">
                 <IoMdMail className="w-4 h-4 flex-shrink-0" style={{ color: "#007EEF" }} />
-                <p className="font-semibold text-white/90">{footerData?.email || "info@electrabd.com"}</p>
+                <p className="font-normal text-white/90">{footerData?.email || "info@electrabd.com"}</p>
               </div>
               <div className="flex items-start gap-2.5">
                 <FaLocationDot className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: "#007EEF" }} />
-                <p className="leading-relaxed font-semibold text-white/90">
+                <p className="leading-relaxed font-normal text-white/90">
                   {footerData?.address || "Tropical Mollah Tower (6th Floor), 15/1-15/4 Pragati Sarani, Middle Badda, Dhaka - 1212, Bangladesh"}
                 </p>
               </div>
@@ -173,73 +212,24 @@ export default function Footer() {
           </div>
 
           {/* Social Follow Us block */}
-          <div className="space-y-2.5 pt-2">
-            <h3 className="text-[14px] font-bold text-white uppercase tracking-wider">Follow Us</h3>
-            <div className="flex gap-3">
-              {[
-                { 
-                  icon: (
-                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M9 8H7v3h2v9h3v-9h3.6l.4-3H12V6c0-.9.2-1.2 1.1-1.2H15V1h-2.9C9.7 1 9 2.2 9 4.8V8z" />
-                    </svg>
-                  ), 
-                  href: footerData?.facebook_link, 
-                  color: "text-slate-300 border-slate-400 hover:text-[#2563EB] hover:border-[#2563EB] hover:bg-blue-50" 
-                },
-                { 
-                  icon: (
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                      <rect x={2} y={2} width={20} height={20} rx={5} ry={5} />
-                      <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37zM17.5 6.5h.01" />
-                    </svg>
-                  ), 
-                  href: footerData?.instagram_link, 
-                  color: "text-slate-300 border-slate-400 hover:text-[#E1306C] hover:border-[#E1306C] hover:bg-pink-50" 
-                },
-                { 
-                  icon: (
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 00-1.95 1.96A29 29 0 001 12a29 29 0 00.46 5.58 2.78 2.78 0 001.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 00-1.95-1.96A29 29 0 0023 12a29 29 0 00-.46-5.58z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 15.02l5.75-3.02-5.75-3z" />
-                    </svg>
-                  ), 
-                  href: footerData?.youtube_link, 
-                  color: "text-slate-300 border-slate-400 hover:text-[#FF0000] hover:border-[#FF0000] hover:bg-red-50" 
-                },
-                { 
-                  icon: (
-                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
-                    </svg>
-                  ), 
-                  href: footerData?.linkedin_link, 
-                  color: "text-slate-300 border-slate-400 hover:text-[#0077B5] hover:border-[#0077B5] hover:bg-blue-50" 
-                },
-                { 
-                  icon: (
-                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.86.02 1.72.01 2.58.02v3.83c-1.12-.01-2.24-.26-3.23-.83-.49-.29-.92-.68-1.25-1.14-.02 2.76-.01 5.51-.02 8.27 0 1.63-.53 3.22-1.5 4.47-.94 1.25-2.36 2.08-3.92 2.33-1.42.23-2.92.01-4.21-.62-1.43-.72-2.52-2-3.04-3.51-.55-1.57-.42-3.34.37-4.81.76-1.46 2.1-2.58 3.7-3.04.53-.15 1.09-.23 1.65-.23.01 1.34 0 2.68.01 4.02-.63.02-1.26.18-1.78.53-.61.41-.99 1.09-1.03 1.83-.07.96.53 1.91 1.45 2.19.68.22 1.43.15 2.05-.2.62-.35 1.05-.98 1.13-1.69.04-3.94.02-7.88.03-11.82z" />
-                    </svg>
-                  ), 
-                  href: footerData?.tiktok_link || undefined, 
-                  color: "text-slate-300 border-slate-400 hover:text-black hover:border-black hover:bg-slate-100" 
-                }
-              ].map((soc, sIdx) => {
-                if (!soc.href) return null;
-                return (
+          {socialLinks.length > 0 && (
+            <div className="space-y-2.5 pt-2">
+              <h3 className="text-[14px] font-bold text-white uppercase tracking-wider">Follow Us</h3>
+              <div className="flex gap-3">
+                {socialLinks.map((soc, sIdx) => (
                   <a 
                     key={sIdx} 
                     href={soc.href} 
                     target="_blank" 
                     rel="noopener noreferrer" 
-                    className={`flex items-center justify-center w-8 h-8 rounded-full border transition-colors ${soc.color}`}
+                    className={`flex items-center justify-center w-[36px] h-[36px] rounded-full border transition-all duration-300 ${soc.colorClass}`}
                   >
                     {soc.icon}
                   </a>
-                );
-              })}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Newsletter */}
           <div className="pt-2 space-y-3">
@@ -271,7 +261,7 @@ export default function Footer() {
               </button>
               <div 
                 className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                  mobileExpanded === "popular" ? "max-h-[300px] opacity-100" : "max-h-0 opacity-0 pointer-events-none"
+                  mobileExpanded === "popular" ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0 pointer-events-none"
                 }`}
               >
                 <ul className="px-4 py-2 space-y-2 text-[12px] text-white/80 bg-black/10 border-x border-b border-white/5 rounded-b-lg">
@@ -299,7 +289,7 @@ export default function Footer() {
               </button>
               <div 
                 className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                  mobileExpanded === "company" ? "max-h-[300px] opacity-100" : "max-h-0 opacity-0 pointer-events-none"
+                  mobileExpanded === "company" ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0 pointer-events-none"
                 }`}
               >
                 <ul className="px-4 py-2 space-y-2 text-[12px] text-white/80 bg-black/10 border-x border-b border-white/5 rounded-b-lg">
@@ -327,7 +317,7 @@ export default function Footer() {
               </button>
               <div 
                 className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                  mobileExpanded === "account" ? "max-h-[300px] opacity-100" : "max-h-0 opacity-0 pointer-events-none"
+                  mobileExpanded === "account" ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0 pointer-events-none"
                 }`}
               >
                 <ul className="px-4 py-2 space-y-2 text-[12px] text-white/80 bg-black/10 border-x border-b border-white/5 rounded-b-lg">
@@ -355,7 +345,7 @@ export default function Footer() {
               </button>
               <div 
                 className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                  mobileExpanded === "aftersales" ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0 pointer-events-none"
+                  mobileExpanded === "aftersales" ? "max-h-[800px] opacity-100" : "max-h-0 opacity-0 pointer-events-none"
                 }`}
               >
                 <ul className="px-4 py-2 space-y-3.5 text-[11px] text-white/80 bg-black/10 border-x border-b border-white/5 rounded-b-lg">
@@ -392,35 +382,44 @@ export default function Footer() {
           <div className="flex w-full items-center justify-between">
             <span className="text-[11px] font-bold text-white uppercase tracking-wider">Secure Payment Method</span>
             {/* Cash on Delivery icon */}
-            <div className="flex items-center gap-1.5 bg-white text-black px-2.5 py-1 rounded text-[10px] font-extrabold shadow-sm select-none">
-              <svg className="w-4 h-4 text-[#2B7FE8]" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-              </svg>
-              <span>CASH ON DELIVERY</span>
-            </div>
+            {footerData?.cod_image && (
+              <div className="w-30 h-10 flex justify-center">
+                <Image
+                  src={footerData.cod_image}
+                  alt="Cash on Delivery"
+                  width={100}
+                  height={25}
+                  className="h-auto object-contain"
+                />
+              </div>
+            )}
           </div>
           
           {/* Payment images row */}
-          {footerData?.payment_image ? (
-            <div className="w-full bg-white rounded-lg p-1">
-              <Image
-                src={footerData.payment_image}
-                alt="Payment Methods"
-                width={400}
-                height={50}
-                className="w-full h-auto object-contain"
-              />
-            </div>
-          ) : (
-            <div className="w-full bg-white rounded-lg p-1 flex justify-center">
-              <Image src="/images/pmethod.png" alt="Payment Methods" width={320} height={40} className="h-auto object-contain" />
-            </div>
-          )}
+          <div className="w-full flex flex-col gap-2">
+            {footerData?.payment_image && (
+              <div className="w-full bg-white rounded-lg p-1">
+                <Image
+                  src={footerData.payment_image}
+                  alt="Payment Methods"
+                  width={400}
+                  height={50}
+                  className="w-full h-auto object-contain"
+                />
+              </div>
+            )}
+            
+            {!footerData?.payment_image && !footerData?.cod_image && (
+              <div className="w-full bg-white rounded-lg p-1 flex justify-center">
+                <Image src="/images/pmethod.png" alt="Payment Methods" width={320} height={40} className="h-auto object-contain" />
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Footer Bottom copyright bar */}
         <div className="w-full bg-blue-600 py-2 px-4 text-center border-t border-white/10 select-none pb-[56px] md:pb-3.5">
-          <p className="text-white text-[12px] mb-2 font-normal leading-relaxed">
+          <p className="text-white text-[10px] mb-2 font-normal leading-relaxed">
             © Copyright {currentYear} | All rights reserved by Electra International
           </p>
         </div>
@@ -579,40 +578,21 @@ export default function Footer() {
               </p>
               
               {/* Follow Us social links */}
-              {(footerData?.facebook_link || footerData?.instagram_link || footerData?.youtube_link || footerData?.linkedin_link || footerData?.whatsapp_link || footerData?.tiktok_link) && (
+              {socialLinks.length > 0 && (
                 <div className="space-y-2">
                   <p className="text-[13px] font-bold text-white">Follow Us:</p>
                   <div className="flex gap-2 text-white">
-                    {footerData?.facebook_link && (
-                      <Link href={footerData.facebook_link} target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors bg-white/10 hover:bg-white/20 p-1.5 rounded-full">
-                        <FaFacebookF size={13} />
+                    {socialLinks.map((soc, sIdx) => (
+                      <Link 
+                        key={sIdx} 
+                        href={soc.href!} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className={`flex items-center justify-center w-[36px] h-[36px] rounded-full border transition-all duration-300 ${soc.colorClass}`}
+                      >
+                        {soc.icon}
                       </Link>
-                    )}
-                    {footerData?.instagram_link && (
-                      <Link href={footerData.instagram_link} target="_blank" rel="noopener noreferrer" className="hover:text-pink-400 transition-colors bg-white/10 hover:bg-white/20 p-1.5 rounded-full">
-                        <FaInstagram size={13} />
-                      </Link>
-                    )}
-                    {footerData?.youtube_link && (
-                      <Link href={footerData.youtube_link} target="_blank" rel="noopener noreferrer" className="hover:text-red-400 transition-colors bg-white/10 hover:bg-white/20 p-1.5 rounded-full">
-                        <FaYoutube size={13} />
-                      </Link>
-                    )}
-                    {footerData?.linkedin_link && (
-                      <Link href={footerData.linkedin_link} target="_blank" rel="noopener noreferrer" className="hover:text-blue-300 transition-colors bg-white/10 hover:bg-white/20 p-1.5 rounded-full">
-                        <FaLinkedinIn size={13} />
-                      </Link>
-                    )}
-                    {footerData?.whatsapp_link && (
-                      <Link href={getWhatsappHref(footerData.whatsapp_link)} target="_blank" rel="noopener noreferrer" className="hover:text-green-400 transition-colors bg-white/10 hover:bg-white/20 p-1.5 rounded-full">
-                        <FaWhatsapp size={13} />
-                      </Link>
-                    )}
-                    {footerData?.tiktok_link && (
-                      <Link href={footerData.tiktok_link} target="_blank" rel="noopener noreferrer" className="hover:text-gray-300 transition-colors bg-white/10 hover:bg-white/20 p-1.5 rounded-full">
-                        <FaTiktok size={13} />
-                      </Link>
-                    )}
+                    ))}
                   </div>
                 </div>
               )}
@@ -624,29 +604,43 @@ export default function Footer() {
         <div className="w-full border-t border-white/10 mt-12 py-6">
           <div className="mx-auto w-full lg:w-10/12 flex flex-col md:flex-row items-center justify-center gap-6">
             <span className="text-[13px] font-bold text-white uppercase tracking-wider">Pay With</span>
-            {footerData?.payment_image ? (
-              <div className="max-w-[600px] w-full">
-                <Image
-                  src={footerData.payment_image}
-                  alt="Payment Methods"
-                  width={600}
-                  height={80}
-                  className="w-full h-auto object-contain"
-                />
-              </div>
-            ) : (
-              <div className="flex flex-wrap items-center justify-center gap-4">
-                <div className="rounded p-1 bg-white shadow-sm flex items-center justify-center">
-                  <Image src="/images/easycod.png" alt="Cash on Delivery" width={100} height={32} className="object-contain" />
+            <div className="flex flex-wrap items-center justify-center gap-6">
+              {footerData?.payment_image && (
+                <div className="max-w-[600px] w-full">
+                  <Image
+                    src={footerData.payment_image}
+                    alt="Payment Methods"
+                    width={600}
+                    height={80}
+                    className="w-full h-auto object-contain"
+                  />
                 </div>
-                <div className="rounded p-1 bg-white shadow-sm flex items-center justify-center">
-                  <Image src="/images/easyemi.png" alt="Easy EMI Payment" width={100} height={32} className="object-contain" />
+              )}
+              {footerData?.cod_image && (
+                <div className="max-w-[200px] w-full">
+                  <Image
+                    src={footerData.cod_image}
+                    alt="Cash on Delivery"
+                    width={200}
+                    height={80}
+                    className="w-full h-auto object-contain"
+                  />
                 </div>
-                <div>
-                  <Image src="/images/pmethod.png" alt="Payment Methods" width={320} height={40} className="h-auto object-contain" />
+              )}
+              {!footerData?.payment_image && !footerData?.cod_image && (
+                <div className="flex flex-wrap items-center justify-center gap-4">
+                  <div className="rounded p-1 bg-white shadow-sm flex items-center justify-center">
+                    <Image src="/images/easycod.png" alt="Cash on Delivery" width={100} height={32} className="object-contain" />
+                  </div>
+                  <div className="rounded p-1 bg-white shadow-sm flex items-center justify-center">
+                    <Image src="/images/easyemi.png" alt="Easy EMI Payment" width={100} height={32} className="object-contain" />
+                  </div>
+                  <div>
+                    <Image src="/images/pmethod.png" alt="Payment Methods" width={320} height={40} className="h-auto object-contain" />
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
 

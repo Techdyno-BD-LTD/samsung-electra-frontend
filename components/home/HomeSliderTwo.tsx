@@ -256,7 +256,7 @@ export default function HomeSliderTwo() {
       {/* Title & Navigation Header */}
       <div className="relative w-full max-w-[1650px] mx-auto lg:mb-8 mt-4 lg:mt-16 flex flex-col items-center justify-center text-center">
         <div className="px-4">
-          <h2 className="text-xl lg:text-[32px] 2xl:text-[38px] font-bold text-gray-900 tracking-tight mb-2">
+          <h2 className="text-xl lg:text-[32px] 2xl:text-[38px] font-semibold text-gray-900 tracking-tight mb-2">
             {title}
           </h2>
           <p className="text-sm lg:text-[16px] 2xl:text-[18px] lg:mt-7 mb-6 lg:mb-0 text-gray-500 max-w-[400px] lg:max-w-[750px] mx-auto">

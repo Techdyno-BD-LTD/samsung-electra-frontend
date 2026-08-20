@@ -1047,7 +1047,7 @@ const ProductCard = ({
         </div>
 
         {/* Top Center Brand name/logo */}
-        <div className="absolute top-2 sm:relative sm:top-auto sm:mt-1 left-1/2 -translate-x-1/2 z-10 flex justify-center">
+        <div className="absolute top-2 sm:relative sm:top-auto sm:mt-1 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 z-10 flex justify-center">
           {(productData?.brand?.logo || brandLogo) ? (
             <Image
               src={productData?.brand?.logo || brandLogo || ""}
@@ -1087,7 +1087,7 @@ const ProductCard = ({
       </div>
 
       {/* Model & EMI below Quick View on Mobile */}
-      <div className="flex sm:hidden items-center justify-center gap-1.5 text-[6px] xs:text-[9px] text-gray-500 border-b border-gray-100 py-1.5 px-2 bg-gray-50/70 w-full text-center">
+      <div className="flex sm:hidden items-center justify-center gap-1.5 text-[6px] xs:text-[16px] text-gray-500 border-b border-gray-100 py-1.5 px-2 bg-gray-50/70 w-full text-center">
         <span className="truncate">Model: {productData?.model_number || "N/A"}</span>
         <span className="text-gray-300">|</span>
         <span className="truncate">
@@ -1150,7 +1150,7 @@ const ProductCard = ({
           {/* Desktop Hover Sliding Area */}
           <div className="hidden sm:flex relative overflow-hidden h-[44px] w-[calc(100%+24px)] -mx-3 items-center">
             {/* Default State: Model & EMI */}
-            <div className="flex items-center justify-between text-[11px] text-black w-full transition-all duration-300 ease-in-out group-hover/card:-translate-y-full group-hover/card:opacity-0 px-3 pb-1">
+            <div className="flex items-center justify-between text-[12px] text-black w-full transition-all duration-300 ease-in-out group-hover/card:-translate-y-full group-hover/card:opacity-0 px-3 pb-1">
               <span>Model: {productData?.model_number || "N/A"}</span>
               <span>
                 EMI Starts From <span className="font-semibold text-blue-600">৳{productData?.emi_start || "N/A"}</span>

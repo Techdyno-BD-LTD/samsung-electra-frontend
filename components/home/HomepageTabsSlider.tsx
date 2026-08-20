@@ -112,7 +112,7 @@ export default function HomepageTabsSlider() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-4 py-2 sm:px-6 sm:py-3 rounded-lg text-sm sm:text-[18px] font-semibold tracking-wide border transition-all duration-300 ${
+                className={`px-4 py-2 font-poppins sm:px-6 sm:py-3 rounded-lg text-sm sm:text-[18px] font-semibold tracking-wide border transition-all duration-300 ${
                   isActive
                     ? "bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white border-[#2563EB]"
                     : "bg-white text-[#2563EB] border-blue-400 hover:bg-gray-50"

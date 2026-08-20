@@ -118,6 +118,7 @@ export default function MainBar() {
               <div className="relative flex items-stretch h-12 border-2 border-[#0054A6] rounded-lg">
               {/* Search Input */}
               <input
+                id="mainbar-search-input"
                 type="text"
                 placeholder="Search For Products Brand And More..."
                 value={searchQuery}
