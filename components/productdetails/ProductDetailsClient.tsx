@@ -744,6 +744,19 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
     }
   };
 
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: title,
+        text: `Check out ${title} on Electra International!`,
+        url: window.location.href,
+      }).catch(console.error);
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      alert("Product link copied to clipboard!");
+    }
+  };
+
   if (loading) {
     return (
       <div className="mx-auto max-w-[1440px] px-4 py-8 space-y-8 animate-in fade-in duration-500">
@@ -1247,10 +1260,10 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
                     <button type="button" onClick={handleToggleWishlist} className="text-slate-600">
                       <FaHeart className={`h-5 w-5 ${isWishlisted ? "text-red-500" : "text-slate-400"}`} />
                     </button>
-                    <button type="button" className="text-slate-600">
+                    <button type="button" onClick={handleShare} className="text-slate-600">
                       <FaRegShareSquare className="h-5 w-5" />
                     </button>
-                    <button type="button" className="text-[11px] text-slate-600 leading-none">
+                    <button type="button" onClick={handleShare} className="text-[11px] text-slate-600 leading-none">
                       Share
                     </button>
                   </div>
@@ -1294,10 +1307,10 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
                     <button type="button" onClick={handleToggleWishlist} className="text-slate-600">
                       <FaHeart className={`h-6 w-6 ${isWishlisted ? "text-red-500" : "text-slate-400"}`} />
                     </button>
-                    <button type="button" className="text-slate-600">
+                    <button type="button" onClick={handleShare} className="text-slate-600">
                       <FaRegShareSquare className="h-6 w-6" />
                     </button>
-                    <button type="button" className="text-[16px] text-slate-600 leading-none">
+                    <button type="button" onClick={handleShare} className="text-[16px] text-slate-600 leading-none">
                       Share
                     </button>
                     {showroomTitle && (

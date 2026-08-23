@@ -11,6 +11,7 @@ type ExclusiveDeal = {
   subtitle: string | null;
   slug: string;
   exclusive_banner: string;
+  exclusive_banner_mobile?: string;
 };
 
 export default function ExclusiveDeals() {
@@ -73,18 +74,32 @@ export default function ExclusiveDeals() {
     <Link
       key={deal.id}
       href={`/offers/details/${deal.slug}`}
-      className={`relative block w-full aspect-[950/700] overflow-hidden shadow-sm hover:shadow-md hover:scale-[1.005] transition-all duration-300 bg-gray-50 ${
+      className={`relative block w-full aspect-square md:aspect-[950/700] overflow-hidden shadow-sm hover:shadow-md hover:scale-[1.005] transition-all duration-300 bg-gray-50 ${
         index === 0 ? "rounded-r-xl" : "rounded-l-xl"
       }`}
     >
-      <Image
-        src={deal.exclusive_banner || "/assets/img/placeholder.jpg"}
-        alt={deal.title}
-        fill
-        sizes="(max-width: 768px) 100vw, 850px"
-        className="object-contain"
-        priority
-      />
+      {/* PC Banner */}
+      <div className="hidden md:block w-full h-full relative">
+        <Image
+          src={deal.exclusive_banner || "/assets/img/placeholder.jpg"}
+          alt={deal.title}
+          fill
+          sizes="(max-width: 768px) 100vw, 850px"
+          className="object-contain"
+          priority
+        />
+      </div>
+      {/* Mobile Banner */}
+      <div className="block md:hidden w-full h-full relative">
+        <Image
+          src={deal.exclusive_banner_mobile || deal.exclusive_banner || "/assets/img/placeholder.jpg"}
+          alt={deal.title}
+          fill
+          sizes="(max-width: 768px) 100vw, 850px"
+          className="object-cover"
+          priority
+        />
+      </div>
     </Link>
   ))}
 </div>

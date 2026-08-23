@@ -150,7 +150,7 @@ export default function OurBrands() {
                 key={section.row_index}
                 type="button"
                 onClick={() => setActiveRowIndex(section.row_index)}
-                className={`lg:py-3.5 flex flex-col items-center justify-center transition-all duration-300 border-b-[10px] ${
+                className={`lg:py-3.5 flex flex-col items-center justify-center transition-all duration-300 border-b-[5px] lg:border-b-[10px] ${
                   isActive ? "border-blue-600 bg-transparent" : "border-gray-200 hover:border-gray-300 bg-transparent"
                 }`}
                 aria-label={`Show ${section.brand.name} categories`}

@@ -11,8 +11,8 @@
       "mobileNumber": { "label": "Mobile Number", "placeholder": "Enter number" },
       "emailAddress": { "label": "E-mail Address", "placeholder": "Enter email" },
       "fullAddress": { "label": "Full-address", "placeholder": "Enter full address" },
-      "division": { "label": "Division", "placeholder": "Enter number" },
-      "district": { "label": "Select District", "placeholder": "Enter email" },
+      "division": { "label": "Division", "placeholder": "Enter Division" },
+      "district": { "label": "Select District", "placeholder": "Enter District" },
       "country": { "label": "Country", "value": "Bangladesh" }
     },
     "enquiryType": {

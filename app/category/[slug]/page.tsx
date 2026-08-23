@@ -144,7 +144,7 @@ export default async function CategoryPage({ params }: PageProps) {
   const shortName = breadcrumbParts[0]; // e.g., "TV" from "TV and Audio"
 
   return (
-    <div className="lg:mt-16">
+    <div className="lg:mt-6">
       {/* ═══════════════ MOBILE NAVIGATION (Hidden on Desktop) ═══════════════ */}
       <div className="mb-4 lg:hidden">
         <Link

@@ -8,6 +8,7 @@ import { setLastOrder } from '@/store/features/order/orderSlice';
 import { formatCurrency, parseCurrency } from "@/lib/currencyUtils";
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
 import Skeleton from "@/components/common/Skeleton";
 import { pushToDataLayer, hashSHA256, fetchClientIP } from "@/lib/gtm";
 
@@ -705,7 +706,7 @@ const Checkout = () => {
         );
     }
 
-    const isUnderDevelopment = true; // Set to false to enable checkout page content
+    const isUnderDevelopment = false; // Set to false to enable checkout page content
 
     if (isUnderDevelopment) {
         return (
@@ -1109,8 +1110,20 @@ const Checkout = () => {
                                 <div className={`flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center transition-all ${agreedToTerms ? 'bg-[#1877f2] border-[#1877f2]' : 'bg-white border-gray-300'}`}>
                                     {agreedToTerms && <span className="text-white text-[8px]">✓</span>}
                                 </div>
-                                <p className="text-[11px] text-gray-600 leading-tight select-none">
-                                    By proceeding, you acknowledge and accept Electra International&apos;s <span className="font-bold text-gray-700">Terms &amp; Conditions, Cancellation &amp; Refund Policy</span>, and <span className="font-bold text-gray-700">Privacy Policy</span>.
+                                <p className="text-[14px] text-gray-900 font-poppins leading-relaxed select-none">
+                                    By proceeding, you acknowledge and accept Electra International&apos;s{" "}
+                                    <Link href="/policy/terms" className="font-bold text-[#1877f2] hover:text-blue-700 underline" onClick={(e) => e.stopPropagation()}>
+                                        Terms &amp; Conditions
+                                    </Link>
+                                    ,{" "}
+                                    <Link href="/policy/cancellation-refund" className="font-bold text-[#1877f2] hover:text-blue-700 underline" onClick={(e) => e.stopPropagation()}>
+                                        Cancellation &amp; Refund Policy
+                                    </Link>
+                                    , and{" "}
+                                    <Link href="/policy/privacy" className="font-bold text-[#1877f2] hover:text-blue-700 underline" onClick={(e) => e.stopPropagation()}>
+                                        Privacy Policy
+                                    </Link>
+                                    .
                                 </p>
                             </div>
 

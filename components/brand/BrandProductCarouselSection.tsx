@@ -94,13 +94,15 @@ export default function BrandProductCarouselSection({
         </Link>
       </div>
 
-      <div className="relative">
+      <div className="relative xl:max-w-[1430px] mx-auto">
         <button
           type="button"
           onClick={() => scrollByOneCard(-1)}
           disabled={!canScrollLeft}
           aria-label={`Show previous ${title} products`}
-          className="absolute -left-4 top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-600 shadow-sm disabled:cursor-not-allowed disabled:opacity-40 md:flex"
+          className={`absolute -left-4 top-1/2 z-10 h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-600 shadow-sm disabled:cursor-not-allowed disabled:opacity-40 ${
+            !canScrollLeft && !canScrollRight ? "hidden" : "hidden md:flex"
+          }`}
         >
           <FaChevronLeft className="h-3.5 w-3.5" />
         </button>
@@ -110,20 +112,30 @@ export default function BrandProductCarouselSection({
           onClick={() => scrollByOneCard(1)}
           disabled={!canScrollRight}
           aria-label={`Show next ${title} products`}
-          className="absolute -right-4 top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-600 shadow-sm disabled:cursor-not-allowed disabled:opacity-40 md:flex"
+          className={`absolute -right-4 top-1/2 z-10 h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-600 shadow-sm disabled:cursor-not-allowed disabled:opacity-40 ${
+            !canScrollLeft && !canScrollRight ? "hidden" : "hidden md:flex"
+          }`}
         >
           <FaChevronRight className="h-3.5 w-3.5" />
         </button>
 
         <div
           ref={sliderRef}
-          className="flex gap-4 overflow-x-auto scroll-smooth pb-3 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          className={`flex gap-4 overflow-x-auto scroll-smooth pb-3 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden ${
+            products.length <= 4 ? "xl:justify-center lg:justify-center" : "xl:justify-start lg:justify-start"
+          } ${
+            products.length <= 3 ? "md:justify-center" : "md:justify-start"
+          } ${
+            products.length <= 2 ? "sm:justify-center" : "sm:justify-start"
+          } ${
+            products.length <= 1 ? "justify-center" : "justify-start"
+          }`}
         >
           {products.map((product) => (
             <div
               key={product.id}
               data-brand-card
-              className="w-[88%] flex-shrink-0 sm:w-[48%] md:w-[31.5%] lg:w-[24%] xl:w-[19.4%]"
+              className="w-[68%] flex-shrink-0 sm:w-[48%] md:w-[31.5%] lg:w-[24%] xl:w-[24%]"
             >
               <ProductCard productData={product as any} />
             </div>
