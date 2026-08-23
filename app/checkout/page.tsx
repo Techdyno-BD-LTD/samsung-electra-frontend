@@ -706,7 +706,7 @@ const Checkout = () => {
         );
     }
 
-    const isUnderDevelopment = false; // Set to false to enable checkout page content
+    const isUnderDevelopment = true; // Set to false to enable checkout page content
 
     if (isUnderDevelopment) {
         return (
