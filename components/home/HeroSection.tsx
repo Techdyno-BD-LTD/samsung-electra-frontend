@@ -140,12 +140,20 @@ export default function HeroSection() {
   }, []);
 
   useEffect(() => {
-    if (!heroData || heroData.slides.length <= 1) return;
+    if (!heroData) return;
+    const hasDesktopSlides = heroData.slides.length > 1;
+    const hasMobileSlides = heroData.slidesMobile.length > 1;
+
+    if (!hasDesktopSlides && !hasMobileSlides) return;
 
     const interval = setInterval(() => {
       setIsSliding(true);
-      setSlideIndex((prev) => prev + 1);
-      setMobileSlideIndex((prev) => prev + 1);
+      if (hasDesktopSlides) {
+        setSlideIndex((prev) => prev + 1);
+      }
+      if (hasMobileSlides) {
+        setMobileSlideIndex((prev) => prev + 1);
+      }
     }, heroData.autoplayMs);
 
     return () => clearInterval(interval);
