@@ -1120,8 +1120,8 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
               </div>
 
               {(isDemoMode || emiText) && (
-                <div className="flex items-center  gap-2 border-b border-slate-200 pb-3 text-[12px] lg:text-[16px] text-slate-700">
-                  <Image src="/images/EMI.png" alt="EMI" width={20} height={20} className="lg:h-5 h-4 w-4 lg:w-5 object-contain" />
+                <div className="flex items-center gap-2 pb-3 text-[12px] lg:text-[16px] text-slate-700">
+                  <Image src="/images/pdemi.svg" alt="EMI" width={20} height={20} className="lg:h-5 h-4 w-4 lg:w-5 object-contain" />
                   EMI Starts From <span >{emiText}</span>
                   <button
                     type="button"
@@ -1241,10 +1241,10 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
 
                 <div className="min-w-0 flex-1 space-y-1.5">
                   {showroomTitle && (
-                    <button type="button" className="inline-flex items-center gap-1.5 whitespace-nowrap text-[11px] font-medium tracking-wide text-[#0C73DA] leading-none">
+                    <Link href="/stores" className="inline-flex items-center gap-1.5 whitespace-nowrap text-[11px] font-medium tracking-wide text-[#0C73DA] leading-none hover:underline">
                       <Image src="/images/shop.png" alt="Showroom" width={12} height={12} className="h-3 w-3 object-contain" />
                       {showroomTitle}
-                    </button>
+                    </Link>
                   )}
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-3 rounded-md border border-slate-300 px-7 py-1">
@@ -1314,9 +1314,9 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
                       Share
                     </button>
                     {showroomTitle && (
-                      <button type="button" className="whitespace-nowrap text-[16px] font-semibold text-[#0C73DA] leading-none">
+                      <Link href="/stores" className="whitespace-nowrap text-[16px] font-semibold text-[#0C73DA] leading-none hover:underline">
                         {showroomTitle}
-                      </button>
+                      </Link>
                     )}
                   </div>
 
@@ -1349,7 +1349,7 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
                           Buy Now
                         </button>
                         <button type="button" onClick={handleAddToCart} className="flex items-center justify-center gap-3 rounded-full border border-[#9CB7D8] py-1 text-[14px] font-semibold leading-none text-slate-900">
-                          <Image src="/images/shopping-cart.png" alt="Cart" width={24} height={24} className="h-6 w-6 object-contain" />
+                          <Image src="/images/pdcart.svg" alt="Cart" width={24} height={24} className="h-6 w-6 object-contain" />
                           Add to Cart
                         </button>
                       </>
@@ -1460,21 +1460,40 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
                         <Image src="/images/warranty.svg" alt="Warranty" width={24} height={24} unoptimized className="h-7 w-7 object-contain" />
                         {warrantyInfo}
                       </span>
-                      <button type="button" className="whitespace-nowrap text-[#0C73DA] text-xs md:text-sm font-medium hover:underline">{warrantyLinkLabel}</button>
+                      <button 
+                        type="button" 
+                        onClick={() => {
+                          document.getElementById('policy-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }}
+                        className="whitespace-nowrap text-[#0C73DA] text-xs md:text-sm font-medium hover:underline"
+                      >
+                        {warrantyLinkLabel}
+                      </button>
                     </p>
                   )}
                   {(isDemoMode || emiFacilityInfo) && (
                     <p className="flex items-center gap-5">
                       <Image src="/images/emi.svg" alt="EMI facility" width={24} height={24} unoptimized className="h-7 w-7 object-contain" />
                       {emiFacilityInfo}
-                      <button type="button" className="whitespace-nowrap text-[#0C73DA] text-xs md:text-sm font-medium hover:underline">{emiLinkLabel}</button>
+                      <button 
+                        type="button" 
+                        onClick={() => setIsBankEmiModalOpen(true)}
+                        className="whitespace-nowrap text-[#0C73DA] text-xs md:text-sm font-medium hover:underline"
+                      >
+                        {emiLinkLabel}
+                      </button>
                     </p>
                   )}
                   {(isDemoMode || exchangeInfo) && (
                     <p className="flex flex-wrap items-start gap-2">
                       <Image src="/images/exchange.svg" alt="Exchange" width={24} height={24} unoptimized className="h-7 w-7 object-contain flex-shrink-0" />
                       <span className="flex-1 pt-0.5">{exchangeInfo}</span>
-                      <button type="button" className="whitespace-nowrap text-[#0C73DA] text-xs md:text-sm font-medium hover:underline flex-shrink-0">{exchangeLinkLabel}</button>
+                      <Link 
+                        href="/stores" 
+                        className="whitespace-nowrap text-[#0C73DA] text-xs md:text-sm font-medium hover:underline flex-shrink-0"
+                      >
+                        {exchangeLinkLabel}
+                      </Link>
                     </p>
                   )}
                 </div>

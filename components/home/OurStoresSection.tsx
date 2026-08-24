@@ -147,7 +147,7 @@ export default function OurStoresSection() {
 
         {/* Bottom stats and button */}
         <div className="w-full flex flex-col items-center gap-3.5 mb-2 ">
-          <div className="grid grid-cols-4 w-full gap-0 justify-center text-left px-1 ml-2">
+          <div className="grid grid-cols-4 w-full gap-0 text-left px-1 ml-2">
             <div className="flex flex-col">
               <span className="text-[13px] font-bold text-slate-700">
                 Districts
@@ -234,7 +234,7 @@ export default function OurStoresSection() {
                 <AnimatedNumber
                   value={data.stores_districts}
                   trigger={inView}
-                />
+                />{" "}
               </span>
             </div>
 
@@ -256,8 +256,9 @@ export default function OurStoresSection() {
               <span className="text-[10px] sm:text-xs lg:text-[13px] xl:text-[16px]  font-semibold text-gray-700 mb-2 xl:mb-3 2xl:mb-4">
                 Dealers
               </span>
-              <span className="text-xl sm:text-2xl lg:text-[28px] xl:text-[38px] font-poppins 2xl:text-[48px] font-extrabold text-blue-600 leading-none whitespace-nowrap">
+              <span className="inline-flex items-start text-xl sm:text-2xl lg:text-[28px] xl:text-[38px] font-poppins 2xl:text-[48px] font-extrabold text-blue-600 leading-none whitespace-nowrap">
                 <AnimatedNumber value={data.stores_dealers} trigger={inView} />
+                <span className="text-[10px] sm:text-xs lg:text-[14px] xl:text-[20px] 2xl:text-[24px] font-bold ml-0.5">+</span>
               </span>
             </div>
 
@@ -266,11 +267,12 @@ export default function OurStoresSection() {
               <span className="text-[10px] sm:text-xs lg:text-[13px] xl:text-[16px]  font-semibold text-gray-700 mb-2 xl:mb-3 2xl:mb-4">
                 Employees
               </span>
-              <span className="text-xl sm:text-2xl lg:text-[28px] xl:text-[38px] font-poppins 2xl:text-[48px] font-extrabold text-blue-600 leading-none whitespace-nowrap">
+              <span className="inline-flex items-start text-xl sm:text-2xl lg:text-[28px] xl:text-[38px] font-poppins 2xl:text-[48px] font-extrabold text-blue-600 leading-none whitespace-nowrap">
                 <AnimatedNumber
                   value={data.stores_employees}
                   trigger={inView}
                 />
+                <span className="text-[10px] sm:text-xs lg:text-[14px] xl:text-[20px] 2xl:text-[24px] font-bold ml-0.5">+</span>
               </span>
             </div>
           </div>

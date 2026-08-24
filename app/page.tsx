@@ -114,17 +114,19 @@ export default async function Home() {
         <div className="lg:mt-14 mt-5">
           <SingleWideBanner />
         </div>
-        <div className="lg:mt-14 mt-5">
-          <ExclusiveDeals />
-        </div>
-        <div className="lg:mt-10 mt-2">
-          <StoreBanner />
-        </div>
-        <div className="lg:mt-14 mt-5 w-full lg:w-9/12 mx-auto">
-          <HomepageTabsSlider />
-        </div>
-        <div className="lg:mt-14 mt-2">
-          <DualPromoBanners />
+        <div className="bg-[#EDF2FB] w-full py-8 lg:py-14 flow-root">
+          <div className="lg:mt-0 mt-0">
+            <ExclusiveDeals />
+          </div>
+          <div className="lg:mt-10 mt-2">
+            <StoreBanner />
+          </div>
+          <div className="lg:mt-14 mt-5 w-full lg:w-9/12 mx-auto">
+            <HomepageTabsSlider />
+          </div>
+          <div className="lg:mt-14 mt-2">
+            <DualPromoBanners />
+          </div>
         </div>
       
         {/* <div className="lg:mt-14 mt-5">
@@ -173,7 +175,7 @@ export default async function Home() {
         <div className="lg:mt-14 mt-5">
           <SpecialDeals />
         </div> */}
-        <div className="lg:mt-14 mt-2">
+        <div className="">
           <AboutElectraHtmlSection />
         </div>
 

@@ -53,16 +53,30 @@ export default function AboutElectraHtmlSection() {
 
   return (
     <section className="relative w-full h-auto md:h-[640px] overflow-hidden select-none bg-black">
-      {/* Background Image (1920x790, object-cover to prevent blank spaces) */}
+      {/* Background Image (Responsive desktop vs mobile) */}
       <div className="absolute inset-0 w-full h-full">
-        <Image
-          src="/images/homeabout.jpg"
-          alt="Home About Background"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover w-full h-full"
-        />
+        {/* Desktop Background */}
+        <div className="hidden md:block relative w-full h-full">
+          <Image
+            src="/images/founderbgdesktop.webp"
+            alt="Home About Background Desktop"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover w-full h-full"
+          />
+        </div>
+        {/* Mobile Background */}
+        <div className="block md:hidden relative w-full h-full">
+          <Image
+            src="/images/founderbgmobile.webp"
+            alt="Home About Background Mobile"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover w-full h-full"
+          />
+        </div>
       </div>
 
       {/* Content Overlay Container */}

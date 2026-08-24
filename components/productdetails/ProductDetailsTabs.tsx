@@ -506,7 +506,7 @@ export default function ProductDetailsTabs({
                 </div>
               </div>
 
-              <div ref={policyRef} className="scroll-mt-32">
+              <div ref={policyRef} id="policy-section" className="scroll-mt-32">
                 <h2 className="mb-3 bg-slate-100 py-1.5 text-center text-[14px] font-semibold text-slate-900 sm:mb-4 sm:text-[15px] lg:text-base">
                   {policyHeading}
                 </h2>

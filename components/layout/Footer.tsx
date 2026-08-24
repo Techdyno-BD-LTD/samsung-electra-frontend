@@ -152,7 +152,7 @@ export default function Footer() {
       {/* Mobile Layout */}
       <footer 
         className="lg:hidden w-full bg-cover bg-center bg-no-repeat text-white/95 pt-8 pb-0 select-none"
-        style={{ backgroundImage: "url('/images/footerbg2.webp')" }}
+        style={{ backgroundImage: "url('/images/footerbgmobile.webp')" }}
       >
         <div className="px-6 space-y-6">
           {/* Logo centered */}
@@ -428,7 +428,7 @@ export default function Footer() {
       {/* PC and Laptop Layout */}
       <footer 
         className="hidden lg:block w-full bg-cover bg-center bg-no-repeat text-white/95 pt-12 pb-0 border-t border-blue-900/20"
-        style={{ backgroundImage: "url('/images/footerbg2.webp')" }}
+        style={{ backgroundImage: "url('/images/footerbgdesktop.webp')" }}
       >
         {/* Footer Container */}
         <div className="mx-auto w-full lg:w-10/12 px-4 lg:px-0">
@@ -452,14 +452,44 @@ export default function Footer() {
               />
             )}
           </div>
+          {/* Header titles row with single continuous bottom border */}
+          <div className="hidden lg:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 w-full border-b border-white/20 pb-2.5 mb-6">
+            <div className="lg:col-span-3 md:col-span-1 col-span-1">
+              <h3 className="text-[14px] font-bold text-white uppercase tracking-wider">
+                Contact
+              </h3>
+            </div>
+            <div className="lg:col-span-1 md:col-span-1 col-span-1">
+              <h3 className="text-[14px] font-bold text-white uppercase tracking-wider">
+                {popularSection.title || "Popular"}
+              </h3>
+            </div>
+            <div className="lg:col-span-2 md:col-span-1 col-span-1">
+              <h3 className="text-[14px] font-bold text-white uppercase tracking-wider">
+                {companySection.title || "Company"}
+              </h3>
+            </div>
+            <div className="lg:col-span-2 md:col-span-1 col-span-1">
+              <h3 className="text-[14px] font-bold text-white uppercase tracking-wider">
+                {myAccountSection.title || "Account"}
+              </h3>
+            </div>
+            <div className="lg:col-span-2 md:col-span-1 col-span-1">
+              <h3 className="text-[14px] font-bold text-white uppercase tracking-wider">
+                {afterSalesSection.title || "After Sales Support"}
+              </h3>
+            </div>
+            <div className="lg:col-span-2 md:col-span-1 col-span-1">
+              <h3 className="text-[14px] font-bold text-white uppercase tracking-wider">
+                About Us
+              </h3>
+            </div>
+          </div>
 
-          {/* Grid containing all 6 columns */}
+          {/* Grid containing all 6 columns content */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 w-full items-start">
             {/* Column 1: CONTACT */}
             <div className="space-y-4 lg:col-span-3 md:col-span-1 col-span-1">
-              <h3 className="text-[14px] font-bold text-white uppercase tracking-wider border-b border-white/20 pb-2">
-                Contact
-              </h3>
               <div className="space-y-3 text-[13px] text-white/80">
                 <div className="flex items-start gap-2.5">
                   <FaPhoneSquare className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: "#007EEF" }} />
@@ -502,9 +532,6 @@ export default function Footer() {
 
             {/* Column 2: POPULAR */}
             <div className="lg:col-span-1 md:col-span-1 col-span-1">
-              <h3 className="text-[14px] font-bold text-white uppercase tracking-wider border-b border-white/20 pb-2 mb-4">
-                {popularSection.title || "Popular"}
-              </h3>
               <ul className="space-y-2.5 text-[13px] text-white/80">
                 {popularSection.links.map((link, i) => (
                   <li key={i}>
@@ -518,9 +545,6 @@ export default function Footer() {
 
             {/* Column 3: COMPANY */}
             <div className="lg:col-span-2 md:col-span-1 col-span-1">
-              <h3 className="text-[14px] font-bold text-white uppercase tracking-wider border-b border-white/20 pb-2 mb-4">
-                {companySection.title || "Company"}
-              </h3>
               <ul className="space-y-2.5 text-[13px] text-white/80">
                 {companySection.links.map((link, i) => (
                   <li key={i}>
@@ -534,9 +558,6 @@ export default function Footer() {
 
             {/* Column 4: ACCOUNT */}
             <div className="lg:col-span-2 md:col-span-1 col-span-1">
-              <h3 className="text-[14px] font-bold text-white uppercase tracking-wider border-b border-white/20 pb-2 mb-4">
-                {myAccountSection.title || "Account"}
-              </h3>
               <ul className="space-y-2.5 text-[13px] text-white/80">
                 {myAccountSection.links.map((link, i) => (
                   <li key={i}>
@@ -550,19 +571,16 @@ export default function Footer() {
 
             {/* Column 5: AFTER SALES SUPPORT */}
             <div className="lg:col-span-2 md:col-span-1 col-span-1">
-              <h3 className="text-[14px] font-bold text-white uppercase tracking-wider border-b border-white/20 pb-2 mb-4">
-                {afterSalesSection.title || "After Sales Support"}
-              </h3>
               <ul className="space-y-4 text-[12px] mb-4 text-white/80">
                 {afterSalesSection.links.map((link, i) => {
                   const parts = link.label.split('-');
                   const centerName = parts[0]?.trim();
                   const restText = link.label.substring(link.label.indexOf('-') + 1)?.trim() || link.label;
                   return (
-                    <li key={i} className="leading-snug">
-                      <span className="font-semibold text-white block mb-0.5">{centerName}</span>
-                      <span className="text-white/75 block">{restText}</span>
-                    </li>
+                     <li key={i} className="leading-snug">
+                       <span className="font-semibold text-white block mb-0.5">{centerName}</span>
+                       <span className="text-white/75 block">{restText}</span>
+                     </li>
                   );
                 })}
               </ul>
@@ -570,9 +588,6 @@ export default function Footer() {
 
             {/* Column 6: ABOUT US */}
             <div className="lg:col-span-2 md:col-span-1 col-span-1 space-y-4">
-              <h3 className="text-[14px] font-bold text-white uppercase tracking-wider border-b border-white/20 pb-2">
-                About Us
-              </h3>
               <p className="text-[13px] leading-relaxed text-white/80">
                 {titleText}
               </p>

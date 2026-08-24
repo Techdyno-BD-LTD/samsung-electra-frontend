@@ -14,7 +14,12 @@ type HeaderNavItem = {
   title: string;
   link: string;
   external_link: string | null;
-  children?: Array<{ id: number; title: string; link: string; external_link: string | null }>;
+  children?: Array<{
+    id: number;
+    title: string;
+    link: string;
+    external_link: string | null;
+  }>;
 };
 
 type HeaderNavResponse = {
@@ -55,8 +60,11 @@ export default function BottomBar() {
   const [categories, setCategories] = useState<HeroCategory[]>([]);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [showAllCategories, setShowAllCategories] = useState(false);
-  const [hoveredCategory, setHoveredCategory] = useState<HeroCategory | null>(null);
-  const [activeMenuCategory, setActiveMenuCategory] = useState<HeroCategory | null>(null);
+  const [hoveredCategory, setHoveredCategory] = useState<HeroCategory | null>(
+    null,
+  );
+  const [activeMenuCategory, setActiveMenuCategory] =
+    useState<HeroCategory | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -78,8 +86,13 @@ export default function BottomBar() {
   };
 
   const cartItems = useAppSelector((state) => state.cart.items);
-  const cartTotalCount = cartItems.reduce((total, item) => total + item.quantity, 0);
-  const wishlistTotalCount = useAppSelector((state) => state.wishlist.items.length);
+  const cartTotalCount = cartItems.reduce(
+    (total, item) => total + item.quantity,
+    0,
+  );
+  const wishlistTotalCount = useAppSelector(
+    (state) => state.wishlist.items.length,
+  );
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
@@ -132,7 +145,7 @@ export default function BottomBar() {
       try {
         const [headerRes, brandsRes] = await Promise.all([
           fetch("/api/header", { cache: "no-store" }),
-          fetch("/api/brands")
+          fetch("/api/brands"),
         ]);
 
         let fetchedBrands: Array<{ name: string; slug: string }> = [];
@@ -147,7 +160,9 @@ export default function BottomBar() {
         const items = (payload.data?.navigation ?? [])
           .map((item) => {
             const name = item.title?.trim() || "";
-            const isOurBrands = name.toLowerCase() === "our brands" || name.toLowerCase() === "brands";
+            const isOurBrands =
+              name.toLowerCase() === "our brands" ||
+              name.toLowerCase() === "brands";
 
             const subLinks = isOurBrands
               ? fetchedBrands.map((b) => ({
@@ -167,7 +182,10 @@ export default function BottomBar() {
               subLinks,
             };
           })
-          .filter((item) => item.name || item.href || (item.subLinks?.length ?? 0) > 0);
+          .filter(
+            (item) =>
+              item.name || item.href || (item.subLinks?.length ?? 0) > 0,
+          );
 
         if (isMounted) {
           setNavLinks(items);
@@ -184,26 +202,35 @@ export default function BottomBar() {
         if (response.ok) {
           const categoryPayload = await response.json();
           const allApiCategories = categoryPayload.data || [];
-          const topLevelCategories = allApiCategories.filter((item: any) => item.parent_id === 0 && (item.number_of_products || 0) > 0);
+          const topLevelCategories = allApiCategories.filter(
+            (item: any) =>
+              item.parent_id === 0 && (item.number_of_products || 0) > 0,
+          );
 
-          const fetchedCategories: HeroCategory[] = topLevelCategories.map((item: any) => ({
-            id: item.id,
-            name: item.name,
-            count: item.number_of_products || 0,
-            icon: item.icon,
-            coverImage: item.cover_image,
-            slug: item.slug,
-            parent_id: item.parent_id,
-            subcategories: allApiCategories
-              .filter((sub: any) => sub.parent_id === item.id && (sub.number_of_products || 0) > 0)
-              .map((sub: any) => ({
-                id: sub.id,
-                name: sub.name,
-                slug: sub.slug,
-                icon: sub.icon,
-                coverImage: sub.cover_image,
-              })),
-          }));
+          const fetchedCategories: HeroCategory[] = topLevelCategories.map(
+            (item: any) => ({
+              id: item.id,
+              name: item.name,
+              count: item.number_of_products || 0,
+              icon: item.icon,
+              coverImage: item.cover_image,
+              slug: item.slug,
+              parent_id: item.parent_id,
+              subcategories: allApiCategories
+                .filter(
+                  (sub: any) =>
+                    sub.parent_id === item.id &&
+                    (sub.number_of_products || 0) > 0,
+                )
+                .map((sub: any) => ({
+                  id: sub.id,
+                  name: sub.name,
+                  slug: sub.slug,
+                  icon: sub.icon,
+                  coverImage: sub.cover_image,
+                })),
+            }),
+          );
 
           if (isMounted) {
             setCategories(fetchedCategories);
@@ -231,24 +258,33 @@ export default function BottomBar() {
             className="flex items-center justify-center w-10 h-10 bg-[#1554d4] hover:bg-[#0c3e9c] text-white rounded-md transition-colors"
             title="Categories"
           >
-            <HiViewGrid className="text-2xl" />
+            <Image
+              src="/images/categoryicon.svg"
+              alt="Categories"
+              width={24}
+              height={24}
+              className="h-5 w-5 object-contain"
+            />
           </button>
 
           {isCategoryOpen && (
             <>
-              <div className="fixed inset-0 z-[110]" onClick={() => {
-                setIsCategoryOpen(false);
-                handleCategoryHover(null);
-              }} />
-              
-              <aside 
+              <div
+                className="fixed inset-0 z-[110]"
+                onClick={() => {
+                  setIsCategoryOpen(false);
+                  handleCategoryHover(null);
+                }}
+              />
+
+              <aside
                 className="absolute top-full left-0 mt-2 w-[320px] bg-[#072F5B]/85 backdrop-blur-md rounded-xl shadow-2xl z-[120] flex flex-col border border-[#1b3e6d]"
                 onMouseLeave={() => handleCategoryHover(null)}
               >
                 {/* Header */}
                 <div className="bg-[#266BF9] h-[3.25rem] flex items-center justify-between px-4 text-white font-semibold text-sm rounded-t-xl">
                   <span>Categories</span>
-                  <button 
+                  <button
                     onClick={() => setShowAllCategories(!showAllCategories)}
                     className="flex items-center gap-1.5 hover:opacity-85 text-xs font-bold uppercase tracking-wider"
                   >
@@ -258,9 +294,20 @@ export default function BottomBar() {
                 </div>
 
                 {/* Categories List */}
-                <div className={`w-full custom-scrollbar divide-y divide-[#1e3f6e] ${showAllCategories ? "overflow-y-auto pr-1" : "overflow-hidden"} h-[420px]`}>
-                  {(showAllCategories ? categories : categories.slice(0, 6)).map((category) => {
-                    const categoryUrl = `/category/${category.slug || category.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`;
+                <div
+                  className={`w-full custom-scrollbar divide-y divide-[#1e3f6e] ${showAllCategories ? "overflow-y-auto pr-1" : "overflow-hidden"} h-[420px]`}
+                >
+                  {(showAllCategories
+                    ? categories
+                    : categories.slice(0, 6)
+                  ).map((category) => {
+                    const categoryUrl = `/category/${
+                      category.slug ||
+                      category.name
+                        .toLowerCase()
+                        .replace(/[^a-z0-9]+/g, "-")
+                        .replace(/(^-|-$)/g, "")
+                    }`;
                     const isHovered = hoveredCategory?.id === category.id;
                     return (
                       <Link
@@ -268,14 +315,17 @@ export default function BottomBar() {
                         href={categoryUrl}
                         onClick={() => setIsCategoryOpen(false)}
                         onMouseEnter={() => handleCategoryHover(category)}
-                        className={`flex w-full items-center justify-between px-4 py-3.5 text-left transition-colors duration-150 ${isHovered
-                          ? "bg-[#e3ebf6] text-[#072F5B]"
-                          : "bg-transparent text-white hover:bg-[#1a3e6d]/40"
-                          }`}
+                        className={`flex w-full items-center justify-between px-4 py-3.5 text-left transition-colors duration-150 ${
+                          isHovered
+                            ? "bg-[#e3ebf6] text-[#072F5B]"
+                            : "bg-transparent text-white hover:bg-[#1a3e6d]/40"
+                        }`}
                       >
                         <div className="flex items-center gap-3">
                           {/* Icon Container with blue glow */}
-                          <div className={`w-12 h-10 flex items-center justify-center flex-shrink-0 relative p-1 ${isHovered ? "bg-[radial-gradient(circle,_rgba(38,107,249,0.95)_0%,_transparent_70%)] drop-shadow-[0_0_8px_rgba(38,107,249,0.8)]" : "bg-[radial-gradient(circle,_rgba(38,107,249,0.85)_0%,_transparent_70%)] drop-shadow-[0_0_6px_rgba(38,107,249,0.6)]"}`}>
+                          <div
+                            className={`w-12 h-10 flex items-center justify-center flex-shrink-0 relative p-1 ${isHovered ? "bg-[radial-gradient(circle,_rgba(38,107,249,0.95)_0%,_transparent_70%)] drop-shadow-[0_0_8px_rgba(38,107,249,0.8)]" : "bg-[radial-gradient(circle,_rgba(38,107,249,0.85)_0%,_transparent_70%)] drop-shadow-[0_0_6px_rgba(38,107,249,0.6)]"}`}
+                          >
                             {category.icon ? (
                               <Image
                                 src={category.icon}
@@ -286,13 +336,17 @@ export default function BottomBar() {
                               />
                             ) : null}
                           </div>
-                          <span className="text-[14px] font-semibold leading-tight">{category.name}</span>
+                          <span className="text-[14px] font-semibold leading-tight">
+                            {category.name}
+                          </span>
                         </div>
-                        
+
                         {/* Right Caret Indicator */}
                         <div className="flex items-center gap-2">
-                          <span className={`text-[11px] font-bold ${isHovered ? "text-[#266BF9]" : "text-blue-400"}`}>
-                            {isHovered ? "▶" : "▼"}
+                          <span
+                            className={`text-[11px] font-bold ${isHovered ? "text-[#266BF9]" : "text-blue-400"}`}
+                          >
+                            ▶
                           </span>
                         </div>
                       </Link>
@@ -311,7 +365,7 @@ export default function BottomBar() {
                       <h2 className="mb-4 text-lg font-bold text-white tracking-wide border-b border-slate-500/20 pb-2">
                         {activeMenuCategory.name}
                       </h2>
-                      
+
                       {activeMenuCategory.subcategories.length > 0 ? (
                         activeMenuCategory.subcategories.map((sub) => (
                           <Link
@@ -332,7 +386,9 @@ export default function BottomBar() {
                           </Link>
                         ))
                       ) : (
-                        <div className="py-8 text-center text-sm text-slate-400">No subcategories available</div>
+                        <div className="py-8 text-center text-sm text-slate-400">
+                          No subcategories available
+                        </div>
                       )}
                     </div>
 
@@ -367,7 +423,9 @@ export default function BottomBar() {
         </div>
 
         {/* Existing Navigation Links */}
-        <ul className={`flex flex-nowrap uppercase items-center ${isSticky ? "justify-start ml-14 " : "justify-center"} flex-1 gap-2 lg:gap-6 py-1`}>
+        <ul
+          className={`flex flex-nowrap uppercase items-center ${isSticky ? "justify-start ml-14 " : "justify-center"} flex-1 gap-2 lg:gap-6 py-1`}
+        >
           {/* HOME link with separator */}
           <li className="relative flex items-center group  pl-2 lg:pl-4">
             <Link
@@ -383,30 +441,38 @@ export default function BottomBar() {
             <li
               key={`${link.name}-${index}`}
               className="relative flex items-center group border-l border-white/20 pl-2 lg:pl-4"
-              onMouseEnter={() => link.subLinks && link.subLinks.length > 0 && setActiveDropdown(link.name)}
+              onMouseEnter={() =>
+                link.subLinks &&
+                link.subLinks.length > 0 &&
+                setActiveDropdown(link.name)
+              }
               onMouseLeave={() => setActiveDropdown(null)}
             >
               {link.href.startsWith("http") ? (
                 <a
                   href={link.href}
-                  className={`text-[14px] 2xl:text-[14px] flex items-center gap-1 transition-colors whitespace-nowrap py-1 ${link.active
+                  className={`text-[14px] 2xl:text-[14px] flex items-center gap-1 transition-colors whitespace-nowrap py-1 ${
+                    link.active
                       ? "text-[#ffffff] font-bold border-b-2 border-[#0054A6]"
                       : "text-[#ffffff] hover:text-[#000000] font-medium"
-                    }`}
+                  }`}
                 >
                   {link.name}
                 </a>
               ) : link.href ? (
                 <Link
                   href={link.href}
-                  className={`text-[14px] 2xl:text-[14px] flex items-center gap-1 transition-colors whitespace-nowrap py-1 ${link.active
+                  className={`text-[14px] 2xl:text-[14px] flex items-center gap-1 transition-colors whitespace-nowrap py-1 ${
+                    link.active
                       ? "text-[#ffffff] font-bold border-b-2 border-[#0054A6]"
                       : "text-[#ffffff] hover:text-[#000000] font-medium"
-                    }`}
+                  }`}
                 >
                   {link.name}
                   {link.subLinks && link.subLinks.length > 0 ? (
-                    <span className={`text-[8px] ml-2 transition-transform duration-200 ${activeDropdown === link.name ? "rotate-180" : ""}`}>
+                    <span
+                      className={`text-[8px] ml-2 transition-transform duration-200 ${activeDropdown === link.name ? "rotate-180" : ""}`}
+                    >
                       ▼
                     </span>
                   ) : null}
@@ -415,14 +481,18 @@ export default function BottomBar() {
                 <div className="text-[14px] lg:text-[15px] flex items-center gap-1 transition-colors whitespace-nowrap py-1 text-[#ffffff] font-medium cursor-default">
                   {link.name}
                   {link.subLinks && link.subLinks.length > 0 ? (
-                    <span className={`text-[8px] ml-2 transition-transform duration-200 ${activeDropdown === link.name ? "rotate-180" : ""}`}>
+                    <span
+                      className={`text-[8px] ml-2 transition-transform duration-200 ${activeDropdown === link.name ? "rotate-180" : ""}`}
+                    >
                       ▼
                     </span>
                   ) : null}
                 </div>
               )}
 
-              {link.subLinks && link.subLinks.length > 0 && activeDropdown === link.name ? (
+              {link.subLinks &&
+              link.subLinks.length > 0 &&
+              activeDropdown === link.name ? (
                 <div className="absolute top-[100%] left-0 mt-0 w-48 bg-white shadow-xl border border-slate-100 z-50 py-2 max-h-[350px] overflow-y-auto scrollbar-thin">
                   {link.subLinks.map((sub) => {
                     const href = sub.href || "#";
@@ -456,13 +526,21 @@ export default function BottomBar() {
         {isSticky && (
           <div className="flex items-center gap-5 text-white flex-shrink-0 mr-32">
             {/* Search */}
-            <button onClick={handleSearchClick} className="hover:opacity-85 transition-opacity" title="Search">
+            <button
+              onClick={handleSearchClick}
+              className="hover:opacity-85 transition-opacity"
+              title="Search"
+            >
               <FaSearch className="text-[18px]" />
             </button>
 
             {/* Login / Profile */}
             {mounted && isAuthenticated ? (
-              <Link href="/dashboard" className="hover:opacity-85 transition-opacity flex items-center" title="My Dashboard">
+              <Link
+                href="/dashboard"
+                className="hover:opacity-85 transition-opacity flex items-center"
+                title="My Dashboard"
+              >
                 {user?.avatar || user?.avatar_original ? (
                   <div className="h-6 w-6 overflow-hidden rounded-full border border-white">
                     <Image
@@ -474,23 +552,37 @@ export default function BottomBar() {
                     />
                   </div>
                 ) : (
-                  <FaUser className="text-[18px]" />
+                  <Image
+                    src="/images/navlogin.svg"
+                    alt="User"
+                    width={18}
+                    height={18}
+                    className="h-[18px] w-[18px] object-contain"
+                  />
                 )}
               </Link>
             ) : (
-              <Link href="/login" className="hover:opacity-85 transition-opacity flex items-center" title="Login">
+              <Link
+                href="/login"
+                className="hover:opacity-85 transition-opacity flex items-center"
+                title="Login"
+              >
                 <Image
-                  src="/images/loginavatar.png"
+                  src="/images/navlogin.svg"
                   alt="Login"
                   width={20}
                   height={20}
-                  className="brightness-0 invert"
+                  className="object-contain"
                 />
               </Link>
             )}
 
             {/* Wishlist */}
-            <Link href="/wishlist" className="relative hover:opacity-85 transition-opacity" title="Wishlist">
+            <Link
+              href="/wishlist"
+              className="relative hover:opacity-85 transition-opacity"
+              title="Wishlist"
+            >
               <FiHeart className="text-[20px]" />
               {mounted && wishlistTotalCount > 0 && (
                 <span className="absolute -top-2 -right-2 flex h-[15px] min-w-[15px] items-center justify-center rounded-full bg-[#F7941D] px-1 text-[9px] font-bold text-white leading-none">
@@ -500,8 +592,18 @@ export default function BottomBar() {
             </Link>
 
             {/* Cart */}
-            <Link href="/cart" className="relative hover:opacity-85 transition-opacity" title="Cart">
-              <FiShoppingCart className="text-[20px]" />
+            <Link
+              href="/cart"
+              className="relative hover:opacity-85 transition-opacity"
+              title="Cart"
+            >
+              <Image
+                src="/images/navcart.svg"
+                alt="Cart"
+                width={20}
+                height={20}
+                className="h-5 w-5 object-contain"
+              />
               {mounted && cartTotalCount > 0 && (
                 <span className="absolute -top-2 -right-2 flex h-[15px] min-w-[15px] items-center justify-center rounded-full bg-[#F7941D] px-1 text-[9px] font-bold text-white leading-none">
                   {cartTotalCount}

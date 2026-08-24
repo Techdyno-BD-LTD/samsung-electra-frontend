@@ -33,7 +33,9 @@ export default function OurBrands() {
   const [brandSections, setBrandSections] = useState<BrandSection[]>([]);
   const [loading, setLoading] = useState(true);
   const [title, setTitle] = useState("Our Brands");
-  const [subtitle, setSubtitle] = useState("There are many variations of Home Appliances");
+  const [subtitle, setSubtitle] = useState(
+    "There are many variations of Home Appliances",
+  );
   const [activeRowIndex, setActiveRowIndex] = useState<number>(0);
 
   const sliderRef = useRef<HTMLDivElement | null>(null);
@@ -45,18 +47,23 @@ export default function OurBrands() {
     if (!slider) return;
     const tolerance = 5;
     setCanScrollLeft(slider.scrollLeft > tolerance);
-    setCanScrollRight(slider.scrollLeft < slider.scrollWidth - slider.clientWidth - tolerance);
+    setCanScrollRight(
+      slider.scrollLeft < slider.scrollWidth - slider.clientWidth - tolerance,
+    );
   };
 
   const scrollByOneCard = (direction: 1 | -1) => {
     const slider = sliderRef.current;
     if (!slider) return;
 
-    const firstCard = slider.querySelector("[data-brand-category-card]") as HTMLDivElement | null;
+    const firstCard = slider.querySelector(
+      "[data-brand-category-card]",
+    ) as HTMLDivElement | null;
     if (!firstCard) return;
 
     const sliderStyles = window.getComputedStyle(slider);
-    const gap = parseFloat(sliderStyles.columnGap || sliderStyles.gap || "0") || 0;
+    const gap =
+      parseFloat(sliderStyles.columnGap || sliderStyles.gap || "0") || 0;
     const shift = firstCard.offsetWidth + gap;
 
     slider.scrollBy({
@@ -73,7 +80,9 @@ export default function OurBrands() {
         if (data?.success && Array.isArray(data?.data)) {
           setBrandSections(data.data);
           setTitle(data.title || "Our Brands");
-          setSubtitle(data.subtitle || "There are many variations of Home Appliances");
+          setSubtitle(
+            data.subtitle || "There are many variations of Home Appliances",
+          );
           if (data.data.length > 0) {
             setActiveRowIndex(data.data[0].row_index);
           }
@@ -88,8 +97,10 @@ export default function OurBrands() {
   }, []);
 
   const activeSection = useMemo(
-    () => brandSections.find((section) => section.row_index === activeRowIndex) || brandSections[0],
-    [activeRowIndex, brandSections]
+    () =>
+      brandSections.find((section) => section.row_index === activeRowIndex) ||
+      brandSections[0],
+    [activeRowIndex, brandSections],
   );
 
   useEffect(() => {
@@ -138,10 +149,12 @@ export default function OurBrands() {
       </div>
 
       {/* Brand Tabs */}
-      <div className="flex justify-center border-b border-gray-100 max-w-[1260px] w-[90%] lg:w-full mx-auto mb-0 ">
-        <div 
-          className="grid w-full gap-2 lg:gap-0" 
-          style={{ gridTemplateColumns: `repeat(${brandSections.length}, minmax(0, 1fr))` }}
+      <div className="flex justify-center border-b border-gray-200 max-w-[1260px] w-[90%] lg:w-full mx-auto mb-0 ">
+        <div
+          className="grid w-full gap-2 lg:gap-4"
+          style={{
+            gridTemplateColumns: `repeat(${brandSections.length}, minmax(0, 1fr))`,
+          }}
         >
           {brandSections.map((section) => {
             const isActive = section.row_index === activeRowIndex;
@@ -151,7 +164,9 @@ export default function OurBrands() {
                 type="button"
                 onClick={() => setActiveRowIndex(section.row_index)}
                 className={`lg:py-3.5 flex flex-col items-center justify-center transition-all duration-300 border-b-[5px] lg:border-b-[10px] ${
-                  isActive ? "border-blue-600 bg-transparent" : "border-gray-200 hover:border-gray-300 bg-transparent"
+                  isActive
+                    ? "border-blue-600 bg-transparent"
+                    : "border-gray-300 hover:border-gray-300 bg-transparent"
                 }`}
                 aria-label={`Show ${section.brand.name} categories`}
                 aria-pressed={isActive}
@@ -175,7 +190,9 @@ export default function OurBrands() {
       <div className="bg-white w-full pt-8">
         {/* Choose Category Header */}
         <div className="text-center mb-1 lg:mb-3">
-          <h3 className="text-xl lg:text-[26px] py-1 lg:py-3 font-medium text-gray-800 tracking-normal">Choose Category</h3>
+          <h3 className="text-xl lg:text-[26px] py-1 lg:py-3 font-medium text-gray-800 tracking-normal">
+            Choose Category
+          </h3>
         </div>
 
         {/* Sliding Categories Wrapper (Desktop & Mobile) */}
@@ -233,7 +250,9 @@ export default function OurBrands() {
                   {/* Cover Image */}
                   <div className="relative mx-auto h-[110px] sm:h-[130px] w-full max-w-[120px] sm:max-w-[170px]">
                     <Image
-                      src={category.cover_image || "/assets/img/placeholder.jpg"}
+                      src={
+                        category.cover_image || "/assets/img/placeholder.jpg"
+                      }
                       alt={category.name}
                       fill
                       sizes="170px"

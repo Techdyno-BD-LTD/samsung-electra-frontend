@@ -674,8 +674,8 @@ export default function AddToCartModal({
                   )}
                 </div>
 
-                <div className="flex items-center gap-3 border-y border-slate-100 py-2 text-sm text-slate-700">
-                  <Image src="/images/EMI.png" alt="EMI" width={20} height={20} className="h-5 w-5 object-contain" />
+                <div className="flex items-center gap-3 py-2 text-sm text-slate-700">
+                  <Image src="/images/pdemi.svg" alt="EMI" width={20} height={20} className="h-5 w-5 object-contain" />
                   <span>EMI Starts From <span className="font-bold">{emiText}</span></span>
                   <button 
                     type="button" 
@@ -775,7 +775,7 @@ export default function AddToCartModal({
                       onClick={handleAddToCart}
                       className="flex items-center justify-center gap-3 h-8 rounded-xl border-2 border-[#9CB7D8] text-sm font-bold text-slate-800 hover:bg-slate-50 active:scale-[0.98] transition-all"
                     >
-                       <FiShoppingCart className="w-5 h-5 text-[#000000]" />
+                      <Image src="/images/pdcart.svg" alt="Cart" width={20} height={20} className="w-5 h-5 object-contain" />
                       Add to Cart
                     </button>
                   </div>

@@ -14,11 +14,11 @@ export default function Navbar() {
         <TopBar />
       </div>
       
-      <div className="hidden lg:block bg-black">
+      <div className="hidden lg:block bg-black relative z-50">
         <MainBar />
       </div>
       
-      <div className="hidden lg:block sticky top-0 z-40">
+      <div className="hidden lg:block sticky top-0 z-30">
         <BottomBar />
       </div>
       

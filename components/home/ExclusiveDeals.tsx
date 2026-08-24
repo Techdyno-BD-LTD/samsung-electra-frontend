@@ -17,7 +17,9 @@ type ExclusiveDeal = {
 export default function ExclusiveDeals() {
   const [deals, setDeals] = useState<ExclusiveDeal[]>([]);
   const [title, setTitle] = useState("Exclusive Deals");
-  const [subtitle, setSubtitle] = useState("Shop Today's Exclusive Deals products at special pricing");
+  const [subtitle, setSubtitle] = useState(
+    "Shop Today's Exclusive Deals products at special pricing",
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -30,7 +32,10 @@ export default function ExclusiveDeals() {
         if (isMounted && payload?.success) {
           setDeals(payload.data || []);
           setTitle(payload.title || "Exclusive Deals");
-          setSubtitle(payload.subtitle || "Shop Today's Exclusive Deals products at special pricing");
+          setSubtitle(
+            payload.subtitle ||
+              "Shop Today's Exclusive Deals products at special pricing",
+          );
         }
       } catch (error) {
         console.error("Error fetching exclusive deals:", error);
@@ -57,7 +62,7 @@ export default function ExclusiveDeals() {
   if (deals.length === 0) return null;
 
   return (
-    <section className="w-full lg:pt-8 pb-0 select-none">
+    <section className="w-full bg-transparent lg:pt-8 pb-0 select-none">
       {/* Title & Subtitle */}
       <div className="text-center mb-4 lg:mb-12 px-4">
         <h2 className="text-xl md:text-[48px] lg:text-[30px] 2xl:text-[38px] font-semibold text-gray-900 tracking-tight lg:mb-4">
@@ -69,40 +74,44 @@ export default function ExclusiveDeals() {
       </div>
 
       {/* Grid of Banners (max 2 side-by-side) */}
-     <div className="grid grid-cols-2 md:grid-cols-2 gap-2 lg:gap-6 w-full">
-  {deals.slice(0, 2).map((deal, index) => (
-    <Link
-      key={deal.id}
-      href={`/offers/details/${deal.slug}`}
-      className={`relative block w-full aspect-square md:aspect-[950/700] overflow-hidden shadow-sm hover:shadow-md hover:scale-[1.005] transition-all duration-300 bg-gray-50 ${
-        index === 0 ? "rounded-r-xl" : "rounded-l-xl"
-      }`}
-    >
-      {/* PC Banner */}
-      <div className="hidden md:block w-full h-full relative">
-        <Image
-          src={deal.exclusive_banner || "/assets/img/placeholder.jpg"}
-          alt={deal.title}
-          fill
-          sizes="(max-width: 768px) 100vw, 850px"
-          className="object-contain"
-          priority
-        />
+      <div className="grid grid-cols-2 md:grid-cols-2 gap-2 lg:gap-6 w-full">
+        {deals.slice(0, 2).map((deal, index) => (
+          <Link
+            key={deal.id}
+            href={`/offers/details/${deal.slug}`}
+            className={`relative block w-full aspect-square md:aspect-[950/700] overflow-hidden shadow-sm hover:shadow-md hover:scale-[1.005] transition-all duration-300 bg-gray-50 ${
+              index === 0 ? "rounded-r-xl" : "rounded-l-xl"
+            }`}
+          >
+            {/* PC Banner */}
+            <div className="hidden md:block w-full h-full relative">
+              <Image
+                src={deal.exclusive_banner || "/assets/img/placeholder.jpg"}
+                alt={deal.title}
+                fill
+                sizes="(max-width: 768px) 100vw, 850px"
+                className="object-contain"
+                priority
+              />
+            </div>
+            {/* Mobile Banner */}
+            <div className="block md:hidden w-full h-full relative">
+              <Image
+                src={
+                  deal.exclusive_banner_mobile ||
+                  deal.exclusive_banner ||
+                  "/assets/img/placeholder.jpg"
+                }
+                alt={deal.title}
+                fill
+                sizes="(max-width: 768px) 100vw, 850px"
+                className="object-cover"
+                priority
+              />
+            </div>
+          </Link>
+        ))}
       </div>
-      {/* Mobile Banner */}
-      <div className="block md:hidden w-full h-full relative">
-        <Image
-          src={deal.exclusive_banner_mobile || deal.exclusive_banner || "/assets/img/placeholder.jpg"}
-          alt={deal.title}
-          fill
-          sizes="(max-width: 768px) 100vw, 850px"
-          className="object-cover"
-          priority
-        />
-      </div>
-    </Link>
-  ))}
-</div>
     </section>
   );
 }
