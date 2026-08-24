@@ -596,7 +596,7 @@ export default function Footer() {
               {socialLinks.length > 0 && (
                 <div className="space-y-2">
                   <p className="text-[13px] font-bold text-white">Follow Us:</p>
-                  <div className="flex gap-2 text-white">
+                  <div className="grid grid-cols-4 gap-2 w-fit text-white">
                     {socialLinks.map((soc, sIdx) => (
                       <Link 
                         key={sIdx} 
