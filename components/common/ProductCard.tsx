@@ -1003,7 +1003,7 @@ const ProductCard = ({
   }
 
   return (
-    <div className="group/card relative w-full max-w-full overflow-hidden rounded-2xl border-2 border-sky-200 bg-white shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[300px] sm:min-h-[400px]">
+    <div className="group/card relative w-full max-w-full overflow-hidden rounded-lg border-2 border-sky-200 bg-white shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[300px] sm:min-h-[400px]">
       
       {/* Top half with light background */}
       <div className="relative w-full p-2 sm:p-3 flex flex-col items-center justify-center min-h-[170px] sm:min-h-[265px]">

@@ -117,7 +117,7 @@ export default async function Home() {
         <div className="lg:mt-14 mt-5">
           <ExclusiveDeals />
         </div>
-        <div className="lg:mt-10 mt-5">
+        <div className="lg:mt-10 mt-2">
           <StoreBanner />
         </div>
         <div className="lg:mt-14 mt-5 w-full lg:w-9/12 mx-auto">

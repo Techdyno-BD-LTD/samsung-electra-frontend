@@ -785,19 +785,19 @@ export default function AddToCartModal({
                 <div className="space-y-4 pt-2">
                   <div className="grid grid-cols-2 gap-4 text-xs font-medium text-slate-600">
                     <p className="flex items-center gap-2">
-                      <Image src="/images/freedelivery.png" alt="Free" width={18} height={18} className="h-4.5 w-4.5 opacity-80" />
+                      <Image src="/images/freedelivery.svg" alt="Free" width={18} height={18} className="h-4.5 w-4.5 opacity-80" />
                       Free Delivery
                     </p>
                     <p className="flex items-center gap-2">
-                      <Image src="/images/freeinstalation.png" alt="Install" width={18} height={18} className="h-4.5 w-4.5 opacity-80" />
+                      <Image src="/images/freeinstallation.svg" alt="Install" width={18} height={18} className="h-4.5 w-4.5 opacity-80" />
                       Free Installation
                     </p>
                     <p className="flex items-center gap-2">
-                      <Image src="/images/cashondelivery.png" alt="COD" width={18} height={18} className="h-4.5 w-4.5 opacity-80" />
+                      <Image src="/images/cod.svg" alt="COD" width={18} height={18} className="h-4.5 w-4.5 opacity-80" />
                       Cash on delivery
                     </p>
                     <p className="flex items-center gap-2">
-                      <Image src="/images/salesservice.png" alt="Service" width={18} height={18} className="h-4.5 w-4.5 opacity-80" />
+                      <Image src="/images/aftersales.svg" alt="Service" width={18} height={18} className="h-4.5 w-4.5 opacity-80" />
                       After sales service
                     </p>
                   </div>

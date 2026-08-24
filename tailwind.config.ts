@@ -54,6 +54,7 @@ const config: Config = {
       fontFamily: {
         sans: ["var(--font-samsung-sans)", "var(--font-poppins)", "sans-serif"],
         poppins: ["var(--font-poppins)", "sans-serif"],
+        jaro: ["Jaro", "sans-serif"],
         "samsung-sans": ["var(--font-samsung-sans)", "sans-serif"],
         "samsung-sharp-sans": ["var(--font-samsung-sharp-sans)", "sans-serif"],
       },

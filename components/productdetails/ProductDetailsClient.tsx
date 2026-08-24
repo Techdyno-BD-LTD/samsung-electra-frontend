@@ -1380,28 +1380,28 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
                 productData?.show_free_installation !== false ||
                 productData?.show_cash_on_delivery !== false ||
                 productData?.show_after_sales_service !== false) && (
-                  <div className="hidden lg:flex lg:flex-wrap lg:items-center lg:gap-x-3 lg:gap-y-2 lg:py-1 lg:text-md lg:text-slate-600">
+                  <div className="hidden lg:flex lg:flex-wrap lg:items-center lg:gap-x-2 lg:gap-y-2 lg:py-1 lg:text-md lg:text-slate-600">
                     {productData?.show_free_delivery !== false && (
                       <p className="mr-0 flex shrink-0 items-center gap-1.5 border-r border-slate-300 pr-3 last:border-r-0 last:pr-0 lg:mr-4 lg:gap-2 lg:border-r-2 lg:pr-4">
-                        <Image src="/images/freedelivery.png" alt="Free delivery" width={20} height={20} className="h-5 w-5 object-contain" />
+                        <Image src="/images/freedelivery.svg" alt="Free delivery" width={20} height={20} className="h-5 w-5 object-contain" />
                         Free Delivery
                       </p>
                     )}
                     {productData?.show_free_installation !== false && (
                       <p className="mr-0 flex shrink-0 items-center gap-1.5 border-r border-slate-300 pr-3 last:border-r-0 last:pr-0 lg:mr-4 lg:gap-2 lg:border-r-2 lg:pr-4">
-                        <Image src="/images/freeinstalation.png" alt="Free installation" width={20} height={20} className="h-5 w-5 object-contain" />
+                        <Image src="/images/freeinstallation.svg" alt="Free installation" width={20} height={20} className="h-5 w-5 object-contain" />
                         Free Installation
                       </p>
                     )}
                     {productData?.show_cash_on_delivery !== false && (
                       <p className="mr-0 flex shrink-0 items-center gap-1.5 border-r border-slate-300 pr-3 last:border-r-0 last:pr-0 lg:mr-4 lg:gap-2 lg:border-r-2 lg:pr-4">
-                        <Image src="/images/cashondelivery.png" alt="Cash on delivery" width={20} height={20} className="h-5 w-5 object-contain" />
+                        <Image src="/images/cod.svg" alt="Cash on delivery" width={20} height={20} className="h-5 w-5 object-contain" />
                         Cash on delivery
                       </p>
                     )}
                     {productData?.show_after_sales_service !== false && (
                       <p className="mr-0 flex shrink-0 items-center gap-1.5 border-r border-slate-300 pr-3 last:border-r-0 last:pr-0 lg:mr-4 lg:gap-2 lg:border-r-2 lg:pr-4">
-                        <Image src="/images/salesservice.png" alt="After sales service" width={20} height={20} className="h-5 w-5 object-contain" />
+                        <Image src="/images/aftersales.svg" alt="After sales service" width={20} height={20} className="h-5 w-5 object-contain" />
                         After sales service
                       </p>
                     )}
@@ -1450,14 +1450,14 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
                 <div className="hidden lg:block lg:space-y-2 lg:border-b lg:border-slate-200 lg:pb-3 lg:text-xs lg:text-slate-600 lg:md:text-sm">
                   {(isDemoMode || shippingInfo) && (
                     <p className="flex items-center gap-5">
-                      <Image src="/images/shippingtime.png" alt="Shipping time" width={24} height={24} unoptimized className="h-7 w-7 object-contain" />
+                      <Image src="/images/shipping.svg" alt="Shipping time" width={24} height={24} unoptimized className="h-7 w-7 object-contain" />
                       <span>Shipping Timeline:</span>{shippingInfo}
                     </p>
                   )}
                   {(isDemoMode || warrantyInfo) && (
                     <p className="flex flex-wrap items-center gap-2">
                       <span className="flex items-center gap-5">
-                        <Image src="/images/warranty.png" alt="Warranty" width={24} height={24} unoptimized className="h-7 w-7 object-contain" />
+                        <Image src="/images/warranty.svg" alt="Warranty" width={24} height={24} unoptimized className="h-7 w-7 object-contain" />
                         {warrantyInfo}
                       </span>
                       <button type="button" className="whitespace-nowrap text-[#0C73DA] text-xs md:text-sm font-medium hover:underline">{warrantyLinkLabel}</button>
@@ -1465,14 +1465,14 @@ export default function ProductDetailsClient({ initialData, slug: propSlug }: Pr
                   )}
                   {(isDemoMode || emiFacilityInfo) && (
                     <p className="flex items-center gap-5">
-                      <Image src="/images/Vector.png" alt="EMI facility" width={24} height={24} unoptimized className="h-7 w-7 object-contain" />
+                      <Image src="/images/emi.svg" alt="EMI facility" width={24} height={24} unoptimized className="h-7 w-7 object-contain" />
                       {emiFacilityInfo}
                       <button type="button" className="whitespace-nowrap text-[#0C73DA] text-xs md:text-sm font-medium hover:underline">{emiLinkLabel}</button>
                     </p>
                   )}
                   {(isDemoMode || exchangeInfo) && (
                     <p className="flex flex-wrap items-start gap-2">
-                      <Image src="/images/exchange.png" alt="Exchange" width={24} height={24} unoptimized className="h-7 w-7 object-contain flex-shrink-0" />
+                      <Image src="/images/exchange.svg" alt="Exchange" width={24} height={24} unoptimized className="h-7 w-7 object-contain flex-shrink-0" />
                       <span className="flex-1 pt-0.5">{exchangeInfo}</span>
                       <button type="button" className="whitespace-nowrap text-[#0C73DA] text-xs md:text-sm font-medium hover:underline flex-shrink-0">{exchangeLinkLabel}</button>
                     </p>

@@ -172,7 +172,7 @@ export default function OurBrands() {
       </div>
 
       {/* Categories section with white background */}
-      <div className="bg-white w-full py-8">
+      <div className="bg-white w-full pt-8">
         {/* Choose Category Header */}
         <div className="text-center mb-1 lg:mb-3">
           <h3 className="text-xl lg:text-[26px] py-1 lg:py-3 font-medium text-gray-800 tracking-normal">Choose Category</h3>

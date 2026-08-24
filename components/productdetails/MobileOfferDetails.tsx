@@ -62,7 +62,7 @@ export default function MobileOfferDetails({
   return (
     <div className="space-y-3 lg:hidden">
       <p className="flex items-start gap-3 text-[12px] text-slate-700">
-        <Image src="/images/warranty.png" alt="Warranty" width={20} height={20} className="mt-0.5 h-4 w-4 object-contain" />
+        <Image src="/images/warranty.svg" alt="Warranty" width={20} height={20} className="mt-0.5 h-4 w-4 object-contain" />
         <span>{renderTextAfterColonBold(warrantyInfo)}</span>
       </p>
 
@@ -100,17 +100,17 @@ export default function MobileOfferDetails({
 
       <div className="space-y-3 border-b border-slate-200 pb-3 text-[12px] text-slate-700">
         <p className="flex items-start gap-3">
-          <Image src="/images/shippingtime.png" alt="Shipping time" width={20} height={20} className="mt-0.5 h-4 w-4 object-contain" />
+          <Image src="/images/shipping.svg" alt="Shipping time" width={20} height={20} className="mt-0.5 h-4 w-4 object-contain" />
           <span>{renderTextAfterColonBold(shippingInfo)}</span>
         </p>
 
         <p className="flex items-start gap-3">
-          <Image src="/images/Vector.png" alt="EMI facility" width={20} height={20} className="mt-0.5 h-4 w-4 object-contain" />
+          <Image src="/images/emi.svg" alt="EMI facility" width={20} height={20} className="mt-0.5 h-4 w-4 object-contain" />
           <span>{renderTextAfterColonBold(emiFacilityInfo)}</span>
         </p>
 
         <p className="flex items-start gap-3">
-          <Image src="/images/exchange.png" alt="Exchange" width={20} height={20} className="mt-0.5 h-4 w-4 object-contain" />
+          <Image src="/images/exchange.svg" alt="Exchange" width={20} height={20} className="mt-0.5 h-4 w-4 object-contain" />
           <span>
             {renderTextAfterColonBold(exchangeInfo)} <button type="button" className="font-medium text-[#0C73DA] underline">Showrooms</button>
           </span>

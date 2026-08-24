@@ -244,7 +244,7 @@ export default function CustomerStoriesSection() {
             {/* Desktop Static Grid Layout */}
             <div className="hidden lg:grid grid-cols-4 gap-6 lg:gap-1 mx-auto w-full justify-items-center">
               {displayedTestimonials.map((item) => (
-                <div key={item.id} className="relative bg-white rounded-3xl pt-16 pb-8 px-6 text-center shadow-lg border border-gray-100 flex flex-col justify-between h-[380px] w-72">
+                <div key={item.id} className="relative bg-gradient-to-br from-[#ffffff] via-[#e3e3fa] to-[#ffffff] rounded-3xl pt-16 pb-8 px-6 text-center shadow-lg border border-gray-100 flex flex-col justify-between h-[380px] w-72">
                   <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-[92px] h-[92px] rounded-full border-4 border-blue-500 bg-blue-100 shadow-md overflow-hidden flex items-center justify-center">
                     <Image
                       src={item.avatar || "/assets/img/avatar-place.png"}
@@ -255,13 +255,13 @@ export default function CustomerStoriesSection() {
                     />
                   </div>
 
-                  <span className="text-[80px] text-gray-200 font-serif leading-none absolute top-20 left-3 select-none">“</span>
+                  <span className="text-[80px] text-gray-300 font-jaro leading-none absolute top-16 left-3 select-none">“</span>
                   
                   <p className="text-gray-900 xl:text-[15px] font-poppins leading-relaxed line-clamp-4 font-base pt-2 flex-grow flex items-center justify-center">
                     {item.comment}
                   </p>
                   
-                  <span className="text-[80px] text-gray-200 font-serif leading-none absolute bottom-24 right-6 select-none">”</span>
+                  <span className="text-[80px] text-gray-300 font-jaro leading-none absolute bottom-24 right-6 select-none">”</span>
 
                   <div className="mt-4 border-t border-gray-100 pt-4">
                     <div className="flex items-center justify-center gap-1 mb-2">
@@ -306,7 +306,7 @@ export default function CustomerStoriesSection() {
                   return (
                     <div
                       key={`${item.id}-mob-slide-${index}`}
-                      className={`relative flex-shrink-0 bg-white rounded-3xl pt-14 pb-6 px-5 text-center shadow-lg border transition-all duration-500 ease-out flex flex-col justify-between ${
+                      className={`relative flex-shrink-0 bg-gradient-to-br from-[#ffffff] via-[#e3e3fa] to-[#ffffff] rounded-3xl pt-14 pb-6 px-5 text-center shadow-lg border transition-all duration-500 ease-out flex flex-col justify-between ${
                         isActive
                           ? "scale-100 opacity-100 z-10 border-blue-200"
                           : "scale-100 opacity-100 z-0 border-gray-100"
@@ -328,13 +328,13 @@ export default function CustomerStoriesSection() {
                         />
                       </div>
 
-                      <span className="text-[70px] text-gray-300 font-serif leading-none absolute top-16 left-4 select-none">“</span>
+                      <span className="text-[70px] text-gray-300 font-jaro leading-none absolute top-16 left-4 select-none">“</span>
                       
                       <p className="text-black text-xs leading-relaxed line-clamp-4 font-base pt-2 flex-grow flex items-center justify-center">
                         {item.comment}
                       </p>
                       
-                      <span className="text-[70px] text-gray-300 font-serif leading-none absolute bottom-20 right-4 select-none">”</span>
+                      <span className="text-[70px] text-gray-300 font-jaro leading-none absolute bottom-20 right-4 select-none">”</span>
 
                       <div className="mt-3 border-t border-gray-100 pt-3">
                         <div className="flex items-center justify-center gap-1 mb-1.5">
