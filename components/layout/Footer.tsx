@@ -103,7 +103,7 @@ export default function Footer() {
   // Format the title text so it renders nicely
   const titleText = footerData?.title || "Electra International | Your Comfort Our Promise The Largest Home Appliance Brand In Bangladesh";
 
-  const [mobileExpanded, setMobileExpanded] = useState<string | null>("popular");
+  const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
 
   const toggleMobileSection = (section: string) => {
     setMobileExpanded(mobileExpanded === section ? null : section);

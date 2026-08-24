@@ -125,7 +125,7 @@ export default async function RootLayout({
               {children}
             </PageWrapper>
           </main>
-          <div id="footer-breadcrumb-target" className="lg:hidden mx-auto mainwidthmore mb-4 px-4"></div>
+          <div id="footer-breadcrumb-target" className="lg:hidden mx-auto mainwidthmore empty:hidden mb-4 px-4"></div>
           <Footer />
           <MobileBottomNav />
           <FloatingContact />
