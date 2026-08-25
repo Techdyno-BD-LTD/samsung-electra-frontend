@@ -1182,67 +1182,73 @@ export default function AddToCartModal({
                     exchangeInfo) && (
                     <div className="space-y-2 text-[11px] text-slate-500 font-medium">
                       {(isDemoMode || shippingInfo) && (
-                        <p className="flex items-center gap-3">
+                        <div className="flex items-center gap-3">
                           <Image
                             src="/images/shipping.svg"
                             alt="Time"
                             width={20}
                             height={20}
-                            className="h-5 w-5 object-contain"
+                            className="h-5 w-5 object-contain flex-shrink-0"
                           />
                           <span>Shipping Timeline: {shippingInfo}</span>
-                        </p>
+                        </div>
                       )}
                       {(isDemoMode || warrantyInfo) && (
-                        <p className="flex items-center gap-3">
-                          <Image
-                            src="/images/warranty.svg"
-                            alt="Warranty"
-                            width={20}
-                            height={20}
-                            className="h-5 w-5 object-contain"
-                          />
-                          <span>{warrantyInfo}</span>
-                          <Link href="/policy/warranty-policy" className="text-blue-600 font-bold hover:underline">
+                        <div className="flex flex-col gap-1 lg:flex-row lg:items-center lg:gap-3">
+                          <span className="flex items-center gap-3">
+                            <Image
+                              src="/images/warranty.svg"
+                              alt="Warranty"
+                              width={20}
+                              height={20}
+                              className="h-5 w-5 object-contain flex-shrink-0"
+                            />
+                            <span>{warrantyInfo}</span>
+                          </span>
+                          <Link href="/policy/warranty-policy" className="text-blue-600 font-bold hover:underline ml-8 lg:ml-0">
                             {warrantyLinkLabel}
                           </Link>
-                        </p>
+                        </div>
                       )}
                       {(isDemoMode || emiFacilityInfo) && (
-                        <p className="flex items-center gap-3">
-                          <Image
-                            src="/images/emi.svg"
-                            alt="EMI"
-                            width={20}
-                            height={20}
-                            className="h-5 w-5 object-contain"
-                          />
-                          <span>{emiFacilityInfo}</span>
+                        <div className="flex flex-col gap-1 lg:flex-row lg:items-center lg:gap-3">
+                          <span className="flex items-center gap-3">
+                            <Image
+                              src="/images/emi.svg"
+                              alt="EMI"
+                              width={20}
+                              height={20}
+                              className="h-5 w-5 object-contain flex-shrink-0"
+                            />
+                            <span>{emiFacilityInfo}</span>
+                          </span>
                           <button
-                            className="text-blue-600 font-bold hover:underline"
+                            className="text-blue-600 font-bold hover:underline text-left ml-8 lg:ml-0"
                             onClick={() => setIsEmiModalOpen(true)}
                           >
                             {emiLinkLabel}
                           </button>
-                        </p>
+                        </div>
                       )}
                       {(isDemoMode || exchangeInfo) && (
-                        <p className="flex items-center gap-3">
-                          <Image
-                            src="/images/exchange.svg"
-                            alt="Exchange"
-                            width={20}
-                            height={20}
-                            className="h-5 w-5 object-contain"
-                          />
-                          <span>{exchangeInfo}</span>
+                        <div className="flex flex-col gap-1 lg:flex-row lg:items-center lg:gap-3">
+                          <span className="flex items-center gap-3">
+                            <Image
+                              src="/images/exchange.svg"
+                              alt="Exchange"
+                              width={20}
+                              height={20}
+                              className="h-5 w-5 object-contain flex-shrink-0"
+                            />
+                            <span>{exchangeInfo}</span>
+                          </span>
                           <Link
                             href="/stores"
-                            className="text-blue-600 font-bold hover:underline"
+                            className="text-blue-600 font-bold hover:underline ml-8 lg:ml-0"
                           >
                             {exchangeLinkLabel}
                           </Link>
-                        </p>
+                        </div>
                       )}
                     </div>
                   )}
