@@ -39,7 +39,7 @@ type SliderApiResponse = {
   status: number;
 };
 
-const HERO_SLIDE_ASPECT_RATIO = "1530 / 588";  
+const HERO_SLIDE_ASPECT_RATIO = "1530 / 588";
 
 const twoDigit = (value: number) => String(value).padStart(2, "0");
 
@@ -74,40 +74,48 @@ export default function HeroSection() {
 
     async function loadHeroData() {
       try {
-        const response = await fetch("/api/homepage/sliders", { cache: "no-store" });
+        const response = await fetch("/api/homepage/sliders", {
+          cache: "no-store",
+        });
         if (!response.ok) {
           throw new Error("Failed to fetch hero section data");
         }
 
         const sliderPayload: SliderApiResponse = await response.json();
 
-        const slides: HeroSlide[] = (sliderPayload.data?.sliders || []).map((item, index) => ({
-          id: item.id,
-          title: `Slide ${index + 1}`,
-          subtitle: "",
-          imageUrl: item.image,
-          ctaLabel: "",
-          ctaHref: item.external_link || "#",
-          countdownTarget: new Date().toISOString(),
-          showTimer: false,
-        }));
+        const slides: HeroSlide[] = (sliderPayload.data?.sliders || []).map(
+          (item, index) => ({
+            id: item.id,
+            title: `Slide ${index + 1}`,
+            subtitle: "",
+            imageUrl: item.image,
+            ctaLabel: "",
+            ctaHref: item.external_link || "#",
+            countdownTarget: new Date().toISOString(),
+            showTimer: false,
+          }),
+        );
 
-        const slidesMobile: HeroSlide[] = (sliderPayload.data?.sliders_mobile && sliderPayload.data.sliders_mobile.length > 0)
-          ? sliderPayload.data.sliders_mobile.map((item, index) => ({
-              id: item.id,
-              title: `Slide ${index + 1}`,
-              subtitle: "",
-              imageUrl: item.image,
-              ctaLabel: "",
-              ctaHref: item.external_link || "#",
-              countdownTarget: new Date().toISOString(),
-              showTimer: false,
-            }))
-          : slides;
+        const slidesMobile: HeroSlide[] =
+          sliderPayload.data?.sliders_mobile &&
+          sliderPayload.data.sliders_mobile.length > 0
+            ? sliderPayload.data.sliders_mobile.map((item, index) => ({
+                id: item.id,
+                title: `Slide ${index + 1}`,
+                subtitle: "",
+                imageUrl: item.image,
+                ctaLabel: "",
+                ctaHref: item.external_link || "#",
+                countdownTarget: new Date().toISOString(),
+                showTimer: false,
+              }))
+            : slides;
 
         if (isMounted) {
           setHeroData({
-            promoBarText: sliderPayload.data?.text || "Discover Samsung Electra seasonal offers.",
+            promoBarText:
+              sliderPayload.data?.text ||
+              "Discover Samsung Electra seasonal offers.",
             autoplayMs: 5000,
             slides,
             slidesMobile,
@@ -171,7 +179,10 @@ export default function HeroSection() {
   useEffect(() => {
     if (!heroData) return;
     const slidesMobile = heroData.slidesMobile;
-    if (slidesMobile.length > 1 && mobileSlideIndex === slidesMobile.length + 1) {
+    if (
+      slidesMobile.length > 1 &&
+      mobileSlideIndex === slidesMobile.length + 1
+    ) {
       setIsSliding(false);
       setMobileSlideIndex(0);
     }
@@ -185,13 +196,18 @@ export default function HeroSection() {
 
     const activeSlide = slideIndex % slides.length;
     const target = slides[activeSlide]?.countdownTarget;
-    return target ? getCountdown(target, tick) : getCountdown(new Date().toISOString(), tick);
+    return target
+      ? getCountdown(target, tick)
+      : getCountdown(new Date().toISOString(), tick);
   }, [heroData, slideIndex, tick]);
 
   if (!heroData) {
     return (
       <section className="w-full animate-pulse flex flex-col gap-3">
-        <div className="rounded-2xl border border-slate-200 bg-slate-200" style={{ aspectRatio: HERO_SLIDE_ASPECT_RATIO }} />
+        <div
+          className="rounded-2xl border border-slate-200 bg-slate-200"
+          style={{ aspectRatio: HERO_SLIDE_ASPECT_RATIO }}
+        />
       </section>
     );
   }
@@ -203,18 +219,27 @@ export default function HeroSection() {
   const shouldShowTimer = Boolean(activeSlideData?.showTimer);
 
   const slidesMobile = heroData.slidesMobile;
-  const loopedSlidesMobile = slidesMobile.length > 1 ? [...slidesMobile, slidesMobile[0]] : slidesMobile;
-  const activeSlideMobile = slidesMobile.length ? mobileSlideIndex % slidesMobile.length : 0;
+  const loopedSlidesMobile =
+    slidesMobile.length > 1 ? [...slidesMobile, slidesMobile[0]] : slidesMobile;
+  const activeSlideMobile = slidesMobile.length
+    ? mobileSlideIndex % slidesMobile.length
+    : 0;
 
   return (
     <>
       {/* Mobile Slider View (414x402) */}
-      <div className="lg:hidden w-full max-w-full mx-auto mt-[42px] relative overflow-hidden select-none" style={{ height: "402px" }}>
+      <div
+        className="lg:hidden w-full max-w-full mx-auto mt-[56px] relative overflow-hidden select-none"
+        style={{ height: "402px" }}
+      >
         <div
           className={`flex h-full w-full ${isSliding ? "transition-transform duration-700 ease-in-out" : ""}`}
           style={{ transform: `translateX(-${mobileSlideIndex * 100}%)` }}
           onTransitionEnd={() => {
-            if (slidesMobile.length > 1 && mobileSlideIndex === slidesMobile.length) {
+            if (
+              slidesMobile.length > 1 &&
+              mobileSlideIndex === slidesMobile.length
+            ) {
               setIsSliding(false);
               setMobileSlideIndex(0);
 
@@ -227,9 +252,15 @@ export default function HeroSection() {
           }}
         >
           {loopedSlidesMobile.map((slide, index) => (
-            <div key={`${slide.id}-mob-${index}`} className="relative h-full min-w-full">
+            <div
+              key={`${slide.id}-mob-${index}`}
+              className="relative h-full min-w-full"
+            >
               {slide.ctaHref && slide.ctaHref !== "#" ? (
-                <Link href={slide.ctaHref} className="block relative w-full h-full">
+                <Link
+                  href={slide.ctaHref}
+                  className="block relative w-full h-full"
+                >
                   <Image
                     src={slide.imageUrl}
                     alt={slide.title}
@@ -274,7 +305,10 @@ export default function HeroSection() {
       <section className="hidden lg:block w-screen relative left-1/2 right-1/2 -translate-x-1/2 lg:mt-[0px]">
         <div className="flex flex-col gap-2">
           <div className="relative w-full overflow-hidden">
-            <div className="relative w-full" style={{ aspectRatio: HERO_SLIDE_ASPECT_RATIO }}>
+            <div
+              className="relative w-full"
+              style={{ aspectRatio: HERO_SLIDE_ASPECT_RATIO }}
+            >
               <div
                 className={`flex h-full w-full ${isSliding ? "transition-transform duration-700 ease-in-out" : ""}`}
                 style={{ transform: `translateX(-${slideIndex * 100}%)` }}
@@ -292,9 +326,15 @@ export default function HeroSection() {
                 }}
               >
                 {loopedSlides.map((slide, index) => (
-                  <div key={`${slide.id}-${index}`} className="relative h-full min-w-full">
+                  <div
+                    key={`${slide.id}-${index}`}
+                    className="relative h-full min-w-full"
+                  >
                     {slide.ctaHref && slide.ctaHref !== "#" ? (
-                      <Link href={slide.ctaHref} className="block relative w-full h-full">
+                      <Link
+                        href={slide.ctaHref}
+                        className="block relative w-full h-full"
+                      >
                         <Image
                           src={slide.imageUrl}
                           alt={slide.title}
@@ -337,20 +377,36 @@ export default function HeroSection() {
                 <div className="absolute bottom-2 right-2 z-40 rounded-xl border border-white/20 bg-black/40 p-1.5 text-white backdrop-blur-md sm:bottom-5 sm:right-5 sm:rounded-2xl sm:p-4 lg:bottom-6 lg:right-6">
                   <div className="grid grid-cols-4 gap-1 text-center text-[8px] sm:gap-3 sm:text-sm">
                     <div>
-                      <div className="rounded bg-[#1976d2] px-1.5 py-1 text-[11px] font-semibold sm:rounded-lg sm:px-3 sm:text-lg">{activeCountdown.days}</div>
-                      <p className="mt-0.5 font-medium text-white/90 sm:mt-2">Days</p>
+                      <div className="rounded bg-[#1976d2] px-1.5 py-1 text-[11px] font-semibold sm:rounded-lg sm:px-3 sm:text-lg">
+                        {activeCountdown.days}
+                      </div>
+                      <p className="mt-0.5 font-medium text-white/90 sm:mt-2">
+                        Days
+                      </p>
                     </div>
                     <div>
-                      <div className="rounded bg-[#1976d2] px-1.5 py-1 text-[11px] font-semibold sm:rounded-lg sm:px-3 sm:text-lg">{activeCountdown.hours}</div>
-                      <p className="mt-0.5 font-medium text-white/90 sm:mt-2">Hour</p>
+                      <div className="rounded bg-[#1976d2] px-1.5 py-1 text-[11px] font-semibold sm:rounded-lg sm:px-3 sm:text-lg">
+                        {activeCountdown.hours}
+                      </div>
+                      <p className="mt-0.5 font-medium text-white/90 sm:mt-2">
+                        Hour
+                      </p>
                     </div>
                     <div>
-                      <div className="rounded bg-[#1976d2] px-1.5 py-1 text-[11px] font-semibold sm:rounded-lg sm:px-3 sm:text-lg">{activeCountdown.minutes}</div>
-                      <p className="mt-0.5 font-medium text-white/90 sm:mt-2">Minute</p>
+                      <div className="rounded bg-[#1976d2] px-1.5 py-1 text-[11px] font-semibold sm:rounded-lg sm:px-3 sm:text-lg">
+                        {activeCountdown.minutes}
+                      </div>
+                      <p className="mt-0.5 font-medium text-white/90 sm:mt-2">
+                        Minute
+                      </p>
                     </div>
                     <div>
-                      <div className="rounded bg-[#1976d2] px-1.5 py-1 text-[11px] font-semibold sm:rounded-lg sm:px-3 sm:text-lg">{activeCountdown.seconds}</div>
-                      <p className="mt-0.5 font-medium text-white/90 sm:mt-2">Second</p>
+                      <div className="rounded bg-[#1976d2] px-1.5 py-1 text-[11px] font-semibold sm:rounded-lg sm:px-3 sm:text-lg">
+                        {activeCountdown.seconds}
+                      </div>
+                      <p className="mt-0.5 font-medium text-white/90 sm:mt-2">
+                        Second
+                      </p>
                     </div>
                   </div>
                 </div>

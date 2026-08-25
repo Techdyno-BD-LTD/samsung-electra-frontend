@@ -86,7 +86,7 @@ export default function SingleWideBanner() {
           href={mobHref}
           target={mobIsExternal ? "_blank" : undefined}
           rel={mobIsExternal ? "noopener noreferrer" : undefined}
-          className="lg:hidden block relative w-full max-w-[414px] mx-auto aspect-[414/138]"
+          className="lg:hidden block relative w-full aspect-[414/138]"
         >
           <Image
             src={mobileItem.image}

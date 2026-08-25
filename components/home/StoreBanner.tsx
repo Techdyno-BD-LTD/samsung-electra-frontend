@@ -58,7 +58,7 @@ export default function StoreBanner() {
 
       {/* Mobile view (414x66) */}
       {mobileBanner && (
-        <div className="lg:hidden block relative aspect-[414/66] w-full max-w-[414px] mx-auto">
+        <div className="lg:hidden block relative aspect-[414/66] w-full">
           {mobileLink ? (
             <Link href={mobileLink} className="block relative w-full h-full">
               <Image

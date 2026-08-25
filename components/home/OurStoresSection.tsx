@@ -55,10 +55,10 @@ const AnimatedNumber = ({
   const suffix = value.replace(/[\d\s]/g, "");
 
   return (
-    <>
+    <span className="tabular-nums">
       {count}
       {suffix}
-    </>
+    </span>
   );
 };
 
@@ -132,7 +132,7 @@ export default function OurStoresSection() {
     <div ref={containerRef} className="w-full">
       {/* Mobile Layout */}
       <div
-        className="md:hidden w-full max-w-[414px] h-[438px] mx-auto bg-cover bg-center flex flex-col justify-between p-4 select-none relative"
+        className="md:hidden w-full h-[438px] bg-cover bg-center flex flex-col justify-between p-4 select-none relative"
         style={{ backgroundImage: "url('/images/storemobile.webp')" }}
       >
         {/* Top Center: Title and Description */}
@@ -223,7 +223,7 @@ export default function OurStoresSection() {
         </div>
 
         {/* Bottom Right: Statistics and Map Link */}
-        <div className="self-end mr-4 mb-4 lg:mr-8 lg:mb-4 xl:mr-6 xl:mt-36 2xl:mr-36 2xl:mb-8 text-left bg-white/10 backdrop-blur-sm p-4 xl:p-5 2xl:p-6 rounded-2xl  max-w-sm sm:max-w-md lg:max-w-[480px] xl:max-w-[600px] 2xl:max-w-[1000px]">
+        <div className="self-end mr-4 mb-4 lg:mr-8 lg:mb-4 xl:mr-6 xl:mt-36 2xl:mr-36 2xl:mb-8 text-left bg-white/10 backdrop-blur-sm p-4 xl:p-5 2xl:p-6 rounded-2xl w-[280px] sm:w-[340px] lg:w-[380px] xl:w-[460px] 2xl:w-[540px]">
           <div className="grid grid-cols-4 gap-3 xl:gap-5 2xl:gap-6 items-end mb-4 xl:mb-5 2xl:mb-6">
             {/* Districts */}
             <div className="flex flex-col text-left">
