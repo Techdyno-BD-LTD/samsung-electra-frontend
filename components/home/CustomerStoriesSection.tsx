@@ -238,50 +238,59 @@ export default function CustomerStoriesSection() {
             <FiChevronLeft className="w-6 h-6" />
           </button>
 
-          {/* Testimonial Cards Viewport (Desktop grid, Mobile sliding track) */}
+          {/* Testimonial Cards Viewport (Desktop sliding track, Mobile sliding track) */}
           <div className="flex-grow w-full relative z-10 -mt-64 lg:-mt-64">
             
-            {/* Desktop Static Grid Layout */}
-            <div className="hidden lg:grid grid-cols-4 gap-6 lg:gap-1 mx-auto w-full justify-items-center">
-              {displayedTestimonials.map((item) => (
-                <div key={item.id} className="relative bg-gradient-to-br from-[#ffffff] via-[#e3e3fa] to-[#ffffff] rounded-3xl pt-16 pb-8 px-6 text-center shadow-lg border border-gray-100 flex flex-col justify-between h-[380px] w-72">
-                  <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-[92px] h-[92px] rounded-full border-4 border-blue-500 bg-blue-100 shadow-md overflow-hidden flex items-center justify-center">
-                    <Image
-                      src={item.avatar || "/assets/img/avatar-place.png"}
-                      alt={item.name}
-                      width={96}
-                      height={96}
-                      className="object-cover w-full h-full"
-                    />
-                  </div>
-
-                  <span className="text-[80px] text-gray-300 font-jaro leading-none absolute top-16 left-3 select-none">“</span>
-                  
-                  <p className="text-gray-900 xl:text-[15px] font-poppins leading-relaxed line-clamp-4 font-base pt-2 flex-grow flex items-center justify-center">
-                    {item.comment}
-                  </p>
-                  
-                  <span className="text-[80px] text-gray-300 font-jaro leading-none absolute bottom-24 right-6 select-none">”</span>
-
-                  <div className="mt-4 border-t border-gray-100 pt-4">
-                    <div className="flex items-center justify-center gap-1 mb-2">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <FaStar
-                          key={i}
-                          className={`w-4 h-4 ${
-                            i < item.rating ? "text-yellow-400" : "text-gray-200"
-                          }`}
-                        />
-                      ))}
+            {/* Desktop Sliding Layout */}
+            <div className="hidden lg:block w-full overflow-hidden pt-16 pb-10">
+              <div
+                className="flex transition-transform duration-500 ease-out"
+                style={{ transform: `translateX(calc(-${startIndex} * (25% + 6px)))` }}
+              >
+                {testimonials.map((item) => (
+                  <div
+                    key={item.id}
+                    className="relative flex-shrink-0 bg-gradient-to-br from-[#ffffff] via-[#e3e3fa] to-[#ffffff] rounded-3xl pt-16 pb-8 px-6 text-center shadow-lg border border-gray-100 flex flex-col justify-between h-[380px]"
+                    style={{ width: "calc((100% - 72px) / 4)", marginRight: "24px" }}
+                  >
+                    <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-[92px] h-[92px] rounded-full border-4 border-blue-500 bg-blue-100 shadow-md overflow-hidden flex items-center justify-center">
+                      <Image
+                        src={item.avatar || "/assets/img/avatar-place.png"}
+                        alt={item.name}
+                        width={96}
+                        height={96}
+                        className="object-cover w-full h-full"
+                      />
                     </div>
 
-                    <h4 className="font-bold text-gray-900 text-[16px]">{item.name}</h4>
-                    <p className="text-[14px] text-gray-400 font-medium mt-0.5">
-                      Reviewed On {formatDate(item.created_at)}
+                    <span className="text-[80px] text-gray-300 font-jaro leading-none absolute top-16 left-3 select-none">“</span>
+                    
+                    <p className="text-gray-900 xl:text-[15px] font-poppins leading-relaxed line-clamp-4 font-base pt-2 flex-grow flex items-center justify-center">
+                      {item.comment}
                     </p>
+                    
+                    <span className="text-[80px] text-gray-300 font-jaro leading-none absolute bottom-24 right-6 select-none">”</span>
+
+                    <div className="mt-4 border-t border-gray-100 pt-4">
+                      <div className="flex items-center justify-center gap-1 mb-2">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <FaStar
+                            key={i}
+                            className={`w-4 h-4 ${
+                              i < item.rating ? "text-yellow-400" : "text-gray-200"
+                            }`}
+                          />
+                        ))}
+                      </div>
+
+                      <h4 className="font-bold text-gray-900 text-[16px]">{item.name}</h4>
+                      <p className="text-[14px] text-gray-400 font-medium mt-0.5">
+                        Reviewed On {formatDate(item.created_at)}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
 
             {/* Mobile Touch Slider Viewport */}

@@ -43,6 +43,7 @@ type HeroCategory = {
   count: number;
   icon: string | null;
   coverImage: string | null;
+  lifestyle: string | null;
   slug?: string;
   parent_id?: number;
   subcategories: Array<{
@@ -53,6 +54,8 @@ type HeroCategory = {
     coverImage: string | null;
   }>;
 };
+
+const DEBUG_PERSIST_MENU = true; // Set to true to keep the category dropdown persistently open for design inspection
 
 export default function BottomBar() {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -66,6 +69,10 @@ export default function BottomBar() {
   const [activeMenuCategory, setActiveMenuCategory] =
     useState<HeroCategory | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [hoveredSubcategory, setHoveredSubcategory] = useState<any | null>(
+    null,
+  );
+  const [allCategoriesFlat, setAllCategoriesFlat] = useState<any[]>([]);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [mounted, setMounted] = useState(false);
@@ -116,6 +123,7 @@ export default function BottomBar() {
     if (category) {
       if (!isMenuOpen) {
         setActiveMenuCategory(category);
+        setHoveredSubcategory(category.subcategories[0] || null);
         hoverTimeoutRef.current = setTimeout(() => {
           setIsMenuOpen(true);
         }, 10);
@@ -123,16 +131,19 @@ export default function BottomBar() {
         setIsMenuOpen(false);
         hoverTimeoutRef.current = setTimeout(() => {
           setActiveMenuCategory(category);
+          setHoveredSubcategory(category.subcategories[0] || null);
           setIsMenuOpen(true);
         }, 150);
       }
       setHoveredCategory(category);
     } else {
+      if (DEBUG_PERSIST_MENU) return;
       setHoveredCategory(null);
       hoverTimeoutRef.current = setTimeout(() => {
         setIsMenuOpen(false);
         hoverTimeoutRef.current = setTimeout(() => {
           setActiveMenuCategory(null);
+          setHoveredSubcategory(null);
         }, 200);
       }, 100);
     }
@@ -214,6 +225,11 @@ export default function BottomBar() {
               count: item.number_of_products || 0,
               icon: item.icon,
               coverImage: item.cover_image,
+              lifestyle:
+                item.lifestyle &&
+                !item.lifestyle.toLowerCase().includes("placeholder")
+                  ? item.lifestyle
+                  : null,
               slug: item.slug,
               parent_id: item.parent_id,
               subcategories: allApiCategories
@@ -234,6 +250,7 @@ export default function BottomBar() {
 
           if (isMounted) {
             setCategories(fetchedCategories);
+            setAllCategoriesFlat(allApiCategories);
           }
         }
       } catch (err) {
@@ -278,7 +295,7 @@ export default function BottomBar() {
               />
 
               <aside
-                className="absolute top-full left-0 mt-2 w-[320px] bg-[#072F5B]/85 backdrop-blur-md rounded-xl shadow-2xl z-[120] flex flex-col border border-[#1b3e6d]"
+                className="absolute top-full left-0 mt-2 w-[320px] bg-[#072F5B]/95 backdrop-blur-md rounded-xl shadow-2xl z-[120] flex flex-col border border-[#1b3e6d]"
                 onMouseLeave={() => handleCategoryHover(null)}
               >
                 {/* Header */}
@@ -308,7 +325,9 @@ export default function BottomBar() {
                         .replace(/[^a-z0-9]+/g, "-")
                         .replace(/(^-|-$)/g, "")
                     }`;
-                    const isHovered = hoveredCategory?.id === category.id;
+                    const isHovered =
+                      hoveredCategory?.id === category.id ||
+                      activeMenuCategory?.id === category.id;
                     return (
                       <Link
                         key={category.id}
@@ -357,34 +376,57 @@ export default function BottomBar() {
                 {/* Subcategory Mega Menu overlay sitting exactly beside the categories sidebar */}
                 {activeMenuCategory && (
                   <div
-                    className={`absolute left-full top-0 ml-1.5 w-[640px] h-full bg-[#072F5B]/85 backdrop-blur-md p-6 shadow-2xl border border-[#1b3e6d] rounded-xl flex transition-all duration-300 z-[130] overflow-hidden ${isMenuOpen ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-2 pointer-events-none"}`}
+                    className={`absolute left-full top-0 ml-1.5 w-[890px] h-full bg-[#072F5B]/95 backdrop-blur-md p-6 shadow-2xl border border-[#1b3e6d] rounded-xl flex gap-6 transition-all duration-300 z-[130] before:content-[''] before:absolute before:right-full before:top-0 before:w-[20px] before:h-full before:bg-transparent ${isMenuOpen ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-2 pointer-events-none"}`}
                     onMouseEnter={() => handleCategoryHover(activeMenuCategory)}
                   >
-                    {/* Subcategories list - Left Column */}
-                    <div className="flex-1 flex flex-col justify-start pr-6 divide-y divide-[#1e3f6e] overflow-y-auto custom-scrollbar">
-                      <h2 className="mb-4 text-lg font-bold text-white tracking-wide border-b border-slate-500/20 pb-2">
+                    {/* Subcategories list - Column 1 */}
+                    <div className="w-[240px] flex-shrink-0 flex flex-col justify-start pr-4 overflow-y-auto custom-scrollbar border-r border-[#1e3f6e]/30">
+                      <h2 className="mb-4 text-lg font-semibold text-white tracking-wide border-b border-slate-500/20 pb-2">
                         {activeMenuCategory.name}
                       </h2>
 
                       {activeMenuCategory.subcategories.length > 0 ? (
-                        activeMenuCategory.subcategories.map((sub) => (
-                          <Link
-                            key={sub.id}
-                            href={`/category/${sub.slug}`}
-                            onClick={() => {
-                              setIsCategoryOpen(false);
-                              setActiveMenuCategory(null);
-                            }}
-                            className="group flex items-center justify-between py-3.5 text-left transition-all hover:pl-2"
-                          >
-                            <span className="text-[14px] font-medium text-[#cbe0ff] transition-colors group-hover:text-white">
-                              {sub.name}
-                            </span>
-                            <span className="text-xs text-[#266BF9] opacity-0 group-hover:opacity-100 transition-opacity">
-                              ▶
-                            </span>
-                          </Link>
-                        ))
+                        <div className="flex flex-col divide-y divide-[#1e3f6e]/30">
+                          {activeMenuCategory.subcategories.map((sub) => {
+                            const isSubHovered =
+                              hoveredSubcategory?.id === sub.id;
+                            return (
+                              <Link
+                                key={sub.id}
+                                href={`/category/${sub.slug}`}
+                                onClick={() => {
+                                  setIsCategoryOpen(false);
+                                  setActiveMenuCategory(null);
+                                }}
+                                onMouseEnter={() => setHoveredSubcategory(sub)}
+                                className={`group flex items-center justify-between py-3 px-3 rounded-lg text-left transition-all hover:bg-white ${
+                                  isSubHovered
+                                    ? "bg-[#e3ebf6] text-[#072F5B]"
+                                    : "bg-transparent text-[#cbe0ff] hover:text-white"
+                                }`}
+                              >
+                                <span
+                                  className={`text-[14px] font-semibold transition-colors ${
+                                    isSubHovered
+                                      ? "text-[#072F5B]"
+                                      : "text-[#cbe0ff] group-hover:text-white"
+                                  }`}
+                                >
+                                  {sub.name}
+                                </span>
+                                <span
+                                  className={`text-xs transition-opacity ${
+                                    isSubHovered
+                                      ? "text-[#266BF9] opacity-100"
+                                      : "text-[#266BF9] opacity-0 group-hover:opacity-100"
+                                  }`}
+                                >
+                                  ▶
+                                </span>
+                              </Link>
+                            );
+                          })}
+                        </div>
                       ) : (
                         <div className="py-8 text-center text-sm text-slate-400">
                           No subcategories available
@@ -392,14 +434,71 @@ export default function BottomBar() {
                       )}
                     </div>
 
-                    {/* Banner Image - Right Column */}
-                    <div className="relative w-[280px] h-full flex-shrink-0 bg-white rounded-lg overflow-hidden border border-slate-100 p-2 shadow-inner flex items-center justify-center">
-                      {activeMenuCategory.coverImage ? (
+                    {/* Sub-subcategories list - Column 2 */}
+                    <div className="w-[280px] flex-shrink-0 flex flex-col justify-start pr-4 overflow-y-auto custom-scrollbar border-r border-[#1e3f6e]/30">
+                      <h2 className="mb-4 text-lg font-semibold text-white tracking-wide border-b border-slate-500/20 pb-2">
+                        {hoveredSubcategory
+                          ? hoveredSubcategory.name
+                          : "Subcategories"}
+                      </h2>
+
+                      {hoveredSubcategory ? (
+                        (() => {
+                          const subSubcategories = allCategoriesFlat.filter(
+                            (item: any) =>
+                              Number(item.parent_id) ===
+                              Number(hoveredSubcategory.id),
+                          );
+                          if (subSubcategories.length > 0) {
+                            return (
+                              <div className="flex flex-col divide-y divide-[#1e3f6e]/30">
+                                {subSubcategories.map((subSub) => (
+                                  <Link
+                                    key={subSub.id}
+                                    href={`/category/${subSub.slug}`}
+                                    onClick={() => {
+                                      setIsCategoryOpen(false);
+                                      setActiveMenuCategory(null);
+                                    }}
+                                    className="group flex items-center justify-between py-3 px-3 rounded-lg text-left transition-all hover:bg-[#1a3e6d]/40"
+                                  >
+                                    <span className="text-[14px] font-medium text-[#cbe0ff] transition-colors group-hover:text-white">
+                                      {subSub.name}
+                                    </span>
+                                  </Link>
+                                ))}
+                              </div>
+                            );
+                          } else {
+                            return (
+                              <div className="py-8 text-center text-sm text-slate-400">
+                                No subcategories available
+                              </div>
+                            );
+                          }
+                        })()
+                      ) : (
+                        <div className="py-8 text-center text-sm text-slate-400">
+                          Hover on a category to view
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Banner Image - Column 3 */}
+                    <div className="relative w-[280px] h-full flex-shrink-0 rounded-lg overflow-hidden flex items-center justify-center">
+                      {activeMenuCategory.lifestyle ? (
+                        <Image
+                          src={activeMenuCategory.lifestyle}
+                          alt={activeMenuCategory.name}
+                          fill
+                          className="object-contain"
+                        />
+                      ) : activeMenuCategory.coverImage ? (
                         <Image
                           src={activeMenuCategory.coverImage}
                           alt={activeMenuCategory.name}
                           fill
-                          className="object-cover p-2 rounded-lg"
+                          className="object-contain"
                         />
                       ) : activeMenuCategory.icon ? (
                         <Image

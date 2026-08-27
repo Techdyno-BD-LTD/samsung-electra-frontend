@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { FaChevronRight } from "react-icons/fa";
-import BrandProductCarouselSection from "@/components/brand/BrandProductCarouselSection";
+import BrandProductsFilter from "@/components/brand/BrandProductsFilter";
 import { withDynamicMetadata } from "@/lib/metadata";
 
 export const revalidate = 60; // Revalidate every minute
@@ -177,8 +177,8 @@ export default async function BrandSlugPage({ params }: PageProps) {
   return (
     <main className=" mt-20">
       {brandBanner && (
-        <section className="mx-auto w-full px-4 pt-4 md:px-0">
-          <div className="relative aspect-[1840/400] w-full overflow-hidden rounded-md">
+        <section className="mx-auto w-full px-0 pt-0 md:px-0 md:pt-4">
+          <div className="relative aspect-[1840/400] w-full overflow-hidden rounded-none md:rounded-md">
             <Image
               src={brandBanner}
               alt={`${brand.name} hero banner`}
@@ -205,7 +205,7 @@ export default async function BrandSlugPage({ params }: PageProps) {
       </div>
 
       <section className="mx-auto w-full max-w-[1840px] px-4 pb-4 md:px-8">
-        <div className="border-y border-gray-300 py-5 text-center md:py-6">
+        <div className="border-y border-gray-300 py-2 text-center md:py-6">
           {brand.logo ? (
             <div className="relative mx-auto h-10 w-52 md:h-12 md:w-60">
               <Image
@@ -224,41 +224,7 @@ export default async function BrandSlugPage({ params }: PageProps) {
         </div>
       </section>
 
-      {categoryList.length > 0 && (
-        <section className="mx-auto w-full max-w-[1840px] px-4 pb-5 md:px-8">
-          <div className="flex flex-wrap items-center justify-center gap-3 border-b border-gray-300 pb-5">
-            {orderedTabs.map((label, index) => {
-              const target = categoryList.find((item) => item.tabLabel === label);
-
-              return (
-                <Link
-                  key={label}
-                  href={target ? `#${target.id}` : "#"}
-                  className={`min-w-[152px] rounded-full border px-5 py-1.5 text-center text-[15px] font-medium transition-colors ${
-                    index === 0
-                      ? "border-black bg-black text-white"
-                      : "border-gray-500 bg-white text-gray-800 hover:border-[#215A9B] hover:text-[#215A9B]"
-                  }`}
-                >
-                  {label}
-                </Link>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
-      <div className="pb-12">
-        {categoryList.map((category) => (
-          <BrandProductCarouselSection
-            key={category.id}
-            id={category.id}
-            title={category.title}
-            products={category.products}
-            seeMoreHref={`/products?brand=${encodeURIComponent(brand.name)}`}
-          />
-        ))}
-      </div>
+      <BrandProductsFilter categoryList={categoryList} brandName={brand.name} />
 
       {categoryList.length === 0 && (
         <section className="mx-auto w-full max-w-[1840px] px-4 py-10 text-center md:px-8">
