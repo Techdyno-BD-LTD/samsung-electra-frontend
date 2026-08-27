@@ -76,17 +76,13 @@ export default function BrandProductsFilter({
       {/* Product Sections */}
       <div className="pb-12 transition-all duration-300">
         {filteredCategories.map((category) => (
-          <div
+          <BrandProductCarouselSection
             key={category.id}
-            className="animate-in fade-in slide-in-from-bottom-4 duration-300"
-          >
-            <BrandProductCarouselSection
-              id={category.id}
-              title={category.title}
-              products={category.products}
-              seeMoreHref={`/products?brand=${encodeURIComponent(brandName)}`}
-            />
-          </div>
+            id={category.id}
+            title={category.title}
+            products={category.products}
+            seeMoreHref={`/products?brand=${encodeURIComponent(brandName)}`}
+          />
         ))}
       </div>
     </>
