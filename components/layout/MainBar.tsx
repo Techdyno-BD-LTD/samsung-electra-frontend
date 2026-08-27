@@ -462,10 +462,10 @@ export default function MainBar() {
                   className="flex items-center gap-2 rounded-[5px] bg-[#2b85ff] px-5 py-2.5 text-white shadow-sm hover:bg-blue-600 transition"
                 >
                   <Image
-                    src="/images/loginavatar.png"
+                    src="/images/navlogin.svg"
                     alt="Login"
-                    width={18}
-                    height={18}
+                    width={20}
+                    height={20}
                     quality={100}
                     priority
                     className="brightness-0 invert"
