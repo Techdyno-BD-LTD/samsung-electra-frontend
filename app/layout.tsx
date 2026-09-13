@@ -69,6 +69,10 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
     title: siteTitle,
     description: siteDescription,
+    robots: {
+      index: false,
+      follow: false,
+    },
     icons: {
       icon: siteIcon,
     },
