@@ -12,7 +12,6 @@ export default function CategoryProductGrid({ filteringAttributes }: { filtering
   const categorySlug = params.slug as string;
   
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [sortOption, setSortOption] = useState("default");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [sourceProducts, setSourceProducts] = useState<{ id: number; name: string; slug: string; calculable_price: number; brand_name?: string; brand?: { name: string }; attributes?: { name: string; values: string[] }[]; color_name?: string }[]>([]);
   const [loading, setLoading] = useState(true);
@@ -21,22 +20,36 @@ export default function CategoryProductGrid({ filteringAttributes }: { filtering
   const [hasMore, setHasMore] = useState(false);
   const [totalItemsCount, setTotalItemsCount] = useState(0);
 
+  const sortOption = searchParams.get("sort_by") || "default";
+
+  const handleSortChange = (newSort: string) => {
+    const query = new URLSearchParams(searchParams.toString());
+    if (newSort === "default") {
+      query.delete("sort_by");
+    } else {
+      query.set("sort_by", newSort);
+    }
+    window.history.replaceState(null, '', `?${query.toString()}`);
+    // Trigger popstate or trigger re-fetch by updating state
+    setPage(1);
+    fetchProducts(1, true, query);
+  };
+
   /* ---- Fetch Products ---- */
-  const fetchProducts = useCallback(async (pageNum: number, isInitial: boolean = false) => {
+  const fetchProducts = useCallback(async (pageNum: number, isInitial: boolean = false, customParams?: URLSearchParams) => {
     if (!categorySlug) return;
 
     try {
       if (isInitial) setLoading(true);
       else setLoadingMore(true);
 
-      const query = new URLSearchParams(searchParams.toString());
+      const query = customParams ? new URLSearchParams(customParams.toString()) : new URLSearchParams(searchParams.toString());
       query.set("page", pageNum.toString());
       query.set("limit", "12"); // Fetch 12 at a time
 
       // Map frontend filter keys to backend filter keys
-      if (searchParams.has("minPrice")) query.set("min_price", searchParams.get("minPrice")!);
-      if (searchParams.has("maxPrice")) query.set("max_price", searchParams.get("maxPrice")!);
-      // brands is already "brands" in both
+      if (query.has("minPrice")) query.set("min_price", query.get("minPrice")!);
+      if (query.has("maxPrice")) query.set("max_price", query.get("maxPrice")!);
 
       const response = await fetch(`/api/products/category/${categorySlug}?${query.toString()}`);
       const data = await response.json();
@@ -71,39 +84,7 @@ export default function CategoryProductGrid({ filteringAttributes }: { filtering
     fetchProducts(nextPage);
   };
 
-  /* ---- Client-Side Sorting & Remaining Filtering (Attributes) ---- */
-  const filteredProducts = useMemo(() => {
-    let filtered = [...sourceProducts];
-
-    // Attribute Filtering (Remaining on client-side for now)
-    searchParams.forEach((value, key) => {
-      if (key.startsWith("attr_")) {
-        const attrName = key.replace("attr_", "");
-        const selectedValues = value.split(/[|,]/).filter(Boolean);
-        if (selectedValues.length > 0) {
-          const selectedValuesLower = selectedValues.map(v => v.toLowerCase());
-          filtered = filtered.filter(p => {
-            const pAttrs = p.attributes || [];
-            return pAttrs.some((pa: { name: string; values: string[] }) => 
-              pa.name.toLowerCase() === attrName && 
-              pa.values.some((v: string) => selectedValuesLower.includes(v.toLowerCase()))
-            ) || (attrName === 'color' && selectedValuesLower.includes((p.color_name || '').toLowerCase()));
-          });
-        }
-      }
-    });
-
-    // Sorting
-    if (sortOption === "price-low") {
-      filtered.sort((a, b) => (a.calculable_price || 0) - (b.calculable_price || 0));
-    } else if (sortOption === "price-high") {
-      filtered.sort((a, b) => (b.calculable_price || 0) - (a.calculable_price || 0));
-    } else if (sortOption === "newest") {
-      filtered.sort((a, b) => b.id - a.id);
-    }
-
-    return filtered;
-  }, [sourceProducts, searchParams, sortOption]);
+  const filteredProducts = sourceProducts;
 
   return (
     <div className="flex flex-col gap-4">
@@ -139,7 +120,7 @@ export default function CategoryProductGrid({ filteringAttributes }: { filtering
         <div className="relative">
           <select
             value={sortOption}
-            onChange={(e) => setSortOption(e.target.value)}
+            onChange={(e) => handleSortChange(e.target.value)}
             className="cursor-pointer appearance-none rounded-md border border-slate-200 bg-white py-2 pl-3 pr-8 text-[13px] text-slate-600 outline-none transition focus:border-blue-400"
           >
             <option value="default">Select Sort Option</option>
@@ -160,7 +141,7 @@ export default function CategoryProductGrid({ filteringAttributes }: { filtering
           <div className="relative flex-1">
             <select
               value={sortOption}
-              onChange={(e) => setSortOption(e.target.value)}
+              onChange={(e) => handleSortChange(e.target.value)}
               className="w-full cursor-pointer appearance-none rounded-full border border-slate-300 bg-white py-1 pl-5 pr-10 text-[12px] text-slate-700 outline-none transition shadow-sm"
             >
               <option value="default">Select Sort Option</option>

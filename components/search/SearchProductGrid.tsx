@@ -20,95 +20,89 @@ type SearchProductGridProps = {
 export default function SearchProductGrid({ query, categoryId, tab, filteringAttributes }: SearchProductGridProps) {
   const searchParams = useSearchParams();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [sortOption, setSortOption] = useState("default");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [sourceProducts, setSourceProducts] = useState<{ id: number; name: string; slug: string; calculable_price: number; brand_name?: string; brand?: { name: string }; attributes?: { name: string; values: string[] }[]; color_name?: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const [totalItemsCount, setTotalItemsCount] = useState(0);
+
+  const sortOption = searchParams.get("sort_by") || "default";
+
+  const handleSortChange = (newSort: string) => {
+    const queryParams = new URLSearchParams(searchParams.toString());
+    if (newSort === "default") {
+      queryParams.delete("sort_by");
+    } else {
+      queryParams.set("sort_by", newSort);
+    }
+    window.history.replaceState(null, '', `?${queryParams.toString()}`);
+    setPage(1);
+    fetchProducts(1, true, queryParams);
+  };
 
   /* ---- Fetch Products ---- */
-  useEffect(() => {
-    async function fetchProducts() {
-      setIsLoading(true);
-      try {
-        let url = "";
-        if (tab === "new-arrivals") {
-          url = "/api/products/new-arrivals";
-        } else if (tab === "hot-sale") {
-          url = "/api/products/hot-sale";
-        } else if (tab === "top-rated") {
-          url = "/api/products/top-rated";
-        } else {
-          url = `/api/products/search?name=${encodeURIComponent(query)}`;
-          if (categoryId) {
-            url += `&category_id=${categoryId}`;
-          }
-        }
-        const response = await fetch(url);
-        if (response.ok) {
-          const payload = await response.json();
+  const fetchProducts = async (pageNum: number, isInitial: boolean = false, customParams?: URLSearchParams) => {
+    try {
+      if (isInitial) setIsLoading(true);
+      else setLoadingMore(true);
+
+      const queryParams = customParams ? new URLSearchParams(customParams.toString()) : new URLSearchParams(searchParams.toString());
+      queryParams.set("page", pageNum.toString());
+      queryParams.set("limit", "12");
+
+      if (queryParams.has("minPrice")) queryParams.set("min_price", queryParams.get("minPrice")!);
+      if (queryParams.has("maxPrice")) queryParams.set("max_price", queryParams.get("maxPrice")!);
+
+      let url = "";
+      if (tab === "new-arrivals") {
+        url = `/api/products/new-arrivals?${queryParams.toString()}`;
+      } else if (tab === "hot-sale") {
+        url = `/api/products/hot-sale?${queryParams.toString()}`;
+      } else if (tab === "top-rated") {
+        url = `/api/products/top-rated?${queryParams.toString()}`;
+      } else {
+        if (query) queryParams.set("name", query);
+        if (categoryId) queryParams.set("category_id", categoryId);
+        url = `/api/products/search?${queryParams.toString()}`;
+      }
+
+      const response = await fetch(url);
+      if (response.ok) {
+        const payload = await response.json();
+        if (isInitial) {
           setSourceProducts(payload.data || []);
+        } else {
+          setSourceProducts(prev => [...prev, ...(payload.data || [])]);
         }
-      } catch (error) {
-        console.error("Error fetching search results:", error);
-      } finally {
-        setIsLoading(false);
+        setTotalItemsCount(payload.meta?.total || (payload.data || []).length);
+        setHasMore(payload.meta ? payload.meta.current_page < payload.meta.last_page : false);
       }
+    } catch (error) {
+      console.error("Error fetching search results:", error);
+    } finally {
+      setIsLoading(false);
+      setLoadingMore(false);
     }
+  };
 
+  useEffect(() => {
     if (query || tab) {
-      fetchProducts();
+      setPage(1);
+      fetchProducts(1, true);
     }
-  }, [query, categoryId, tab]);
+  }, [query, categoryId, tab, searchParams]);
 
-  /* ---- Client-Side Filtering ---- */
-  const filteredProducts = useMemo(() => {
-    let filtered = [...sourceProducts];
+  const loadMore = () => {
+    if (loadingMore || !hasMore) return;
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchProducts(nextPage);
+  };
 
-    // 1. Price Filtering
-    const minPrice = Number(searchParams.get("minPrice")) || 0;
-    const maxPrice = Number(searchParams.get("maxPrice")) || Infinity;
-    filtered = filtered.filter(p => {
-      const price = p.calculable_price || 0;
-      return price >= minPrice && price <= maxPrice;
-    });
-
-    // 2. Brand Filtering
-    const selectedBrands = searchParams.get("brands")?.split(",").filter(Boolean) || [];
-    if (selectedBrands.length > 0) {
-      filtered = filtered.filter(p => selectedBrands.includes(p.brand_name || p.brand?.name || ""));
-    }
-
-    // 3. Attribute Filtering
-    searchParams.forEach((value, key) => {
-      if (key.startsWith("attr_")) {
-        const attrName = key.replace("attr_", "");
-        const selectedValues = value.split(/[|,]/).filter(Boolean);
-        if (selectedValues.length > 0) {
-          const selectedValuesLower = selectedValues.map(v => v.toLowerCase());
-          filtered = filtered.filter(p => {
-            const pAttrs = p.attributes || [];
-            return pAttrs.some((pa: { name: string; values: string[] }) => 
-              pa.name.toLowerCase() === attrName && 
-              pa.values.some((v: string) => selectedValuesLower.includes(v.toLowerCase()))
-            ) || (attrName === 'color' && selectedValuesLower.includes((p.color_name || '').toLowerCase()));
-          });
-        }
-      }
-    });
-
-    // 4. Sorting
-    if (sortOption === "price-low") {
-      filtered.sort((a, b) => (a.calculable_price || 0) - (b.calculable_price || 0));
-    } else if (sortOption === "price-high") {
-      filtered.sort((a, b) => (b.calculable_price || 0) - (a.calculable_price || 0));
-    } else if (sortOption === "newest") {
-      filtered.sort((a, b) => (b.id || 0) - (a.id || 0));
-    }
-
-    return filtered;
-  }, [sourceProducts, searchParams, sortOption]);
-
-  const totalItems = filteredProducts.length;
+  const filteredProducts = sourceProducts;
+  const totalItems = totalItemsCount;
 
   if (isLoading) {
     return (
@@ -175,7 +169,7 @@ export default function SearchProductGrid({ query, categoryId, tab, filteringAtt
         <div className="relative">
           <select
             value={sortOption}
-            onChange={(e) => setSortOption(e.target.value)}
+            onChange={(e) => handleSortChange(e.target.value)}
             className="cursor-pointer appearance-none rounded-md border border-slate-200 bg-white py-2 pl-3 pr-8 text-[13px] text-slate-600 outline-none transition focus:border-blue-400"
           >
             <option value="default">Select Sort Option</option>
@@ -196,7 +190,7 @@ export default function SearchProductGrid({ query, categoryId, tab, filteringAtt
           <div className="relative flex-1">
             <select
               value={sortOption}
-              onChange={(e) => setSortOption(e.target.value)}
+              onChange={(e) => handleSortChange(e.target.value)}
               className="w-full cursor-pointer appearance-none rounded-full border border-slate-300 bg-white py-1 pl-5 pr-10 text-[12px] text-slate-700 outline-none transition shadow-sm"
             >
               <option value="default">Select Sort Option</option>
@@ -241,6 +235,28 @@ export default function SearchProductGrid({ query, categoryId, tab, filteringAtt
           <ProductCard key={product.id} productData={product} />
         ))}
       </div>
+
+      {/* ═══════════════ PAGINATION ═══════════════ */}
+      {hasMore && (
+        <div className="mt-8 flex justify-center pb-10">
+          <button
+            onClick={loadMore}
+            disabled={loadingMore}
+            className="group relative flex items-center gap-2 overflow-hidden rounded-full bg-white border border-slate-200 px-10 py-3 text-sm font-bold text-slate-800 transition-all hover:border-[#2b7fe8] hover:text-[#2b7fe8] disabled:opacity-50 shadow-sm"
+          >
+            {loadingMore ? (
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#2b7fe8] border-t-transparent"></div>
+            ) : (
+              <>
+                <span>Load More Products</span>
+                <span className="text-slate-400 group-hover:text-[#2b7fe8]">
+                   ({totalItemsCount - filteredProducts.length} Remaining)
+                </span>
+              </>
+            )}
+          </button>
+        </div>
+      )}
 
       {filteredProducts.length === 0 && !isLoading && (
         <div className="flex flex-col items-center justify-center py-20 text-center">
